@@ -283,7 +283,7 @@ function render(res, opts){
   </div>
 
   <div class="masthead">
-    <h1>Sổ vận hành Shopee &amp; TikTok Shop</h1>
+    <h1>Sổ vận hành Shopee &amp; TikTok Shop v2</h1>
     <span class="badge"><span class="dot"></span>${esc(label)}</span>
   </div>
 
