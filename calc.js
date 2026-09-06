@@ -98,6 +98,7 @@ const ROLE_META = {
   income: { platform: 'Shopee', label: 'Tài chính', required: true },
   tiktokFinance: { platform: 'TikTok', label: 'Tài chính', required: true },
   shopStats: { platform: 'Shopee', label: 'Shop Stats', required: false },
+  shopeeFailedDelivery: { platform: 'Shopee', label: 'Giao hàng thất bại (khách không nhận)', required: false },
 };
 
 // TikTok: tên file KHÔNG có ngày thật (khác Shopee) — không được suy tháng
@@ -118,6 +119,10 @@ function detectRoleFromContent(wb){
   const header = new Set((firstAOA[0] || []).map(nfc));
   if (header.has('Phương án') && header.has('Trạng thái Trả hàng/Hoàn tiền')) return 'shopeeReturnRefund';
   if (header.has('Trạng Thái Đơn Hàng') && header.has('Mã đơn hàng')) return 'shopeeOrders';
+  // Order.failed_delivery (khách không nhận hàng thật) có "Trạng thái trả hàng"
+  // nhưng KHÔNG có "Lý do hủy" — ngược lại với Order.cancelled (có "Lý do hủy",
+  // không có "Trạng thái trả hàng") để tránh nhận nhầm 2 file này với nhau.
+  if (header.has('Trạng thái trả hàng') && !header.has('Lý do hủy')) return 'shopeeFailedDelivery';
   if (header.has('Return Type') && header.has('Return Status')) return 'tiktokReturns';
   if (header.has('Order Status') && header.has('Order ID')) return 'tiktokOrders';
   return null;
@@ -158,6 +163,10 @@ function detectMonthForRole(role, wb){
   try {
     if (role === 'shopeeOrders'){
       const rows = rowsAsDicts(sheetToAOA(getSheet(wb, 'orders')), 0);
+      return modeMonthFromDates(rows.map(r => r['Ngày đặt hàng']));
+    }
+    if (role === 'shopeeFailedDelivery'){
+      const rows = rowsAsDicts(sheetToAOA(getSheet(wb)), 0);
       return modeMonthFromDates(rows.map(r => r['Ngày đặt hàng']));
     }
     if (role === 'shopeeReturnRefund'){
@@ -255,6 +264,7 @@ async function computeAll(files){
   const wbInc = await readWorkbook(files.income);
   const wbFin = await readWorkbook(files.tiktokFinance);
   const wbSs = files.shopStats ? await readWorkbook(files.shopStats) : null;
+  const wbFd = files.shopeeFailedDelivery ? await readWorkbook(files.shopeeFailedDelivery) : null;
 
   const aoa = {
     shopeeOrders: sheetToAOA(getSheet(wbSp, 'orders')),
@@ -267,6 +277,7 @@ async function computeAll(files){
     ss_DonDaThanhToan: wbSs ? sheetToAOA(getSheet(wbSs, 'Đơn Đã Thanh Toán')) : null,
     ss_NguonTruyCap: wbSs ? sheetToAOA(getSheet(wbSs, 'Nguồn truy cập cho Đơn hàng...')) : null,
     ss_TheoSanPham: wbSs ? sheetToAOA(getSheet(wbSs, 'Theo sản phẩm (đơn đã đặt)')) : null,
+    shopeeFailedDelivery: wbFd ? sheetToAOA(getSheet(wbFd)) : null,
   };
   return computeAllFromAOA(aoa);
 }
@@ -347,8 +358,20 @@ function computeAllFromAOA(aoa){
   for (const [oid, r] of Object.entries(spDonTra)) if ((r['Lí do Trả hàng/Hoàn tiền'] || '').includes('Khác với mô tả')) spErrTra[oid] = r;
   const spErrTotal = Object.keys(spErrCancel).length + Object.keys(spErrHoan).length + Object.keys(spErrTra).length;
 
-  // đơn hoàn về kho (Shopee) = đổi ý giữa đường (reclass) + [khách không nhận hàng thật, chưa có file -> 0] + đơn trả thật
-  const spHoanVeKho = Object.keys(spReclassToCancel).length + 0 + Object.keys(spDonTra).length;
+  // ---------- 2.5) Shopee Order.failed_delivery (khách không nhận hàng thật) —
+  // file tuỳ chọn (các tháng cũ không có), gộp trùng theo Mã đơn hàng vì 1 đơn
+  // có thể có nhiều dòng do nhiều SKU.
+  const spKhachKhongNhanHangThat = {};
+  if (aoa.shopeeFailedDelivery){
+    const fdRows = rowsAsDicts(aoa.shopeeFailedDelivery, 0);
+    for (const r of fdRows){
+      const oid = r['Mã đơn hàng'];
+      if (oid !== undefined && !(oid in spKhachKhongNhanHangThat)) spKhachKhongNhanHangThat[oid] = r;
+    }
+  }
+
+  // đơn hoàn về kho (Shopee) = đổi ý giữa đường (reclass) + khách không nhận hàng thật + đơn trả thật
+  const spHoanVeKho = Object.keys(spReclassToCancel).length + Object.keys(spKhachKhongNhanHangThat).length + Object.keys(spDonTra).length;
 
   // Chi tiết để đối chiếu với file nhập kho thực tế: nên đối theo MÃ ĐƠN / MÃ VẬN
   // ĐƠN, không theo ngày — vì ngày sàn ghi nhận (vd. "hoàn tiền thành công") có
@@ -367,6 +390,14 @@ function computeAllFromAOA(aoa){
       oid, sanPham: 'Shopee', loai: 'Đổi ý giữa đường (huỷ) — có thể đã gửi hàng',
       ngay: null, maVanDon: null,
       ngayDatHang: (rrOrders[oid] && rrOrders[oid]['Ngày đặt hàng']) || null,
+    });
+  }
+  for (const [oid, r] of Object.entries(spKhachKhongNhanHangThat)){
+    spHoanVeKhoDetail.push({
+      oid, sanPham: 'Shopee', loai: 'Khách không nhận hàng thật',
+      ngay: r['Ngày đặt hàng'] || null,
+      maVanDon: r['Mã vận đơn'] || null,
+      ngayDatHang: r['Ngày đặt hàng'] || null,
     });
   }
 
