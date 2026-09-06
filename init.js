@@ -272,6 +272,9 @@ function classifyFileName(filename){
   const hasTiktok = n.includes('tiktok');
   const hasShopee = n.includes('shopee');
   if (n.includes('return refund')) return 'shopeeReturnRefund';
+  // Phải kiểm tra TRƯỚC nhánh chung "order" bên dưới — "Order.failed_delivery"
+  // chứa chữ "order" nên nếu không chặn sớm sẽ bị rơi nhầm vào shopeeOrders.
+  if (n.includes('failed delivery')) return 'shopeeFailedDelivery';
   if (hasTiktok && n.includes('tra hang')) return 'tiktokReturns';
   if (hasTiktok && (n.includes('tai chinh') || n.includes('finance'))) return 'tiktokFinance';
   if (n.includes('income')) return 'income';
