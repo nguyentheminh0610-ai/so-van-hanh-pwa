@@ -212,33 +212,68 @@
   }
 
 
+  /* ---------- Tabs ---------- */
+  .tabs{ display:inline-flex; gap:4px; background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:4px; margin-bottom:20px; box-shadow:var(--shadow); }
+  .tab-btn{ border:none; background:transparent; padding:9px 18px; font-size:13.5px; font-weight:600; color:var(--ink-soft); border-radius:7px; cursor:pointer; font-family:inherit; }
+  .tab-btn.active{ background:var(--accent); color:#fff; }
+  .screen{ display:none; }
+  .screen.active{ display:block; }
+
   /* ---------- Upload section ---------- */
   .upload-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin-bottom:20px; }
   .upload-card h2{ font-size:16px; font-weight:700; margin:0 0 4px; }
   .upload-card .up-sub{ font-size:12.5px; color:var(--ink-soft); margin:0 0 16px; line-height:1.6; }
-  .up-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:16px; }
-  .up-slot{ border:1px dashed var(--line-strong); border-radius:8px; padding:10px 12px; display:flex; align-items:center; gap:10px; background:var(--surface-soft); }
-  .up-slot.filled{ border-style:solid; border-color:var(--good); background:var(--good-soft); }
-  .up-slot .up-num{ flex:none; width:22px; height:22px; border-radius:50%; background:var(--surface); border:1px solid var(--line-strong); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--ink-soft); }
-  .up-slot.filled .up-num{ background:var(--good); border-color:var(--good); color:#fff; }
-  .up-slot .up-body{ flex:1; min-width:0; }
-  .up-slot .up-label{ font-size:12.5px; font-weight:600; }
-  .up-slot .up-optional{ font-weight:400; color:var(--ink-faint); }
-  .up-slot .up-filename{ font-size:11px; color:var(--ink-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .up-slot input[type=file]{ font-size:11px; max-width:100%; }
-  .up-manual-link{ font-size:10.5px; color:var(--accent); cursor:pointer; text-decoration:underline; display:inline-block; margin-top:2px; }
   .up-dropzone{ border:2px dashed var(--line-strong); border-radius:10px; padding:18px; display:flex; align-items:center; gap:14px; cursor:pointer; background:var(--surface-soft); margin-bottom:14px; transition:border-color .15s, background .15s; }
   .up-dropzone:hover{ border-color:var(--accent); }
   .up-dropzone.dragover{ border-color:var(--accent); background:var(--good-soft); }
   .up-dz-icon{ font-size:26px; flex:none; }
   .up-dz-text{ font-size:12.5px; color:var(--ink-soft); line-height:1.5; }
   .up-dz-text b{ color:var(--ink); }
-  .up-unmatched{ border:1px solid var(--warn); background:var(--warn-soft, var(--surface-soft)); border-radius:8px; padding:10px 12px; margin-bottom:14px; }
-  .up-unmatched-title{ font-size:12px; font-weight:600; color:var(--ink); margin-bottom:8px; }
-  .up-unmatched-item{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 0; font-size:12px; }
-  .up-unmatched-item .uu-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-soft); }
-  .up-unmatched-item select{ font-family:inherit; font-size:11.5px; padding:4px 6px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); }
+  .up-manual-link{ font-size:10.5px; color:var(--accent); cursor:pointer; text-decoration:underline; display:inline-block; margin-top:2px; }
   .up-actions{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+
+  /* ---------- Detect list (danh sách file đã nhận diện, tab Tải & tính toán) ---------- */
+  .dl-list{ display:flex; flex-direction:column; gap:8px; margin-bottom:10px; }
+  .dl-row{ display:flex; align-items:center; gap:10px; border:1px solid var(--line); border-radius:9px; padding:9px 12px; font-size:12.5px; background:var(--surface-soft); }
+  .dl-row.is-warn{ border-color:var(--warn); background:var(--warn-soft); }
+  .dl-badge{ font-size:11px; font-weight:700; border-radius:6px; padding:3px 8px; white-space:nowrap; flex:none; background:var(--surface); color:var(--ink-faint); border:1px solid var(--line-strong); }
+  .dl-badge.shopee{ background:var(--shopee-soft); color:var(--shopee); border-color:transparent; }
+  .dl-badge.tiktok{ background:var(--tiktok-soft); color:var(--tiktok); border-color:transparent; }
+  .dl-role-select{ font-family:inherit; font-size:11.5px; padding:5px 6px; border-radius:6px; border:1px solid var(--line-strong); background:var(--surface); color:var(--ink); flex:none; max-width:190px; }
+  .dl-fname{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--ink-soft); }
+  .dl-month{ font-size:11px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:6px; padding:3px 8px; white-space:nowrap; flex:none; }
+  .dl-status{ flex:none; font-weight:700; }
+  .dl-row.is-ok .dl-status{ color:var(--good); }
+  .dl-row.is-warn .dl-status{ color:var(--warn); }
+  .dl-remove{ flex:none; border:none; background:transparent; color:var(--ink-faint); font-size:13px; cursor:pointer; padding:2px 6px; border-radius:6px; }
+  .dl-remove:hover{ background:var(--surface); color:var(--warn); }
+  .dl-row-error{ font-size:11.5px; color:var(--warn); font-weight:600; margin:-4px 0 2px 4px; }
+  .dl-summary{ font-size:12.5px; font-weight:600; border-radius:8px; padding:10px 12px; margin-bottom:14px; }
+  .dl-summary.is-warn{ color:var(--warn); background:var(--warn-soft); }
+
+  /* ---------- Thư viện file (tab "Các file đã tải lên") ---------- */
+  .library-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin-bottom:20px; }
+  .library-card h2{ font-size:16px; font-weight:700; margin:0 0 4px; }
+  .lib-cols{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .lib-col-head{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:700; margin-bottom:12px; padding-bottom:10px; border-bottom:2px solid var(--line); }
+  .dl-dot{ width:10px; height:10px; border-radius:50%; flex:none; }
+  .dl-dot.shopee{ background:var(--shopee); }
+  .dl-dot.tiktok{ background:var(--tiktok); }
+  .month-group{ border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden; }
+  .month-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 14px; background:var(--surface-soft); font-size:13px; font-weight:700; }
+  .month-head .lib-rename{ font-size:11px; font-weight:600; color:var(--accent); cursor:pointer; white-space:nowrap; }
+  .month-files{ padding:4px 14px 8px; }
+  .file-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; }
+  .file-row:first-child{ border-top:none; }
+  .file-row .ftype{ font-weight:600; color:var(--ink); min-width:80px; flex:none; }
+  .file-row .fn{ color:var(--ink-soft); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .icon-btn{ border:none; background:transparent; cursor:pointer; font-size:14px; padding:4px 6px; border-radius:6px; text-decoration:none; color:var(--ink); flex:none; }
+  .icon-btn:hover{ background:var(--surface-soft); }
+  .icon-btn.del:hover{ background:var(--warn-soft); }
+  @media (max-width: 720px){
+    .lib-cols{ grid-template-columns:1fr; }
+    .dl-row{ flex-wrap:wrap; }
+  }
   .btn-primary{ background:var(--accent); color:#fff; border:none; border-radius:8px; padding:11px 22px; font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; }
   .btn-primary:disabled{ opacity:.45; cursor:not-allowed; }
   .btn-secondary{ background:var(--surface); color:var(--ink); border:1px solid var(--line-strong); border-radius:8px; padding:10px 18px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }

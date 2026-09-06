@@ -1,21 +1,15 @@
 /* ============================================================
-   Page wiring: upload slots, compute, lưu/xem lịch sử qua Supabase
-   (thay cho cơ chế claude.use('artifact') của bản Artifact cũ).
+   Page wiring: upload dropzone, compute, lưu/xem lịch sử + thư viện file
+   qua Supabase (thay cho cơ chế claude.use('artifact') của bản Artifact cũ).
+   ROLE_META (sàn/loại/bắt buộc theo từng vai trò file) định nghĩa ở calc.js,
+   dùng chung với detectFile() — xem calc.js để biết chi tiết nhận diện.
    ============================================================ */
-const FILE_SLOTS = [
-  { key: 'shopeeOrders', label: 'Shopee — tất cả đơn hàng', required: true },
-  { key: 'shopeeReturnRefund', label: 'Shopee — return/refund (Order.return_refund)', required: true },
-  { key: 'tiktokOrders', label: 'TikTok — tất cả đơn hàng', required: true },
-  { key: 'tiktokReturns', label: 'TikTok — trả hàng', required: true },
-  { key: 'income', label: 'Shopee — Income (tài chính)', required: true },
-  { key: 'tiktokFinance', label: 'TikTok — tài chính', required: true },
-  { key: 'shopStats', label: 'Shopee — Shop Stats', required: false },
-];
-
-const selectedFiles = {};
+let selectedFiles = {}; // role -> File, suy ra từ detectedFiles mỗi lần thay đổi
 let currentResult = null;
 let HISTORY = []; // [{id, label, period_start, period_end, created_at}] — chưa có "data" đầy đủ, tải khi chọn xem
-let pendingUnmatched = [];
+let detectedFiles = []; // [{file, role, platform, typeLabel, monthKey, monthLabel, readError, error}]
+let libraryRows = []; // bản ghi monthly_reports kèm cột files, tải khi mở tab thư viện
+let restoreContext = null; // {label, recordId} — khi đang khôi phục file sau khi xoá 1 file sai
 
 // ---------- Supabase config (lưu trong localStorage của trình duyệt) ----------
 function getConfig(){
@@ -92,17 +86,30 @@ function sbStoragePublicUrl(path){
   return c.url + '/storage/v1/object/public/' + STORAGE_BUCKET + '/' + path.split('/').map(encodeURIComponent).join('/');
 }
 
+async function sbStorageDelete(path){
+  const c = getConfig();
+  if (!c.url || !c.key) throw new Error('Chưa cấu hình Supabase.');
+  const res = await fetch(c.url + '/storage/v1/object/' + STORAGE_BUCKET + '/' + path.split('/').map(encodeURIComponent).join('/'), {
+    method: 'DELETE',
+    headers: { 'apikey': c.key, 'Authorization': 'Bearer ' + c.key },
+  });
+  if (!res.ok){
+    let msg = res.status + ' ' + res.statusText;
+    try { const j = await res.json(); if (j.message) msg += ' — ' + j.message; } catch (e){}
+    throw new Error(msg);
+  }
+}
+
 async function uploadOriginalFiles(labelSlug){
   const uploaded = [];
-  for (const slot of FILE_SLOTS){
-    const file = selectedFiles[slot.key];
-    if (!file) continue;
-    const path = labelSlug + '/' + slot.key + '__' + file.name;
+  for (const key of Object.keys(selectedFiles)){
+    const file = selectedFiles[key];
+    const path = labelSlug + '/' + key + '__' + file.name;
     try {
       await sbStorageUpload(path, file);
-      uploaded.push({ key: slot.key, name: file.name, path });
+      uploaded.push({ key, name: file.name, path });
     } catch (err){
-      console.error('Tải file gốc lên thất bại (' + slot.key + '):', err);
+      console.error('Tải file gốc lên thất bại (' + key + '):', err);
     }
   }
   return uploaded;
@@ -201,19 +208,41 @@ function wireInstallHint(){
   });
 }
 
+// ---------- Tabs ----------
+function buildTabsHTML(){
+  return `<div class="tabs" id="tabs">
+    <button class="tab-btn active" data-tab="upload">Tải &amp; tính toán</button>
+    <button class="tab-btn" data-tab="library">Các file đã tải lên</button>
+  </div>`;
+}
+
+function switchToTab(tab){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.getElementById('screen-upload').classList.toggle('active', tab === 'upload');
+  document.getElementById('screen-library').classList.toggle('active', tab === 'library');
+  if (tab === 'library') refreshLibrary();
+}
+
+function wireTabs(){
+  document.getElementById('tabs').addEventListener('click', (e) => {
+    const btn = e.target.closest('.tab-btn');
+    if (btn) switchToTab(btn.dataset.tab);
+  });
+}
+
 // ---------- Upload UI ----------
 function buildUploadHTML(){
   return `
   <div class="upload-card">
     <h2>Tải số liệu tháng này</h2>
-    <p class="up-sub">Chọn đúng file export tháng gần nhất từ Shopee Seller Center &amp; TikTok Shop Partner Center. Bấm ô bên dưới để chọn tất cả file cùng lúc (hoặc kéo-thả) — hệ thống tự nhận diện từng loại file, chỗ nào chưa đúng thì sửa tay ở dòng tương ứng. Mọi tính toán chạy ngay trên trình duyệt của anh, không gửi file lên đâu cả — chỉ khi anh bấm "Lưu vào lịch sử" thì kết quả và các file gốc mới được lưu lên server để xem/tải lại sau này. File Order.cancelled không cần nữa (đã nằm sẵn trong file "tất cả đơn hàng").</p>
+    <p class="up-sub">Kéo-thả hoặc bấm chọn nhiều file cùng lúc từ Shopee Seller Center &amp; TikTok Shop Partner Center — hệ thống tự đọc tên file và nội dung bên trong để nhận diện đúng sàn, loại báo cáo và tháng, không cần chọn tay từng ô như trước. Chỗ nào chưa đúng thì sửa lại ngay tại dòng tương ứng bên dưới. Mọi tính toán chạy ngay trên trình duyệt của anh, không gửi file lên đâu cả — chỉ khi anh bấm "Lưu vào lịch sử" thì kết quả và các file gốc mới được lưu lên server để xem/tải lại sau này.</p>
     <div class="up-dropzone" id="up-dropzone">
       <input type="file" id="up-multi-input" accept=".xlsx,.xls,.csv" multiple style="display:none;">
       <div class="up-dz-icon">📂</div>
-      <div class="up-dz-text"><b>Bấm để chọn tất cả file cùng lúc</b><br>(hoặc kéo-thả cả 7 file vào đây)</div>
+      <div class="up-dz-text"><b>Bấm để chọn file, hoặc kéo-thả cả loạt file vào đây</b><br>Không giới hạn số file, không cần đúng thứ tự</div>
     </div>
-    <div class="up-grid" id="up-grid"></div>
-    <div class="up-unmatched" id="up-unmatched" style="display:none;"></div>
+    <div class="dl-list" id="dl-list"></div>
+    <div class="dl-summary" id="dl-summary" style="display:none;"></div>
     <div class="up-actions">
       <button class="btn-primary" id="btn-compute" disabled>Tính toán</button>
       <span class="up-status" id="up-status"></span>
@@ -228,24 +257,8 @@ function buildUploadHTML(){
   <div id="results"></div>`;
 }
 
-function buildUpGridHTML(){
-  return FILE_SLOTS.map((slot, i) => `
-    <div class="up-slot" id="up-slot-${slot.key}">
-      <div class="up-num">${i+1}</div>
-      <div class="up-body">
-        <div class="up-label">${slot.label}${slot.required ? '' : ' <span class="up-optional">(tuỳ chọn — cần cho Voucher extra/kênh/SP)</span>'}</div>
-        <div class="up-filename">Chưa chọn file</div>
-        <label class="up-manual-link">chọn tay<input type="file" accept=".xlsx,.xls,.csv" data-key="${slot.key}" style="display:none;"></label>
-      </div>
-    </div>`).join('');
-}
-
-function checkReady(){
-  const ready = FILE_SLOTS.filter(s => s.required).every(s => selectedFiles[s.key]);
-  document.getElementById('btn-compute').disabled = !ready;
-}
-
-// ---------- nhận diện file tự động theo tên ----------
+// ---------- nhận diện theo tên file — dùng làm phương án dự phòng bởi
+// detectFile() (calc.js) khi không đọc được nội dung file (lỗi định dạng) ----------
 function stripDiacritics(str){
   return String(str || '')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -268,79 +281,114 @@ function classifyFileName(filename){
   return null;
 }
 
-function assignFile(key, file){
-  if (!FILE_SLOTS.some(s => s.key === key)) return;
-  selectedFiles[key] = file;
-  const slotEl = document.getElementById('up-slot-' + key);
-  if (slotEl){
-    slotEl.classList.add('filled');
-    slotEl.querySelector('.up-filename').textContent = file.name;
-  }
+// ---------- danh sách file đã nhận diện (validation UI) ----------
+function roleOptionsHtml(selectedRole){
+  const opts = ['<option value="">— Chưa xác định —</option>'];
+  Object.entries(ROLE_META).forEach(([key, meta]) => {
+    opts.push(`<option value="${key}" ${selectedRole === key ? 'selected' : ''}>${esc(meta.platform + ' — ' + meta.label)}</option>`);
+  });
+  return opts.join('');
 }
 
-function clearFile(key){
-  delete selectedFiles[key];
-  const slotEl = document.getElementById('up-slot-' + key);
-  if (slotEl){
-    slotEl.classList.remove('filled');
-    slotEl.querySelector('.up-filename').textContent = 'Chưa chọn file';
-  }
-}
-
-function renderUnmatched(unmatchedFiles){
-  pendingUnmatched = unmatchedFiles;
-  const box = document.getElementById('up-unmatched');
-  if (!box) return;
-  if (!unmatchedFiles.length){ box.innerHTML = ''; box.style.display = 'none'; return; }
-  box.style.display = 'block';
-  box.innerHTML = '<div class="up-unmatched-title">Không tự nhận diện được ' + unmatchedFiles.length + ' file (vd. Order.cancelled cũ không cần dùng nữa) — chọn tay loại file nếu cần:</div>' +
-    unmatchedFiles.map((f, i) => `
-      <div class="up-unmatched-item">
-        <span class="uu-name">${esc(f.name)}</span>
-        <select data-idx="${i}">
-          <option value="">— Chọn loại file —</option>
-          ${FILE_SLOTS.map(s => `<option value="${s.key}">${esc(s.label)}</option>`).join('')}
-          <option value="__skip">Bỏ qua file này</option>
-        </select>
-      </div>`).join('');
-  box.querySelectorAll('select').forEach(sel => {
-    sel.addEventListener('change', (e) => {
-      const idx = parseInt(e.target.dataset.idx, 10);
-      const file = pendingUnmatched[idx];
-      const val = e.target.value;
-      if (val && val !== '__skip'){
-        assignFile(val, file);
-        checkReady();
-      }
-      e.target.closest('.up-unmatched-item').style.opacity = '0.4';
-      e.target.disabled = true;
+function renderDetectedList(){
+  const listEl = document.getElementById('dl-list');
+  const roleCounts = {};
+  detectedFiles.forEach(e => { if (e.role) roleCounts[e.role] = (roleCounts[e.role] || 0) + 1; });
+  detectedFiles.forEach(e => {
+    if (e.readError) e.error = e.readError;
+    else if (!e.role) e.error = 'Chưa nhận diện được — chọn tay loại file ở dòng này, hoặc bấm ✕ nếu không cần dùng.';
+    else if (roleCounts[e.role] > 1) e.error = 'Trùng vai trò với 1 file khác (' + ROLE_META[e.role].platform + ' — ' + ROLE_META[e.role].label + ') — chỉ giữ lại đúng 1 file, xoá hoặc đổi loại ở dòng kia.';
+    else e.error = null;
+  });
+  listEl.innerHTML = detectedFiles.map((e, i) => `
+    <div class="dl-row ${e.error ? 'is-warn' : 'is-ok'}">
+      <span class="dl-badge ${e.platform === 'Shopee' ? 'shopee' : e.platform === 'TikTok' ? 'tiktok' : ''}">${esc(e.platform || '?')}</span>
+      <select class="dl-role-select" data-idx="${i}">${roleOptionsHtml(e.role)}</select>
+      <span class="dl-fname" title="${esc(e.file.name)}">${esc(e.file.name)}</span>
+      <span class="dl-month">${esc(e.monthLabel || 'Chưa rõ tháng')}</span>
+      <span class="dl-status">${e.error ? '⚠' : '✓'}</span>
+      <button class="dl-remove" data-idx="${i}" title="Bỏ file này">✕</button>
+    </div>
+    ${e.error ? `<div class="dl-row-error">⚠ ${esc(e.error)}</div>` : ''}
+  `).join('');
+  listEl.querySelectorAll('.dl-role-select').forEach(sel => {
+    sel.addEventListener('change', (ev) => {
+      const idx = parseInt(ev.target.dataset.idx, 10);
+      const entry = detectedFiles[idx];
+      const newRole = ev.target.value || null;
+      entry.role = newRole;
+      const meta = newRole ? ROLE_META[newRole] : null;
+      entry.platform = meta ? meta.platform : null;
+      entry.typeLabel = meta ? meta.label : null;
+      entry.monthKey = null;
+      entry.monthLabel = null; // cột ngày dùng để suy tháng khác nhau theo vai trò — tháng cũ (nếu có) không còn đúng nữa
+      renderDetectedList();
     });
   });
+  listEl.querySelectorAll('.dl-remove').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      const idx = parseInt(ev.target.dataset.idx, 10);
+      detectedFiles.splice(idx, 1);
+      renderDetectedList();
+    });
+  });
+  updateValidityAndButton();
 }
 
-function handleIncomingFiles(fileList){
+function updateValidityAndButton(){
+  const roleCounts = {};
+  detectedFiles.forEach(e => { if (e.role) roleCounts[e.role] = (roleCounts[e.role] || 0) + 1; });
+  const missing = Object.entries(ROLE_META)
+    .filter(([k, m]) => m.required && (roleCounts[k] || 0) !== 1)
+    .map(([, m]) => m.platform + ' — ' + m.label);
+  const hasRowErrors = detectedFiles.some(e => e.error);
+  const ready = !hasRowErrors && missing.length === 0;
+  const btn = document.getElementById('btn-compute');
+  if (btn) btn.disabled = !ready;
+
+  const summaryEl = document.getElementById('dl-summary');
+  if (summaryEl){
+    if (missing.length){
+      summaryEl.style.display = 'block';
+      summaryEl.className = 'dl-summary is-warn';
+      summaryEl.textContent = '⚠ Còn thiếu file bắt buộc: ' + missing.join(', ') + '.';
+    } else if (hasRowErrors){
+      summaryEl.style.display = 'block';
+      summaryEl.className = 'dl-summary is-warn';
+      summaryEl.textContent = '⚠ Còn ' + detectedFiles.filter(e => e.error).length + ' dòng cần sửa ở trên trước khi tính toán.';
+    } else {
+      summaryEl.style.display = 'none';
+    }
+  }
+
+  selectedFiles = {};
+  detectedFiles.forEach(e => { if (e.role && roleCounts[e.role] === 1) selectedFiles[e.role] = e.file; });
+}
+
+async function handleIncomingFiles(fileList){
   const files = Array.from(fileList || []);
-  const unmatched = [];
-  files.forEach(file => {
-    const key = classifyFileName(file.name);
-    if (key) assignFile(key, file); else unmatched.push(file);
-  });
-  renderUnmatched(unmatched);
-  checkReady();
+  if (!files.length) return;
+  const statusEl = document.getElementById('up-status');
+  statusEl.classList.remove('err');
+  statusEl.textContent = 'Đang nhận diện ' + files.length + ' file…';
+  const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
+  if (!xlsxOk || typeof XLSX === 'undefined'){
+    statusEl.classList.add('err');
+    statusEl.textContent = 'Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo) — không thể tự nhận diện file. Thử tắt VPN/ad-blocker, đổi mạng rồi thả file lại.';
+    return;
+  }
+  for (const file of files){
+    try {
+      detectedFiles.push(await detectFile(file));
+    } catch (err){
+      detectedFiles.push({ file, role: null, platform: null, typeLabel: null, monthKey: null, monthLabel: null, readError: 'Lỗi nhận diện: ' + err.message });
+    }
+  }
+  statusEl.textContent = '';
+  renderDetectedList();
 }
 
 function wireUpload(){
-  document.getElementById('up-grid').innerHTML = buildUpGridHTML();
-
-  document.querySelectorAll('#up-grid input[type=file]').forEach(inp => {
-    inp.addEventListener('change', (e) => {
-      const key = e.target.dataset.key;
-      const file = e.target.files[0];
-      if (file) assignFile(key, file); else clearFile(key);
-      checkReady();
-    });
-  });
-
   const dz = document.getElementById('up-dropzone');
   const multiInput = document.getElementById('up-multi-input');
   dz.addEventListener('click', () => multiInput.click());
@@ -393,7 +441,145 @@ async function onCompute(){
     statusEl.classList.add('err');
     statusEl.textContent = 'Lỗi khi đọc file: ' + err.message + ' — kiểm tra lại đúng file/đúng sheet rồi thử lại.';
   } finally {
-    checkReady();
+    updateValidityAndButton();
+  }
+}
+
+// ---------- Tab "Các file đã tải lên" ----------
+function buildLibraryScreenHTML(){
+  return `<div class="library-card">
+    <h2>Các file đã tải lên</h2>
+    <p class="up-sub">Toàn bộ file gốc đã lưu qua các tháng, chia theo sàn. Đổi tên hiển thị của từng tháng, tải lại, hoặc xoá để thay đúng file rồi tính lại.</p>
+    <div id="library-body"></div>
+  </div>`;
+}
+
+function buildLibraryHTML(rows){
+  const withFiles = rows.filter(r => r.files && r.files.length);
+  if (!withFiles.length) return '<p class="up-status">Chưa có file nào được lưu — lưu 1 kỳ báo cáo ở tab "Tải &amp; tính toán" để bắt đầu.</p>';
+  const col = (platform) => {
+    const groups = withFiles.map(r => {
+      const files = (r.files || []).filter(f => ROLE_META[f.key] && ROLE_META[f.key].platform === platform);
+      if (!files.length) return '';
+      return `<div class="month-group">
+        <div class="month-head">
+          <span>📁 ${esc(r.label)}</span>
+          <span class="lib-rename" data-id="${esc(r.id)}" data-label="${esc(r.label)}" title="Đổi tên hiển thị">✎ đổi tên</span>
+        </div>
+        <div class="month-files">
+          ${files.map(f => `<div class="file-row">
+            <span class="ftype">${esc((ROLE_META[f.key] || {}).label || f.key)}</span>
+            <span class="fn" title="${esc(f.name)}">${esc(f.name)}</span>
+            <a class="icon-btn" href="${sbStoragePublicUrl(f.path)}" target="_blank" rel="noopener" title="Tải về">⬇</a>
+            <button class="icon-btn del" data-record="${esc(r.id)}" data-path="${esc(f.path)}" title="Xoá file này">🗑</button>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }).filter(Boolean).join('');
+    return groups || '<p class="up-status">Chưa có file nào.</p>';
+  };
+  return `<div class="lib-cols">
+    <div><div class="lib-col-head"><span class="dl-dot shopee"></span>Shopee</div>${col('Shopee')}</div>
+    <div><div class="lib-col-head"><span class="dl-dot tiktok"></span>TikTok Shop</div>${col('TikTok')}</div>
+  </div>`;
+}
+
+function wireLibraryEvents(el){
+  el.querySelectorAll('.lib-rename').forEach(btn => {
+    btn.addEventListener('click', () => renameLibraryRecord(btn.dataset.id, btn.dataset.label));
+  });
+  el.querySelectorAll('.icon-btn.del').forEach(btn => {
+    btn.addEventListener('click', () => deleteLibraryFile(btn.dataset.record, btn.dataset.path));
+  });
+}
+
+async function refreshLibrary(){
+  const el = document.getElementById('library-body');
+  if (!el) return;
+  if (!isConfigured()){
+    el.innerHTML = '<p class="up-status">Cần cài đặt kết nối Supabase trước (xem "Cài đặt kết nối" ở đầu trang).</p>';
+    return;
+  }
+  el.innerHTML = '<p class="up-status">Đang tải…</p>';
+  try {
+    libraryRows = await sbFetch('monthly_reports?select=id,label,period_start,files&order=period_start.desc.nullslast,created_at.desc') || [];
+    el.innerHTML = buildLibraryHTML(libraryRows);
+    wireLibraryEvents(el);
+  } catch (err){
+    el.innerHTML = '<p class="up-status err">Không tải được: ' + esc(err.message) + '</p>';
+  }
+}
+
+async function renameLibraryRecord(recordId, currentLabel){
+  const newLabel = prompt('Đổi tên hiển thị cho tháng này (không ảnh hưởng tới kỳ dữ liệu dùng để tính toán):', currentLabel);
+  if (!newLabel || newLabel === currentLabel) return;
+  try {
+    await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(recordId), {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ label: newLabel }),
+    });
+    await refreshHistoryFromServer();
+    await refreshLibrary();
+  } catch (err){
+    alert('Đổi tên thất bại: ' + err.message + ' (có thể tên này đã dùng cho tháng khác — chọn tên khác).');
+  }
+}
+
+async function restoreRemainingFilesToUploadTab(record){
+  detectedFiles = [];
+  restoreContext = { label: record.label, recordId: record.id };
+  const statusEl = document.getElementById('up-status');
+  statusEl.classList.remove('err');
+  const total = (record.files || []).length;
+  statusEl.textContent = 'Đang tải lại ' + total + ' file còn lại của "' + record.label + '"…';
+  let failCount = 0;
+  for (const f of (record.files || [])){
+    try {
+      const resp = await fetch(sbStoragePublicUrl(f.path));
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      const file = new File([blob], f.name, { type: blob.type || 'application/octet-stream' });
+      const meta = ROLE_META[f.key] || null;
+      detectedFiles.push({
+        file, role: f.key, platform: meta ? meta.platform : null, typeLabel: meta ? meta.label : null,
+        monthKey: null, monthLabel: record.label, readError: null,
+      });
+    } catch (err){
+      console.error('Không tải lại được file ' + f.name, err);
+      failCount++;
+    }
+  }
+  renderDetectedList();
+  statusEl.textContent = 'Đã tự điền lại ' + detectedFiles.length + '/' + total + ' file của "' + record.label + '"'
+    + (failCount ? ' (' + failCount + ' file tải lại thất bại, anh chọn tay lại giúp)' : '')
+    + ' — chọn file thay thế cho vai trò còn thiếu rồi bấm "Tính toán", sau đó "Lưu vào lịch sử" để ghi đè đúng tháng này.';
+}
+
+async function deleteLibraryFile(recordId, filePath){
+  if (!confirm('Xoá file này khỏi server? Không thể hoàn tác.')) return;
+  try {
+    await sbStorageDelete(filePath);
+    const record = libraryRows.find(r => r.id === recordId);
+    const newFiles = (record.files || []).filter(f => f.path !== filePath);
+    await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(recordId), {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ files: newFiles }),
+    });
+    record.files = newFiles;
+    await refreshHistoryFromServer();
+    switchToTab('upload');
+    currentResult = null;
+    const resultsEl = document.getElementById('results');
+    resultsEl.innerHTML = '';
+    resultsEl.classList.remove('show');
+    document.getElementById('btn-save-history').disabled = true;
+    renderFilesSection(null);
+    await restoreRemainingFilesToUploadTab(record);
+  } catch (err){
+    console.error(err);
+    alert('Xoá thất bại: ' + err.message);
   }
 }
 
@@ -460,9 +646,14 @@ async function onSaveHistory(){
     document.getElementById('history-note').textContent = 'Cần cài đặt kết nối trước khi lưu (xem ô "Cài đặt kết nối" phía trên).';
     return;
   }
-  const defaultLabel = fmtDateVN(currentResult.minDate) + ' – ' + fmtDateVN(currentResult.maxDate);
-  const label = prompt('Đặt tên cho kỳ báo cáo này (ví dụ: Tháng 7/2026):', defaultLabel);
-  if (!label) return;
+  let label;
+  if (restoreContext){
+    label = restoreContext.label;
+  } else {
+    const defaultLabel = fmtDateVN(currentResult.minDate) + ' – ' + fmtDateVN(currentResult.maxDate);
+    label = prompt('Đặt tên cho kỳ báo cáo này (ví dụ: Tháng 7/2026):', defaultLabel);
+    if (!label) return;
+  }
 
   const statusEl = document.getElementById('history-note');
   statusEl.textContent = 'Đang tải file gốc lên…';
@@ -482,6 +673,7 @@ async function onSaveHistory(){
         updated_at: new Date().toISOString(),
       }]),
     });
+    restoreContext = null;
     await refreshHistoryFromServer();
     renderFilesSection(files);
     const filesNote = files.length < Object.keys(selectedFiles).length
@@ -495,10 +687,13 @@ async function onSaveHistory(){
 }
 
 function init(){
-  document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildSettingsHTML() + buildUploadHTML();
+  document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildSettingsHTML() + buildTabsHTML() +
+    `<div class="screen active" id="screen-upload">${buildUploadHTML()}</div>` +
+    `<div class="screen" id="screen-library">${buildLibraryScreenHTML()}</div>`;
   wireSettings();
   wireInstallHint();
   wireUpload();
+  wireTabs();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
   if (isConfigured()){

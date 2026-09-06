@@ -67,6 +67,153 @@ function getSheet(wb, name){
   return wb.Sheets[wb.SheetNames[0]];
 }
 
+// Chấp cả 2 định dạng ngày gặp trong các file nguồn: "YYYY-MM-DD..." (Shopee)
+// và "DD/MM/YYYY..." (TikTok, vd. "Created Time"). Dùng chung bởi cả phần tính
+// toán (computeAllFromAOA) lẫn phần tự nhận diện file/tháng (detectFile) bên dưới.
+function toDate(v){
+  if (!v) return null;
+  if (v instanceof Date) return v;
+  const s = String(v);
+  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (m) return new Date(+m[1], +m[2]-1, +m[3]);
+  m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
+  if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+  return null;
+}
+
+// ============================================================
+// Tự nhận diện file (sàn + loại báo cáo + tháng) — dùng bởi UI upload
+// (init.js) để gộp 7 ô chọn file riêng lẻ thành 1 dropzone duy nhất. Nhận
+// diện theo NỘI DUNG file (tên sheet / cột header) là chính vì bắt buộc với
+// TikTok (tên file không có ngày thật) và để phân biệt 2 file "income"/tài
+// chính của 2 sàn khi tên file trùng nhau; classifyFileName (theo tên file,
+// định nghĩa ở init.js) chỉ dùng làm phương án dự phòng khi không đọc được
+// nội dung (file lỗi định dạng nhưng tên vẫn gợi ý được loại file).
+// ============================================================
+const ROLE_META = {
+  shopeeOrders: { platform: 'Shopee', label: 'Đơn hàng', required: true },
+  shopeeReturnRefund: { platform: 'Shopee', label: 'Trả/hoàn', required: true },
+  tiktokOrders: { platform: 'TikTok', label: 'Đơn hàng', required: true },
+  tiktokReturns: { platform: 'TikTok', label: 'Trả hàng', required: true },
+  income: { platform: 'Shopee', label: 'Tài chính', required: true },
+  tiktokFinance: { platform: 'TikTok', label: 'Tài chính', required: true },
+  shopStats: { platform: 'Shopee', label: 'Shop Stats', required: false },
+};
+
+// TikTok: tên file KHÔNG có ngày thật (khác Shopee) — không được suy tháng
+// từ tên file cho các vai trò này, thà hiển thị "chưa rõ tháng" còn hơn sai.
+const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance']);
+
+function detectRoleFromContent(wb){
+  const sheetNames = wb.SheetNames.map(nfc);
+  if (sheetNames.includes('OrderSKUList')) return 'tiktokOrders';
+  if (sheetNames.includes('Chi tiết đơn hàng')) return 'tiktokFinance';
+  if (sheetNames.includes('Đơn Đã Thanh Toán') && sheetNames.some(n => n.startsWith('Theo sản phẩm'))) return 'shopStats';
+  if (sheetNames.includes('Doanh thu') && sheetNames.includes('Service Fee Details')) return 'income';
+  if (sheetNames.includes('orders')) return 'shopeeOrders';
+
+  // Các file không có tên sheet cố định (return_refund, tiktok returns...) —
+  // sniff header dòng đầu của sheet đầu tiên.
+  const firstAOA = sheetToAOA(wb.Sheets[wb.SheetNames[0]]).slice(0, 2);
+  const header = new Set((firstAOA[0] || []).map(nfc));
+  if (header.has('Phương án') && header.has('Trạng thái Trả hàng/Hoàn tiền')) return 'shopeeReturnRefund';
+  if (header.has('Trạng Thái Đơn Hàng') && header.has('Mã đơn hàng')) return 'shopeeOrders';
+  if (header.has('Return Type') && header.has('Return Status')) return 'tiktokReturns';
+  if (header.has('Order Status') && header.has('Order ID')) return 'tiktokOrders';
+  return null;
+}
+
+function modeMonthFromDates(values){
+  const counts = {};
+  for (const v of values){
+    const d = toDate(v);
+    if (!d) continue;
+    const key = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+    counts[key] = (counts[key] || 0) + 1;
+  }
+  let best = null, bestCount = 0;
+  for (const [k, c] of Object.entries(counts)) if (c > bestCount){ best = k; bestCount = c; }
+  if (!best) return null;
+  const [y, m] = best.split('-');
+  return { monthKey: best, label: 'Tháng ' + parseInt(m, 10) + '/' + y };
+}
+
+function detectMonthForRole(role, wb){
+  try {
+    if (role === 'shopeeOrders'){
+      const rows = rowsAsDicts(sheetToAOA(getSheet(wb, 'orders')), 0);
+      return modeMonthFromDates(rows.map(r => r['Ngày đặt hàng']));
+    }
+    if (role === 'shopeeReturnRefund'){
+      // Phải lấy đúng cột NGÀY YÊU CẦU TRẢ (không phải "Ngày đặt hàng") — nếu
+      // không tìm thấy cột nào phù hợp thì bỏ trống, không đoán bừa.
+      const rows = rowsAsDicts(sheetToAOA(getSheet(wb)), 0);
+      const candidates = ['Thời gian yêu cầu Trả hàng/Hoàn tiền', 'Ngày yêu cầu Trả hàng/Hoàn tiền', 'Thời gian yêu cầu trả hàng/hoàn tiền'];
+      for (const col of candidates){
+        if (rows.some(r => r[col] !== undefined)){
+          const m = modeMonthFromDates(rows.map(r => r[col]));
+          if (m) return m;
+        }
+      }
+      return null;
+    }
+    if (role === 'tiktokOrders'){
+      const rows = rowsAsDicts(sheetToAOA(getSheet(wb, 'OrderSKUList')), 0);
+      return modeMonthFromDates(rows.map(r => r['Created Time']));
+    }
+    if (role === 'tiktokReturns'){
+      // Tương tự — lấy ngày yêu cầu/xử lý trả hàng, không có cột ngày đặt
+      // hàng trong file này (ngày đặt hàng nằm ở file "tất cả đơn hàng").
+      const rows = rowsAsDicts(sheetToAOA(getSheet(wb)), 0);
+      const candidates = ['Return Time', 'Return Request Time', 'Request Time', 'Refund Time'];
+      for (const col of candidates){
+        if (rows.some(r => r[col] !== undefined)){
+          const m = modeMonthFromDates(rows.map(r => r[col]));
+          if (m) return m;
+        }
+      }
+      return null;
+    }
+  } catch (err){
+    console.error('detectMonthForRole(' + role + ')', err);
+  }
+  return null;
+}
+
+function detectMonthFromFilename(filename){
+  const m = String(filename).match(/(20\d{2})[-_.]?(\d{2})[-_.]?\d{2}/);
+  if (m){
+    const y = m[1], mo = m[2];
+    if (+mo >= 1 && +mo <= 12) return { monthKey: y + '-' + mo, label: 'Tháng ' + parseInt(mo, 10) + '/' + y };
+  }
+  return null;
+}
+
+/** Nhận diện 1 file: đọc workbook, xác định vai trò (role) theo nội dung,
+ *  suy ra tháng dữ liệu. Trả về entry hiển thị được ngay trong danh sách
+ *  detect-list của UI (init.js), không phụ thuộc DOM. */
+async function detectFile(file){
+  let wb;
+  try {
+    wb = await readWorkbook(file);
+  } catch (err){
+    return {
+      file, role: null, platform: null, typeLabel: null, monthKey: null, monthLabel: null,
+      readError: 'Không đọc được file (' + err.message + ') — kiểm tra đúng định dạng Excel/CSV.',
+    };
+  }
+  let role = detectRoleFromContent(wb);
+  if (!role && typeof classifyFileName === 'function') role = classifyFileName(file.name);
+  const meta = role ? ROLE_META[role] : null;
+  let monthInfo = role ? detectMonthForRole(role, wb) : null;
+  if (!monthInfo && !(role && NO_FILENAME_MONTH_ROLES.has(role))) monthInfo = detectMonthFromFilename(file.name);
+  return {
+    file, role, platform: meta ? meta.platform : null, typeLabel: meta ? meta.label : null,
+    monthKey: monthInfo ? monthInfo.monthKey : null, monthLabel: monthInfo ? monthInfo.label : null,
+    readError: null,
+  };
+}
+
 // ============================================================
 // Main computation — takes { shopeeOrders, shopeeReturnRefund, tiktokOrders,
 // tiktokReturns, income, tiktokFinance, shopStats } workbook objects (from
@@ -389,18 +536,7 @@ function computeAllFromAOA(aoa){
   ];
 
   // ---------- date range detected (for display only) ----------
-  // Chấp cả 2 định dạng ngày gặp trong các file nguồn: "YYYY-MM-DD..." (Shopee)
-  // và "DD/MM/YYYY..." (TikTok, vd. "Created Time").
-  function toDate(v){
-    if (!v) return null;
-    if (v instanceof Date) return v;
-    const s = String(v);
-    let m = s.match(/^(\d{4})-(\d{2})-(\d{2})/);
-    if (m) return new Date(+m[1], +m[2]-1, +m[3]);
-    m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
-    if (m) return new Date(+m[3], +m[2]-1, +m[1]);
-    return null;
-  }
+  // (toDate() đã tách lên top-level phía trên, dùng chung với detectFile())
   let minDate = null, maxDate = null;
   for (const r of Object.values(spOrders)){
     const d = toDate(r['Ngày đặt hàng']);
