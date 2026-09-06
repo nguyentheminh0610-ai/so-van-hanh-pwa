@@ -232,8 +232,12 @@ function detectMonthFromFilename(filename){
   return null;
 }
 
-/** Nhận diện 1 file: đọc workbook, xác định vai trò (role) theo nội dung,
- *  suy ra tháng dữ liệu. Trả về entry hiển thị được ngay trong danh sách
+/** Nhận diện 1 file: xác định vai trò (role) chủ yếu theo TÊN FILE
+ *  (classifyFileName, định nghĩa ở init.js) — tên file các sàn xuất ra khá rõ
+ *  ràng/đáng tin cậy. Chỉ đọc thêm NỘI DUNG file để xác nhận đúng 1 trường
+ *  hợp: phân biệt Income (Shopee) với Tài chính (TikTok) khi 2 file trùng
+ *  tên gần giống hệt nhau (dạng income_...(UTC+7).xlsx, không có chữ nào cho
+ *  biết là sàn nào). Trả về entry hiển thị được ngay trong danh sách
  *  detect-list của UI (init.js), không phụ thuộc DOM. */
 async function detectFile(file){
   let wb;
@@ -245,16 +249,15 @@ async function detectFile(file){
       readError: 'Không đọc được file (' + err.message + ') — kiểm tra đúng định dạng Excel/CSV.',
     };
   }
-  // Order.cancelled không thể phân biệt với Order.all bằng nội dung cột (Order.all
-  // liệt kê TẤT CẢ đơn hàng, kể cả đơn đã huỷ, nên vẫn có sẵn cột "Lý do hủy") —
-  // phải loại theo TÊN FILE, 2 file này luôn đặt tên khác nhau rõ ràng.
-  const normName = stripDiacritics(file.name);
-  let role;
-  if (normName.includes('cancelled')){
-    role = null; // Order.cancelled — dữ liệu dư thừa, đã có sẵn trong Order.all
-  } else {
+  let role = classifyFileName(file.name);
+  if (role === 'income'){
+    const contentRole = detectRoleFromContent(wb);
+    if (contentRole === 'tiktokFinance') role = 'tiktokFinance';
+  } else if (!role && !stripDiacritics(file.name).includes('cancelled')){
+    // Order.cancelled: classifyFileName đã CỐ TÌNH trả về null (dư thừa, không
+    // thể phân biệt Order.all bằng nội dung vì cả 2 đều có cột "Lý do hủy") —
+    // không được rơi về content-detect ở đây, kẻo bị chốt nhầm lại shopeeOrders.
     role = detectRoleFromContent(wb);
-    if (!role && typeof classifyFileName === 'function') role = classifyFileName(file.name);
   }
   const meta = role ? ROLE_META[role] : null;
   let monthInfo = role ? detectMonthForRole(role, wb) : null;

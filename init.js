@@ -257,8 +257,11 @@ function buildUploadHTML(){
   <div id="results"></div>`;
 }
 
-// ---------- nhận diện theo tên file — dùng làm phương án dự phòng bởi
-// detectFile() (calc.js) khi không đọc được nội dung file (lỗi định dạng) ----------
+// ---------- nhận diện theo tên file — nguồn nhận diện CHÍNH cho mọi loại file
+// (tên file các sàn xuất ra khá rõ ràng/đáng tin cậy); detectFile() (calc.js)
+// chỉ còn đọc nội dung để xác nhận thêm cho đúng 1 trường hợp: phân biệt
+// Income (Shopee) với Tài chính (TikTok) khi 2 file trùng tên gần giống hệt
+// nhau (dạng income_...(UTC+7).xlsx không có chữ nào cho biết là sàn nào). ----------
 function stripDiacritics(str){
   return String(str || '')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -271,15 +274,15 @@ function classifyFileName(filename){
   const n = stripDiacritics(filename);
   const hasTiktok = n.includes('tiktok');
   const hasShopee = n.includes('shopee');
+  if (n.includes('cancelled')) return null; // Order.cancelled — dư thừa, đã có trong Order.all
   if (n.includes('return refund')) return 'shopeeReturnRefund';
-  // Phải kiểm tra TRƯỚC nhánh chung "order" bên dưới — "Order.failed_delivery"
-  // chứa chữ "order" nên nếu không chặn sớm sẽ bị rơi nhầm vào shopeeOrders.
   if (n.includes('failed delivery')) return 'shopeeFailedDelivery';
   if (hasTiktok && n.includes('tra hang')) return 'tiktokReturns';
   if (hasTiktok && (n.includes('tai chinh') || n.includes('finance'))) return 'tiktokFinance';
   if (n.includes('income')) return 'income';
   if (n.includes('shop stats') || n.includes('shopstats')) return 'shopStats';
   if (hasTiktok && (n.includes('don hang') || n.includes('order'))) return 'tiktokOrders';
+  if (n.includes('order all')) return 'shopeeOrders'; // tên file gốc Shopee "Order.all...", không có chữ "shopee"
   if (hasShopee && (n.includes('don hang') || n.includes('order'))) return 'shopeeOrders';
   return null;
 }
