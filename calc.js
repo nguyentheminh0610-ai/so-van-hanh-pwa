@@ -111,18 +111,21 @@ function detectRoleFromContent(wb){
   if (sheetNames.includes('Chi tiết đơn hàng')) return 'tiktokFinance';
   if (sheetNames.includes('Đơn Đã Thanh Toán') && sheetNames.some(n => n.startsWith('Theo sản phẩm'))) return 'shopStats';
   if (sheetNames.includes('Doanh thu') && sheetNames.includes('Service Fee Details')) return 'income';
-  if (sheetNames.includes('orders')) return 'shopeeOrders';
 
-  // Các file không có tên sheet cố định (return_refund, tiktok returns...) —
-  // sniff header dòng đầu của sheet đầu tiên.
+  // Order.all / Order.cancelled / Order.failed_delivery / return_refund của
+  // Shopee đều có thể dùng chung tên sheet "orders" — PHẢI phân biệt bằng
+  // HEADER trước, không được chốt sớm theo tên sheet (từng gây bug: mọi file
+  // sheet "orders" bị nhận nhầm hết thành shopeeOrders trước khi kịp xét header).
   const firstAOA = sheetToAOA(wb.Sheets[wb.SheetNames[0]]).slice(0, 2);
   const header = new Set((firstAOA[0] || []).map(nfc));
   if (header.has('Phương án') && header.has('Trạng thái Trả hàng/Hoàn tiền')) return 'shopeeReturnRefund';
-  if (header.has('Trạng Thái Đơn Hàng') && header.has('Mã đơn hàng')) return 'shopeeOrders';
   // Order.failed_delivery (khách không nhận hàng thật) có "Trạng thái trả hàng"
-  // nhưng KHÔNG có "Lý do hủy" — ngược lại với Order.cancelled (có "Lý do hủy",
-  // không có "Trạng thái trả hàng") để tránh nhận nhầm 2 file này với nhau.
+  // nhưng KHÔNG có "Lý do hủy" — phải xét trước cả nhánh shopeeOrders bên dưới.
   if (header.has('Trạng thái trả hàng') && !header.has('Lý do hủy')) return 'shopeeFailedDelivery';
+  // Order.cancelled (có "Lý do hủy") dư thừa — dữ liệu đã có sẵn trong Order.all
+  // (xem ghi chú trong up-sub cũ) — không nhận diện thành vai trò nào, tránh gán nhầm.
+  if (header.has('Lý do hủy')) return null;
+  if (sheetNames.includes('orders') || (header.has('Trạng Thái Đơn Hàng') && header.has('Mã đơn hàng'))) return 'shopeeOrders';
   if (header.has('Return Type') && header.has('Return Status')) return 'tiktokReturns';
   if (header.has('Order Status') && header.has('Order ID')) return 'tiktokOrders';
   return null;
