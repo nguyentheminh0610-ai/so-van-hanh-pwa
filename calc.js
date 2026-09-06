@@ -123,6 +123,22 @@ function detectRoleFromContent(wb){
   return null;
 }
 
+// Sheet "Báo cáo" trong file tài chính TikTok không phải bảng theo dòng mà là
+// các cặp nhãn/giá trị (nhãn ở 1 ô, giá trị ở ô cùng dòng phía bên phải) — dò
+// theo nhãn thay vì theo cột cố định vì không biết trước đúng cột.
+function findLabeledValue(aoa, labelText){
+  const target = nfc(labelText).trim().toLowerCase();
+  for (const row of (aoa || [])){
+    if (!row) continue;
+    const idx = row.findIndex(c => typeof c === 'string' && nfc(c).trim().toLowerCase() === target);
+    if (idx === -1) continue;
+    for (let i = idx + 1; i < row.length; i++){
+      if (row[i] !== null && row[i] !== undefined && String(row[i]).trim() !== '') return row[i];
+    }
+  }
+  return null;
+}
+
 function modeMonthFromDates(values){
   const counts = {};
   for (const v of values){
@@ -171,6 +187,17 @@ function detectMonthForRole(role, wb){
           const m = modeMonthFromDates(rows.map(r => r[col]));
           if (m) return m;
         }
+      }
+      return null;
+    }
+    if (role === 'tiktokFinance'){
+      // Sheet "Báo cáo" có dòng "Khoảng thời gian" dạng "2026/06/01-2026/06/30"
+      // — lấy tháng từ ngày bắt đầu của khoảng đó.
+      const aoa = sheetToAOA(getSheet(wb, 'Báo cáo'));
+      const raw = findLabeledValue(aoa, 'Khoảng thời gian');
+      if (raw){
+        const m = String(raw).match(/^(\d{4})\/(\d{2})\/\d{2}/);
+        if (m) return { monthKey: m[1] + '-' + m[2], label: 'Tháng ' + parseInt(m[2], 10) + '/' + m[1] };
       }
       return null;
     }
