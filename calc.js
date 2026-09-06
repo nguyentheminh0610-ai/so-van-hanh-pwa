@@ -123,9 +123,9 @@ function detectRoleFromContent(wb){
   // Order.failed_delivery (khách không nhận hàng thật): có "Trạng thái trả hàng"
   // nhưng KHÔNG có "Lý do hủy".
   if (header.has('Trạng thái trả hàng') && !header.has('Lý do hủy')) return 'shopeeFailedDelivery';
-  // Order.cancelled (có "Lý do hủy") dư thừa — dữ liệu đã có sẵn trong Order.all —
-  // không nhận diện thành vai trò nào, tránh gán nhầm.
-  if (header.has('Lý do hủy')) return null;
+  // LƯU Ý: không loại Order.cancelled bằng header('Lý do hủy') ở đây — Order.all
+  // (liệt kê TẤT CẢ đơn hàng, kể cả đơn đã huỷ) cũng có sẵn cột này nên bị loại
+  // nhầm theo. Order.cancelled được loại theo TÊN FILE trong detectFile() bên dưới.
   if (header.has('Return Type') && header.has('Return Status')) return 'tiktokReturns';
   if (header.has('Order Status') && header.has('Order ID')) return 'tiktokOrders';
 
@@ -245,8 +245,17 @@ async function detectFile(file){
       readError: 'Không đọc được file (' + err.message + ') — kiểm tra đúng định dạng Excel/CSV.',
     };
   }
-  let role = detectRoleFromContent(wb);
-  if (!role && typeof classifyFileName === 'function') role = classifyFileName(file.name);
+  // Order.cancelled không thể phân biệt với Order.all bằng nội dung cột (Order.all
+  // liệt kê TẤT CẢ đơn hàng, kể cả đơn đã huỷ, nên vẫn có sẵn cột "Lý do hủy") —
+  // phải loại theo TÊN FILE, 2 file này luôn đặt tên khác nhau rõ ràng.
+  const normName = stripDiacritics(file.name);
+  let role;
+  if (normName.includes('cancelled')){
+    role = null; // Order.cancelled — dữ liệu dư thừa, đã có sẵn trong Order.all
+  } else {
+    role = detectRoleFromContent(wb);
+    if (!role && typeof classifyFileName === 'function') role = classifyFileName(file.name);
+  }
   const meta = role ? ROLE_META[role] : null;
   let monthInfo = role ? detectMonthForRole(role, wb) : null;
   if (!monthInfo && !(role && NO_FILENAME_MONTH_ROLES.has(role))) monthInfo = detectMonthFromFilename(file.name);
