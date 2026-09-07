@@ -11,26 +11,23 @@ let detectedFiles = []; // [{file, role, platform, typeLabel, monthKey, monthLab
 let libraryRows = []; // bản ghi monthly_reports kèm cột files, tải khi mở tab thư viện
 let restoreContext = null; // {label, recordId} — khi đang khôi phục file sau khi xoá 1 file sai
 
-// ---------- Supabase config (lưu trong localStorage của trình duyệt) ----------
+// ---------- Supabase config — cố định trong code ----------
+// App chỉ phục vụ đúng 1 chủ shop, dùng chung 1 project Supabase duy nhất nên
+// không cần bắt nhập tay URL/key mỗi lần mở trên trình duyệt/thiết bị mới.
+// Đây là anon/publishable key — đúng loại key Supabase thiết kế để nhúng công
+// khai vào code phía client (không phải secret key); ranh giới bảo mật thật sự
+// nằm ở chính sách Row Level Security (RLS) cấu hình trên bảng/bucket, không
+// phải ở việc giấu key này.
+const SUPABASE_URL = 'https://dyvublxyrldmmnsrfvpz.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR5dnVibHh5cmxkbW1uc3JmdnB6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MzU4MzMsImV4cCI6MjEwNDExMTgzM30.jM3hD0hNMZ5osaZHDDe5PSm9rQ1Jr6IdWFF0VjT1edI';
+
 function getConfig(){
-  try {
-    return { url: localStorage.getItem('sb_url') || '', key: localStorage.getItem('sb_key') || '' };
-  } catch (e){ return { url: '', key: '' }; }
-}
-function saveConfig(url, key){
-  try {
-    localStorage.setItem('sb_url', url.trim().replace(/\/+$/, ''));
-    localStorage.setItem('sb_key', key.trim());
-  } catch (e){}
-}
-function isConfigured(){
-  const c = getConfig();
-  return !!(c.url && c.key);
+  return { url: SUPABASE_URL, key: SUPABASE_ANON_KEY };
 }
 
 async function sbFetch(path, opts){
   const c = getConfig();
-  if (!c.url || !c.key) throw new Error('Chưa cấu hình Supabase — bấm "Cài đặt kết nối" ở trên để nhập URL/Key.');
+  if (!c.url || !c.key) throw new Error('Chưa cấu hình Supabase.');
   opts = opts || {};
   const headers = Object.assign({
     'apikey': c.key,
@@ -128,56 +125,6 @@ function buildFilesSectionHtml(files){
 function renderFilesSection(files){
   const el = document.getElementById('files-section');
   if (el) el.innerHTML = buildFilesSectionHtml(files);
-}
-
-// ---------- Settings panel ----------
-function buildSettingsHTML(){
-  const c = getConfig();
-  const configured = isConfigured();
-  return `
-  <div class="settings-card" id="settings-card" ${configured ? 'style="display:none;"' : ''}>
-    <h2>Cài đặt kết nối lưu trữ (Supabase)</h2>
-    <p class="st-sub">Nhập 1 lần — trình duyệt sẽ tự nhớ. Lấy 2 giá trị này ở Supabase: Project Settings &gt; API.</p>
-    <div class="st-row"><label>Project URL</label><input type="text" id="sb-url-input" placeholder="https://xxxxxxxx.supabase.co" value="${esc(c.url)}"></div>
-    <div class="st-row"><label>anon public key</label><input type="text" id="sb-key-input" placeholder="eyJhbGciOi..." value="${esc(c.key)}"></div>
-    <div class="st-actions">
-      <button class="btn-primary" id="btn-save-config">Lưu &amp; kết nối</button>
-      <span class="st-status" id="st-status"></span>
-    </div>
-  </div>
-  <button class="st-toggle" id="btn-toggle-settings" ${configured ? '' : 'style="display:none;"'}>⚙ Cài đặt kết nối</button>
-  `;
-}
-
-function wireSettings(){
-  document.getElementById('btn-save-config').addEventListener('click', async () => {
-    const url = document.getElementById('sb-url-input').value;
-    const key = document.getElementById('sb-key-input').value;
-    const statusEl = document.getElementById('st-status');
-    if (!url || !key){
-      statusEl.className = 'st-status err';
-      statusEl.textContent = 'Nhập đủ cả URL và key.';
-      return;
-    }
-    saveConfig(url, key);
-    statusEl.className = 'st-status';
-    statusEl.textContent = 'Đang kiểm tra kết nối…';
-    try {
-      await sbFetch('monthly_reports?select=id&limit=1');
-      statusEl.className = 'st-status ok';
-      statusEl.textContent = 'Kết nối thành công.';
-      document.getElementById('settings-card').style.display = 'none';
-      document.getElementById('btn-toggle-settings').style.display = '';
-      await refreshHistoryFromServer();
-    } catch (err){
-      statusEl.className = 'st-status err';
-      statusEl.textContent = 'Không kết nối được: ' + err.message + ' — kiểm tra lại URL/key và đã chạy SQL tạo bảng chưa.';
-    }
-  });
-  document.getElementById('btn-toggle-settings').addEventListener('click', () => {
-    const card = document.getElementById('settings-card');
-    card.style.display = card.style.display === 'none' ? '' : 'none';
-  });
 }
 
 // ---------- Install-to-homescreen hint ----------
@@ -502,10 +449,6 @@ function wireLibraryEvents(el){
 async function refreshLibrary(){
   const el = document.getElementById('library-body');
   if (!el) return;
-  if (!isConfigured()){
-    el.innerHTML = '<p class="up-status">Cần cài đặt kết nối Supabase trước (xem "Cài đặt kết nối" ở đầu trang).</p>';
-    return;
-  }
   el.innerHTML = '<p class="up-status">Đang tải…</p>';
   try {
     libraryRows = await sbFetch('monthly_reports?select=id,label,period_start,files&order=period_start.desc.nullslast,created_at.desc') || [];
@@ -598,7 +541,6 @@ function isoDate(d){
 }
 
 async function refreshHistoryFromServer(){
-  if (!isConfigured()) return;
   const noteEl = document.getElementById('history-note');
   try {
     HISTORY = await sbFetch('monthly_reports?select=id,label,period_start,period_end,created_at&order=created_at.desc') || [];
@@ -647,11 +589,6 @@ async function onHistorySelectChange(){
 
 async function onSaveHistory(){
   if (!currentResult) return;
-  if (!isConfigured()){
-    document.getElementById('settings-card').style.display = '';
-    document.getElementById('history-note').textContent = 'Cần cài đặt kết nối trước khi lưu (xem ô "Cài đặt kết nối" phía trên).';
-    return;
-  }
   let label;
   if (restoreContext){
     label = restoreContext.label;
@@ -693,19 +630,16 @@ async function onSaveHistory(){
 }
 
 function init(){
-  document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildSettingsHTML() + buildTabsHTML() +
+  document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-upload">${buildUploadHTML()}</div>` +
     `<div class="screen" id="screen-library">${buildLibraryScreenHTML()}</div>`;
-  wireSettings();
   wireInstallHint();
   wireUpload();
   wireTabs();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
-  if (isConfigured()){
-    document.getElementById('history-bar').style.display = 'flex';
-    refreshHistoryFromServer();
-  }
+  document.getElementById('history-bar').style.display = 'flex';
+  refreshHistoryFromServer();
   if ('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
