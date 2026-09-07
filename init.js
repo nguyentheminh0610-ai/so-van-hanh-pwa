@@ -97,14 +97,26 @@ async function sbStorageDelete(path){
   }
 }
 
+function safeStorageFilename(name){
+  const idx = name.lastIndexOf('.');
+  const base = idx > 0 ? name.slice(0, idx) : name;
+  const ext = idx > 0 ? name.slice(idx) : '';
+  const safeBase = base
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/đ/g, 'd').replace(/Đ/g, 'D')
+    .replace(/[^a-zA-Z0-9._-]+/g, '-')
+    .replace(/(^-+|-+$)/g, '') || 'file';
+  return safeBase + ext;
+}
+
 async function uploadOriginalFiles(labelSlug){
   const uploaded = [];
   for (const key of Object.keys(selectedFiles)){
     const file = selectedFiles[key];
-    const path = labelSlug + '/' + key + '__' + file.name;
+    const path = labelSlug + '/' + key + '__' + safeStorageFilename(file.name);
     try {
       await sbStorageUpload(path, file);
-      uploaded.push({ key, name: file.name, path });
+      uploaded.push({ key, name: file.name, path }); // name giữ nguyên gốc để hiển thị
     } catch (err){
       console.error('Tải file gốc lên thất bại (' + key + '):', err);
     }
