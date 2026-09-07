@@ -17,15 +17,6 @@ function fmtPct(x, decimals){
 }
 function fmtRatio(x){ return x.toLocaleString('vi-VN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
 function esc(s){ return (s === null || s === undefined) ? '' : String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-function fmtAnyDateTime(v){
-  if (!v) return '—';
-  const s = String(v).trim();
-  let m = s.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}:\d{2})/);
-  if (m) return `${m[3]}/${m[2]}/${m[1]} ${m[4]}`;
-  m = s.match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2}:\d{2})/);
-  if (m) return `${m[1]}/${m[2]}/${m[3]} ${m[4]}`;
-  return s;
-}
 function fmtDateVN(d){
   if (!d) return '?';
   const dt = (d instanceof Date) ? d : new Date(d);
@@ -247,22 +238,6 @@ function render(res, opts){
     ctrHtml = convHtml = '<p style="font-size:12px;color:var(--ink-faint);">Chưa có dữ liệu (cần file Shop Stats).</p>';
   }
 
-  // chi tiết đơn hoàn về kho — để chủ shop đối chiếu với file nhập kho thực tế
-  // bằng MÃ ĐƠN / MÃ VẬN ĐƠN (không nên đối theo ngày vì ngày sàn ghi nhận có
-  // thể lệch so với ngày hàng thực về đến kho do thời gian vận chuyển)
-  let hoanVeKhoDetailHtml = '';
-  if (res.hoanVeKhoDetail && res.hoanVeKhoDetail.length){
-    const rows = res.hoanVeKhoDetail.slice().sort((a,b) => (a.sanPham).localeCompare(b.sanPham));
-    const ngoaiKyNote = res.hoanVeKhoNgoaiKyCount
-      ? `<p style="font-size:11.5px;color:var(--warn);margin:4px 0 0;">⚠ ${res.hoanVeKhoNgoaiKyCount}/${rows.length} đơn hoàn về kho kỳ này có <b>ngày đặt hàng</b> nằm ngoài khoảng ${fmtDateVN(res.minDate)}–${fmtDateVN(res.maxDate)} (đánh dấu <i>*</i> ở cột Ngày đặt hàng) — tức đơn được đặt ở kỳ trước, chỉ mới phát sinh yêu cầu trả/hoàn trong kỳ này. Đếm "đơn hoàn về kho" hiện theo kỳ mà file trả hàng/hoàn tiền tải lên bao phủ (ngày yêu cầu trả), không phải theo ngày đặt hàng.</p>`
-      : '';
-    hoanVeKhoDetailHtml = `<div class="sub-label">Chi tiết đơn hoàn về kho <span style="text-transform:none;font-weight:400;">— đối chiếu với file nhập kho thực tế theo mã đơn / mã vận đơn</span></div>
-    <table class="dtable"><thead><tr><th>Sàn</th><th>Mã đơn hàng</th><th>Loại</th><th>Ngày đặt hàng</th><th>Ngày (ghi nhận trên sàn)</th><th>Mã vận đơn trả</th></tr></thead><tbody>
-      ${rows.map(r => `<tr><td><span class="plat ${r.sanPham==='Shopee'?'shopee':'tiktok'}"><i></i>${r.sanPham}</span></td><td>${esc(r.oid)}</td><td>${esc(r.loai)}</td><td class="num"${r.ngoaiKy?' style="color:var(--warn);font-weight:600;"':''}>${fmtAnyDateTime(r.ngayDatHang)}${r.ngoaiKy?' *':''}</td><td class="num">${fmtAnyDateTime(r.ngay)}</td><td class="num">${r.maVanDon ? esc(r.maVanDon) : '—'}</td></tr>`).join('')}
-    </tbody></table>
-    ${ngoaiKyNote}
-    <p style="font-size:11.5px;color:var(--ink-faint);margin:6px 0 0;">Lưu ý: nên đối chiếu với file kho vật lý bằng mã đơn/mã vận đơn, không nên đối theo ngày — cột "Ngày (ghi nhận trên sàn)" là ngày sàn ghi nhận (hoàn tiền thành công / hoàn trả thành công), có thể lệch vài ngày so với ngày hàng thực tế về đến kho do thời gian vận chuyển. Các đơn "đổi ý giữa đường" (Shopee) và "huỷ sau khi đã gửi hàng" (TikTok) chưa có mã vận đơn trả trong file nguồn — chủ shop tự xác nhận hàng đã về kho chưa dựa theo mã đơn.</p>`;
-  }
 
   const warningsHtml = (res.warnings && res.warnings.length) || res.ssWarning
     ? `<div class="card" style="border-color:var(--warn); margin-bottom:16px;">
@@ -333,7 +308,6 @@ function render(res, opts){
     <div class="colchart-wrap stacked">${reasonCols}</div>
     <div class="col-labels">${reasonLabels}</div>
   </div>
-  ${hoanVeKhoDetailHtml}
 
   <!-- ZONE 3 -->
   <div class="zone"><span class="z-num">3</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>

@@ -486,6 +486,15 @@ function computeAllFromAOA(aoa){
     ttTroGia += num(r['Giảm giá của nền tảng']) + Math.abs(num(r['TikTok Shop giảm phí vận chuyển cho khách hàng']));
   }
   ttPhiSan = Math.abs(ttPhiSan);
+  // Debug Tlove — in ra console để đối chiếu khi số ra 0 bất thường: nếu
+  // finOrderRows.length = 0 thì header sheet/tên cột "Loại giao dịch" đang lệch
+  // so với file thực tế; nếu > 0 mà ttPhiSan hoặc ttTroGia vẫn = 0 thì đúng tên
+  // 1 trong 4 cột nguồn (Phí xử lý đơn hàng / Phí giao dịch / Phí hoa hồng... /
+  // Giảm giá của nền tảng / TikTok Shop giảm phí vận chuyển...) đang lệch tên.
+  console.log('[debug Tlove] finRows.length=', finRows.length, 'finOrderRows.length=', finOrderRows.length,
+    'header thực tế đọc được:', finRows[0] ? Object.keys(finRows[0]) : '(không có dòng nào)');
+  console.log('[debug Tlove] ttTroGia (tử số — Chi phí sàn đã hỗ trợ) =', ttTroGia,
+    '| ttPhiSan (mẫu số — Tổng chi phí sàn) =', ttPhiSan, '| tlove =', ttPhiSan ? ttTroGia / ttPhiSan : 0);
 
   function ttIsShopErrorCancel(reason){
     if (!reason) return false;
