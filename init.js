@@ -199,6 +199,10 @@ function wireTabs(){
 // ---------- Dashboard (tab 1) — chỉ hiển thị kết quả ----------
 function buildDashboardHTML(){
   return `
+  <div class="hb-view" id="hb-view">
+    <label for="history-select">Xem kỳ:</label>
+    <select id="history-select"></select>
+  </div>
   <div id="files-section"></div>
   <p class="up-status" id="dashboard-empty">Chưa có số liệu — sang tab "Tải file &amp; lịch sử" để tải file lên.</p>
   <div id="results"></div>`;
@@ -223,7 +227,6 @@ function buildUploadFlowHTML(){
     </div>
   </div>
   <div class="history-bar" id="history-bar" style="display:none;">
-    <select id="history-select"></select>
     <button class="btn-secondary" id="btn-save-history" disabled>Lưu vào lịch sử</button>
     <span class="hb-note" id="history-note"></span>
   </div>`;
