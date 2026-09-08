@@ -170,16 +170,23 @@ function wireInstallHint(){
 // ---------- Tabs ----------
 function buildTabsHTML(){
   return `<div class="tabs" id="tabs">
-    <button class="tab-btn active" data-tab="upload">Tải &amp; tính toán</button>
-    <button class="tab-btn" data-tab="library">Các file đã tải lên</button>
+    <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+    <button class="tab-btn" data-tab="library">Tải file &amp; lịch sử</button>
   </div>`;
 }
 
 function switchToTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
-  document.getElementById('screen-upload').classList.toggle('active', tab === 'upload');
+  document.getElementById('screen-dashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('screen-library').classList.toggle('active', tab === 'library');
   if (tab === 'library') refreshLibrary();
+}
+
+function refreshDashboardEmptyState(){
+  const emptyEl = document.getElementById('dashboard-empty');
+  if (!emptyEl) return;
+  const hasResults = document.getElementById('results').classList.contains('show');
+  emptyEl.style.display = hasResults ? 'none' : '';
 }
 
 function wireTabs(){
@@ -189,8 +196,16 @@ function wireTabs(){
   });
 }
 
-// ---------- Upload UI ----------
-function buildUploadHTML(){
+// ---------- Dashboard (tab 1) — chỉ hiển thị kết quả ----------
+function buildDashboardHTML(){
+  return `
+  <div id="files-section"></div>
+  <p class="up-status" id="dashboard-empty">Chưa có số liệu — sang tab "Tải file &amp; lịch sử" để tải file lên.</p>
+  <div id="results"></div>`;
+}
+
+// ---------- Upload UI (tab 2) — dropzone + nhận diện file + tính toán + lịch sử ----------
+function buildUploadFlowHTML(){
   return `
   <div class="upload-card">
     <h2>Tải số liệu tháng này</h2>
@@ -211,9 +226,7 @@ function buildUploadHTML(){
     <select id="history-select"></select>
     <button class="btn-secondary" id="btn-save-history" disabled>Lưu vào lịch sử</button>
     <span class="hb-note" id="history-note"></span>
-  </div>
-  <div id="files-section"></div>
-  <div id="results"></div>`;
+  </div>`;
 }
 
 // ---------- nhận diện theo tên file — nguồn nhận diện CHÍNH cho mọi loại file
@@ -378,6 +391,7 @@ function renderResults(el, res, opts){
   el.innerHTML = render(res, opts);
   el.classList.add('show');
   wireDailyRevenueChart(el, res);
+  refreshDashboardEmptyState();
 }
 
 async function onCompute(){
@@ -400,6 +414,7 @@ async function onCompute(){
     statusEl.textContent = 'Xong — số liệu ' + fmtDateVN(result.minDate) + ' – ' + fmtDateVN(result.maxDate) + '.';
     document.getElementById('btn-save-history').disabled = false;
     document.getElementById('history-bar').style.display = 'flex';
+    switchToTab('dashboard');
     resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } catch (err){
     console.error(err);
@@ -410,7 +425,7 @@ async function onCompute(){
   }
 }
 
-// ---------- Tab "Các file đã tải lên" ----------
+// ---------- Thư viện file đã lưu (nằm dưới phần tải file/lịch sử, cùng tab) ----------
 function buildLibraryScreenHTML(){
   return `<div class="library-card">
     <h2>Các file đã tải lên</h2>
@@ -421,7 +436,7 @@ function buildLibraryScreenHTML(){
 
 function buildLibraryHTML(rows){
   const withFiles = rows.filter(r => r.files && r.files.length);
-  if (!withFiles.length) return '<p class="up-status">Chưa có file nào được lưu — lưu 1 kỳ báo cáo ở tab "Tải &amp; tính toán" để bắt đầu.</p>';
+  if (!withFiles.length) return '<p class="up-status">Chưa có file nào được lưu — tải file lên và tính toán ở phía trên để bắt đầu.</p>';
   const col = (platform) => {
     const groups = withFiles.map(r => {
       const files = (r.files || []).filter(f => ROLE_META[f.key] && ROLE_META[f.key].platform === platform);
@@ -530,11 +545,12 @@ async function deleteLibraryFile(recordId, filePath){
     });
     record.files = newFiles;
     await refreshHistoryFromServer();
-    switchToTab('upload');
+    switchToTab('library');
     currentResult = null;
     const resultsEl = document.getElementById('results');
     resultsEl.innerHTML = '';
     resultsEl.classList.remove('show');
+    refreshDashboardEmptyState();
     document.getElementById('btn-save-history').disabled = true;
     renderFilesSection(null);
     await restoreRemainingFilesToUploadTab(record);
@@ -579,7 +595,7 @@ async function onHistorySelectChange(){
   const v = sel.value;
   const resultsEl = document.getElementById('results');
   if (v === 'current'){
-    if (currentResult){ renderResults(resultsEl, currentResult); }
+    if (currentResult){ renderResults(resultsEl, currentResult); switchToTab('dashboard'); }
     renderFilesSection(null);
     return;
   }
@@ -592,6 +608,7 @@ async function onHistorySelectChange(){
     if (rows && rows[0]){
       renderResults(resultsEl, rows[0].data, { label: rows[0].label });
       renderFilesSection(rows[0].files);
+      switchToTab('dashboard');
     }
     refreshHistorySelect();
   } catch (err){
@@ -631,6 +648,7 @@ async function onSaveHistory(){
     restoreContext = null;
     await refreshHistoryFromServer();
     renderFilesSection(files);
+    switchToTab('dashboard');
     const filesNote = files.length < Object.keys(selectedFiles).length
       ? ` (lưu ý: ${Object.keys(selectedFiles).length - files.length} file gốc tải lên chưa thành công — thử lưu lại nếu cần)`
       : '';
@@ -643,14 +661,15 @@ async function onSaveHistory(){
 
 function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
-    `<div class="screen active" id="screen-upload">${buildUploadHTML()}</div>` +
-    `<div class="screen" id="screen-library">${buildLibraryScreenHTML()}</div>`;
+    `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
+    `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>`;
   wireInstallHint();
   wireUpload();
   wireTabs();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
   document.getElementById('history-bar').style.display = 'flex';
+  refreshDashboardEmptyState();
   refreshHistoryFromServer();
   if ('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(() => {});
