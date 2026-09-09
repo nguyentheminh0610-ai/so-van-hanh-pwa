@@ -121,6 +121,16 @@
   .bar-fill{ height:100%; border-radius:5px; }
   .bar-item .b-val{ font-size:13px; font-weight:700; text-align:right; }
 
+  /* ---------- Affiliate/KOL: thanh ngang xếp chồng trong ô bảng — biến thể
+     của .bar-track/.bar-fill có sẵn ở trên, không thêm màu/font mới ---------- */
+  .bar-track.stacked-h{ display:flex; }
+  .bar-track .aff-seg{ height:100%; }
+  .bar-track.aff-empty{ border:1px dashed var(--line-strong); background:transparent; display:flex; align-items:center; justify-content:center; }
+  .aff-empty-text{ font-size:10px; color:var(--ink-faint); white-space:nowrap; }
+  .aff-legend{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
+  .aff-legend-item{ display:inline-flex; align-items:center; gap:4px; font-size:10px; color:var(--ink-faint); white-space:nowrap; }
+  .aff-legend-item i{ width:7px; height:7px; border-radius:2px; flex:none; display:inline-block; }
+
   .donut-ring{ position:relative; width:150px; height:150px; border-radius:50%; flex:none; }
   .donut-ring::after{ content:""; position:absolute; inset:20px; border-radius:50%; background:var(--surface); }
   .donut-center{ position:absolute; inset:20px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }

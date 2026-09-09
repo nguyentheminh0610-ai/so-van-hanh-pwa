@@ -153,6 +153,54 @@ function wireDailyRevenueChart(container, res){
   });
 }
 
+// ---------- Affiliate/KOL (TikTok) — 2 bảng tuỳ chọn, chỉ hiện khi có ít
+// nhất 1 trong 2 file affiliateOrders/videoAnalysis (res.affiliateKoc khác
+// null) — tái dùng đúng token màu (--p1/--p2/--p3/--accent/--good/--proc) và
+// các class bảng/thanh ngang (.dtable, .bar-track) đang có sẵn trong app,
+// không tạo màu/font riêng cho phần này. ----------
+const AFF_SEGMENT_COLORS = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--accent)', 'var(--good)', 'var(--proc)'];
+
+function buildAffiliateTable1Html(rows){
+  if (!rows) return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tải file Affiliate Orders tháng này.</p>';
+  if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có đơn "Đã quyết toán" nào trong file Affiliate Orders.</p>';
+  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số đơn</th><th style="text-align:right">Doanh thu</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soDon)}</td><td class="num">${fmtVND(r.doanhThu)}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
+function buildAffContentCellHtml(row){
+  if (!row.hasOrderThisMonth || !row.contentBreakdown || !row.contentBreakdown.length){
+    return `<div class="bar-track aff-empty" title="Chưa có đơn Affiliate Orders tháng này — video có thể đã ra đơn ở tháng khác (Video Analysis là dữ liệu luỹ kế theo video, không theo tháng)."><span class="aff-empty-text">chưa có đơn tháng này</span></div>`;
+  }
+  const segs = row.contentBreakdown.map((seg, i) =>
+    `<span class="aff-seg" style="width:${(seg.pct * 100).toFixed(2)}%;background:${AFF_SEGMENT_COLORS[i % AFF_SEGMENT_COLORS.length]}" title="${esc(seg.loai)}: ${fmtPct(seg.pct, 0)}"></span>`
+  ).join('');
+  const legend = row.contentBreakdown.map((seg, i) =>
+    `<span class="aff-legend-item"><i style="background:${AFF_SEGMENT_COLORS[i % AFF_SEGMENT_COLORS.length]}"></i>${esc(seg.loai)} ${fmtPct(seg.pct, 0)}</span>`
+  ).join('');
+  return `<div class="bar-track stacked-h">${segs}</div><div class="aff-legend">${legend}</div>`;
+}
+
+function buildAffiliateTable2Html(rows){
+  if (!rows) return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tải file Video Analysis tháng này.</p>';
+  if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu video nào trong file Video Analysis.</p>';
+  return `<table class="dtable"><thead><tr><th>KOC</th><th>Doanh thu đến từ đâu</th><th style="text-align:right">Tỷ lệ xem hết TB</th><th style="text-align:right">CTR TB</th><th style="text-align:right">GPM</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td style="min-width:180px;">${buildAffContentCellHtml(r)}</td><td class="num">${fmtPct(r.completionAvg, 1)}</td><td class="num">${fmtPct(r.ctrAvg, 2)}</td><td class="num">${fmtVND(Math.round(r.gpm))}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
+function buildAffiliateKocSectionHtml(res){
+  const aff = res.affiliateKoc;
+  if (!aff) return '';
+  return `
+  <!-- ZONE 5 -->
+  <div class="zone"><span class="z-num">5</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
+  <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
+  ${buildAffiliateTable1Html(aff.table1)}
+  <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
+  ${buildAffiliateTable2Html(aff.table2)}`;
+}
+
 // ---------- render ----------
 function render(res, opts){
   opts = opts || {};
@@ -335,6 +383,7 @@ function render(res, opts){
   </div>
   <div class="sub-label">Chi tiết sản phẩm</div>
   ${prodTableHtml}
+  ${buildAffiliateKocSectionHtml(res)}
 
   <footer>
     <p><b>Nguồn dữ liệu:</b> tự tính từ các file Excel/CSV chủ shop tải lên ngay trên trình duyệt — không gửi lên máy chủ nào.</p>

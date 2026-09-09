@@ -28,6 +28,13 @@ function num(v){
   return isPct ? f / 100 : f;
 }
 
+/** Chuỗi tiền TikTok kiểu "1.234.567₫" (Video Analysis) — bỏ ký hiệu ₫ rồi
+ *  tái dùng num() để parse (đã tự xử lý dấu chấm ngăn cách nghìn kiểu VN). */
+function parseVndCurrency(v){
+  if (v === null || v === undefined) return 0;
+  return num(String(v).replace(/₫/g, '').trim());
+}
+
 /** sheet -> array of arrays (raw), via SheetJS */
 function sheetToAOA(ws){
   return XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: true });
@@ -99,11 +106,17 @@ const ROLE_META = {
   tiktokFinance: { platform: 'TikTok', label: 'Tài chính', required: true },
   shopStats: { platform: 'Shopee', label: 'Shop Stats', required: false },
   shopeeFailedDelivery: { platform: 'Shopee', label: 'Giao hàng thất bại (khách không nhận)', required: false },
+  tiktokAffiliateOrders: { platform: 'TikTok', label: 'Affiliate Orders', required: false },
+  tiktokVideoAnalysis: { platform: 'TikTok', label: 'Video Analysis', required: false },
 };
 
 // TikTok: tên file KHÔNG có ngày thật (khác Shopee) — không được suy tháng
 // từ tên file cho các vai trò này, thà hiển thị "chưa rõ tháng" còn hơn sai.
-const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance']);
+// tiktokAffiliateOrders/tiktokVideoAnalysis: phần đuôi số trong tên file chỉ
+// là ID/khoảng ngày XUẤT file, không phải mốc tháng dữ liệu — 2 role này
+// không dùng để xác định tháng của kỳ báo cáo (tháng do file đơn hàng/tài
+// chính chính quyết định như hiện tại).
+const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance', 'tiktokAffiliateOrders', 'tiktokVideoAnalysis']);
 
 function detectRoleFromContent(wb){
   const sheetNames = wb.SheetNames.map(nfc);
@@ -284,6 +297,8 @@ async function computeAll(files){
   const wbFin = await readWorkbook(files.tiktokFinance);
   const wbSs = files.shopStats ? await readWorkbook(files.shopStats) : null;
   const wbFd = files.shopeeFailedDelivery ? await readWorkbook(files.shopeeFailedDelivery) : null;
+  const wbAff = files.tiktokAffiliateOrders ? await readWorkbook(files.tiktokAffiliateOrders) : null;
+  const wbVid = files.tiktokVideoAnalysis ? await readWorkbook(files.tiktokVideoAnalysis) : null;
 
   const aoa = {
     shopeeOrders: sheetToAOA(getSheet(wbSp, 'orders')),
@@ -297,6 +312,8 @@ async function computeAll(files){
     ss_NguonTruyCap: wbSs ? sheetToAOA(getSheet(wbSs, 'Nguồn truy cập cho Đơn hàng...')) : null,
     ss_TheoSanPham: wbSs ? sheetToAOA(getSheet(wbSs, 'Theo sản phẩm (đơn đã đặt)')) : null,
     shopeeFailedDelivery: wbFd ? sheetToAOA(getSheet(wbFd)) : null,
+    tiktokAffiliateOrders: wbAff ? sheetToAOA(getSheet(wbAff)) : null,
+    tiktokVideoAnalysis: wbVid ? sheetToAOA(getSheet(wbVid)) : null,
   };
   return computeAllFromAOA(aoa);
 }
@@ -665,6 +682,83 @@ function computeAllFromAOA(aoa){
   const spHuyHoanTra = spCancelAllIds.size + Object.keys(spDonTra).length + Object.keys(spDonHoan).length;
   const ttHuyHoanTra = Object.keys(ttCancelledNative).length + Object.keys(ttDonTra).length + Object.keys(ttDonHoan).length;
 
+  // ---------- 10) Affiliate/KOL (TikTok) — 2 file tuỳ chọn, không ảnh hưởng
+  // tới việc xác định tháng của kỳ báo cáo (xem NO_FILENAME_MONTH_ROLES). ----------
+  // Bảng 1 (Tổng hợp KOC theo đơn & doanh thu) — chỉ cần affiliateOrders.
+  const affRowsRaw = aoa.tiktokAffiliateOrders ? rowsAsDicts(aoa.tiktokAffiliateOrders, 0) : null;
+  const kocOrders = {}; // koc -> {count, revenue} — chỉ có dữ liệu khi đã tải affiliateOrders
+  const kocContentRevenue = {}; // koc -> { [loạiNộiDung]: revenue }
+  if (affRowsRaw){
+    const affSettled = affRowsRaw.filter(r => r['Trạng thái đơn hàng'] === 'Đã quyết toán');
+    for (const r of affSettled){
+      const koc = r['Tên người dùng nhà sáng tạo'];
+      if (koc === undefined || koc === null || koc === '') continue;
+      const amt = num(r['Payment Amount']);
+      if (!kocOrders[koc]) kocOrders[koc] = { count: 0, revenue: 0 };
+      kocOrders[koc].count += 1;
+      kocOrders[koc].revenue += amt;
+      const loai = r['Loại nội dung'] || '(không rõ)';
+      if (!kocContentRevenue[koc]) kocContentRevenue[koc] = {};
+      kocContentRevenue[koc][loai] = (kocContentRevenue[koc][loai] || 0) + amt;
+    }
+  }
+  const kocTable1 = affRowsRaw ? Object.entries(kocOrders)
+    .map(([koc, v]) => ({ koc, soDon: v.count, doanhThu: v.revenue }))
+    .sort((a, b) => b.doanhThu - a.doanhThu)
+    .slice(0, 20) : null;
+
+  // Bảng 2 (Chất lượng nội dung theo KOC) — nền tảng là videoAnalysis (đo hiệu
+  // quả nội dung); cột "doanh thu đến từ đâu" nối chéo sang kocContentRevenue ở
+  // trên, KOC nào chưa có đơn affiliateOrders tháng này thì đánh dấu riêng
+  // (không phải lỗi/0% — video có thể ra đơn ở tháng khác vì đây là dữ liệu
+  // luỹ kế theo video, không theo tháng).
+  const vidRowsRaw = aoa.tiktokVideoAnalysis ? rowsAsDicts(aoa.tiktokVideoAnalysis, 0, 2) : null;
+  const kocVideoAgg = {};
+  if (vidRowsRaw){
+    for (const r of vidRowsRaw){
+      const koc = r['Tên nhà sáng tạo'];
+      if (koc === undefined || koc === null || koc === '') continue;
+      if (!kocVideoAgg[koc]) kocVideoAgg[koc] = { gmvSum: 0, viewSum: 0, completionSum: 0, completionCount: 0, ctrSum: 0, ctrCount: 0 };
+      const agg = kocVideoAgg[koc];
+      agg.gmvSum += parseVndCurrency(r['GMV đến từ video liên kết']);
+      agg.viewSum += num(r['Lượt xem video']);
+      const completion = r['Tỷ lệ xem hết'];
+      if (completion !== undefined && completion !== null && completion !== ''){
+        agg.completionSum += num(completion);
+        agg.completionCount += 1;
+      }
+      const ctr = r['CTR'];
+      if (ctr !== undefined && ctr !== null && ctr !== ''){
+        agg.ctrSum += num(ctr);
+        agg.ctrCount += 1;
+      }
+    }
+  }
+  const kocTable2 = vidRowsRaw ? Object.entries(kocVideoAgg).map(([koc, v]) => {
+    const orderInfo = kocOrders[koc];
+    const hasOrderThisMonth = !!orderInfo;
+    let contentBreakdown = null;
+    if (hasOrderThisMonth && orderInfo.revenue > 0){
+      contentBreakdown = Object.entries(kocContentRevenue[koc] || {})
+        .map(([loai, amt]) => ({ loai, amt, pct: amt / orderInfo.revenue }))
+        .sort((a, b) => b.amt - a.amt);
+    }
+    return {
+      koc, hasOrderThisMonth, contentBreakdown,
+      completionAvg: v.completionCount ? v.completionSum / v.completionCount : 0,
+      ctrAvg: v.ctrCount ? v.ctrSum / v.ctrCount : 0,
+      gpm: v.viewSum ? (v.gmvSum / v.viewSum) * 1000 : 0,
+    };
+  }).sort((a, b) => {
+    if (b.gpm !== a.gpm) return b.gpm - a.gpm;
+    if (b.completionAvg !== a.completionAvg) return b.completionAvg - a.completionAvg;
+    return b.ctrAvg - a.ctrAvg;
+  }).slice(0, 20) : null;
+
+  // Chỉ hiện cả khu vực khi có ÍT NHẤT 1 trong 2 file — không có file nào thì
+  // affiliateKoc = null, app.js sẽ ẩn hoàn toàn khu vực (không hiện bảng rỗng).
+  const affiliateKoc = (affRowsRaw || vidRowsRaw) ? { table1: kocTable1, table2: kocTable2 } : null;
+
   return {
     warnings, ssWarning, minDate, maxDate,
     shopee: {
@@ -694,5 +788,6 @@ function computeAllFromAOA(aoa){
     hoanVeKhoDetail: hoanVeKhoDetailAll, hoanVeKhoNgoaiKyCount,
     dailyRevenue,
     kenh, sanPham,
+    affiliateKoc,
   };
 }
