@@ -202,6 +202,7 @@ function buildDashboardHTML(){
   <div class="hb-view" id="hb-view">
     <label for="history-select">Xem kỳ:</label>
     <select id="history-select"></select>
+    <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
   </div>
   <div id="files-section"></div>
   <p class="up-status" id="dashboard-empty">Chưa có số liệu — sang tab "Tải file &amp; lịch sử" để tải file lên.</p>
@@ -593,6 +594,8 @@ function refreshHistorySelect(){
   document.getElementById('history-note').textContent = HISTORY.length
     ? `Đã lưu ${HISTORY.length} tháng trên server.`
     : 'Chưa lưu tháng nào.';
+  const refreshBtn = document.getElementById('btn-refresh-all-history');
+  if (refreshBtn) refreshBtn.style.display = HISTORY.length > 0 ? '' : 'none';
 }
 
 async function onHistorySelectChange(){
@@ -664,6 +667,63 @@ async function onSaveHistory(){
   }
 }
 
+// Tính lại toàn bộ các tháng đã lưu bằng công thức mới nhất của computeAll():
+// tải lại file gốc từng tháng từ Storage (như restoreRemainingFilesToUploadTab
+// nhưng đưa thẳng vào computeAll, KHÔNG đụng biến global selectedFiles), rồi
+// ghi đè riêng cột `data` — giữ nguyên label/period_start/period_end/files.
+async function onRefreshAllHistory(){
+  if (!HISTORY.length) return;
+  if (!confirm('Tính lại toàn bộ ' + HISTORY.length + ' tháng đã lưu bằng công thức mới nhất? Việc này sẽ tải lại file gốc của từng tháng và ghi đè số liệu cũ (không đổi file gốc, không đổi tên tháng). Có thể mất vài phút. Tiếp tục?')) return;
+
+  const btn = document.getElementById('btn-refresh-all-history');
+  const noteEl = document.getElementById('history-note');
+  btn.disabled = true;
+
+  let records;
+  try {
+    records = await sbFetch('monthly_reports?select=id,label,files') || [];
+  } catch (err){
+    noteEl.textContent = 'Không lấy được danh sách: ' + err.message;
+    btn.disabled = false;
+    return;
+  }
+
+  let okCount = 0;
+  const failed = [];
+
+  for (let i = 0; i < records.length; i++){
+    const record = records[i];
+    noteEl.textContent = `Đang cập nhật ${i + 1}/${records.length}: "${record.label}"…`;
+    try {
+      const localFiles = {};
+      for (const f of (record.files || [])){
+        const resp = await fetch(sbStoragePublicUrl(f.path));
+        if (!resp.ok) throw new Error(`Tải file "${f.name}" thất bại (HTTP ${resp.status})`);
+        const blob = await resp.blob();
+        localFiles[f.key] = new File([blob], f.name, { type: blob.type || 'application/octet-stream' });
+      }
+
+      const freshResult = await computeAll(localFiles);
+
+      await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(record.id), {
+        method: 'PATCH',
+        headers: { 'Prefer': 'return=minimal' },
+        body: JSON.stringify({ data: freshResult, updated_at: new Date().toISOString() }),
+      });
+      okCount++;
+    } catch (err){
+      console.error('Cập nhật lại thất bại cho "' + record.label + '":', err);
+      failed.push(record.label + ' (' + err.message + ')');
+    }
+  }
+
+  btn.disabled = false;
+  await refreshHistoryFromServer();
+  noteEl.textContent = failed.length
+    ? `Đã cập nhật ${okCount}/${records.length} tháng. Lỗi: ${failed.join('; ')}`
+    : `Đã cập nhật lại toàn bộ ${okCount} tháng theo công thức mới nhất.`;
+}
+
 function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
@@ -673,6 +733,7 @@ function init(){
   wireTabs();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
+  document.getElementById('btn-refresh-all-history').addEventListener('click', onRefreshAllHistory);
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();
