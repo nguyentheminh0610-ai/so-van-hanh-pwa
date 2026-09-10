@@ -376,10 +376,7 @@ function render(res, opts){
   </div>
   ${buildDailyRevenueChartHtml(res)}
   <div class="sub-label">Chi tiết theo sàn</div>
-  <div class="grid cols-3">
-    <div class="card"><div class="c-title">Giá trị đơn trung bình (AOV)</div>
-      <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtVND(s.aov)}</span></div><div class="divider"></div>
-      <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtVND(t.aov)}</span></div></div>
+  <div class="grid cols-2">
     <div class="card"><div class="c-title">Doanh thu ròng</div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtVND(s.doanhThuRong)}</span></div><div class="divider"></div>
       <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtVND(t.doanhThuRong)}</span></div></div>
@@ -394,10 +391,7 @@ function render(res, opts){
 
   <!-- ZONE 3 -->
   <div class="zone"><span class="z-num">3</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
-  <div class="grid cols-3">
-    <div class="card"><div class="c-title">Tổng huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(huỷ+trả+hoàn)</span></div>
-      <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtInt(s.huyHoanTra)}</span></div><div class="divider"></div>
-      <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtInt(t.huyHoanTra)}</span></div></div>
+  <div class="grid cols-2">
     <div class="card"><div class="c-title">Tỷ lệ huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(/ tổng đơn đặt)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtPct(s.huyHoanTra/(s.tongDon||1))}</span></div><div class="divider"></div>
       <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtPct(t.huyHoanTra/(t.tongDon||1))}</span></div></div>
