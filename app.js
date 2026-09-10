@@ -193,12 +193,66 @@ function buildAffiliateKocSectionHtml(res){
   const aff = res.affiliateKoc;
   if (!aff) return '';
   return `
-  <!-- ZONE 5 -->
-  <div class="zone"><span class="z-num">5</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
+  <!-- ZONE 6 -->
+  <div class="zone"><span class="z-num">6</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
   ${buildAffiliateTable2Html(aff.table2)}`;
+}
+
+// ---------- Khách hàng theo khu vực — donut % số đơn theo tỉnh/thành (gộp 2
+// sàn). Tái dùng đúng component donut sẵn có (.donut-body/.donut-ring/
+// conic-gradient/.donut-legend/.dl-row); 6 lát tỉnh = 6 sắc độ nhạt dần của
+// đúng màu chủ đạo --accent (color-mix với --surface, không thêm màu mới),
+// lát "Khác" = --ink-faint (xám muted có sẵn). ----------
+const REGION_SHADES = [
+  'var(--accent)',
+  'color-mix(in srgb, var(--accent) 80%, var(--surface))',
+  'color-mix(in srgb, var(--accent) 64%, var(--surface))',
+  'color-mix(in srgb, var(--accent) 50%, var(--surface))',
+  'color-mix(in srgb, var(--accent) 38%, var(--surface))',
+  'color-mix(in srgb, var(--accent) 28%, var(--surface))',
+];
+
+function buildKhuVucHtml(res){
+  const kv = res.khuVuc;
+  if (!kv || !kv.total || !kv.rows || !kv.rows.length){
+    return '<div class="ct-title">Khách hàng theo khu vực</div><p style="font-size:12px;color:var(--ink-faint);">Chưa đọc được cột tỉnh/thành từ file "tất cả đơn hàng".</p>';
+  }
+  const rows = kv.rows.map((r, i) => ({
+    ten: r.ten,
+    soDon: r.soDon,
+    pct: kv.total ? r.soDon / kv.total : 0,
+    color: r.isKhac ? 'var(--ink-faint)' : REGION_SHADES[i % REGION_SHADES.length],
+  }));
+  let acc = 0;
+  const stops = [];
+  const sliceLabels = [];
+  for (const r of rows){
+    const pct = r.pct * 100;
+    stops.push(`${r.color} ${acc.toFixed(2)}% ${(acc + pct).toFixed(2)}%`);
+    if (r.pct >= 0.04){
+      const mid = (acc + pct / 2) / 100; // tỉ lệ tính từ đỉnh, theo chiều kim đồng hồ
+      const x = 95 + 82 * Math.sin(2 * Math.PI * mid);
+      const y = 95 - 82 * Math.cos(2 * Math.PI * mid);
+      sliceLabels.push(`<span class="region-slice-lbl" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;">${fmtPct(r.pct, 0)}</span>`);
+    }
+    acc += pct;
+  }
+  const legendRows = rows.map(r =>
+    `<div class="dl-row"><i style="background:${r.color}"></i><span class="dl-name">${esc(r.ten)}</span><span class="dl-count">${fmtInt(r.soDon)} đơn</span><span class="dl-pct">${fmtPct(r.pct, 1)}</span></div>`
+  ).join('');
+  return `<div class="ct-title">Khách hàng theo khu vực <span class="ct-note">(% số đơn, gộp Shopee + TikTok)</span></div>
+  <div class="donut-body">
+    <div class="region-donut-wrap">
+      <div class="donut-ring" style="background:conic-gradient(${stops.join(', ')})">
+        <div class="donut-center"><span class="d-val">${fmtInt(kv.total)}</span><span class="d-lbl">tổng SL đơn</span></div>
+      </div>
+      ${sliceLabels.join('')}
+    </div>
+    <div class="donut-legend">${legendRows}</div>
+  </div>`;
 }
 
 // ---------- render ----------
@@ -335,7 +389,11 @@ function render(res, opts){
   </div>
 
   <!-- ZONE 2 -->
-  <div class="zone"><span class="z-num">2</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
+  <div class="zone"><span class="z-num">2</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
+  <div class="chart-card" style="margin-bottom:14px;">${buildKhuVucHtml(res)}</div>
+
+  <!-- ZONE 3 -->
+  <div class="zone"><span class="z-num">3</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
   <div class="grid cols-3">
     <div class="card"><div class="c-title">Tổng huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(huỷ+trả+hoàn)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtInt(s.huyHoanTra)}</span></div><div class="divider"></div>
@@ -357,8 +415,8 @@ function render(res, opts){
     <div class="col-labels">${reasonLabels}</div>
   </div>
 
-  <!-- ZONE 3 -->
-  <div class="zone"><span class="z-num">3</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
+  <!-- ZONE 4 -->
+  <div class="zone"><span class="z-num">4</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.slove)}</span>${pill(n4.slove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
@@ -374,8 +432,8 @@ function render(res, opts){
     </div>
   </div>
 
-  <!-- ZONE 4 -->
-  <div class="zone"><span class="z-num">4</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
+  <!-- ZONE 5 -->
+  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
   <div class="chart-card" style="margin-bottom:14px;"><div class="ct-title">Doanh thu theo kênh</div>${channelHtml}</div>
   <div class="chart-grid">
     <div class="chart-card"><div class="ct-title">CTR theo sản phẩm <span class="ct-note">(kênh Thẻ sản phẩm)</span></div>${ctrHtml}</div>

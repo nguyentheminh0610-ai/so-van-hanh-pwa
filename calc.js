@@ -35,6 +35,13 @@ function parseVndCurrency(v){
   return num(String(v).replace(/₫/g, '').trim());
 }
 
+/** Chuẩn hoá tên tỉnh/thành để gộp 2 sàn: Shopee ghi "Thành phố Hồ Chí Minh" /
+ *  "Tỉnh Đồng Nai", TikTok ghi "Hồ Chí Minh" / "Đồng Nai" (không tiền tố). */
+function normalizeTinhThanh(raw){
+  if (!raw || typeof raw !== 'string') return 'Không rõ';
+  return raw.replace(/^Thành phố\s+/, '').replace(/^Tỉnh\s+/, '').trim() || 'Không rõ';
+}
+
 /** sheet -> array of arrays (raw), via SheetJS */
 function sheetToAOA(ws){
   return XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: true });
@@ -682,6 +689,32 @@ function computeAllFromAOA(aoa){
   const spHuyHoanTra = spCancelAllIds.size + Object.keys(spDonTra).length + Object.keys(spDonHoan).length;
   const ttHuyHoanTra = Object.keys(ttCancelledNative).length + Object.keys(ttDonTra).length + Object.keys(ttDonHoan).length;
 
+  // ---------- Khách hàng theo khu vực (tỉnh/thành) — chỉ đếm SL đơn, gộp 2 sàn ----------
+  // Đếm trên CÙNG tập đơn đã dedup dùng cho "SL đơn" tổng (spOrders + ttOrders),
+  // không phân biệt trạng thái đơn — nên tổng các lát LUÔN = tong.tongDon.
+  console.log('[debug KhuVuc] Shopee "Tỉnh/Thành phố" (5 dòng đầu):', Object.values(spOrders).slice(0, 5).map(r => r['Tỉnh/Thành phố']));
+  console.log('[debug KhuVuc] TikTok "Province" (5 dòng đầu):', Object.values(ttOrders).slice(0, 5).map(r => r['Province']));
+  const khuVucCount = {};
+  for (const r of Object.values(spOrders)){
+    const tt = normalizeTinhThanh(r['Tỉnh/Thành phố']);
+    khuVucCount[tt] = (khuVucCount[tt] || 0) + 1;
+  }
+  for (const r of Object.values(ttOrders)){
+    const tt = normalizeTinhThanh(r['Province']);
+    khuVucCount[tt] = (khuVucCount[tt] || 0) + 1;
+  }
+  const khuVucTotal = Object.values(khuVucCount).reduce((s, n) => s + n, 0);
+  const khuVucNamed = Object.entries(khuVucCount)
+    .filter(([ten]) => ten !== 'Không rõ')
+    .map(([ten, soDon]) => ({ ten, soDon }))
+    .sort((a, b) => b.soDon - a.soDon);
+  const khuVucKhongRo = khuVucCount['Không rõ'] || 0;
+  const khuVucTop6 = khuVucNamed.slice(0, 6);
+  const khuVucKhac = khuVucNamed.slice(6).reduce((s, x) => s + x.soDon, 0) + khuVucKhongRo;
+  const khuVucRows = khuVucTop6.slice();
+  if (khuVucKhac > 0) khuVucRows.push({ ten: 'Khác', soDon: khuVucKhac, isKhac: true });
+  const khuVuc = { total: khuVucTotal, rows: khuVucRows };
+
   // ---------- 10) Affiliate/KOL (TikTok) — 2 file tuỳ chọn, không ảnh hưởng
   // tới việc xác định tháng của kỳ báo cáo (xem NO_FILENAME_MONTH_ROLES). ----------
   // Bảng 1 (Tổng hợp KOC theo đơn & doanh thu) — chỉ cần affiliateOrders.
@@ -789,5 +822,6 @@ function computeAllFromAOA(aoa){
     dailyRevenue,
     kenh, sanPham,
     affiliateKoc,
+    khuVuc,
   };
 }
