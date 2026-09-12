@@ -115,15 +115,17 @@ const ROLE_META = {
   shopeeFailedDelivery: { platform: 'Shopee', label: 'Giao hàng thất bại (khách không nhận)', required: false },
   tiktokAffiliateOrders: { platform: 'TikTok', label: 'Affiliate Orders', required: false },
   tiktokVideoAnalysis: { platform: 'TikTok', label: 'Video Analysis', required: false },
+  tiktokCreatorList: { platform: 'TikTok', label: 'Creator List (Transaction Analysis)', required: false },
+  tiktokLiveList: { platform: 'TikTok', label: 'Live List (Transaction Analysis)', required: false },
 };
 
 // TikTok: tên file KHÔNG có ngày thật (khác Shopee) — không được suy tháng
 // từ tên file cho các vai trò này, thà hiển thị "chưa rõ tháng" còn hơn sai.
-// tiktokAffiliateOrders/tiktokVideoAnalysis: phần đuôi số trong tên file chỉ
-// là ID/khoảng ngày XUẤT file, không phải mốc tháng dữ liệu — 2 role này
-// không dùng để xác định tháng của kỳ báo cáo (tháng do file đơn hàng/tài
-// chính chính quyết định như hiện tại).
-const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance', 'tiktokAffiliateOrders', 'tiktokVideoAnalysis']);
+// tiktokAffiliateOrders/tiktokVideoAnalysis/tiktokCreatorList/tiktokLiveList:
+// phần đuôi số trong tên file chỉ là ID/khoảng ngày XUẤT file, không phải
+// mốc tháng dữ liệu — các role này không dùng để xác định tháng của kỳ báo
+// cáo (tháng do file đơn hàng/tài chính chính quyết định như hiện tại).
+const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance', 'tiktokAffiliateOrders', 'tiktokVideoAnalysis', 'tiktokCreatorList', 'tiktokLiveList']);
 
 function detectRoleFromContent(wb){
   const sheetNames = wb.SheetNames.map(nfc);
@@ -306,6 +308,8 @@ async function computeAll(files){
   const wbFd = files.shopeeFailedDelivery ? await readWorkbook(files.shopeeFailedDelivery) : null;
   const wbAff = files.tiktokAffiliateOrders ? await readWorkbook(files.tiktokAffiliateOrders) : null;
   const wbVid = files.tiktokVideoAnalysis ? await readWorkbook(files.tiktokVideoAnalysis) : null;
+  const wbCreatorList = files.tiktokCreatorList ? await readWorkbook(files.tiktokCreatorList) : null;
+  const wbLiveList = files.tiktokLiveList ? await readWorkbook(files.tiktokLiveList) : null;
 
   const aoa = {
     shopeeOrders: sheetToAOA(getSheet(wbSp, 'orders')),
@@ -321,6 +325,8 @@ async function computeAll(files){
     shopeeFailedDelivery: wbFd ? sheetToAOA(getSheet(wbFd)) : null,
     tiktokAffiliateOrders: wbAff ? sheetToAOA(getSheet(wbAff)) : null,
     tiktokVideoAnalysis: wbVid ? sheetToAOA(getSheet(wbVid)) : null,
+    tiktokCreatorList: wbCreatorList ? sheetToAOA(getSheet(wbCreatorList)) : null,
+    tiktokLiveList: wbLiveList ? sheetToAOA(getSheet(wbLiveList)) : null,
   };
   return computeAllFromAOA(aoa);
 }
@@ -735,8 +741,22 @@ function computeAllFromAOA(aoa){
       kocContentRevenue[koc][loai] = (kocContentRevenue[koc][loai] || 0) + amt;
     }
   }
+  // CTOR (Creator List — Transaction Analysis) nối chéo vào Bảng 1 theo KOC —
+  // file tuỳ chọn riêng, không bắt buộc phải có mới tính được Bảng 1.
+  const creatorListRaw = aoa.tiktokCreatorList ? rowsAsDicts(aoa.tiktokCreatorList, 0, 2) : null;
+  const creatorCtorMap = {};
+  if (creatorListRaw){
+    for (const r of creatorListRaw){
+      const koc = r['Tên nhà sáng tạo'];
+      if (!koc) continue;
+      creatorCtorMap[koc] = num(r['CTOR']);
+    }
+  }
   const kocTable1 = affRowsRaw ? Object.entries(kocOrders)
-    .map(([koc, v]) => ({ koc, soDon: v.count, doanhThu: v.revenue }))
+    .map(([koc, v]) => ({
+      koc, soDon: v.count, doanhThu: v.revenue,
+      ctor: creatorCtorMap[koc] !== undefined ? creatorCtorMap[koc] : null,
+    }))
     .sort((a, b) => b.doanhThu - a.doanhThu)
     .slice(0, 20) : null;
 
@@ -788,9 +808,36 @@ function computeAllFromAOA(aoa){
     return b.ctrAvg - a.ctrAvg;
   }).slice(0, 20) : null;
 
+  // Bảng 3 "Hiệu quả LIVE theo KOC" (Live List — Transaction Analysis) — file
+  // tuỳ chọn riêng, độc lập với table1/table2; liveTable = null khi chưa tải
+  // file này, app.js sẽ ẩn hẳn bảng (không hiện bảng rỗng).
+  const liveRowsRaw = aoa.tiktokLiveList ? rowsAsDicts(aoa.tiktokLiveList, 0, 2) : null;
+  const kocLiveAgg = {};
+  if (liveRowsRaw){
+    for (const r of liveRowsRaw){
+      const koc = r['Tên nhà sáng tạo'];
+      if (!koc) continue;
+      if (!kocLiveAgg[koc]) kocLiveAgg[koc] = { liveIds: new Set(), gmvSum: 0, ctrSum: 0, ctrCount: 0, gpmSum: 0, gpmCount: 0 };
+      const agg = kocLiveAgg[koc];
+      agg.liveIds.add(r['ID buổi LIVE']);
+      agg.gmvSum += parseVndCurrency(r['GMV nhờ buổi LIVE của nhà sáng tạo']);
+      const ctr = r['CTR'];
+      if (ctr !== undefined && ctr !== null && ctr !== ''){ agg.ctrSum += num(ctr); agg.ctrCount += 1; }
+      const gpm = r['GPM hiển thị'];
+      if (gpm !== undefined && gpm !== null && gpm !== ''){ agg.gpmSum += parseVndCurrency(gpm); agg.gpmCount += 1; }
+    }
+  }
+  const kocLiveTable = liveRowsRaw ? Object.entries(kocLiveAgg).map(([koc, v]) => ({
+    koc,
+    soBuoiLive: v.liveIds.size,
+    gmvLive: v.gmvSum,
+    ctrAvg: v.ctrCount ? v.ctrSum / v.ctrCount : 0,
+    gpmHienThiAvg: v.gpmCount ? v.gpmSum / v.gpmCount : 0,
+  })).sort((a, b) => b.gmvLive - a.gmvLive).slice(0, 10) : null;
+
   // Chỉ hiện cả khu vực khi có ÍT NHẤT 1 trong 2 file — không có file nào thì
   // affiliateKoc = null, app.js sẽ ẩn hoàn toàn khu vực (không hiện bảng rỗng).
-  const affiliateKoc = (affRowsRaw || vidRowsRaw) ? { table1: kocTable1, table2: kocTable2 } : null;
+  const affiliateKoc = (affRowsRaw || vidRowsRaw) ? { table1: kocTable1, table2: kocTable2, liveTable: kocLiveTable } : null;
 
   return {
     warnings, ssWarning, minDate, maxDate,

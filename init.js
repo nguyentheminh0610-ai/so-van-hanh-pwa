@@ -255,6 +255,8 @@ function classifyFileName(filename){
   if (n.includes('failed delivery')) return 'shopeeFailedDelivery';
   if (n.includes('affiliate') && n.includes('order')) return 'tiktokAffiliateOrders';
   if (n.includes('video analysis') || (n.includes('video') && n.includes('list') && n.includes('analysis'))) return 'tiktokVideoAnalysis';
+  if (n.includes('creator list')) return 'tiktokCreatorList';
+  if (n.includes('live list')) return 'tiktokLiveList';
   if (hasTiktok && n.includes('tra hang')) return 'tiktokReturns';
   if (hasTiktok && (n.includes('tai chinh') || n.includes('finance'))) return 'tiktokFinance';
   if (n.includes('income')) return 'income';

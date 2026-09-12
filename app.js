@@ -163,8 +163,11 @@ const AFF_SEGMENT_COLORS = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--accent
 function buildAffiliateTable1Html(rows){
   if (!rows) return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tải file Affiliate Orders tháng này.</p>';
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có đơn "Đã quyết toán" nào trong file Affiliate Orders.</p>';
-  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số đơn</th><th style="text-align:right">Doanh thu</th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soDon)}</td><td class="num">${fmtVND(r.doanhThu)}</td></tr>`).join('')}
+  // Cột CTOR (từ file Creator List) là tuỳ chọn riêng — chỉ thêm cột khi có ít
+  // nhất 1 dòng có giá trị, để bảng vẫn y hệt cũ lúc chưa tải file này.
+  const hasCtor = rows.some(r => r.ctor !== null && r.ctor !== undefined);
+  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số đơn</th><th style="text-align:right">Doanh thu</th>${hasCtor ? '<th style="text-align:right">CTOR</th>' : ''}</tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soDon)}</td><td class="num">${fmtVND(r.doanhThu)}</td>${hasCtor ? `<td class="num">${r.ctor !== null && r.ctor !== undefined ? fmtPct(r.ctor, 2) : '—'}</td>` : ''}</tr>`).join('')}
   </tbody></table>`;
 }
 
@@ -189,16 +192,28 @@ function buildAffiliateTable2Html(rows){
   </tbody></table>`;
 }
 
+// Bảng 3 "Hiệu quả LIVE theo KOC" (Live List — Transaction Analysis) — tuỳ
+// chọn, độc lập với Bảng 1/2; chỉ được gọi khi aff.liveTable khác null.
+function buildAffiliateLiveTableHtml(rows){
+  if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu buổi LIVE nào trong file Live List.</p>';
+  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số buổi LIVE</th><th style="text-align:right">GMV từ LIVE</th><th style="text-align:right">CTR TB</th><th style="text-align:right">GPM hiển thị TB</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soBuoiLive)}</td><td class="num">${fmtVND(r.gmvLive)}</td><td class="num">${fmtPct(r.ctrAvg, 2)}</td><td class="num">${fmtVND(Math.round(r.gpmHienThiAvg))}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
 function buildAffiliateKocSectionHtml(res){
   const aff = res.affiliateKoc;
   if (!aff) return '';
+  const liveSectionHtml = aff.liveTable ? `
+  <div class="sub-label">Hiệu quả LIVE theo KOC</div>
+  ${buildAffiliateLiveTableHtml(aff.liveTable)}` : '';
   return `
   <!-- ZONE 6 -->
   <div class="zone"><span class="z-num">6</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
-  ${buildAffiliateTable2Html(aff.table2)}`;
+  ${buildAffiliateTable2Html(aff.table2)}${liveSectionHtml}`;
 }
 
 // ---------- Khách hàng theo khu vực — donut % số đơn theo tỉnh/thành (gộp 2
