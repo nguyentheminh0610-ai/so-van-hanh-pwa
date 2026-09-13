@@ -216,10 +216,15 @@ function detectMonthForRole(role, wb){
       return modeMonthFromDates(rows.map(r => r['Created Time']));
     }
     if (role === 'tiktokReturns'){
-      // Tương tự — lấy ngày yêu cầu/xử lý trả hàng, không có cột ngày đặt
-      // hàng trong file này (ngày đặt hàng nằm ở file "tất cả đơn hàng").
+      // Ưu tiên "Time Requested" — tên cột thật trong file "Trả hàng" TikTok
+      // hiện tại (xác nhận từ file mẫu thực tế): ngày người mua YÊU CẦU trả
+      // hàng, đúng bản chất tháng của giao dịch trả hàng. "Refund Time"
+      // (ngày hoàn tiền xong) có thể rơi sang tháng sau với đơn xử lý gần
+      // cuối tháng, gây tính nhầm tháng cho vài đơn ở biên giới tháng — nên
+      // chỉ dùng làm dự phòng cuối cùng. Các tên còn lại giữ lại làm dự
+      // phòng cho các phiên bản export khác có thể đặt tên khác.
       const rows = rowsAsDicts(sheetToAOA(getSheet(wb)), 0);
-      const candidates = ['Return Time', 'Return Request Time', 'Request Time', 'Refund Time'];
+      const candidates = ['Time Requested', 'Return Time', 'Return Request Time', 'Request Time', 'Refund Time'];
       for (const col of candidates){
         if (rows.some(r => r[col] !== undefined)){
           const m = modeMonthFromDates(rows.map(r => r[col]));
