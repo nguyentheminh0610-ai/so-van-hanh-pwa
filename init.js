@@ -197,12 +197,19 @@ function wireTabs(){
 }
 
 // ---------- Dashboard (tab 1) — chỉ hiển thị kết quả ----------
+// "Xem kỳ" đã gộp thẳng vào widget "Kỳ báo cáo" (to hơn, làm nút chính để
+// chọn/xem lại kỳ) theo yêu cầu chủ shop 2026-09-15 — không còn tách riêng
+// dòng "Xem kỳ:" + hộp chọn nhỏ như trước.
 function buildDashboardHTML(){
   return `
-  <div class="hb-view" id="hb-view">
-    <label for="history-select">Xem kỳ:</label>
-    <select id="history-select"></select>
+  <div class="topbar">
+    <div class="range-card range-card-lg" id="range-card">
+      <div class="rc-head"><span class="rc-title">Kỳ báo cáo</span></div>
+      <select id="history-select" class="rc-select"></select>
+      <div class="rc-dates-live" id="rc-dates-live"></div>
+    </div>
     <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
+    <div class="legend"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok Shop</span></div>
   </div>
   <div id="files-section"></div>
   <p class="up-status" id="dashboard-empty">Chưa có số liệu — sang tab "Tải file &amp; lịch sử" để tải file lên.</p>
@@ -400,6 +407,10 @@ function renderResults(el, res, opts){
   el.classList.add('show');
   wireDailyRevenueChart(el, res);
   refreshDashboardEmptyState();
+  // Widget "Kỳ báo cáo" (gộp chung với "Xem kỳ") nằm ngoài #results, cập
+  // nhật riêng khoảng ngày của kỳ đang xem tại đây.
+  const datesLive = document.getElementById('rc-dates-live');
+  if (datesLive) datesLive.textContent = fmtDateVN(res.minDate) + ' – ' + fmtDateVN(res.maxDate);
 }
 
 async function onCompute(){
@@ -422,8 +433,9 @@ async function onCompute(){
     statusEl.textContent = 'Xong — số liệu ' + fmtDateVN(result.minDate) + ' – ' + fmtDateVN(result.maxDate) + '.';
     document.getElementById('btn-save-history').disabled = false;
     document.getElementById('history-bar').style.display = 'flex';
-    switchToTab('dashboard');
-    resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Không tự chuyển sang tab Dashboard / cuộn trang nữa (theo yêu cầu chủ
+    // shop 2026-09-15) — ở lại tab "Tải file & lịch sử" để bấm luôn "Lưu vào
+    // lịch sử" ngay tại đây, không phải chuyển qua chuyển lại giữa 2 tab.
   } catch (err){
     console.error(err);
     statusEl.classList.add('err');
@@ -579,7 +591,19 @@ function isoDate(d){
 async function refreshHistoryFromServer(){
   const noteEl = document.getElementById('history-note');
   try {
-    HISTORY = await sbFetch('monthly_reports?select=id,label,period_start,period_end,created_at&order=created_at.desc') || [];
+    const rows = await sbFetch('monthly_reports?select=id,label,period_start,period_end,created_at') || [];
+    // Sắp xếp theo THÁNG THẬT của kỳ báo cáo (period_start), mới nhất lên
+    // đầu — không sắp theo created_at/thứ tự lưu nữa (chủ shop phản ánh
+    // 2026-09-15: lưu lại 1 tháng cũ sau sẽ đẩy nó lên đầu danh sách, làm
+    // danh sách "Xem kỳ" bị lộn xộn không theo trình tự tháng).
+    HISTORY = rows.slice().sort((a, b) => {
+      const da = a.period_start ? new Date(a.period_start) : null;
+      const db = b.period_start ? new Date(b.period_start) : null;
+      if (da && db) return db - da;
+      if (da) return -1;
+      if (db) return 1;
+      return String(b.created_at || '').localeCompare(String(a.created_at || ''));
+    });
     refreshHistorySelect();
   } catch (err){
     console.error(err);
@@ -658,7 +682,9 @@ async function onSaveHistory(){
     restoreContext = null;
     await refreshHistoryFromServer();
     renderFilesSection(files);
-    switchToTab('dashboard');
+    // Không tự chuyển sang tab Dashboard nữa sau khi lưu (theo yêu cầu chủ
+    // shop 2026-09-15) — ở lại tab hiện tại, chủ shop tự bấm "Dashboard" khi
+    // muốn xem, tránh bị nhảy tab liên tục sau mỗi thao tác Tính toán/Lưu.
     const filesNote = files.length < Object.keys(selectedFiles).length
       ? ` (lưu ý: ${Object.keys(selectedFiles).length - files.length} file gốc tải lên chưa thành công — thử lưu lại nếu cần)`
       : '';

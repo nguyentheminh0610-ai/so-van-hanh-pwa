@@ -57,32 +57,24 @@
   }
   .filter-chip .fc-label{ color:var(--ink-soft); font-weight:400; }
 
-  /* ---------- Range slicer (date filter, top-left) ---------- */
-  .range-card{ display:inline-flex; flex-direction:column; gap:11px; background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; padding:12px 16px 15px; box-shadow:var(--shadow); min-width:230px; }
+  /* ---------- "Kỳ báo cáo" — đã gộp "Xem kỳ" vào đây, làm to hơn hẳn
+     (2026-09-15) để làm nút chính chọn/xem lại kỳ báo cáo, thay cho ô chọn
+     nhỏ "Xem kỳ" + card ngày tách rời + tiêu đề trang trước đây. ---------- */
+  .range-card{ display:inline-flex; flex-direction:column; gap:8px; background:var(--surface); border:1px solid var(--line-strong); border-radius:10px; padding:12px 16px 15px; box-shadow:var(--shadow); min-width:230px; }
+  .range-card-lg{ min-width:300px; padding:16px 20px 18px; border-radius:14px; gap:10px; }
   .rc-head{ display:flex; align-items:center; justify-content:space-between; }
-  .rc-head .rc-title{ font-size:13px; font-weight:700; color:var(--ink); }
-  .rc-head .rc-chev{ color:var(--ink-faint); font-size:10px; }
-  .rc-dates{ display:flex; justify-content:space-between; gap:8px; }
-  .rc-date{ font-size:11.5px; font-weight:600; color:var(--ink-soft); border:1px solid var(--line); border-radius:6px; padding:4px 9px; background:var(--bg); font-variant-numeric:tabular-nums; }
-  .rc-track{ position:relative; height:14px; margin:2px 3px 0; }
-  .rc-track .rc-base{ position:absolute; top:50%; left:0; right:0; height:2px; background:var(--line-strong); transform:translateY(-50%); border-radius:2px; }
-  .rc-track .rc-fill{ position:absolute; top:50%; left:0; right:0; height:2px; background:var(--accent); transform:translateY(-50%); border-radius:2px; }
-  .rc-track .rc-handle{ position:absolute; top:50%; width:12px; height:12px; border-radius:50%; background:var(--surface); border:2px solid var(--accent); transform:translate(-50%,-50%); box-shadow:0 0 0 2px var(--surface); }
+  .rc-head .rc-title{ font-size:13px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.03em; }
+  .range-card-lg .rc-select{
+    font-family:inherit; font-size:17px; font-weight:700; color:var(--ink);
+    padding:10px 14px; border-radius:9px; border:1px solid var(--line-strong);
+    background:var(--bg); cursor:pointer; width:100%;
+  }
+  .rc-dates-live{ font-size:12.5px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .legend{ display:flex; gap:16px; align-items:center; }
   .legend span{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); font-weight:600; }
   .legend i{ width:9px; height:9px; border-radius:3px; display:inline-block; }
   .legend .i-shopee{ background:var(--shopee); }
   .legend .i-tiktok{ background:var(--tiktok); }
-
-  .masthead{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--line-strong); flex-wrap:wrap; }
-  .masthead h1{ font-size:26px; font-weight:700; margin:0; letter-spacing:-0.01em; }
-  .badge{
-    display:inline-flex; align-items:center; gap:6px;
-    background:var(--proc-soft); color:var(--proc); border:1px solid color-mix(in srgb, var(--proc) 35%, transparent);
-    font-size:11.5px; font-weight:600; letter-spacing:.02em;
-    padding:5px 10px; border-radius:6px;
-  }
-  .badge .dot{ width:6px; height:6px; border-radius:50%; background:var(--proc); }
 
   /* ---------- Zone label ---------- */
   .zone{ margin:30px 0 12px; }
@@ -191,6 +183,9 @@
   .pill.warn{ background:var(--warn-soft); color:var(--warn); }
   .pill.proc{ background:var(--proc-soft); color:var(--proc); }
   .pill .dot{ width:6px; height:6px; border-radius:50%; background:currentColor; }
+
+  .ink-faint{ color:var(--ink-faint); }
+  .sku-size-chip{ display:inline-block; font-size:11.5px; font-weight:600; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:3px 8px; margin:2px 4px 2px 0; }
 
   .reasons{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:18px 20px 16px; box-shadow:var(--shadow); }
   .r-total{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; flex-wrap:wrap; gap:8px;}

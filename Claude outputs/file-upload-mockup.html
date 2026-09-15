@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Phác thảo — Tải file & Thư viện file</title>
+<style>
+  :root{
+    --ink:#1F2937; --ink-soft:#6B7280; --line:#E5E7EB; --surface:#FFFFFF; --bg:#F8F9FA;
+    --accent:#2563EB; --accent-soft:#EFF4FF;
+    --shopee:#EE4D2D; --shopee-soft:#FDEEEA;
+    --tiktok:#111111; --tiktok-soft:#F0F0F0;
+    --good:#16A34A; --warn:#D97706; --bad:#DC2626;
+    --shadow:0 1px 3px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,sans-serif;}
+  .wrap{max-width:1080px;margin:0 auto;padding:24px 20px 60px;}
+  .app-title{font-size:26px;font-weight:700;margin:0 0 4px;}
+  .app-sub{font-size:13px;color:var(--ink-soft);margin:0 0 20px;}
+  .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:4px;margin-bottom:20px;width:fit-content;box-shadow:var(--shadow);}
+  .tab-btn{border:none;background:transparent;padding:9px 18px;font-size:13.5px;font-weight:600;color:var(--ink-soft);border-radius:7px;cursor:pointer;font-family:inherit;}
+  .tab-btn.active{background:var(--accent);color:#fff;}
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:18px;}
+  .card h2{font-size:16px;font-weight:700;margin:0 0 6px;}
+  .card p.desc{font-size:12.5px;color:var(--ink-soft);line-height:1.6;margin:0 0 16px;}
+
+  /* Screen 1: upload */
+  .dropzone{border:2px dashed #C7D2FE;border-radius:12px;background:var(--accent-soft);padding:36px 20px;text-align:center;cursor:pointer;}
+  .dropzone .icon{font-size:30px;}
+  .dropzone .main{font-size:14.5px;font-weight:700;color:var(--accent);margin-top:6px;}
+  .dropzone .sub{font-size:12px;color:var(--ink-soft);margin-top:4px;}
+
+  .detect-list{display:flex;flex-direction:column;gap:8px;margin-top:18px;}
+  .detect-row{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;padding:10px 14px;font-size:13px;}
+  .detect-row .badge{font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px;white-space:nowrap;}
+  .badge.shopee{background:var(--shopee-soft);color:var(--shopee);}
+  .badge.tiktok{background:var(--tiktok-soft);color:var(--tiktok);}
+  .detect-row .type{font-weight:600;color:var(--ink);}
+  .detect-row .fname{color:var(--ink-soft);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .detect-row .month-chip{font-size:11px;color:var(--ink-soft);background:#F3F4F6;border-radius:6px;padding:3px 8px;}
+  .detect-row.ok .status{color:var(--good);font-weight:700;font-size:13px;}
+  .detect-row.warn{border-color:#FDE68A;background:#FFFBEB;}
+  .detect-row.warn .status{color:var(--warn);font-weight:700;font-size:13px;}
+  .warn-note{font-size:12px;color:var(--warn);margin-top:8px;}
+
+  .btn{border:none;border-radius:9px;padding:11px 22px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+  .btn.primary{background:var(--accent);color:#fff;margin-top:18px;}
+  .btn.primary:disabled{background:#C7D2FE;cursor:not-allowed;}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+
+  /* Screen 2: file library */
+  .lib-cols{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+  .lib-col-head{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--line);}
+  .dot{width:10px;height:10px;border-radius:50%;}
+  .dot.shopee{background:var(--shopee);}
+  .dot.tiktok{background:var(--tiktok);}
+
+  .month-group{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden;}
+  .month-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:#FAFAFA;cursor:pointer;font-size:13.5px;font-weight:700;}
+  .month-head .rename{font-size:11px;font-weight:600;color:var(--accent);cursor:pointer;}
+  .month-files{padding:6px 14px 10px;}
+  .file-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid #F1F1F1;font-size:12.5px;}
+  .file-row:first-child{border-top:none;}
+  .file-row .ftype{font-weight:600;color:var(--ink);min-width:96px;}
+  .file-row .fn{color:var(--ink-soft);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .icon-btn{border:none;background:transparent;cursor:pointer;font-size:14px;padding:4px 6px;border-radius:6px;}
+  .icon-btn:hover{background:#F1F1F1;}
+  .icon-btn.del:hover{background:#FEE2E2;}
+
+  .note{font-size:12px;color:var(--ink-soft);background:#F3F4F6;border-radius:8px;padding:10px 12px;margin-top:14px;line-height:1.6;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="app-title">Sổ Vận Hành Shopee &amp; TikTok</div>
+  <div class="app-sub">Phác thảo giao diện mới — chỉ để xem trước bố cục, chưa phải bản chạy thật</div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-screen="s1">Tải &amp; tính toán</button>
+    <button class="tab-btn" data-screen="s2">Các file đã tải lên</button>
+  </div>
+
+  <!-- SCREEN 1 -->
+  <div class="screen active" id="s1">
+    <div class="card">
+      <h2>Tải số liệu tháng này</h2>
+      <p class="desc">Chỉ còn 1 khu vực tải file duy nhất — kéo-thả hoặc chọn nhiều file cùng lúc, không cần chọn tay từng ô như trước. Hệ thống tự đọc tên file + nội dung cột bên trong để nhận diện đúng sàn, loại báo cáo và tháng.</p>
+      <div class="dropzone">
+        <div class="icon">📂</div>
+        <div class="main">Bấm để chọn file, hoặc kéo-thả cả loạt file vào đây</div>
+        <div class="sub">Không giới hạn số file, không cần đúng thứ tự</div>
+      </div>
+
+      <div class="detect-list">
+        <div class="detect-row ok">
+          <span class="badge shopee">Shopee</span>
+          <span class="type">Tất cả đơn hàng</span>
+          <span class="fname">Shopee tất cả đơn hàng.xlsx</span>
+          <span class="month-chip">Tháng 7/2026</span>
+          <span class="status">✓ nhận diện được</span>
+        </div>
+        <div class="detect-row ok">
+          <span class="badge shopee">Shopee</span>
+          <span class="type">Trả/hoàn</span>
+          <span class="fname">Order.return_refund.20260701_20260801.xls</span>
+          <span class="month-chip">Tháng 7/2026</span>
+          <span class="status">✓ nhận diện được</span>
+        </div>
+        <div class="detect-row ok">
+          <span class="badge tiktok">TikTok</span>
+          <span class="type">Tất cả đơn hàng</span>
+          <span class="fname">Tất cả đơn hàng-2026-09-05-23_31.xlsx</span>
+          <span class="month-chip">Tháng 7/2026</span>
+          <span class="status">✓ nhận diện được</span>
+        </div>
+        <div class="detect-row warn">
+          <span class="badge shopee">Shopee</span>
+          <span class="type">Tài chính</span>
+          <span class="fname">income_20260905233219(UTC+7).xlsx</span>
+          <span class="month-chip">Tháng 7/2026</span>
+          <span class="status">⚠ trùng với 1 file khác</span>
+        </div>
+      </div>
+      <div class="warn-note">⚠ 2 file đang được nhận diện là cùng 1 vai trò (Shopee — Tài chính). Anh kiểm tra lại, chọn đúng file TikTok — Tài chính để thay thế.</div>
+
+      <button class="btn primary" disabled>Tính toán (còn 1 lỗi cần sửa ở trên)</button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2 -->
+  <div class="screen" id="s2">
+    <div class="card">
+      <h2>Các file đã tải lên</h2>
+      <p class="desc">Toàn bộ file gốc anh đã lưu qua các tháng, chia theo sàn. Đổi tên hiển thị của từng tháng, tải lại, hoặc xoá để thay file đúng rồi tính lại.</p>
+
+      <div class="lib-cols">
+        <!-- SHOPEE -->
+        <div>
+          <div class="lib-col-head"><span class="dot shopee"></span> Shopee</div>
+
+          <div class="month-group">
+            <div class="month-head">
+              <span>📁 Tháng 7/2026 <span class="rename">✎ đổi tên</span></span>
+              <span>▾</span>
+            </div>
+            <div class="month-files">
+              <div class="file-row">
+                <span class="ftype">Đơn hàng</span>
+                <span class="fn">Shopee tất cả đơn hàng.xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+              <div class="file-row">
+                <span class="ftype">Trả/hoàn</span>
+                <span class="fn">Order.return_refund...xls</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+              <div class="file-row">
+                <span class="ftype">Tài chính</span>
+                <span class="fn">Income.đã phát hành.vn...xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-group">
+            <div class="month-head">
+              <span>📁 Tháng 6/2026 <span class="rename">✎ đổi tên</span></span>
+              <span>▾</span>
+            </div>
+            <div class="month-files">
+              <div class="file-row">
+                <span class="ftype">Đơn hàng</span>
+                <span class="fn">Order.all.20260601_20260630.xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+              <div class="file-row">
+                <span class="ftype">Tài chính</span>
+                <span class="fn">income_20260905233219(UTC+7).xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TIKTOK -->
+        <div>
+          <div class="lib-col-head"><span class="dot tiktok"></span> TikTok Shop</div>
+
+          <div class="month-group">
+            <div class="month-head">
+              <span>📁 Tháng 7/2026 <span class="rename">✎ đổi tên</span></span>
+              <span>▾</span>
+            </div>
+            <div class="month-files">
+              <div class="file-row">
+                <span class="ftype">Đơn hàng</span>
+                <span class="fn">Tiktok tất cả đơn hàng.xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+              <div class="file-row">
+                <span class="ftype">Trả hàng</span>
+                <span class="fn">Tiktok trả hàng.xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+              <div class="file-row">
+                <span class="ftype">Tài chính</span>
+                <span class="fn">Tiktok tài chính.xlsx</span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="month-group">
+            <div class="month-head">
+              <span>📁 Tháng 6/2026 <span class="rename">✎ đổi tên</span></span>
+              <span>▾</span>
+            </div>
+            <div class="month-files">
+              <div class="file-row">
+                <span class="ftype">Tài chính</span>
+                <span class="fn">income_20260905233219(UTC+7).xlsx <b style="color:#D97706">(sai — cần thay)</b></span>
+                <button class="icon-btn">⬇</button>
+                <button class="icon-btn del">🗑</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">Khi bấm 🗑 xoá 1 file bị sai, hệ thống sẽ quay lại tab "Tải &amp; tính toán", tự điền sẵn các file còn đúng của đúng tháng đó — anh chỉ cần chọn thêm đúng 1 file thay thế rồi bấm tính lại, không cần chọn lại từ đầu.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.screen).classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

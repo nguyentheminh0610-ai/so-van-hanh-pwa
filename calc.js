@@ -511,23 +511,58 @@ function computeAllFromAOA(aoa){
   const ttRevenue = Object.values(ttCompleted).reduce((s, r) => s + num(r['Order Amount']), 0);
 
   // ---------- 5) TikTok tài chính — Chi tiết đơn hàng ----------
+  // Trước đây so khớp CỨNG đúng tên cột (vd. "Loại giao dịch" === 'Đơn hàng',
+  // r['Phí xử lý đơn hàng']...) nên chỉ cần TikTok đổi nhẹ tên cột (thêm
+  // khoảng trắng, đổi cách dịch, viết hoa/thường khác) là toàn bộ Tổng chi phí
+  // sàn/Tlove TikTok ra sai hoặc = 0 mà không có cảnh báo rõ ràng (chỉ có
+  // console.log ẩn, chủ shop không thấy). Sửa: dò cột theo TỪ KHOÁ (regex,
+  // không cần khớp tuyệt đối) trên header thật đọc được, và nếu vẫn không dò
+  // được cột nào thì cảnh báo NGAY trên dashboard (mục cảnh báo) kèm danh sách
+  // header thật, thay vì âm thầm trả về 0.
   const finAOA = aoa.tiktokFinance;
   const finRows = rowsAsDicts(finAOA, 0);
-  const finOrderRows = finRows.filter(r => r['Loại giao dịch'] === 'Đơn hàng');
+  const finHeaderKeys = finRows.length ? Object.keys(finRows[0]) : ((finAOA[0] || []).map(nfc).filter(v => v !== null && v !== undefined && v !== ''));
+
+  function findColKey(headerKeys, patterns){
+    for (const p of patterns){
+      const hit = headerKeys.find(k => p.test(String(k || '').trim()));
+      if (hit) return hit;
+    }
+    return null;
+  }
+
+  const COL_LOAI_GD = findColKey(finHeaderKeys, [/^loại\s*giao\s*dịch$/i, /loại.*giao.*dịch/i]);
+  const COL_PHI_XU_LY = findColKey(finHeaderKeys, [/phí.*xử\s*lý.*đơn/i]);
+  const COL_PHI_GIAO_DICH = findColKey(finHeaderKeys, [/^phí\s*giao\s*dịch$/i, /^phí\s*giao\s*dịch\b/i]);
+  const COL_HOA_HONG = findColKey(finHeaderKeys, [/phí.*hoa\s*hồng/i, /hoa\s*hồng.*tiktok/i]);
+  const COL_GIAM_GIA_NEN_TANG = findColKey(finHeaderKeys, [/giảm\s*giá.*nền\s*tảng/i]);
+  const COL_GIAM_PHI_VC = findColKey(finHeaderKeys, [/tiktok.*giảm.*phí.*vận\s*chuyển/i, /giảm.*phí.*vận\s*chuyển.*khách/i]);
+
+  const missingFinCols = [];
+  if (!COL_LOAI_GD) missingFinCols.push('"Loại giao dịch"');
+  if (!COL_PHI_XU_LY) missingFinCols.push('"Phí xử lý đơn hàng"');
+  if (!COL_PHI_GIAO_DICH) missingFinCols.push('"Phí giao dịch"');
+  if (!COL_HOA_HONG) missingFinCols.push('"Phí hoa hồng của TikTok Shop"');
+  if (!COL_GIAM_GIA_NEN_TANG) missingFinCols.push('"Giảm giá của nền tảng"');
+  if (!COL_GIAM_PHI_VC) missingFinCols.push('"TikTok Shop giảm phí vận chuyển cho khách hàng"');
+
+  const finOrderRows = COL_LOAI_GD ? finRows.filter(r => String(r[COL_LOAI_GD] || '').trim() === 'Đơn hàng') : [];
   let ttPhiSan = 0, ttTroGia = 0;
   for (const r of finOrderRows){
-    const hoaHong = r['Phí hoa hồng của TikTok Shop'] !== undefined ? r['Phí hoa hồng của TikTok Shop'] : r['Phí hoa hồng TikTok Shop'];
-    ttPhiSan += num(r['Phí xử lý đơn hàng']) + num(r['Phí giao dịch']) + num(hoaHong);
-    ttTroGia += num(r['Giảm giá của nền tảng']) + Math.abs(num(r['TikTok Shop giảm phí vận chuyển cho khách hàng']));
+    ttPhiSan += num(COL_PHI_XU_LY ? r[COL_PHI_XU_LY] : 0) + num(COL_PHI_GIAO_DICH ? r[COL_PHI_GIAO_DICH] : 0) + num(COL_HOA_HONG ? r[COL_HOA_HONG] : 0);
+    ttTroGia += num(COL_GIAM_GIA_NEN_TANG ? r[COL_GIAM_GIA_NEN_TANG] : 0) + Math.abs(num(COL_GIAM_PHI_VC ? r[COL_GIAM_PHI_VC] : 0));
   }
   ttPhiSan = Math.abs(ttPhiSan);
-  // Debug Tlove — in ra console để đối chiếu khi số ra 0 bất thường: nếu
-  // finOrderRows.length = 0 thì header sheet/tên cột "Loại giao dịch" đang lệch
-  // so với file thực tế; nếu > 0 mà ttPhiSan hoặc ttTroGia vẫn = 0 thì đúng tên
-  // 1 trong 4 cột nguồn (Phí xử lý đơn hàng / Phí giao dịch / Phí hoa hồng... /
-  // Giảm giá của nền tảng / TikTok Shop giảm phí vận chuyển...) đang lệch tên.
+
+  if (missingFinCols.length){
+    warnings.push(`Phí sàn TikTok (Tổng chi phí sàn / Tlove): không tìm thấy cột ${missingFinCols.join(', ')} trong sheet "Chi tiết đơn hàng" (file TikTok - Tài chính) — số liệu này có thể SAI hoặc =0. Các cột thực đọc được từ file: ${finHeaderKeys.length ? finHeaderKeys.join(' | ') : '(không đọc được dòng/cột nào)'}.`);
+  } else if (finOrderRows.length === 0){
+    warnings.push('Phí sàn TikTok (Tổng chi phí sàn / Tlove): tìm thấy cột "Loại giao dịch" nhưng không có dòng nào = "Đơn hàng" — kiểm tra lại có đúng file/tháng TikTok - Tài chính không.');
+  }
+  // Debug Tlove — vẫn giữ ở console để đối chiếu nhanh khi cần (F12 > Console).
+  console.log('[debug Tlove] cột dò được:', { COL_LOAI_GD, COL_PHI_XU_LY, COL_PHI_GIAO_DICH, COL_HOA_HONG, COL_GIAM_GIA_NEN_TANG, COL_GIAM_PHI_VC });
   console.log('[debug Tlove] finRows.length=', finRows.length, 'finOrderRows.length=', finOrderRows.length,
-    'header thực tế đọc được:', finRows[0] ? Object.keys(finRows[0]) : '(không có dòng nào)');
+    'header thực tế đọc được:', finHeaderKeys);
   console.log('[debug Tlove] ttTroGia (tử số — Chi phí sàn đã hỗ trợ) =', ttTroGia,
     '| ttPhiSan (mẫu số — Tổng chi phí sàn) =', ttPhiSan, '| tlove =', ttPhiSan ? ttTroGia / ttPhiSan : 0);
 
@@ -726,6 +761,113 @@ function computeAllFromAOA(aoa){
   if (khuVucKhac > 0) khuVucRows.push({ ten: 'Khác', soDon: khuVucKhac, isKhac: true });
   const khuVuc = { total: khuVucTotal, rows: khuVucRows };
 
+  // ---------- Hiệu suất theo SKU/size (2026-09-15, theo yêu cầu chủ shop) ----------
+  // Chủ shop xác nhận: cột "SKU phân loại hàng" (Shopee) và "Seller SKU"
+  // (TikTok) gộp SẴN cả mã SKU sản phẩm + size trong 1 chuỗi, dạng "CL01-L"
+  // (size luôn là token cuối, nối bằng dấu "-"). CHỈ tính trên đơn Hoàn thành
+  // (đã chốt với chủ shop), gộp chung 2 sàn theo TÊN SẢN PHẨM hiển thị (không
+  // theo mã SKU thô) vì chủ shop xác nhận Shopee đôi khi phải rút ngắn mã SKU
+  // so với Sapo/TikTok (giới hạn độ dài Shopee cho phép) nên mã có thể lệch
+  // giữa 2 sàn, còn TÊN sản phẩm thì luôn giống hệt nhau ở cả 3 nơi.
+  const SIZE_TOKENS = ['3XL', '2XL', 'XXL', 'XL', 'S', 'M', 'L'];
+  function splitSkuSize(code){
+    if (!code) return { baseSku: null, size: null };
+    const s = String(code).trim();
+    const upper = s.toUpperCase();
+    for (const tok of SIZE_TOKENS){
+      const suffix = '-' + tok;
+      if (upper.endsWith(suffix)) return { baseSku: s.slice(0, s.length - suffix.length), size: tok };
+    }
+    return { baseSku: s, size: null }; // không tách được size — coi cả chuỗi là mã SKU gốc
+  }
+  // Bảng tra cứu SKU -> Tên hiển thị, lấy từ tài liệu "quy-tac-dat-ten-sku-va-danh-sach-san-pham"
+  // (chủ shop cung cấp 2026-09-11). Mã nào chưa có trong bảng này thì hiện
+  // nguyên mã gốc + báo cảnh báo để chủ shop bổ sung, không làm mất dữ liệu.
+  const SKU_DISPLAY_NAME = {
+    CL01: 'Chất Lông-Shin', CL02: 'Chất Lông-Hello Kitty', CL03: 'Chất Lông-Vịt Xanh',
+    CL04: 'Chất Lông-Lợn Hồng', CL05: 'Chất Lông-Kuromi', CL06: 'Chất Lông-Shin 02',
+    CL07: 'Chất Lông-Shin 03', CL08: 'Chất Lông-Patrick Star', CL09: 'Chất Lông-Hello Kitty Hồng',
+    CL10: 'Chất Lông-Thỏ Nơ', CL11: 'Chất Lông-Thỏ Nơ', CL12: 'Chất Lông-Caro Xanh',
+    CL13: 'Chất Lông-Kẻ Xanh', CL14: 'Chất Lông-Đốm Hồng',
+    CT01: 'Chất Thun-Màu 01', CT02: 'Chất Thun-Màu 02', CT03: 'Chất Thun-Màu 03',
+    CT04: 'Chất Thun-Màu 04', CT05: 'Chất Thun-Màu 05', CT06: 'Chất Thun-Màu 06',
+    CT07: 'Chất Thun-Màu 07', CT08: 'Chất Thun-Shin 01', CT09: 'Chất Thun-Shin 02', CT10: 'Chất Thun-Shin 04',
+    DO03: 'Đỏ 03', DEN02: 'Đen 02', DO04: 'Đỏ 04', XANHLA03: 'Xanh Lá 03',
+    DO03BANNANGCAP: 'Đỏ 03 Cao Cấp (Noel)', XANHLA02: 'Xanh Lá 02', DADEN: 'Chất Dạ Đen Cao Cấp',
+    DADO: 'Chất Dạ Đỏ Cao Cấp', DO02: 'Đỏ 02', DO05: 'Đỏ 05', XANHLA05: 'Xanh Lá 05',
+    'PJD-CT-01': 'Bộ Dài-Shin 01', 'PJD-CT-02': 'Bộ Dài-Shin 02', 'PJD-CT-03': 'Bộ Dài-Shin 03',
+    'PJC-CT-01': 'Bộ Ngắn-Shin 01', 'PJC-CT-02': 'Bộ Ngắn-Shin 02', 'PJC-CT-03': 'Bộ Ngắn-Shin 03',
+    'QS-CT-01': 'Quần Short-Shin 01', 'QS-CT-02': 'Quần Short-Shin 02', 'QS-CT-03': 'Quần Short-Shin 03',
+  };
+  function normSkuKey(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+  const SKU_DISPLAY_NAME_NORM = {};
+  for (const [k, v] of Object.entries(SKU_DISPLAY_NAME)) SKU_DISPLAY_NAME_NORM[normSkuKey(k)] = v;
+  function resolveSkuName(baseSku){
+    if (!baseSku) return { name: null, matched: false };
+    if (SKU_DISPLAY_NAME[baseSku]) return { name: SKU_DISPLAY_NAME[baseSku], matched: true };
+    const norm = normSkuKey(baseSku);
+    if (SKU_DISPLAY_NAME_NORM[norm]) return { name: SKU_DISPLAY_NAME_NORM[norm], matched: true };
+    return { name: baseSku, matched: false }; // chưa có trong bảng — hiện tạm mã gốc
+  }
+
+  const skuFinHdrSp = spRows.length ? Object.keys(spRows[0]) : [];
+  const skuFinHdrTt = ttRows.length ? Object.keys(ttRows[0]) : [];
+  const COL_SP_SKU_SIZE = findColKey(skuFinHdrSp, [/^sku\s*phân\s*loại\s*hàng$/i, /sku.*phân\s*loại/i]);
+  const COL_SP_SL = findColKey(skuFinHdrSp, [/^số\s*lượng$/i]);
+  const COL_TT_SKU_SIZE = findColKey(skuFinHdrTt, [/^seller\s*sku$/i, /seller.*sku/i]);
+  const COL_TT_SL = findColKey(skuFinHdrTt, [/^quantity$/i]);
+
+  const skuAgg = {}; // key: tên hiển thị (hoặc mã gốc nếu chưa có tên) -> { name, matched, tongSL, sizes: {size: sl} }
+  const unmappedSkuCodes = new Set();
+  function addSkuLine(rawCode, qty){
+    if (!rawCode || !qty) return;
+    const { baseSku, size } = splitSkuSize(rawCode);
+    const { name, matched } = resolveSkuName(baseSku);
+    if (!matched) unmappedSkuCodes.add(baseSku);
+    const key = name || baseSku;
+    if (!skuAgg[key]) skuAgg[key] = { name: key, matched, tongSL: 0, sizes: {} };
+    skuAgg[key].tongSL += qty;
+    const sizeKey = size || '(không rõ size)';
+    skuAgg[key].sizes[sizeKey] = (skuAgg[key].sizes[sizeKey] || 0) + qty;
+  }
+  const skuColMissing = [];
+  if (!COL_SP_SKU_SIZE) skuColMissing.push('Shopee: "SKU phân loại hàng"');
+  if (!COL_SP_SL) skuColMissing.push('Shopee: "Số lượng"');
+  if (!COL_TT_SKU_SIZE) skuColMissing.push('TikTok: "Seller SKU"');
+  if (!COL_TT_SL) skuColMissing.push('TikTok: "Quantity"');
+  if (COL_SP_SKU_SIZE && COL_SP_SL){
+    for (const r of spRows){
+      const oid = r['Mã đơn hàng'];
+      if (oid === undefined || !(oid in spCompleted)) continue;
+      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]));
+    }
+  }
+  if (COL_TT_SKU_SIZE && COL_TT_SL){
+    for (const r of ttRows){
+      const oid = r['Order ID'];
+      if (oid === undefined || !(oid in ttCompleted)) continue;
+      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]));
+    }
+  }
+  const periodDays = (minDate && maxDate) ? Math.round((maxDate - minDate) / 86400000) + 1 : null;
+  const SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
+  const skuPerformance = {
+    periodDays,
+    items: Object.values(skuAgg).map(item => ({
+      ten: item.name, matched: item.matched, tongSL: item.tongSL,
+      slNgay: periodDays ? item.tongSL / periodDays : null,
+      sizes: Object.entries(item.sizes)
+        .map(([size, sl]) => ({ size, sl, pct: item.tongSL ? sl / item.tongSL : 0 }))
+        .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
+    })).sort((a, b) => b.tongSL - a.tongSL),
+    unmappedCodes: [...unmappedSkuCodes],
+  };
+  if (skuColMissing.length){
+    warnings.push(`Hiệu suất theo SKU/size: không tìm thấy cột ${skuColMissing.join(', ')} — chưa tính được SL bán/ngày theo SKU và tỷ trọng size. Kiểm tra lại đúng tên cột trong file "tất cả đơn hàng" 2 sàn.`);
+  } else if (skuPerformance.unmappedCodes.length){
+    warnings.push(`Hiệu suất theo SKU/size: ${skuPerformance.unmappedCodes.length} mã SKU chưa có trong bảng tên sản phẩm, đang hiện tạm mã gốc: ${skuPerformance.unmappedCodes.join(', ')} — báo lại tên sản phẩm tương ứng để cập nhật bảng tra cứu.`);
+  }
+
   // ---------- 10) Affiliate/KOL (TikTok) — 2 file tuỳ chọn, không ảnh hưởng
   // tới việc xác định tháng của kỳ báo cáo (xem NO_FILENAME_MONTH_ROLES). ----------
   // Bảng 1 (Tổng hợp KOC theo đơn & doanh thu) — chỉ cần affiliateOrders.
@@ -875,5 +1017,6 @@ function computeAllFromAOA(aoa){
     kenh, sanPham,
     affiliateKoc,
     khuVuc,
+    skuPerformance,
   };
 }

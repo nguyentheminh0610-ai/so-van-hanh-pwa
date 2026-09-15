@@ -201,6 +201,29 @@ function buildAffiliateLiveTableHtml(rows){
   </tbody></table>`;
 }
 
+// Hiệu suất theo SKU/size (2026-09-15, theo yêu cầu chủ shop) — gộp 2 sàn
+// theo TÊN sản phẩm, chỉ tính đơn Hoàn thành. Độc lập với Shop Stats (lấy
+// thẳng từ 2 file "tất cả đơn hàng" chính) nên luôn có nếu cột SKU/SL đọc
+// được, kể cả khi chưa tải Shop Stats.
+function buildSkuPerformanceHtml(res){
+  const sp = res.skuPerformance;
+  if (!sp || !sp.items || !sp.items.length){
+    return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tính được — kiểm tra mục cảnh báo ở trên (cột SKU/số lượng chưa đọc được).</p>';
+  }
+  const dayNote = sp.periodDays ? ` (chia cho ${sp.periodDays} ngày của kỳ)` : '';
+  const rowsHtml = sp.items.map(item => {
+    const nameHtml = esc(item.ten) + (item.matched ? '' : ' <span class="pill warn" style="margin-left:4px;">chưa rõ tên</span>');
+    const sizesHtml = item.sizes.map(s => `<span class="sku-size-chip">${esc(s.size)}: ${fmtInt(s.sl)} <span class="ink-faint">(${fmtPct(s.pct, 1)})</span></span>`).join(' ');
+    return `<tr>
+      <td>${nameHtml}</td>
+      <td class="num">${fmtInt(item.tongSL)}</td>
+      <td class="num">${item.slNgay === null ? '—' : item.slNgay.toFixed(1)}</td>
+      <td>${sizesHtml}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="dtable"><thead><tr><th>SKU (không tính size)</th><th style="text-align:right">Tổng SL bán (đơn Hoàn thành)</th><th style="text-align:right">SL bán TB/ngày${dayNote}</th><th>Tỷ trọng theo size</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+}
+
 function buildAffiliateKocSectionHtml(res){
   const aff = res.affiliateKoc;
   if (!aff) return '';
@@ -365,20 +388,6 @@ function render(res, opts){
     : '';
 
   return `
-  <div class="topbar">
-    <div class="range-card">
-      <div class="rc-head"><span class="rc-title">Kỳ báo cáo</span><span class="rc-chev">⌄</span></div>
-      <div class="rc-dates"><span class="rc-date">${fmtDateVN(res.minDate)}</span><span class="rc-date">${fmtDateVN(res.maxDate)}</span></div>
-      <div class="rc-track"><div class="rc-base"></div><div class="rc-fill"></div><span class="rc-handle" style="left:0%"></span><span class="rc-handle" style="left:100%"></span></div>
-    </div>
-    <div class="legend"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok Shop</span></div>
-  </div>
-
-  <div class="masthead">
-    <h1>Sổ vận hành Shopee &amp; TikTok Shop v2</h1>
-    <span class="badge"><span class="dot"></span>${esc(label)}</span>
-  </div>
-
   ${warningsHtml}
 
   <!-- ZONE 1 -->
@@ -450,6 +459,10 @@ function render(res, opts){
   </div>
   <div class="sub-label">Chi tiết sản phẩm</div>
   ${prodTableHtml}
+
+  <div class="sub-label">Hiệu suất theo SKU/size <span style="text-transform:none;font-weight:400;">— gộp 2 sàn, chỉ tính đơn Hoàn thành</span></div>
+  ${buildSkuPerformanceHtml(res)}
+
   ${buildAffiliateKocSectionHtml(res)}
 
   <footer>
