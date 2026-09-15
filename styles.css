@@ -94,6 +94,23 @@
   .rc-item-check{ width:14px; flex:none; font-size:12px; color:var(--accent); }
   .rc-item-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .rc-dates-live{ font-size:12.5px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
+  /* "Gộp nhiều tháng" (2026-09-15) — nút bật/tắt chế độ chọn nhiều + danh sách
+     checkbox tái dùng chung .rc-panel/.rc-item ở trên, cộng thanh hành động
+     "Đã chọn N tháng / Xem gộp / Huỷ" bên dưới widget. */
+  .rc-multi-toggle{
+    font-family:inherit; font-size:11.5px; font-weight:700; color:var(--accent);
+    background:var(--accent-soft); border:none; border-radius:99px; padding:4px 10px; cursor:pointer;
+  }
+  .rc-multi-toggle:hover{ filter:brightness(0.96); }
+  .rc-item-check-mode{ display:flex; align-items:center; gap:9px; padding:9px 10px; border-radius:7px; font-size:14px; font-weight:600; color:var(--ink); cursor:pointer; }
+  .rc-item-check-mode:hover{ background:var(--surface-soft); }
+  .rc-item-check-mode.is-selected{ background:var(--accent-soft); color:var(--accent); }
+  .rc-item-checkbox{ width:15px; height:15px; flex:none; accent-color:var(--accent); cursor:pointer; }
+  .rc-multi-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-top:2px; }
+  .rc-multi-actions #rc-multi-count{ font-size:12.5px; font-weight:600; color:var(--ink-soft); }
+  .rc-multi-actions .btn-secondary{ padding:6px 12px; font-size:12.5px; }
+  .rc-multi-actions .btn-secondary:disabled{ opacity:.5; cursor:not-allowed; }
+  .rc-multi-actions #rc-multi-cancel{ cursor:pointer; }
   .legend{ display:flex; gap:16px; align-items:center; }
   .legend span{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); font-weight:600; }
   .legend i{ width:9px; height:9px; border-radius:3px; display:inline-block; }

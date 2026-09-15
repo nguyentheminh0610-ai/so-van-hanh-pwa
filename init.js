@@ -204,7 +204,10 @@ function buildDashboardHTML(){
   return `
   <div class="topbar">
     <div class="range-card range-card-lg" id="range-card">
-      <div class="rc-head"><span class="rc-title">Kỳ báo cáo</span></div>
+      <div class="rc-head">
+        <span class="rc-title">Kỳ báo cáo</span>
+        <button type="button" class="rc-multi-toggle" id="rc-multi-toggle" style="display:none;">Gộp nhiều tháng</button>
+      </div>
       <div class="rc-dropdown" id="rc-dropdown">
         <button type="button" class="rc-select-btn" id="rc-select-btn" aria-haspopup="listbox" aria-expanded="false">
           <span id="rc-select-label">Số liệu vừa tính (chưa lưu)</span>
@@ -214,6 +217,11 @@ function buildDashboardHTML(){
       </div>
       <select id="history-select" class="rc-select-native" aria-hidden="true" tabindex="-1"></select>
       <div class="rc-dates-live" id="rc-dates-live"></div>
+      <div class="rc-multi-actions" id="rc-multi-actions" hidden>
+        <span id="rc-multi-count">Đã chọn 0 tháng</span>
+        <button type="button" class="btn-secondary" id="rc-multi-apply" disabled>Xem gộp</button>
+        <span class="up-manual-link" id="rc-multi-cancel">Huỷ</span>
+      </div>
     </div>
     <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
     <div class="legend"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok Shop</span></div>
@@ -639,6 +647,9 @@ function refreshHistorySelect(){
     : 'Chưa lưu tháng nào.';
   const refreshBtn = document.getElementById('btn-refresh-all-history');
   if (refreshBtn) refreshBtn.style.display = HISTORY.length > 0 ? '' : 'none';
+  const multiToggle = document.getElementById('rc-multi-toggle');
+  if (multiToggle) multiToggle.style.display = HISTORY.length >= 2 ? '' : 'none';
+  if (HISTORY.length < 2) setMultiMode(false);
   renderRcDropdown();
 }
 
@@ -648,6 +659,33 @@ function refreshHistorySelect(){
 // <select id="history-select"> ẩn đi làm "nguồn sự thật" (vẫn phát event
 // change để mọi chỗ khác dùng nguyên, không phải sửa lại), còn phần hiển thị
 // cho chủ shop bấm là nút + danh sách tự vẽ (rc-select-btn/rc-panel) dưới đây.
+//
+// Chế độ "Gộp nhiều tháng" (2026-09-15) — dùng chung panel này: bật lên thì
+// mỗi kỳ ĐÃ LƯU (trừ "Số liệu vừa tính (chưa lưu)") hiện thành 1 dòng có ô
+// tick thay vì bấm-là-chọn-luôn — chủ shop tick nhiều tháng rồi bấm "Xem gộp".
+// Chỉ gộp được các tháng LIỀN KỀ (đã chốt với chủ shop) — kiểm tra tính liền kề
+// ở thời điểm bấm "Xem gộp" (applyMultiSelect), không chặn lúc tick để đơn giản.
+let multiMode = false;
+let multiSelectedIds = [];
+
+function setMultiMode(on){
+  multiMode = on;
+  multiSelectedIds = [];
+  const toggle = document.getElementById('rc-multi-toggle');
+  const actions = document.getElementById('rc-multi-actions');
+  if (toggle) toggle.textContent = on ? 'Thôi gộp' : 'Gộp nhiều tháng';
+  if (actions) actions.hidden = !on;
+  updateMultiCount();
+  renderRcDropdown();
+}
+
+function updateMultiCount(){
+  const countEl = document.getElementById('rc-multi-count');
+  const applyBtn = document.getElementById('rc-multi-apply');
+  if (countEl) countEl.textContent = `Đã chọn ${multiSelectedIds.length} tháng`;
+  if (applyBtn) applyBtn.disabled = multiSelectedIds.length < 2;
+}
+
 function renderRcDropdown(){
   const sel = document.getElementById('history-select');
   const panel = document.getElementById('rc-panel');
@@ -655,6 +693,18 @@ function renderRcDropdown(){
   if (!sel || !panel || !labelEl) return;
   const options = [...sel.options];
   const current = sel.value;
+  if (multiMode){
+    labelEl.textContent = 'Chọn các tháng cần gộp bên dưới';
+    panel.innerHTML = options.filter(o => o.value !== 'current').map(o => {
+      const checked = multiSelectedIds.includes(o.value);
+      return `
+      <label class="rc-item rc-item-check-mode${checked ? ' is-selected' : ''}">
+        <input type="checkbox" class="rc-item-checkbox" data-value="${esc(o.value)}" ${checked ? 'checked' : ''}>
+        <span class="rc-item-label">${esc(o.textContent)}</span>
+      </label>`;
+    }).join('') || '<div style="padding:10px;font-size:13px;color:var(--ink-faint);">Chưa có tháng nào đã lưu để gộp.</div>';
+    return;
+  }
   const selectedOpt = options.find(o => o.value === current);
   labelEl.textContent = selectedOpt ? selectedOpt.textContent : 'Chọn kỳ';
   panel.innerHTML = options.map(o => `
@@ -664,10 +714,52 @@ function renderRcDropdown(){
     </div>`).join('');
 }
 
+// Bấm "Xem gộp": kiểm tra các tháng đã tick có LIỀN KỀ nhau trong danh sách
+// (đã sắp theo đúng thứ tự thời gian bởi refreshHistoryFromServer) hay không —
+// nếu bỏ cách quãng (vd chọn tháng 6 và tháng 8, bỏ qua tháng 7) thì báo lỗi và
+// không cho gộp, đúng quyết định đã chốt với chủ shop.
+async function applyMultiSelect(){
+  if (multiSelectedIds.length < 2) return;
+  const orderedIds = HISTORY.map(h => h.id); // đã sắp theo period_start, mới nhất trước
+  const indices = multiSelectedIds.map(id => orderedIds.indexOf(id)).sort((a, b) => a - b);
+  const isContiguous = indices.every((idx, i) => i === 0 || idx === indices[i - 1] + 1);
+  if (!isContiguous){
+    alert('Chỉ gộp được các tháng LIỀN KỀ nhau (không bỏ cách quãng). Chọn lại cho đúng các tháng liên tiếp nhé.');
+    return;
+  }
+  const noteEl = document.getElementById('history-note');
+  if (noteEl) noteEl.textContent = 'Đang tải dữ liệu các tháng đã chọn…';
+  try {
+    const idsParam = multiSelectedIds.map(id => encodeURIComponent(id)).join(',');
+    const rows = await sbFetch(`monthly_reports?id=in.(${idsParam})&select=id,label,period_start,data`) || [];
+    const byId = {}; rows.forEach(r => { byId[r.id] = r; });
+    // sắp theo đúng thứ tự thời gian tăng dần (period_start) trước khi gộp
+    const entries = [...multiSelectedIds]
+      .map(id => byId[id])
+      .filter(Boolean)
+      .sort((a, b) => new Date(a.period_start || 0) - new Date(b.period_start || 0))
+      .map(r => ({ label: r.label, data: r.data }));
+    if (entries.length < 2) throw new Error('Không tải đủ dữ liệu các tháng đã chọn.');
+    const combined = combineMonthlyResults(entries);
+    const resultsEl = document.getElementById('results');
+    renderResults(resultsEl, combined, { label: 'Gộp: ' + entries.map(e => e.label).join(' + ') });
+    renderFilesSection(null);
+    switchToTab('dashboard');
+    if (noteEl) noteEl.textContent = HISTORY.length ? `Đã lưu ${HISTORY.length} tháng trên server.` : 'Chưa lưu tháng nào.';
+    setMultiMode(false);
+  } catch (err){
+    console.error(err);
+    if (noteEl) noteEl.textContent = 'Gộp thất bại: ' + err.message;
+  }
+}
+
 function wireRcDropdown(){
   const btn = document.getElementById('rc-select-btn');
   const panel = document.getElementById('rc-panel');
   const sel = document.getElementById('history-select');
+  const multiToggle = document.getElementById('rc-multi-toggle');
+  const multiCancel = document.getElementById('rc-multi-cancel');
+  const multiApply = document.getElementById('rc-multi-apply');
   if (!btn || !panel || !sel) return;
   const closePanel = () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
   const openPanel = () => { panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); };
@@ -675,7 +767,17 @@ function wireRcDropdown(){
     e.stopPropagation();
     if (panel.hidden) openPanel(); else closePanel();
   });
+  panel.addEventListener('change', (e) => {
+    const cb = e.target.closest('.rc-item-checkbox');
+    if (!cb) return;
+    const value = cb.dataset.value;
+    if (cb.checked){ if (!multiSelectedIds.includes(value)) multiSelectedIds.push(value); }
+    else multiSelectedIds = multiSelectedIds.filter(v => v !== value);
+    updateMultiCount();
+    renderRcDropdown();
+  });
   panel.addEventListener('click', (e) => {
+    if (multiMode) return; // chế độ gộp: chọn qua ô tick (event 'change' ở trên), không đóng panel khi bấm dòng
     const item = e.target.closest('.rc-item');
     if (!item) return;
     const value = item.dataset.value;
@@ -685,8 +787,11 @@ function wireRcDropdown(){
     }
     closePanel();
   });
+  if (multiToggle) multiToggle.addEventListener('click', () => { setMultiMode(!multiMode); openPanel(); });
+  if (multiCancel) multiCancel.addEventListener('click', () => setMultiMode(false));
+  if (multiApply) multiApply.addEventListener('click', () => applyMultiSelect());
   document.addEventListener('click', (e) => {
-    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) closePanel();
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn && !(multiToggle && multiToggle.contains(e.target))) closePanel();
   });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
 }

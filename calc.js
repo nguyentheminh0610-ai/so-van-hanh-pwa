@@ -630,6 +630,7 @@ function computeAllFromAOA(aoa){
 
   // ---------- 9) ShopStats — Voucher extra / kênh / sản phẩm ----------
   let voucherExtra = null, kenh = null, sanPham = null, ssWarning = null;
+  let shopeeTroGiaForVoucher = null; // lộ ra ngoài (raw) để gộp nhiều tháng chính xác — xem combineMonthlyResults()
   if (aoa.ss_DonDaThanhToan){
     const paidAOA = aoa.ss_DonDaThanhToan;
     const hdrPaid = (paidAOA[0] || []).map(nfc);
@@ -638,6 +639,7 @@ function computeAllFromAOA(aoa){
     const tongDoanhSo = num(paid['Tổng doanh số (VND)']);
     const doanhSoKhongTroGia = num(paid['Doanh số không bao gồm trợ giá bởi Shopee']);
     const shopeeTroGia = tongDoanhSo - doanhSoKhongTroGia;
+    shopeeTroGiaForVoucher = shopeeTroGia;
     voucherExtra = voucherXtraTotal ? shopeeTroGia / voucherXtraTotal : 0;
 
     const chanAOA = aoa.ss_NguonTruyCap;
@@ -1018,5 +1020,235 @@ function computeAllFromAOA(aoa){
     affiliateKoc,
     khuVuc,
     skuPerformance,
+    // Số liệu gốc (tử số/mẫu số) của các chỉ số tỷ lệ — KHÔNG hiện trực tiếp lên
+    // dashboard, chỉ dùng để gộp nhiều tháng chính xác (combineMonthlyResults()
+    // bên dưới): cộng thẳng tử số + mẫu số gốc của từng tháng trước rồi mới chia
+    // 1 lần ra tỷ lệ gộp, thay vì lấy trung bình cộng % (sai) hoặc thiếu dữ liệu
+    // để tính lại (piShipPhi/piShipHoan, shopeeTroGia không có sẵn ở chỗ nào khác
+    // trong object trả về). Các tháng đã lưu TRƯỚC 2026-09-15 (trước khi thêm
+    // trường này) sẽ không có "raw" — bấm "Cập nhật lại lịch sử" để tính lại và
+    // có đủ dữ liệu gộp chính xác.
+    raw: { piShipPhi, piShipHoan, voucherXtraTotal, shopeeTroGia: shopeeTroGiaForVoucher },
+  };
+}
+
+// ============================================================
+// Gộp nhiều kỳ (tháng) LIỀN KỀ đã lưu thành 1 kỳ xem tổng hợp — thiết kế đã chốt
+// với chủ shop (2026-09-15, xem project doc "dac-ta-chi-so-dashboard-web.md",
+// mục "Quyết định về việc xem theo tuần/nhiều tháng"):
+//   (1) số tuyệt đối — cộng thẳng.
+//   (2) tỷ lệ (Slove/Tlove/PiShip/Voucher extra, tỷ lệ huỷ hoàn trả/lỗi shop) —
+//       cộng riêng tử số + mẫu số gốc của từng tháng rồi mới chia 1 lần.
+//   (3) % theo tỷ trọng (kênh, CTR/chuyển đổi SP) — cộng tuyệt đối từng phần
+//       trước, tính % lại trên tổng gộp sau (CTR/chuyển đổi SP: không có sẵn số
+//       lượt xem/lượt click gốc trong dữ liệu ShopStats đã lưu, nên tạm dùng
+//       trung bình có trọng số theo doanh số — có thể lệch nhẹ so với gộp đúng
+//       từ số liệu gốc, đã ghi chú trong cảnh báo).
+//   (4) bảng chi tiết — nối danh sách các tháng lại.
+// entries: [{ label, data }] — PHẢI đã được lọc/sắp xếp LIỀN KỀ theo thời gian
+// bởi phía gọi (init.js); hàm này không tự kiểm tra tính liền kề.
+function combineMonthlyResults(entries){
+  const warnings = [];
+  const list = entries.map(e => e.data).filter(Boolean);
+  if (!list.length) return null;
+
+  function sumField(getter){ return list.reduce((s, d) => s + (num(getter(d)) || 0), 0); }
+  function safeDiv(a, b){ return b ? a / b : 0; }
+
+  const shopee = {
+    tongDon: sumField(d => d.shopee.tongDon), hoanThanh: sumField(d => d.shopee.hoanThanh),
+    doanhThu: sumField(d => d.shopee.doanhThu), phiSan: sumField(d => d.shopee.phiSan),
+    troGia: sumField(d => d.shopee.troGia),
+    huy: sumField(d => d.shopee.huy), tra: sumField(d => d.shopee.tra), hoan: sumField(d => d.shopee.hoan),
+    huyHoanTra: sumField(d => d.shopee.huyHoanTra), loiShop: sumField(d => d.shopee.loiShop),
+    hoanVeKho: sumField(d => d.shopee.hoanVeKho),
+  };
+  shopee.doanhThuRong = shopee.doanhThu - shopee.phiSan;
+  shopee.aov = safeDiv(shopee.doanhThu, shopee.hoanThanh);
+
+  const tiktok = {
+    tongDon: sumField(d => d.tiktok.tongDon), hoanThanh: sumField(d => d.tiktok.hoanThanh),
+    doanhThu: sumField(d => d.tiktok.doanhThu), phiSan: sumField(d => d.tiktok.phiSan),
+    troGia: sumField(d => d.tiktok.troGia),
+    huy: sumField(d => d.tiktok.huy), tra: sumField(d => d.tiktok.tra), hoan: sumField(d => d.tiktok.hoan),
+    huyHoanTra: sumField(d => d.tiktok.huyHoanTra), loiShop: sumField(d => d.tiktok.loiShop),
+    hoanVeKho: sumField(d => d.tiktok.hoanVeKho),
+  };
+  tiktok.doanhThuRong = tiktok.doanhThu - tiktok.phiSan;
+  tiktok.aov = safeDiv(tiktok.doanhThu, tiktok.hoanThanh);
+
+  const tongDoanhThu = shopee.doanhThu + tiktok.doanhThu;
+  const tongHoanThanh = shopee.hoanThanh + tiktok.hoanThanh;
+  const tongDon = shopee.tongDon + tiktok.tongDon;
+  const tongHuyHoanTra = shopee.huyHoanTra + tiktok.huyHoanTra;
+  const tongLoiShop = shopee.loiShop + tiktok.loiShop;
+  const tong = {
+    doanhThu: tongDoanhThu, tongDon, hoanThanh: tongHoanThanh,
+    phiSan: shopee.phiSan + tiktok.phiSan, doanhThuRong: shopee.doanhThuRong + tiktok.doanhThuRong,
+    aov: safeDiv(tongDoanhThu, tongHoanThanh),
+    huyHoanTra: tongHuyHoanTra, tyLeHuyHoanTra: safeDiv(tongHuyHoanTra, tongDon),
+    loiShop: tongLoiShop, tyLeLoiShop: safeDiv(tongLoiShop, tongDon),
+    hoanVeKho: shopee.hoanVeKho + tiktok.hoanVeKho,
+  };
+
+  // Slove/Tlove/PiShip/Voucher extra — gộp đúng bằng tử/mẫu gốc CHỈ với các
+  // tháng đã có "raw" (tính lại từ 2026-09-15 trở đi); tháng cũ thiếu "raw"
+  // vẫn được cộng phần Tlove (đủ dữ liệu sẵn có), riêng Slove/PiShip/Voucher
+  // extra sẽ bị BỎ QUA phần đóng góp của tháng đó và có cảnh báo rõ.
+  const monthsMissingRaw = entries.filter(e => e.data && !e.data.raw).map(e => e.label);
+  let piShipPhiSum = 0, piShipHoanSum = 0, shopeeTroGiaSum = 0, voucherXtraSum = 0, hasVoucherData = false;
+  for (const d of list){
+    if (d.raw){
+      piShipPhiSum += num(d.raw.piShipPhi) || 0;
+      piShipHoanSum += num(d.raw.piShipHoan) || 0;
+      voucherXtraSum += num(d.raw.voucherXtraTotal) || 0;
+      if (d.raw.shopeeTroGia !== null && d.raw.shopeeTroGia !== undefined){ shopeeTroGiaSum += num(d.raw.shopeeTroGia) || 0; hasVoucherData = true; }
+    }
+  }
+  const slovePhi = shopee.phiSan + piShipPhiSum; // xấp xỉ nếu có tháng thiếu raw (thiếu phần piShipPhi của tháng đó)
+  const slove = safeDiv(shopee.troGia, slovePhi);
+  const tlove = safeDiv(tiktok.troGia, tiktok.phiSan);
+  const piShipRatio = safeDiv(piShipHoanSum, piShipPhiSum);
+  const voucherExtra = hasVoucherData ? safeDiv(shopeeTroGiaSum, voucherXtraSum) : null;
+  if (monthsMissingRaw.length){
+    warnings.push(`Gộp kỳ: ${monthsMissingRaw.join(', ')} chưa được tính lại theo công thức mới (thiếu số liệu gốc) — Slove/PiShip/Voucher extra gộp có thể hơi lệch cho các tháng này. Bấm "Cập nhật lại lịch sử" rồi gộp lại để có số chính xác.`);
+  }
+
+  // reasonRows — gộp theo (reason, platform)
+  const reasonMap = {};
+  for (const d of list){
+    for (const r of (d.reasonRows || [])){
+      const key = r.platform + '|' + r.reason;
+      if (!reasonMap[key]) reasonMap[key] = { reason: r.reason, platform: r.platform, count: 0 };
+      reasonMap[key].count += r.count;
+    }
+  }
+  const reasonRows = Object.values(reasonMap);
+
+  // ngày kỳ gộp — nhỏ nhất/lớn nhất trong toàn bộ các tháng đã chọn
+  let minDate = null, maxDate = null;
+  for (const d of list){
+    if (d.minDate){ const dd = new Date(d.minDate); if (!minDate || dd < minDate) minDate = dd; }
+    if (d.maxDate){ const dd = new Date(d.maxDate); if (!maxDate || dd > maxDate) maxDate = dd; }
+  }
+
+  // hoanVeKhoDetail — nối các tháng lại, tính lại "ngoài kỳ" theo đúng khoảng đã gộp
+  const hoanVeKhoDetail = [];
+  for (const d of list){
+    for (const item of (d.hoanVeKhoDetail || [])){
+      const dd = item.ngayDatHang ? new Date(item.ngayDatHang) : null;
+      hoanVeKhoDetail.push(Object.assign({}, item, {
+        ngoaiKy: !!(dd && minDate && maxDate && (dd < minDate || dd > maxDate)),
+      }));
+    }
+  }
+  const hoanVeKhoNgoaiKyCount = hoanVeKhoDetail.filter(x => x.ngoaiKy).length;
+
+  // dailyRevenue — nối các tháng (liền kề, không trùng ngày) rồi sắp lại cho chắc
+  const dailyRevenue = list.flatMap(d => d.dailyRevenue || []).sort((a, b) => a.date.localeCompare(b.date));
+
+  // kenh (doanh thu theo kênh) — cộng tuyệt đối từng phần, chỉ trên các tháng có ShopStats
+  const kenhList = list.map(d => d.kenh).filter(Boolean);
+  const kenh = kenhList.length ? {
+    total: kenhList.reduce((s, k) => s + k.total, 0),
+    theSanPham: kenhList.reduce((s, k) => s + k.theSanPham, 0),
+    livestream: kenhList.reduce((s, k) => s + k.livestream, 0),
+    video: kenhList.reduce((s, k) => s + k.video, 0),
+    tiepThiLienKet: kenhList.reduce((s, k) => s + k.tiepThiLienKet, 0),
+  } : null;
+
+  // sanPham (hiệu suất sản phẩm) — gộp theo tên, doanh số cộng thẳng; CTR/tỷ lệ
+  // chuyển đổi dùng trung bình có trọng số theo doanh số (xấp xỉ — không có sẵn
+  // số lượt xem/click gốc để cộng đúng tử/mẫu).
+  const sanPhamMap = {};
+  for (const d of list){
+    for (const sp of (d.sanPham || [])){
+      if (!sanPhamMap[sp.ten]) sanPhamMap[sp.ten] = { ten: sp.ten, doanhSo: 0, ctrWeighted: 0, chuyenDoiWeighted: 0 };
+      const m = sanPhamMap[sp.ten];
+      m.doanhSo += sp.doanhSo;
+      m.ctrWeighted += sp.ctr * sp.doanhSo;
+      m.chuyenDoiWeighted += sp.chuyenDoi * sp.doanhSo;
+    }
+  }
+  const sanPhamMerged = Object.values(sanPhamMap).map(m => ({
+    ten: m.ten, doanhSo: m.doanhSo,
+    ctr: safeDiv(m.ctrWeighted, m.doanhSo), chuyenDoi: safeDiv(m.chuyenDoiWeighted, m.doanhSo),
+  })).sort((a, b) => b.doanhSo - a.doanhSo);
+  const sanPham = Object.keys(sanPhamMap).length ? sanPhamMerged : null;
+  if (sanPham){
+    warnings.push('Gộp kỳ: cột CTR/Tỷ lệ chuyển đổi của "Hiệu suất sản phẩm" là số xấp xỉ (trung bình có trọng số theo doanh số), không cộng đúng tử/mẫu gốc như Slove/Tlove.');
+  }
+
+  // khuVuc — gộp theo tên tỉnh/thành đã có sẵn trong top6+Khác của từng tháng
+  // (xấp xỉ: 1 tỉnh nằm trong "Khác" ở tháng này nhưng lên top6 ở tháng khác sẽ
+  // không được tách lại đúng — chấp nhận theo quyết định đã chốt, vì dữ liệu chi
+  // tiết hơn top6 không được lưu lại mỗi tháng).
+  const khuVucMap = {};
+  let khuVucKhacSum = 0, khuVucTotalSum = 0;
+  for (const d of list){
+    if (!d.khuVuc) continue;
+    khuVucTotalSum += d.khuVuc.total || 0;
+    for (const row of (d.khuVuc.rows || [])){
+      if (row.isKhac){ khuVucKhacSum += row.soDon; continue; }
+      khuVucMap[row.ten] = (khuVucMap[row.ten] || 0) + row.soDon;
+    }
+  }
+  const khuVucNamed = Object.entries(khuVucMap).map(([ten, soDon]) => ({ ten, soDon })).sort((a, b) => b.soDon - a.soDon);
+  const khuVucRows = khuVucNamed.slice();
+  if (khuVucKhacSum > 0) khuVucRows.push({ ten: 'Khác', soDon: khuVucKhacSum, isKhac: true });
+  const khuVuc = list.some(d => d.khuVuc) ? { total: khuVucTotalSum, rows: khuVucRows } : null;
+  if (khuVuc){
+    warnings.push('Gộp kỳ: "Khách hàng theo khu vực" là số gần đúng — các tỉnh nhỏ lẻ nằm trong nhóm "Khác" ở 1 tháng nào đó sẽ không tách lại được dù lên top ở tháng khác.');
+  }
+
+  // skuPerformance — gộp theo tên SKU, cộng SL + cộng SL theo size, tính lại % và SL/ngày
+  const skuMap = {};
+  let totalPeriodDays = 0;
+  const unmappedSet = new Set();
+  for (const d of list){
+    const sp = d.skuPerformance;
+    if (!sp) continue;
+    totalPeriodDays += sp.periodDays || 0;
+    for (const code of (sp.unmappedCodes || [])) unmappedSet.add(code);
+    for (const item of (sp.items || [])){
+      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, matched: item.matched, tongSL: 0, sizes: {} };
+      const m = skuMap[item.ten];
+      m.tongSL += item.tongSL;
+      if (!item.matched) m.matched = false;
+      for (const s of (item.sizes || [])) m.sizes[s.size] = (m.sizes[s.size] || 0) + s.sl;
+    }
+  }
+  const SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
+  const skuItems = Object.values(skuMap).map(m => ({
+    ten: m.ten, matched: m.matched, tongSL: m.tongSL,
+    slNgay: totalPeriodDays ? m.tongSL / totalPeriodDays : null,
+    sizes: Object.entries(m.sizes).map(([size, sl]) => ({ size, sl, pct: m.tongSL ? sl / m.tongSL : 0 }))
+      .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
+  })).sort((a, b) => b.tongSL - a.tongSL);
+  const skuPerformance = Object.keys(skuMap).length ? { periodDays: totalPeriodDays || null, items: skuItems, unmappedCodes: [...unmappedSet] } : null;
+
+  // ssWarning — chỉ hiện nếu KHÔNG tháng nào có ShopStats (giống logic 1 tháng)
+  const anyShopStats = list.some(d => d.kenh || d.sanPham);
+  const ssWarning = anyShopStats
+    ? (list.some(d => d.ssWarning) ? 'Một số tháng trong kỳ gộp chưa tải Shop Stats — Voucher extra/Doanh thu theo kênh/Hiệu suất sản phẩm chỉ tính trên các tháng đã có đủ dữ liệu.' : null)
+    : 'Chưa tháng nào trong kỳ gộp có Shop Stats — bỏ qua Voucher extra, Doanh thu theo kênh, Hiệu suất sản phẩm.';
+
+  warnings.push('Gộp kỳ: bảng "Affiliate/KOC theo nhà sáng tạo" chưa hỗ trợ xem gộp nhiều tháng — mở lại từng tháng riêng lẻ nếu cần xem mục này.');
+
+  return {
+    warnings: [...warnings, ...list.flatMap((d, i) => (d.warnings || []).map(w => `[${entries[i].label}] ${w}`))],
+    ssWarning, minDate, maxDate,
+    shopee, tiktok, tong,
+    nhanh4: { slove, tlove, piShipRatio, voucherExtra },
+    reasonRows,
+    hoanVeKhoDetail, hoanVeKhoNgoaiKyCount,
+    dailyRevenue,
+    kenh, sanPham,
+    affiliateKoc: null,
+    khuVuc,
+    skuPerformance,
+    raw: null,
+    isCombined: true,
+    combinedLabels: entries.map(e => e.label),
   };
 }
