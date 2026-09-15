@@ -202,26 +202,41 @@ function buildAffiliateLiveTableHtml(rows){
 }
 
 // Hiệu suất theo SKU/size (2026-09-15, theo yêu cầu chủ shop) — gộp 2 sàn
-// theo TÊN sản phẩm, chỉ tính đơn Hoàn thành. Độc lập với Shop Stats (lấy
-// thẳng từ 2 file "tất cả đơn hàng" chính) nên luôn có nếu cột SKU/SL đọc
-// được, kể cả khi chưa tải Shop Stats.
+// theo TÊN sản phẩm, chỉ tính đơn Hoàn thành, chỉ gồm mã đã có trong bảng tra
+// cứu (calc.js đã lọc bỏ mã cũ/ngừng bán). Độc lập với Shop Stats.
+// Thiết kế lại (2026-09-15, theo yêu cầu chủ shop "chỉ quan tâm 2 chỉ số SL
+// bán TB/ngày và tỷ trọng size"): bỏ cột Tổng SL bán, hiện SL/ngày làm số to
+// dễ nhìn + vẽ tỷ trọng size thành 1 thanh ngang xếp chồng theo màu đậm dần
+// theo size (thay cho các "chip" rời rạc khó so sánh trước đây).
+const SKU_SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
+const SKU_SIZE_COLORS = ['#bfdbfe', '#93c5fd', '#60a5fa', '#3b82f6', '#2563eb', '#1d4ed8', '#1e3a8a', '#cbd5e1'];
+function skuSizeColor(size){
+  const i = SKU_SIZE_ORDER.indexOf(size);
+  return SKU_SIZE_COLORS[i === -1 ? SKU_SIZE_COLORS.length - 1 : i];
+}
 function buildSkuPerformanceHtml(res){
   const sp = res.skuPerformance;
   if (!sp || !sp.items || !sp.items.length){
     return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tính được — kiểm tra mục cảnh báo ở trên (cột SKU/số lượng chưa đọc được).</p>';
   }
-  const dayNote = sp.periodDays ? ` (chia cho ${sp.periodDays} ngày của kỳ)` : '';
+  const dayNote = sp.periodDays ? `SL bán trung bình/ngày (chia cho ${sp.periodDays} ngày của kỳ đang xem) và tỷ trọng theo size:` : 'SL bán trung bình/ngày và tỷ trọng theo size:';
   const rowsHtml = sp.items.map(item => {
-    const nameHtml = esc(item.ten) + (item.matched ? '' : ' <span class="pill warn" style="margin-left:4px;">chưa rõ tên</span>');
-    const sizesHtml = item.sizes.map(s => `<span class="sku-size-chip">${esc(s.size)}: ${fmtInt(s.sl)} <span class="ink-faint">(${fmtPct(s.pct, 1)})</span></span>`).join(' ');
-    return `<tr>
-      <td>${nameHtml}</td>
-      <td class="num">${fmtInt(item.tongSL)}</td>
-      <td class="num">${item.slNgay === null ? '—' : item.slNgay.toFixed(1)}</td>
-      <td>${sizesHtml}</td>
-    </tr>`;
+    const barHtml = item.sizes.map(s => {
+      const showLabel = s.pct >= 0.08; // lát quá hẹp thì bỏ chữ, tránh đè lên nhau
+      return `<div class="sku-size-seg" style="width:${(s.pct * 100).toFixed(2)}%; background:${skuSizeColor(s.size)};" title="${esc(s.size)}: ${fmtInt(s.sl)} sp (${fmtPct(s.pct, 0)})">${showLabel ? `<span>${esc(s.size)} ${fmtPct(s.pct, 0)}</span>` : ''}</div>`;
+    }).join('');
+    const legendHtml = item.sizes.map(s => `<span class="sku-size-legend-item"><i style="background:${skuSizeColor(s.size)}"></i>${esc(s.size)} ${fmtPct(s.pct, 0)}</span>`).join('');
+    return `
+    <div class="sku-perf-row">
+      <div class="sku-perf-head">
+        <span class="sku-perf-name">${esc(item.ten)}</span>
+        <span class="sku-perf-day"><b>${item.slNgay === null ? '—' : item.slNgay.toFixed(1)}</b> sp/ngày</span>
+      </div>
+      <div class="sku-size-bar">${barHtml}</div>
+      <div class="sku-size-legend">${legendHtml}</div>
+    </div>`;
   }).join('');
-  return `<table class="dtable"><thead><tr><th>SKU (không tính size)</th><th style="text-align:right">Tổng SL bán (đơn Hoàn thành)</th><th style="text-align:right">SL bán TB/ngày${dayNote}</th><th>Tỷ trọng theo size</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
+  return `<div class="sku-perf-note">${esc(dayNote)}</div><div class="sku-perf-list">${rowsHtml}</div>`;
 }
 
 function buildAffiliateKocSectionHtml(res){

@@ -819,18 +819,21 @@ function computeAllFromAOA(aoa){
   const COL_TT_SKU_SIZE = findColKey(skuFinHdrTt, [/^seller\s*sku$/i, /seller.*sku/i]);
   const COL_TT_SL = findColKey(skuFinHdrTt, [/^quantity$/i]);
 
-  const skuAgg = {}; // key: tên hiển thị (hoặc mã gốc nếu chưa có tên) -> { name, matched, tongSL, sizes: {size: sl} }
-  const unmappedSkuCodes = new Set();
+  // Chủ shop xác nhận (2026-09-15): CHỈ tính các mã SKU có trong bảng tra cứu
+  // (`SKU_DISPLAY_NAME` ở trên, lấy từ quy-tac-dat-ten-sku-va-danh-sach-san-pham.md)
+  // — mã nào không có trong bảng là SKU cũ đã ngừng bán, KHÔNG cần quan tâm nữa
+  // nên bỏ qua hẳn (không hiện, không cảnh báo), tránh danh sách lẫn lộn giữa
+  // tên sản phẩm thật và mã thô nhìn rối mắt.
+  const skuAgg = {}; // key: tên hiển thị -> { name, tongSL, sizes: {size: sl} }
   function addSkuLine(rawCode, qty){
     if (!rawCode || !qty) return;
     const { baseSku, size } = splitSkuSize(rawCode);
     const { name, matched } = resolveSkuName(baseSku);
-    if (!matched) unmappedSkuCodes.add(baseSku);
-    const key = name || baseSku;
-    if (!skuAgg[key]) skuAgg[key] = { name: key, matched, tongSL: 0, sizes: {} };
-    skuAgg[key].tongSL += qty;
+    if (!matched) return; // SKU không có trong bảng tra cứu — bỏ qua
+    if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {} };
+    skuAgg[name].tongSL += qty;
     const sizeKey = size || '(không rõ size)';
-    skuAgg[key].sizes[sizeKey] = (skuAgg[key].sizes[sizeKey] || 0) + qty;
+    skuAgg[name].sizes[sizeKey] = (skuAgg[name].sizes[sizeKey] || 0) + qty;
   }
   const skuColMissing = [];
   if (!COL_SP_SKU_SIZE) skuColMissing.push('Shopee: "SKU phân loại hàng"');
@@ -856,18 +859,15 @@ function computeAllFromAOA(aoa){
   const skuPerformance = {
     periodDays,
     items: Object.values(skuAgg).map(item => ({
-      ten: item.name, matched: item.matched, tongSL: item.tongSL,
+      ten: item.name, tongSL: item.tongSL,
       slNgay: periodDays ? item.tongSL / periodDays : null,
       sizes: Object.entries(item.sizes)
         .map(([size, sl]) => ({ size, sl, pct: item.tongSL ? sl / item.tongSL : 0 }))
         .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
     })).sort((a, b) => b.tongSL - a.tongSL),
-    unmappedCodes: [...unmappedSkuCodes],
   };
   if (skuColMissing.length){
     warnings.push(`Hiệu suất theo SKU/size: không tìm thấy cột ${skuColMissing.join(', ')} — chưa tính được SL bán/ngày theo SKU và tỷ trọng size. Kiểm tra lại đúng tên cột trong file "tất cả đơn hàng" 2 sàn.`);
-  } else if (skuPerformance.unmappedCodes.length){
-    warnings.push(`Hiệu suất theo SKU/size: ${skuPerformance.unmappedCodes.length} mã SKU chưa có trong bảng tên sản phẩm, đang hiện tạm mã gốc: ${skuPerformance.unmappedCodes.join(', ')} — báo lại tên sản phẩm tương ứng để cập nhật bảng tra cứu.`);
   }
 
   // ---------- 10) Affiliate/KOL (TikTok) — 2 file tuỳ chọn, không ảnh hưởng
@@ -1202,30 +1202,29 @@ function combineMonthlyResults(entries){
   }
 
   // skuPerformance — gộp theo tên SKU, cộng SL + cộng SL theo size, tính lại % và SL/ngày
+  // (chỉ gồm các mã đã có tên trong bảng tra cứu — computeAllFromAOA đã lọc bỏ
+  // mã cũ/ngừng bán từ trước khi lưu, xem addSkuLine()).
   const skuMap = {};
   let totalPeriodDays = 0;
-  const unmappedSet = new Set();
   for (const d of list){
     const sp = d.skuPerformance;
     if (!sp) continue;
     totalPeriodDays += sp.periodDays || 0;
-    for (const code of (sp.unmappedCodes || [])) unmappedSet.add(code);
     for (const item of (sp.items || [])){
-      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, matched: item.matched, tongSL: 0, sizes: {} };
+      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, tongSL: 0, sizes: {} };
       const m = skuMap[item.ten];
       m.tongSL += item.tongSL;
-      if (!item.matched) m.matched = false;
       for (const s of (item.sizes || [])) m.sizes[s.size] = (m.sizes[s.size] || 0) + s.sl;
     }
   }
   const SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
   const skuItems = Object.values(skuMap).map(m => ({
-    ten: m.ten, matched: m.matched, tongSL: m.tongSL,
+    ten: m.ten, tongSL: m.tongSL,
     slNgay: totalPeriodDays ? m.tongSL / totalPeriodDays : null,
     sizes: Object.entries(m.sizes).map(([size, sl]) => ({ size, sl, pct: m.tongSL ? sl / m.tongSL : 0 }))
       .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
   })).sort((a, b) => b.tongSL - a.tongSL);
-  const skuPerformance = Object.keys(skuMap).length ? { periodDays: totalPeriodDays || null, items: skuItems, unmappedCodes: [...unmappedSet] } : null;
+  const skuPerformance = Object.keys(skuMap).length ? { periodDays: totalPeriodDays || null, items: skuItems } : null;
 
   // ssWarning — chỉ hiện nếu KHÔNG tháng nào có ShopStats (giống logic 1 tháng)
   const anyShopStats = list.some(d => d.kenh || d.sanPham);
