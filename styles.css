@@ -64,11 +64,35 @@
   .range-card-lg{ min-width:300px; padding:16px 20px 18px; border-radius:14px; gap:10px; }
   .rc-head{ display:flex; align-items:center; justify-content:space-between; }
   .rc-head .rc-title{ font-size:13px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:.03em; }
-  .range-card-lg .rc-select{
+  /* Dropdown "Kỳ báo cáo" tự vẽ (2026-09-15) — thay cho <select> gốc vì popup
+     mặc định của trình duyệt vẽ theo giao diện hệ điều hành (chữ nhỏ, nền
+     xám, không theo được thiết kế trang) nên chủ shop thấy khó nhìn. Ẩn hẳn
+     <select> gốc (.rc-select-native), chỉ dùng nó làm nơi lưu giá trị. */
+  .rc-select-native{ position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; }
+  .rc-dropdown{ position:relative; }
+  .rc-select-btn{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
     font-family:inherit; font-size:17px; font-weight:700; color:var(--ink);
     padding:10px 14px; border-radius:9px; border:1px solid var(--line-strong);
-    background:var(--bg); cursor:pointer; width:100%;
+    background:var(--bg); cursor:pointer; width:100%; text-align:left;
   }
+  .rc-select-btn:hover{ border-color:var(--accent); }
+  .rc-select-btn[aria-expanded="true"]{ border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft); }
+  .rc-select-btn .rc-chev{ color:var(--ink-faint); font-size:13px; flex:none; }
+  .rc-select-btn #rc-select-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .rc-panel{
+    position:absolute; top:calc(100% + 6px); left:0; right:0; z-index:20;
+    background:var(--surface); border:1px solid var(--line-strong); border-radius:10px;
+    box-shadow:var(--shadow); max-height:280px; overflow-y:auto; padding:6px;
+  }
+  .rc-item{
+    display:flex; align-items:center; gap:8px; padding:9px 10px; border-radius:7px;
+    font-size:14px; font-weight:600; color:var(--ink); cursor:pointer;
+  }
+  .rc-item:hover{ background:var(--surface-soft); }
+  .rc-item.is-selected{ background:var(--accent-soft); color:var(--accent); }
+  .rc-item-check{ width:14px; flex:none; font-size:12px; color:var(--accent); }
+  .rc-item-label{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .rc-dates-live{ font-size:12.5px; font-weight:600; color:var(--ink-soft); font-variant-numeric:tabular-nums; }
   .legend{ display:flex; gap:16px; align-items:center; }
   .legend span{ display:flex; align-items:center; gap:7px; font-size:12px; color:var(--ink-soft); font-weight:600; }

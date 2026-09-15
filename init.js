@@ -205,7 +205,14 @@ function buildDashboardHTML(){
   <div class="topbar">
     <div class="range-card range-card-lg" id="range-card">
       <div class="rc-head"><span class="rc-title">Kỳ báo cáo</span></div>
-      <select id="history-select" class="rc-select"></select>
+      <div class="rc-dropdown" id="rc-dropdown">
+        <button type="button" class="rc-select-btn" id="rc-select-btn" aria-haspopup="listbox" aria-expanded="false">
+          <span id="rc-select-label">Số liệu vừa tính (chưa lưu)</span>
+          <span class="rc-chev">⌄</span>
+        </button>
+        <div class="rc-panel" id="rc-panel" role="listbox" hidden></div>
+      </div>
+      <select id="history-select" class="rc-select-native" aria-hidden="true" tabindex="-1"></select>
       <div class="rc-dates-live" id="rc-dates-live"></div>
     </div>
     <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
@@ -436,6 +443,11 @@ async function onCompute(){
     // Không tự chuyển sang tab Dashboard / cuộn trang nữa (theo yêu cầu chủ
     // shop 2026-09-15) — ở lại tab "Tải file & lịch sử" để bấm luôn "Lưu vào
     // lịch sử" ngay tại đây, không phải chuyển qua chuyển lại giữa 2 tab.
+    // Widget "Kỳ báo cáo" quay lại hiện "Số liệu vừa tính (chưa lưu)" vì
+    // dashboard vừa đổi sang số MỚI tính (chưa lưu), tránh hiện nhầm tên 1
+    // kỳ cũ đã xem trước đó trong khi số liệu trên trang đã là số mới.
+    const histSel = document.getElementById('history-select');
+    if (histSel){ histSel.value = 'current'; renderRcDropdown(); }
   } catch (err){
     console.error(err);
     statusEl.classList.add('err');
@@ -613,15 +625,70 @@ async function refreshHistoryFromServer(){
 
 function refreshHistorySelect(){
   const sel = document.getElementById('history-select');
+  const prevValue = sel.value || 'current';
   const opts = ['<option value="current">Số liệu vừa tính (chưa lưu)</option>']
     .concat(HISTORY.map((h) => `<option value="${esc(h.id)}">${esc(h.label)}</option>`));
   sel.innerHTML = opts.join('');
-  sel.value = 'current';
+  // Giữ nguyên lựa chọn đang xem nếu vẫn còn trong danh sách mới (trước đây
+  // luôn reset về "current" mỗi lần refresh, kể cả sau khi vừa chọn xem 1
+  // kỳ đã lưu — khiến nút hiện sai tên kỳ đang xem) — chỉ về "current" khi
+  // giá trị cũ không còn tồn tại nữa.
+  sel.value = [...sel.options].some(o => o.value === prevValue) ? prevValue : 'current';
   document.getElementById('history-note').textContent = HISTORY.length
     ? `Đã lưu ${HISTORY.length} tháng trên server.`
     : 'Chưa lưu tháng nào.';
   const refreshBtn = document.getElementById('btn-refresh-all-history');
   if (refreshBtn) refreshBtn.style.display = HISTORY.length > 0 ? '' : 'none';
+  renderRcDropdown();
+}
+
+// ---------- "Kỳ báo cáo" — dropdown tự vẽ (2026-09-15) ----------
+// Trình duyệt vẽ popup của <select> gốc theo giao diện hệ điều hành, không
+// theo được CSS của trang (chủ shop phản ánh nhìn xấu/khó đọc) — nên giữ
+// <select id="history-select"> ẩn đi làm "nguồn sự thật" (vẫn phát event
+// change để mọi chỗ khác dùng nguyên, không phải sửa lại), còn phần hiển thị
+// cho chủ shop bấm là nút + danh sách tự vẽ (rc-select-btn/rc-panel) dưới đây.
+function renderRcDropdown(){
+  const sel = document.getElementById('history-select');
+  const panel = document.getElementById('rc-panel');
+  const labelEl = document.getElementById('rc-select-label');
+  if (!sel || !panel || !labelEl) return;
+  const options = [...sel.options];
+  const current = sel.value;
+  const selectedOpt = options.find(o => o.value === current);
+  labelEl.textContent = selectedOpt ? selectedOpt.textContent : 'Chọn kỳ';
+  panel.innerHTML = options.map(o => `
+    <div class="rc-item${o.value === current ? ' is-selected' : ''}" data-value="${esc(o.value)}" role="option" aria-selected="${o.value === current}">
+      <span class="rc-item-check">${o.value === current ? '✓' : ''}</span>
+      <span class="rc-item-label">${esc(o.textContent)}</span>
+    </div>`).join('');
+}
+
+function wireRcDropdown(){
+  const btn = document.getElementById('rc-select-btn');
+  const panel = document.getElementById('rc-panel');
+  const sel = document.getElementById('history-select');
+  if (!btn || !panel || !sel) return;
+  const closePanel = () => { panel.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
+  const openPanel = () => { panel.hidden = false; btn.setAttribute('aria-expanded', 'true'); };
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (panel.hidden) openPanel(); else closePanel();
+  });
+  panel.addEventListener('click', (e) => {
+    const item = e.target.closest('.rc-item');
+    if (!item) return;
+    const value = item.dataset.value;
+    if (value !== sel.value){
+      sel.value = value;
+      sel.dispatchEvent(new Event('change'));
+    }
+    closePanel();
+  });
+  document.addEventListener('click', (e) => {
+    if (!panel.hidden && !panel.contains(e.target) && e.target !== btn) closePanel();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closePanel(); });
 }
 
 async function onHistorySelectChange(){
@@ -760,6 +827,7 @@ function init(){
   wireUpload();
   wireTabs();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
+  wireRcDropdown();
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
   document.getElementById('btn-refresh-all-history').addEventListener('click', onRefreshAllHistory);
   document.getElementById('history-bar').style.display = 'flex';
