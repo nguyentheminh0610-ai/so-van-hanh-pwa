@@ -207,8 +207,8 @@ function buildAffiliateLiveTableHtml(rows){
 // Analysis); chỉ được gọi khi aff.ctorCtrTable khác null.
 function buildAffiliateCtorCtrTableHtml(rows){
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu nào trong file Creator List.</p>';
-  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">GMV</th><th style="text-align:right">CTOR</th><th style="text-align:right">CTR</th><th style="text-align:right">Lượt xem/triệu GMV</th></tr></thead><tbody>
-    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtVND(r.gmv)}</td><td class="num">${fmtPct(r.ctor, 2)}</td><td class="num">${fmtPct(r.ctr, 2)}</td><td class="num">${r.viewTrenTrieuGmv === null ? '—' : fmtInt(r.viewTrenTrieuGmv)}</td></tr>`).join('')}
+  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">GMV</th><th style="text-align:right">CTOR</th><th style="text-align:right">CTR</th><th style="text-align:right">GMV/1.000 view</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtVND(r.gmv)}</td><td class="num">${fmtPct(r.ctor, 2)}</td><td class="num">${fmtPct(r.ctr, 2)}</td><td class="num">${r.gmvTren1000View === null ? '—' : fmtVND(r.gmvTren1000View)}</td></tr>`).join('')}
   </tbody></table>`;
 }
 
@@ -257,7 +257,7 @@ function buildAffiliateKocSectionHtml(res){
   <div class="sub-label">Hiệu quả LIVE theo KOC</div>
   ${buildAffiliateLiveTableHtml(aff.liveTable)}` : '';
   const ctorCtrSectionHtml = aff.ctorCtrTable ? `
-  <div class="sub-label">CTOR/CTR &amp; hiệu quả lượt xem theo KOC <span style="text-transform:none;font-weight:400;">— GMV tính cả đơn chưa trừ huỷ/hoàn (khác "Doanh thu" ở bảng trên); Lượt xem/triệu GMV = lượt xem video chia GMV (triệu đồng) — càng cao nghĩa là view nhiều nhưng ra doanh thu ít</span></div>
+  <div class="sub-label">CTOR/CTR &amp; hiệu quả lượt xem theo KOC <span style="text-transform:none;font-weight:400;">— GMV tính cả đơn chưa trừ huỷ/hoàn (khác "Doanh thu" ở bảng trên); GMV/1.000 view = doanh thu chia lượt xem, nhân 1.000 — càng cao nghĩa là view chuyển đổi ra tiền càng tốt (cùng chiều với GPM ở bảng trên)</span></div>
   ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
   <!-- ZONE 6 -->

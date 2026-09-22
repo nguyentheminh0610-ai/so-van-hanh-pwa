@@ -947,17 +947,22 @@ function computeAllFromAOA(aoa){
   // file này tính cả đơn CHƯA trừ huỷ/hoàn (theo đúng chú thích cột trong file
   // gốc) — khác với "Doanh thu" ở Bảng 1 (chỉ tính đơn "Đã quyết toán") — nên
   // để tên riêng "GMV" ở bảng này, tránh chủ shop nhầm là cùng 1 số với Bảng 1.
+  //
+  // (2026-09-22, sửa lại theo yêu cầu chủ shop) Ban đầu tính "lượt view trên
+  // triệu GMV" (view chia doanh thu — CÀNG THẤP càng tốt) nhưng đổi lại thành
+  // "GMV/1.000 view" (doanh thu chia lượt xem — CÀNG CAO càng tốt) để:
+  // (1) cùng chiều "cao = tốt" với các chỉ số khác trong dashboard (doanh
+  // thu, CTR, CTOR); (2) khớp đúng tinh thần chỉ số GPM đã có sẵn ở Bảng 2
+  // ("GPM = doanh thu video liên kết / 1.000 lượt xem") — tránh 2 bảng cùng
+  // nói về "hiệu quả view ra tiền" mà lại ngược chiều nhau.
   const kocCtorCtrTable = creatorListRaw ? creatorListRaw
     .map(r => {
       const koc = r['Tên nhà sáng tạo'];
       if (!koc) return null;
       const gmv = parseVndCurrency(r['GMV nhờ nhà sáng tạo']); // dạng "19.645.855₫" — cần bỏ ký hiệu ₫ trước khi parse
       const luotXem = num(r['Lượt xem video']);
-      // Lượt xem trên mỗi TRIỆU đồng GMV — chủ shop yêu cầu "lượt view trên
-      // doanh thu" (view chia doanh thu); quy về đơn vị triệu đồng cho số dễ đọc
-      // (vd 1.500 lượt/triệu thay vì 0.0015 lượt/đồng).
-      const viewTrenTrieuGmv = gmv ? luotXem / (gmv / 1e6) : null;
-      return { koc, gmv, ctor: num(r['CTOR']), ctr: num(r['CTR']), luotXem, viewTrenTrieuGmv };
+      const gmvTren1000View = luotXem ? (gmv / luotXem) * 1000 : null;
+      return { koc, gmv, ctor: num(r['CTOR']), ctr: num(r['CTR']), luotXem, gmvTren1000View };
     })
     .filter(Boolean)
     .sort((a, b) => b.gmv - a.gmv)
