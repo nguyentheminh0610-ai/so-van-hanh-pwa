@@ -321,6 +321,9 @@
   .dl-row-error{ font-size:11.5px; color:var(--warn); font-weight:600; margin:-4px 0 2px 4px; }
   .dl-summary{ font-size:12.5px; font-weight:600; border-radius:8px; padding:10px 12px; margin-bottom:14px; }
   .dl-summary.is-warn{ color:var(--warn); background:var(--warn-soft); }
+  .dl-suggest{ font-size:12.5px; font-weight:600; border-radius:8px; padding:10px 12px; margin-bottom:14px; color:var(--accent); background:var(--accent-soft, var(--surface-soft)); display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .dl-suggest-apply{ font-size:12px; font-weight:700; border:none; border-radius:8px; padding:7px 12px; background:var(--accent); color:#fff; cursor:pointer; }
+  .dl-suggest-apply:hover{ opacity:0.9; }
 
   /* ---------- Thư viện file (tab "Các file đã tải lên") ---------- */
   .library-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:20px 22px; box-shadow:var(--shadow); margin-bottom:20px; }
@@ -332,7 +335,8 @@
   .dl-dot.tiktok{ background:var(--tiktok); }
   .month-group{ border:1px solid var(--line); border-radius:10px; margin-bottom:10px; overflow:hidden; }
   .month-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:11px 14px; background:var(--surface-soft); font-size:13px; font-weight:700; }
-  .month-head .lib-rename{ font-size:11px; font-weight:600; color:var(--accent); cursor:pointer; white-space:nowrap; }
+  .month-head-actions{ display:flex; align-items:center; gap:12px; flex:none; }
+  .month-head .lib-rename, .month-head .lib-addfile{ font-size:11px; font-weight:600; color:var(--accent); cursor:pointer; white-space:nowrap; }
   .month-files{ padding:4px 14px 8px; }
   .file-row{ display:flex; align-items:center; gap:10px; padding:8px 0; border-top:1px solid var(--line); font-size:12.5px; }
   .file-row:first-child{ border-top:none; }

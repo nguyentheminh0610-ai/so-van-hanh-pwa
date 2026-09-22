@@ -244,6 +244,7 @@ function buildUploadFlowHTML(){
     </div>
     <div class="dl-list" id="dl-list"></div>
     <div class="dl-summary" id="dl-summary" style="display:none;"></div>
+    <div class="dl-suggest" id="dl-suggest" style="display:none;"></div>
     <div class="up-actions">
       <button class="btn-primary" id="btn-compute" disabled>Tính toán</button>
       <span class="up-status" id="up-status"></span>
@@ -371,6 +372,84 @@ function updateValidityAndButton(){
 
   selectedFiles = {};
   detectedFiles.forEach(e => { if (e.role && roleCounts[e.role] === 1) selectedFiles[e.role] = e.file; });
+
+  maybeSuggestMonthMatch(missing.length > 0);
+}
+
+// ---------- Gợi ý tự động gắn vào tháng đã lưu (2026-09-22, theo yêu cầu chủ
+// shop: "khi a thêm file mới thì chỉ cần tải thêm file đó thôi chứ") ----------
+// Khi chủ shop chỉ kéo-thả 1 file TUỲ CHỌN (Creator/Live/Affiliate/Video) mà
+// hệ thống đọc được đúng tháng của file đó (xem calc.js), tự tìm xem tháng
+// đó đã lưu trên server chưa — nếu khớp đúng 1 tháng, hiện ngay tại khu thả
+// file 1 nút để tự điền các file còn lại, khỏi phải qua tab Thư viện.
+let suggestRunId = 0;
+
+async function ensureLibraryRowsLoaded(){
+  if (libraryRows && libraryRows.length) return libraryRows;
+  try {
+    libraryRows = await sbFetch('monthly_reports?select=id,label,period_start,period_end,files') || [];
+  } catch (err){
+    console.error('ensureLibraryRowsLoaded', err);
+    libraryRows = [];
+  }
+  return libraryRows;
+}
+
+function renderDlSuggest(html){
+  const el = document.getElementById('dl-suggest');
+  if (!el) return;
+  if (!html){ el.style.display = 'none'; el.innerHTML = ''; return; }
+  el.style.display = 'block';
+  el.innerHTML = html;
+  const btn = el.querySelector('.dl-suggest-apply');
+  if (btn) btn.addEventListener('click', () => mergeMissingFilesFromRecord(btn.dataset.id));
+}
+
+async function maybeSuggestMonthMatch(hasMissingRequired){
+  const runId = ++suggestRunId;
+  if (!hasMissingRequired || restoreContext){ renderDlSuggest(null); return; }
+  const candidate = detectedFiles.find(e => e.role && e.monthKey && !e.error && ROLE_META[e.role] && !ROLE_META[e.role].required);
+  if (!candidate){ renderDlSuggest(null); return; }
+  const rows = await ensureLibraryRowsLoaded();
+  if (runId !== suggestRunId) return; // đã có thay đổi khác trong lúc chờ tải
+  const matches = (rows || []).filter(r => r.period_start && String(r.period_start).slice(0, 7) === candidate.monthKey);
+  if (matches.length !== 1){ renderDlSuggest(null); return; }
+  const record = matches[0];
+  renderDlSuggest(`⚡ File "${esc(candidate.file.name)}" thuộc <b>${esc(candidate.monthLabel)}</b> — trùng với tháng đã lưu <b>"${esc(record.label)}"</b>.
+    <button type="button" class="dl-suggest-apply" data-id="${esc(record.id)}">Tự động điền các file còn lại của tháng này</button>`);
+}
+
+async function mergeMissingFilesFromRecord(recordId){
+  const rows = await ensureLibraryRowsLoaded();
+  const record = rows.find(r => r.id === recordId);
+  if (!record) return;
+  renderDlSuggest(null);
+  const statusEl = document.getElementById('up-status');
+  statusEl.classList.remove('err');
+  const toFetch = (record.files || []).filter(f => !detectedFiles.some(e => e.role === f.key));
+  statusEl.textContent = 'Đang tự điền ' + toFetch.length + ' file còn lại của "' + record.label + '"…';
+  let failCount = 0;
+  for (const f of toFetch){
+    try {
+      const resp = await fetch(sbStoragePublicUrl(f.path));
+      if (!resp.ok) throw new Error('HTTP ' + resp.status);
+      const blob = await resp.blob();
+      const file = new File([blob], f.name, { type: blob.type || 'application/octet-stream' });
+      const meta = ROLE_META[f.key] || null;
+      detectedFiles.push({
+        file, role: f.key, platform: meta ? meta.platform : null, typeLabel: meta ? meta.label : null,
+        monthKey: null, monthLabel: record.label, readError: null,
+      });
+    } catch (err){
+      console.error('Không tải lại được file ' + f.name, err);
+      failCount++;
+    }
+  }
+  restoreContext = { label: record.label, recordId: record.id };
+  renderDetectedList();
+  statusEl.textContent = 'Đã tự điền xong file của "' + record.label + '"'
+    + (failCount ? ' (' + failCount + ' file tải lại thất bại, anh chọn tay lại giúp)' : '')
+    + ' — bấm "Tính toán" rồi "Lưu vào lịch sử" để ghi đè đúng tháng này.';
 }
 
 async function handleIncomingFiles(fileList){
@@ -484,7 +563,10 @@ function buildLibraryHTML(rows){
       return `<div class="month-group">
         <div class="month-head">
           <span>📁 ${esc(r.label)}</span>
-          <span class="lib-rename" data-id="${esc(r.id)}" data-label="${esc(r.label)}" title="Đổi tên hiển thị">✎ đổi tên</span>
+          <span class="month-head-actions">
+            <span class="lib-addfile" data-id="${esc(r.id)}" title="Thêm/thay 1 file cho đúng tháng này, không cần tải lại các file khác">➕ thêm file</span>
+            <span class="lib-rename" data-id="${esc(r.id)}" data-label="${esc(r.label)}" title="Đổi tên hiển thị">✎ đổi tên</span>
+          </span>
         </div>
         <div class="month-files">
           ${files.map(f => `<div class="file-row">
@@ -511,6 +593,23 @@ function wireLibraryEvents(el){
   el.querySelectorAll('.icon-btn.del').forEach(btn => {
     btn.addEventListener('click', () => deleteLibraryFile(btn.dataset.record, btn.dataset.path));
   });
+  el.querySelectorAll('.lib-addfile').forEach(btn => {
+    btn.addEventListener('click', () => addFileToLibraryRecord(btn.dataset.id));
+  });
+}
+
+// "➕ thêm file" — theo yêu cầu chủ shop (2026-09-22: "khi a thêm file mới
+// thì chỉ cần tải thêm file đó thôi chứ") — trước đây chỉ có cách này khi
+// XOÁ 1 file bị sai (deleteLibraryFile → restoreRemainingFilesToUploadTab);
+// giờ cho phép làm y hệt luồng đó NHƯNG không cần xoá gì trước: tự tải lại
+// tất cả file gốc đã lưu của đúng tháng đó vào khu upload, chủ shop chỉ cần
+// kéo-thả thêm 1 file mới (ví dụ Creator List) vào, bấm "Tính toán" rồi
+// "Lưu vào lịch sử" để ghi đè đúng tháng này (giữ nguyên các file cũ).
+async function addFileToLibraryRecord(recordId){
+  const record = libraryRows.find(r => r.id === recordId);
+  if (!record) return;
+  switchToTab('dashboard');
+  await restoreRemainingFilesToUploadTab(record);
 }
 
 async function refreshLibrary(){

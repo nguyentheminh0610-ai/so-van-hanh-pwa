@@ -121,11 +121,16 @@ const ROLE_META = {
 
 // TikTok: tên file KHÔNG có ngày thật (khác Shopee) — không được suy tháng
 // từ tên file cho các vai trò này, thà hiển thị "chưa rõ tháng" còn hơn sai.
-// tiktokAffiliateOrders/tiktokVideoAnalysis/tiktokCreatorList/tiktokLiveList:
-// phần đuôi số trong tên file chỉ là ID/khoảng ngày XUẤT file, không phải
-// mốc tháng dữ liệu — các role này không dùng để xác định tháng của kỳ báo
-// cáo (tháng do file đơn hàng/tài chính chính quyết định như hiện tại).
-const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance', 'tiktokAffiliateOrders', 'tiktokVideoAnalysis', 'tiktokCreatorList', 'tiktokLiveList']);
+// tiktokAffiliateOrders/tiktokVideoAnalysis: phần đuôi số trong tên file chỉ
+// là ID/thời điểm XUẤT file, không phải mốc tháng dữ liệu — không dùng để
+// xác định tháng của kỳ báo cáo (tháng do file đơn hàng/tài chính quyết
+// định như hiện tại).
+// LƯU Ý (xác nhận từ chủ shop 2026-09-22): tiktokCreatorList/tiktokLiveList
+// (Creator/Live List — Transaction Analysis) KHÁC 2 role trên — tên file
+// loại này CÓ mang đúng khoảng ngày dữ liệu thật (`..._YYYYMMDD-YYYYMMDD`)
+// nên KHÔNG nằm trong danh sách loại trừ này — xem detectMonthFromDateRangeInFilename().
+const NO_FILENAME_MONTH_ROLES = new Set(['tiktokOrders', 'tiktokReturns', 'tiktokFinance', 'tiktokAffiliateOrders', 'tiktokVideoAnalysis']);
+const DATE_RANGE_FILENAME_ROLES = new Set(['tiktokCreatorList', 'tiktokLiveList']);
 
 function detectRoleFromContent(wb){
   const sheetNames = wb.SheetNames.map(nfc);
@@ -259,6 +264,38 @@ function detectMonthFromFilename(filename){
   return null;
 }
 
+// Riêng Creator/Live List (Transaction Analysis): tên file mang đúng khoảng
+// ngày dữ liệu thật dạng "..._YYYYMMDD-YYYYMMDD.xlsx" (xác nhận từ chủ shop
+// 2026-09-22), nhưng đây là KỲ BÁO CÁO TỰ CHỌN lúc export (không phải lịch
+// tháng cố định) nên có thể vắt qua 2 tháng — ví dụ
+// "..._20260821-20260919.xlsx" là 21/08 → 19/09. Quy tắc: đếm số ngày rơi
+// vào mỗi tháng trong khoảng đó, chọn tháng có NHIỀU NGÀY HƠN (ví dụ trên:
+// tháng 8 có 11 ngày, tháng 9 có 19 ngày → chọn Tháng 9/2026).
+function detectMonthFromDateRangeInFilename(filename){
+  const m = String(filename).match(/(\d{4})(\d{2})(\d{2})-(\d{4})(\d{2})(\d{2})/);
+  if (!m) return detectMonthFromFilename(filename); // dự phòng: chỉ có 1 mốc ngày trong tên
+  const start = new Date(+m[1], +m[2] - 1, +m[3]);
+  const end = new Date(+m[4], +m[5] - 1, +m[6]);
+  if (isNaN(start) || isNaN(end) || start > end) return null;
+  const dayCounts = {};
+  let cursor = new Date(start.getFullYear(), start.getMonth(), 1);
+  while (cursor <= end){
+    const y = cursor.getFullYear(), mo = cursor.getMonth() + 1;
+    const monthStart = new Date(y, mo - 1, 1);
+    const monthEnd = new Date(y, mo, 0);
+    const overlapStart = start > monthStart ? start : monthStart;
+    const overlapEnd = end < monthEnd ? end : monthEnd;
+    const days = Math.round((overlapEnd - overlapStart) / 86400000) + 1;
+    if (days > 0) dayCounts[y + '-' + String(mo).padStart(2, '0')] = days;
+    cursor = new Date(y, mo, 1); // tháng kế tiếp
+  }
+  let best = null, bestCount = -1;
+  for (const [k, c] of Object.entries(dayCounts)) if (c > bestCount){ best = k; bestCount = c; }
+  if (!best) return null;
+  const [y, mo] = best.split('-');
+  return { monthKey: best, label: 'Tháng ' + parseInt(mo, 10) + '/' + y };
+}
+
 /** Nhận diện 1 file: xác định vai trò (role) chủ yếu theo TÊN FILE
  *  (classifyFileName, định nghĩa ở init.js) — tên file các sàn xuất ra khá rõ
  *  ràng/đáng tin cậy. Chỉ đọc thêm NỘI DUNG file để xác nhận đúng 1 trường
@@ -288,7 +325,8 @@ async function detectFile(file){
   }
   const meta = role ? ROLE_META[role] : null;
   let monthInfo = role ? detectMonthForRole(role, wb) : null;
-  if (!monthInfo && !(role && NO_FILENAME_MONTH_ROLES.has(role))) monthInfo = detectMonthFromFilename(file.name);
+  if (!monthInfo && role && DATE_RANGE_FILENAME_ROLES.has(role)) monthInfo = detectMonthFromDateRangeInFilename(file.name);
+  else if (!monthInfo && !(role && NO_FILENAME_MONTH_ROLES.has(role))) monthInfo = detectMonthFromFilename(file.name);
   return {
     file, role, platform: meta ? meta.platform : null, typeLabel: meta ? meta.label : null,
     monthKey: monthInfo ? monthInfo.monthKey : null, monthLabel: monthInfo ? monthInfo.label : null,
