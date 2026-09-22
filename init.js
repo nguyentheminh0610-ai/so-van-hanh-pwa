@@ -384,8 +384,8 @@ function updateValidityAndButton(){
 // file 1 nút để tự điền các file còn lại, khỏi phải qua tab Thư viện.
 let suggestRunId = 0;
 
-async function ensureLibraryRowsLoaded(){
-  if (libraryRows && libraryRows.length) return libraryRows;
+async function ensureLibraryRowsLoaded(forceRefresh){
+  if (!forceRefresh && libraryRows && libraryRows.length) return libraryRows;
   try {
     libraryRows = await sbFetch('monthly_reports?select=id,label,period_start,period_end,files') || [];
   } catch (err){
@@ -408,14 +408,23 @@ function renderDlSuggest(html){
 async function maybeSuggestMonthMatch(hasMissingRequired){
   const runId = ++suggestRunId;
   if (!hasMissingRequired || restoreContext){ renderDlSuggest(null); return; }
-  const candidate = detectedFiles.find(e => e.role && e.monthKey && !e.error && ROLE_META[e.role] && !ROLE_META[e.role].required);
-  if (!candidate){ renderDlSuggest(null); return; }
-  const rows = await ensureLibraryRowsLoaded();
+  // Chỉ gợi ý khi CHỈ có đúng 1 file tuỳ chọn nhận diện được tháng trong khu
+  // thả file (đúng kịch bản "vừa kéo thêm 1 file mới") — tránh lấy nhầm 1
+  // dòng còn sót lại từ thao tác trước đó nếu chưa refresh trang.
+  const optionalWithMonth = detectedFiles.filter(e => e.role && e.monthKey && !e.error && ROLE_META[e.role] && !ROLE_META[e.role].required);
+  if (optionalWithMonth.length !== 1){ renderDlSuggest(null); return; }
+  const candidate = optionalWithMonth[0];
+  // Luôn tải lại mới nhất từ server (không dùng cache) — tránh khớp nhầm nếu
+  // danh sách tháng đã lưu vừa thay đổi (thêm/sửa) sau lần tải trước đó.
+  const rows = await ensureLibraryRowsLoaded(true);
   if (runId !== suggestRunId) return; // đã có thay đổi khác trong lúc chờ tải
   const matches = (rows || []).filter(r => r.period_start && String(r.period_start).slice(0, 7) === candidate.monthKey);
   if (matches.length !== 1){ renderDlSuggest(null); return; }
   const record = matches[0];
-  renderDlSuggest(`⚡ File "${esc(candidate.file.name)}" thuộc <b>${esc(candidate.monthLabel)}</b> — trùng với tháng đã lưu <b>"${esc(record.label)}"</b>.
+  const rangeText = (record.period_start && record.period_end)
+    ? fmtDateVN(record.period_start) + ' – ' + fmtDateVN(record.period_end)
+    : '';
+  renderDlSuggest(`⚡ File "${esc(candidate.file.name)}" thuộc <b>${esc(candidate.monthLabel)}</b> — trùng với tháng đã lưu <b>"${esc(record.label)}"</b>${rangeText ? ' (' + esc(rangeText) + ')' : ''}. Kiểm tra đúng khoảng ngày rồi hẵng bấm:
     <button type="button" class="dl-suggest-apply" data-id="${esc(record.id)}">Tự động điền các file còn lại của tháng này</button>`);
 }
 
@@ -700,11 +709,26 @@ async function deleteLibraryFile(recordId, filePath){
 }
 
 // ---------- history (Supabase) ----------
+// BUG đã tìm ra (2026-09-22, phát hiện khi gợi ý tự động gắn tháng bị lệch
+// tháng): trước đây dùng dt.toISOString() để lấy ngày — hàm này LUÔN quy đổi
+// sang giờ UTC trước khi cắt chuỗi. Việt Nam là UTC+7, nên 1 ngày lúc 00:00
+// giờ Việt Nam (mốc đầu tháng) bị lùi về 17:00 NGÀY HÔM TRƯỚC theo UTC — kết
+// quả period_start của các tháng đã lưu trước đây có thể bị lệch sớm 1 ngày
+// (ví dụ ngày 01/08 bị lưu thành 2026-07-31), khiến các phép so khớp CHÍNH
+// XÁC theo tháng (như gợi ý tự động gắn file mới vào đúng tháng) bị lệch
+// sang tháng trước dù nhãn hiển thị vẫn đúng. Sửa lại: lấy NGÀY THEO GIỜ ĐỊA
+// PHƯƠNG của trình duyệt (getFullYear/getMonth/getDate), không quy đổi UTC.
+// Các tháng ĐÃ lưu trước bản sửa này vẫn giữ period_start cũ (lệch) trong
+// database — chỉ tự sửa đúng khi tháng đó được tính lại và "Lưu vào lịch sử"
+// lần nữa (ghi đè theo đúng label).
 function isoDate(d){
   if (!d) return null;
   const dt = (d instanceof Date) ? d : new Date(d);
   if (isNaN(dt)) return null;
-  return dt.toISOString().slice(0, 10);
+  const y = dt.getFullYear();
+  const mo = String(dt.getMonth() + 1).padStart(2, '0');
+  const day = String(dt.getDate()).padStart(2, '0');
+  return y + '-' + mo + '-' + day;
 }
 
 async function refreshHistoryFromServer(){
