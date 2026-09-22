@@ -201,6 +201,17 @@ function buildAffiliateLiveTableHtml(rows){
   </tbody></table>`;
 }
 
+// Bảng 4 "CTOR/CTR & hiệu quả lượt xem" (2026-09-22, theo yêu cầu chủ shop:
+// "ctor và ctr và tính thêm 1 chỉ số lượt view trên doanh thu") — tuỳ chọn,
+// độc lập với Bảng 1/2/3, chỉ cần đúng 1 file Creator List (Transaction
+// Analysis); chỉ được gọi khi aff.ctorCtrTable khác null.
+function buildAffiliateCtorCtrTableHtml(rows){
+  if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu nào trong file Creator List.</p>';
+  return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">GMV</th><th style="text-align:right">CTOR</th><th style="text-align:right">CTR</th><th style="text-align:right">Lượt xem/triệu GMV</th></tr></thead><tbody>
+    ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtVND(r.gmv)}</td><td class="num">${fmtPct(r.ctor, 2)}</td><td class="num">${fmtPct(r.ctr, 2)}</td><td class="num">${r.viewTrenTrieuGmv === null ? '—' : fmtInt(r.viewTrenTrieuGmv)}</td></tr>`).join('')}
+  </tbody></table>`;
+}
+
 // Hiệu suất theo SKU/size (2026-09-15, theo yêu cầu chủ shop) — gộp 2 sàn
 // theo TÊN sản phẩm, chỉ tính đơn Hoàn thành, chỉ gồm mã đã có trong bảng tra
 // cứu (calc.js đã lọc bỏ mã cũ/ngừng bán). Độc lập với Shop Stats.
@@ -245,13 +256,16 @@ function buildAffiliateKocSectionHtml(res){
   const liveSectionHtml = aff.liveTable ? `
   <div class="sub-label">Hiệu quả LIVE theo KOC</div>
   ${buildAffiliateLiveTableHtml(aff.liveTable)}` : '';
+  const ctorCtrSectionHtml = aff.ctorCtrTable ? `
+  <div class="sub-label">CTOR/CTR &amp; hiệu quả lượt xem theo KOC <span style="text-transform:none;font-weight:400;">— GMV tính cả đơn chưa trừ huỷ/hoàn (khác "Doanh thu" ở bảng trên); Lượt xem/triệu GMV = lượt xem video chia GMV (triệu đồng) — càng cao nghĩa là view nhiều nhưng ra doanh thu ít</span></div>
+  ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
   <!-- ZONE 6 -->
   <div class="zone"><span class="z-num">6</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
-  ${buildAffiliateTable2Html(aff.table2)}${liveSectionHtml}`;
+  ${buildAffiliateTable2Html(aff.table2)}${liveSectionHtml}${ctorCtrSectionHtml}`;
 }
 
 // ---------- Khách hàng theo khu vực — donut % số đơn theo tỉnh/thành (gộp 2

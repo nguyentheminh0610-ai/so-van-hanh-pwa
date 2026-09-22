@@ -901,6 +901,30 @@ function computeAllFromAOA(aoa){
       creatorCtorMap[koc] = num(r['CTOR']);
     }
   }
+
+  // Bảng 4 "CTOR/CTR & hiệu quả lượt xem" (2026-09-22, theo yêu cầu chủ shop:
+  // "ctor và ctr và tính thêm 1 chỉ số lượt view trên doanh thu") — tự đứng
+  // riêng, chỉ cần đúng 1 file "Creator List (Transaction Analysis)", KHÔNG
+  // phụ thuộc affiliateOrders/videoAnalysis (khác Bảng 1/2). Lưu ý: GMV trong
+  // file này tính cả đơn CHƯA trừ huỷ/hoàn (theo đúng chú thích cột trong file
+  // gốc) — khác với "Doanh thu" ở Bảng 1 (chỉ tính đơn "Đã quyết toán") — nên
+  // để tên riêng "GMV" ở bảng này, tránh chủ shop nhầm là cùng 1 số với Bảng 1.
+  const kocCtorCtrTable = creatorListRaw ? creatorListRaw
+    .map(r => {
+      const koc = r['Tên nhà sáng tạo'];
+      if (!koc) return null;
+      const gmv = parseVndCurrency(r['GMV nhờ nhà sáng tạo']); // dạng "19.645.855₫" — cần bỏ ký hiệu ₫ trước khi parse
+      const luotXem = num(r['Lượt xem video']);
+      // Lượt xem trên mỗi TRIỆU đồng GMV — chủ shop yêu cầu "lượt view trên
+      // doanh thu" (view chia doanh thu); quy về đơn vị triệu đồng cho số dễ đọc
+      // (vd 1.500 lượt/triệu thay vì 0.0015 lượt/đồng).
+      const viewTrenTrieuGmv = gmv ? luotXem / (gmv / 1e6) : null;
+      return { koc, gmv, ctor: num(r['CTOR']), ctr: num(r['CTR']), luotXem, viewTrenTrieuGmv };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.gmv - a.gmv)
+    .slice(0, 20) : null;
+
   const kocTable1 = affRowsRaw ? Object.entries(kocOrders)
     .map(([koc, v]) => ({
       koc, soDon: v.count, doanhThu: v.revenue,
@@ -986,7 +1010,9 @@ function computeAllFromAOA(aoa){
 
   // Chỉ hiện cả khu vực khi có ÍT NHẤT 1 trong 2 file — không có file nào thì
   // affiliateKoc = null, app.js sẽ ẩn hoàn toàn khu vực (không hiện bảng rỗng).
-  const affiliateKoc = (affRowsRaw || vidRowsRaw) ? { table1: kocTable1, table2: kocTable2, liveTable: kocLiveTable } : null;
+  const affiliateKoc = (affRowsRaw || vidRowsRaw || creatorListRaw)
+    ? { table1: kocTable1, table2: kocTable2, liveTable: kocLiveTable, ctorCtrTable: kocCtorCtrTable }
+    : null;
 
   return {
     warnings, ssWarning, minDate, maxDate,
