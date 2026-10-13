@@ -1,0 +1,171 @@
+{
+  "version": "2026-10-13",
+  "source": "size-spec.md (chốt với chủ shop Nguyễn Thế Minh 13/10/2026)",
+  "size_order": ["S", "M", "L", "XL", "XXL", "3XL"],
+  "default_landmark": "cham_got",
+  "landmarks": ["mat_ca", "cham_got", "quet_dat"],
+  "weight_threshold": {
+    "overweight_nam_kg": 10,
+    "overweight_nu_kg": 7,
+    "overweight_unknown_gender_kg": 10,
+    "underweight_kg": 20
+  },
+  "size_2xl_alias": "XXL",
+
+  "product_groups": {
+    "CL": {
+      "name": "Quần lông (Quần Hoạt Hình)",
+      "measure_table": "A",
+      "default_available_sizes": ["M", "L", "XL"],
+      "sku_overrides": {
+        "Chất Lông-Shin": ["S", "M", "L", "XL", "XXL", "3XL"],
+        "Chất Lông-Shin 02": ["M", "L", "XL", "XXL"],
+        "Chất Lông-Shin 03": ["M", "L", "XL", "XXL"],
+        "Chất Lông-Patrick Star": ["M", "L", "XL", "XXL"]
+      }
+    },
+    "CR": {
+      "name": "Quần caro (Quần Kẻ Caro)",
+      "measure_table": "B",
+      "default_available_sizes": ["M", "L", "XL", "XXL"],
+      "cotton_thuong_skus": ["Đỏ 03", "Đỏ 04", "Đen 02"],
+      "cotton_thuong_size_bonus": 1
+    },
+    "CT": {
+      "name": "Quần thun",
+      "measure_table": "A",
+      "default_available_sizes": ["M", "L", "XL"],
+      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+    },
+    "PJD": {
+      "name": "Bộ dài",
+      "measure_table": "A",
+      "default_available_sizes": ["M", "L", "XL"],
+      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+    },
+    "PJC": {
+      "name": "Bộ ngắn",
+      "measure_table": "A",
+      "default_available_sizes": ["M", "L", "XL"],
+      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+    },
+    "QS": {
+      "name": "Quần short",
+      "measure_table": "A",
+      "default_available_sizes": ["M", "L", "XL"],
+      "length_cm_applicable": false,
+      "_unconfirmed": "mục 8.1 — dùng tạm bảng A (bỏ qua dài quần), cần chủ shop xác nhận"
+    },
+    "CB": {
+      "name": "Combo",
+      "measure_table": null,
+      "note": "Size cố định theo tên combo — tư vấn từng SKU con rồi chọn combo đúng cặp size. Nếu không có cặp phù hợp, tư vấn mua lẻ 2 quần (mục 8.5 — cần xác nhận)."
+    }
+  },
+
+  "table_A_height_decision": [
+    { "size": "S", "max_height_cm": 152, "length_cm": 92 },
+    { "size": "M", "min_height_cm": 153, "max_height_cm": 161, "length_cm": 95 },
+    { "size": "L", "min_height_cm": 162, "max_height_cm": 174, "length_cm": 97 },
+    { "size": "XL", "min_height_cm": 175, "max_height_cm": 179, "length_cm": 99 },
+    { "size": "XXL", "min_height_cm": 180, "max_height_cm": 185, "length_cm": 102 },
+    { "size": "3XL", "min_height_cm": 186, "max_height_cm": 191, "length_cm": 105 }
+  ],
+  "table_A_height_out_of_range": {
+    "below_140cm": { "size": "S", "warning": "quần sẽ dài hơn, khuyên xắn/cắt gấu" },
+    "above_191cm": { "size": "3XL", "warning": "quần sẽ ngắn hơn chạm gót" }
+  },
+  "table_A_weight_decision": [
+    { "size": "M", "max_weight_kg": 65 },
+    { "size": "L", "max_weight_kg": 70 },
+    { "size": "XL", "max_weight_kg": 80 },
+    { "size": "XXL", "max_weight_kg": 90 },
+    { "size": "3XL", "max_weight_kg": 100 }
+  ],
+  "table_A_weight_out_of_range": {
+    "at_or_above_100kg": { "size": "3XL", "warning": "có thể chật" }
+  },
+  "table_A_public_display": [
+    { "size": "S", "height_range": "1m40–1m55", "weight_range": "dưới 55kg", "length_cm": 92, "dui_cm": 62, "mong_cm": 100, "ong_quan_cm": 44 },
+    { "size": "M", "height_range": "1m45–1m65", "weight_range": "dưới 65kg", "length_cm": 95, "dui_cm": 65, "mong_cm": 104, "ong_quan_cm": 46 },
+    { "size": "L", "height_range": "1m55–1m75", "weight_range": "dưới 70kg", "length_cm": 97, "dui_cm": 68, "mong_cm": 108, "ong_quan_cm": 48 },
+    { "size": "XL", "height_range": "1m60–1m80", "weight_range": "dưới 80kg", "length_cm": 99, "dui_cm": 71, "mong_cm": 112, "ong_quan_cm": 50 },
+    { "size": "XXL", "height_range": "1m70–1m90", "weight_range": "dưới 90kg", "length_cm": 102, "dui_cm": 74, "mong_cm": 116, "ong_quan_cm": 52 },
+    { "size": "3XL", "height_range": "1m75–1m95", "weight_range": "dưới 100kg", "length_cm": 105, "dui_cm": 77, "mong_cm": 120, "ong_quan_cm": 54 }
+  ],
+
+  "table_B_height_decision": [
+    { "height_bracket_from_A": "S", "size": "M", "length_cm": 94, "note": "size nhỏ nhất caro" },
+    { "height_bracket_from_A": "M", "size": "M", "length_cm": 94 },
+    { "height_bracket_from_A": "L", "size": "L", "length_cm": 97 },
+    { "height_bracket_from_A": "XL", "size": "XL", "length_cm": 100 },
+    { "height_bracket_from_A": "XXL", "size": "XXL", "length_cm": 104 },
+    { "height_bracket_from_A": "3XL", "size": "XXL", "length_cm": 104, "warning": "quần ngắn hơn bình thường" }
+  ],
+  "table_B_weight_decision": [
+    { "size": "M", "max_weight_kg": 60 },
+    { "size": "L", "max_weight_kg": 70 },
+    { "size": "XL", "max_weight_kg": 77 },
+    { "size": "XXL", "max_weight_kg": 85 }
+  ],
+  "table_B_weight_out_of_range": {
+    "at_or_above_85kg": { "size": "XXL", "warning": "có thể chật (caro không có 3XL)" }
+  },
+  "table_B_public_display": [
+    { "size": "M", "height_range": "1m45–1m60", "weight_range": "dưới 60kg", "length_cm": 94, "bung_cm": 96, "dui_cm": 62, "mong_cm": 112, "ong_quan_cm": 23 },
+    { "size": "L", "height_range": "1m60–1m70", "weight_range": "dưới 70kg", "length_cm": 97, "bung_cm": 98, "dui_cm": 65, "mong_cm": 116, "ong_quan_cm": 24 },
+    { "size": "XL", "height_range": "1m65–1m77", "weight_range": "dưới 77kg", "length_cm": 100, "bung_cm": 103, "dui_cm": 68, "mong_cm": 118, "ong_quan_cm": 24 },
+    { "size": "XXL", "height_range": "1m70–1m85", "weight_range": "dưới 85kg", "length_cm": 104, "bung_cm": 110, "dui_cm": 71, "mong_cm": 122, "ong_quan_cm": 26 }
+  ],
+
+  "reply_templates": {
+    "normal": "Dạ bạn mặc size {size} là ok nhé ạ, dài quần {length}cm, quần dài tới tầm {landmark} á. Bạn thích quần dài tới mắt cá, chạm gót hay quét đất để mình chốt size chuẩn nhất ạ?",
+    "has_length_pref": "Dạ bạn thích {landmark} thì lấy size {size} nhé ạ, dài quần {length}cm là vừa đẹp.",
+    "overweight_longer": "Dạ với cân nặng của bạn mình tư vấn size {size} cho thoải mái ạ, dài quần {length}cm — quần sẽ hơi dài hơn chạm gót một chút, bạn xắn nhẹ gấu là vừa nhé.",
+    "underweight_loose": "Dạ bạn lấy size {size} để quần đủ dài tới chạm gót ạ, form sẽ hơi rộng một chút. Nếu bạn thích mặc gọn thì xuống size {size_minus_1} nhé.",
+    "clamped_min": "Dạ size nhỏ nhất của mẫu này là {size} ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé.",
+    "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
+    "caro_cotton_thuong_suffix": "Mẫu {ten} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ.",
+    "missing_height": "Dạ bạn cho mình xin chiều cao và cân nặng để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ.",
+    "missing_weight": "Dạ {height} bạn mặc size {size} ({length}cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ."
+  },
+
+  "missing_data_rules": {
+    "only_height": "Tư vấn theo bảng chiều cao, mốc chạm gót; xin cân nặng và hỏi mốc dài trong cùng tin.",
+    "only_weight": "Tạm theo bảng cân nặng, bắt buộc xin chiều cao trước khi chốt (sai chiều cao = sai dài quần = lý do trả hàng số 1).",
+    "only_length_pref": "Xin chiều cao.",
+    "height_parse_accept_range_cm": [140, 200],
+    "buying_for_someone_else": "Hỏi chiều cao/cân của người mặc, không của người mua.",
+    "other_brand_size_given": "Không quy đổi; vẫn xin chiều cao (quần ống rộng, size theo dài quần)."
+  },
+
+  "test_cases": [
+    { "id": 1, "input": "Nữ 1m56, 50kg, chạm gót", "expected_size": "M", "expected_length_cm": 95 },
+    { "id": 2, "input": "Nam 1m70, 65kg, chạm gót", "expected_size": "L", "expected_length_cm": 97 },
+    { "id": 3, "input": "Nam 1m75, 65kg, chạm gót", "expected_size": "XL", "expected_length_cm": 99 },
+    { "id": 4, "input": "Nam 1m68, 62kg, mắt cá", "expected_size": "M", "expected_length_cm": 95 },
+    { "id": 5, "input": "Nam 1m68, 62kg, quét đất", "expected_size": "XL", "expected_length_cm": 99 },
+    { "id": 6, "input": "Nữ 1m60, 50kg, quét đất", "expected_size": "L", "expected_length_cm": 97 },
+    { "id": 8, "input": "Nam 1m88, 80kg, quét đất", "expected_size": "3XL", "expected_length_cm": 105, "expected_flags": ["clamped_max"] },
+    { "id": 9, "input": "1m50, mắt cá", "expected_size": "S", "expected_length_cm": 92, "expected_flags": ["clamped_min"] },
+    { "id": 10, "input": "Nam 1m80, 95kg", "expected_size": "3XL", "expected_length_cm": 105, "expected_flags": ["overweight_longer"] },
+    { "id": 11, "input": "Nữ 1m60, 68kg", "expected_size": "L", "expected_length_cm": 97, "expected_flags": ["overweight_longer"] },
+    { "id": 12, "input": "Nam 1m70, 79kg", "expected_size": "L", "expected_length_cm": 97 },
+    { "id": 13, "input": "Nữ 1m70, 45kg", "expected_size": "L", "expected_length_cm": 97, "expected_flags": ["underweight_loose"] },
+    { "id": 14, "input": "Caro, nữ 1m50, 45kg, chạm gót", "expected_size": "M", "expected_length_cm": 94, "expected_flags": ["clamped_min"] },
+    { "id": 15, "input": "Caro, nam 1m78, 68kg, chạm gót", "expected_size": "XL", "expected_length_cm": 100 },
+    { "id": 16, "input": "Caro, nam 1m88, 78kg, chạm gót", "expected_size": "XXL", "expected_length_cm": 104, "expected_flags": ["clamped_max"] },
+    { "id": 17, "input": "Nam 1m75, 85kg, mắt cá", "expected_size": "XL", "expected_length_cm": 99, "expected_flags": ["overweight_longer"], "note": "kiểm tra thứ tự B2 rồi B3" },
+    { "id": 18, "input": "Chất Lông-Hello Kitty (dải M–XL), nam 1m83, 75kg", "expected_size": "XL", "expected_length_cm": 99, "expected_flags": ["clamped_max"] },
+    { "id": 19, "input": "1m6, không có cân", "expected_size": "M", "expected_length_cm": 95, "note": "xin cân nặng" },
+    { "id": 20, "input": "chỉ có 60kg", "expected_size": "M", "note": "tạm M vì <65kg, bắt buộc xin chiều cao" }
+  ],
+
+  "unconfirmed_items": [
+    "CT/PJD/PJC/QS dùng tạm bảng A — chưa có bảng đo riêng, cần chủ shop gửi/xác nhận",
+    "Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02) +1 size — áp dụng ở bước B1 trước mốc dài, cần chủ shop chốt có dùng không",
+    "Bảng cân nặng caro dùng ngưỡng riêng (mục 3.3) thay vì y hệt quần lông — cần xác nhận",
+    "Giới tính không rõ dùng ngưỡng nam (10kg) — cần xác nhận",
+    "Combo thiếu cặp size phù hợp → tư vấn mua lẻ 2 quần — cần xác nhận"
+  ]
+}
