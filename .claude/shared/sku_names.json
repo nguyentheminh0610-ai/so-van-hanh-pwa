@@ -1,0 +1,17 @@
+{
+  "_note": "Mã SKU gốc (bỏ đuôi size) -> tên phân loại hiển thị. Bản sao của SKU_DISPLAY_NAME trong calc.js (Sổ Vận Hành) -- sửa ở đây thì sửa luôn bên calc.js. Mã chưa có thì hiện nguyên mã + nhắc chủ shop bổ sung.",
+  "CL01": "Chất Lông-Shin", "CL02": "Chất Lông-Hello Kitty", "CL03": "Chất Lông-Vịt Xanh",
+  "CL04": "Chất Lông-Lợn Hồng", "CL05": "Chất Lông-Kuromi", "CL06": "Chất Lông-Shin 02",
+  "CL07": "Chất Lông-Shin 03", "CL08": "Chất Lông-Patrick Star", "CL09": "Chất Lông-Hello Kitty Hồng",
+  "CL10": "Chất Lông-Thỏ Nơ", "CL11": "Chất Lông-Caro Hồng", "CL12": "Chất Lông-Caro Xanh",
+  "CL13": "Chất Lông-Kẻ Xanh", "CL14": "Chất Lông-Đốm Hồng",
+  "CT01": "Chất Thun-Màu 01", "CT02": "Chất Thun-Màu 02", "CT03": "Chất Thun-Màu 03",
+  "CT04": "Chất Thun-Màu 04", "CT05": "Chất Thun-Màu 05", "CT06": "Chất Thun-Màu 06",
+  "CT07": "Chất Thun-Màu 07", "CT08": "Chất Thun-Shin 01", "CT09": "Chất Thun-Shin 02", "CT10": "Chất Thun-Shin 04",
+  "DO03": "Đỏ 03", "DEN02": "Đen 02", "DO04": "Đỏ 04", "XANHLA03": "Xanh Lá 03",
+  "DO03BANNANGCAP": "Đỏ 03 Cao Cấp (Noel)", "XANHLA02": "Xanh Lá 02", "DADEN": "Chất Dạ Đen Cao Cấp",
+  "DADO": "Chất Dạ Đỏ Cao Cấp", "DO02": "Đỏ 02", "DO05": "Đỏ 05", "XANHLA05": "Xanh Lá 05",
+  "PJD-CT-01": "Bộ Dài-Shin 01", "PJD-CT-02": "Bộ Dài-Shin 02", "PJD-CT-03": "Bộ Dài-Shin 03",
+  "PJC-CT-01": "Bộ Ngắn-Shin 01", "PJC-CT-02": "Bộ Ngắn-Shin 02", "PJC-CT-03": "Bộ Ngắn-Shin 03",
+  "QS-CT-01": "Quần Short-Shin 01", "QS-CT-02": "Quần Short-Shin 02", "QS-CT-03": "Quần Short-Shin 03"
+}

@@ -49,8 +49,9 @@ Chỉ là câu kết luận rút ra từ Nhóm B ở trên, không tính riêng:
 1. Shiper lấy hàng: [Đã lấy hết / Chưa lấy hết]
 
 2. Đơn chưa đóng: [X] đơn
-   - [SKU A]: [số lượng]
-   - [SKU B]: [số lượng]
+   - [Tên phân loại A]: [size]×[số lượng], [size]×[số lượng]
+   - [Tên phân loại B]: [size]×[số lượng]
+   (chủ shop sửa 2026-10-13: ghi tên phân loại, vd "Chất Lông-Shin: M×1, L×2", không ghi mã SKU — tra .claude/shared/sku_names.json)
    ...
    Đơn đã đóng nhưng chưa đi: [Y] đơn
 

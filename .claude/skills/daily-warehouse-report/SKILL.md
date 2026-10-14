@@ -1,11 +1,14 @@
 ---
 name: daily-warehouse-report
-description: Run the "3 báo cáo đối chiếu sàn" (+ bonus Báo cáo 4) daily warehouse check and send it to the shop owner via Telegram -- use whenever the shop owner asks to "check kho hôm nay", "check 3 báo cáo", "báo cáo đối chiếu sàn", or around end-of-day without being asked, since this is a daily recurring task that must never be skipped. Covers: cross-checking TikTok/Shopee "packed, waiting on shipper" orders against Sổ Kho's "Tích đơn đi" record (shipper pickup confirmation + packed-but-undispatched detection), cross-checking against "Đơn đã in nhưng chưa đóng được" for discrepancies, finding orders forgotten within the last 48h that were never even printed, and checking resend/"gửi bù" shipments from the last 48h against Sổ Kho to catch replacement orders that were created but never actually dispatched -- then sending the result as a Telegram message.
+description: Run the "3 báo cáo đối chiếu sàn" (+ bonus Báo cáo 4) daily warehouse check and send it to the shop owner via Telegram -- use whenever the shop owner asks to "check kho hôm nay", "check 3 báo cáo", "báo cáo đối chiếu sàn", or at 17:30 every day without being asked, since this is a daily recurring task that must never be skipped. Covers: cross-checking TikTok/Shopee "packed, waiting on shipper" orders against Sổ Kho's "Tích đơn đi" record (shipper pickup confirmation + packed-but-undispatched detection), cross-checking against "Đơn đã in nhưng chưa đóng được" for discrepancies, finding orders forgotten within the last 48h that were never even printed, and checking resend/"gửi bù" shipments from the last 48h against Sổ Kho to catch replacement orders that were created but never actually dispatched -- then sending the result as a Telegram message.
 ---
 
 # Báo cáo kho hàng ngày — 3 báo cáo đối chiếu sàn
 
 ## What this is for
+
+**Giờ chạy cố định: 17:30 hằng ngày** (chốt 2026-10-13, thay cho "cuối
+ngày" chung chung trước đây). Shop owner vẫn có thể gọi tay bất kỳ lúc nào.
 
 Daily recurring task (shop owner can trigger it any time, e.g. "check 3 báo
 cáo hôm nay") that answers 3 questions about today's TikTok Shop + Shopee
@@ -120,6 +123,12 @@ Taxonomy đầy đủ 2 sàn: [reference_platform_order_status_definitions](refe
 3. **Báo cáo 2**:
    - Đếm Nhóm A, mở từng đơn lấy SKU+số lượng (sàn không có file xuất
      gộp sẵn — phải mở từng đơn), cộng theo SKU.
+   - **Khi viết vào báo cáo, ghi TÊN PHÂN LOẠI + size, không ghi mã SKU**
+     (chốt 2026-10-13): tách đuôi size (`CL01-L` → `CL01` + `L`), tra
+     `.claude/shared/sku_names.json` → "Chất Lông-Shin size L: 2". Mã chưa
+     có trong bảng thì ghi nguyên mã kèm "(chưa có tên)" và nhắc chủ shop
+     bổ sung vào bảng. Gộp các size của cùng 1 phân loại trên 1 dòng, vd
+     "Chất Lông-Shin: M×1, L×2".
    - Đếm Nhóm B (chỉ số lượng).
    - Lấy `warehouse_unpacked_log` với `scan_date` = hôm nay, so mã vận
      đơn với Nhóm A — liệt kê phần lệch hai chiều nếu có (có ở nhóm này

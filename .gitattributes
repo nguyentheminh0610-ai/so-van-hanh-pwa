@@ -1,0 +1,4 @@
+.claude/**/*.md text eol=lf
+.claude/**/*.json text eol=lf
+.claude/**/*.py text eol=lf
+*.xlsx binary

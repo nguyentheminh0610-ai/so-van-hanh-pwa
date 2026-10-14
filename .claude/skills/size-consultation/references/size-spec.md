@@ -183,8 +183,8 @@ Cấu trúc bắt buộc: **1 size + dài quần + mốc**, rồi hỏi/chốt m
 |---|---|
 | Bình thường | "Dạ bạn mặc **size {size}** là ok nhé ạ, dài quần **{length}cm**, quần dài tới tầm **{landmark}** á. Bạn thích quần dài tới mắt cá, chạm gót hay quét đất để mình chốt size chuẩn nhất ạ?" |
 | Đã có mốc khách thích | "Dạ bạn thích {landmark} thì lấy **size {size}** nhé ạ, dài quần {length}cm là vừa đẹp." |
-| Thừa cân (`overweight_longer`) | "Dạ với cân nặng của bạn mình tư vấn **size {size}** cho thoải mái ạ, dài quần {length}cm — quần sẽ hơi dài hơn chạm gót một chút, bạn xắn nhẹ gấu là vừa nhé." |
-| Gầy (`underweight_loose`) | "Dạ bạn lấy **size {size}** để quần đủ dài tới chạm gót ạ, form sẽ hơi rộng một chút. Nếu bạn thích mặc gọn thì xuống **size {size−1}** nhé." |
+| Thừa cân (`overweight_longer`) | "Dạ với cân nặng của bạn mình tư vấn **size {size}** cho thoải mái ạ, dài quần {length}cm, quần sẽ hơi dài hơn chạm gót một chút." |
+| Gầy (`underweight_loose`) | "Dạ bạn lấy **size {size}** để quần đủ dài tới chạm gót ạ, dài quần {length}cm, form sẽ hơi rộng một chút." |
 | Kẹp size nhỏ nhất (`clamped_min`) | "Dạ size nhỏ nhất của mẫu này là **{size}** ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé." |
 | Kẹp size lớn nhất (`clamped_max`) | "Dạ mẫu này lớn nhất là **size {size}** ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé." |
 | Caro – Cotton thường | thêm: "Mẫu {tên} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ." (xem mục 8) |

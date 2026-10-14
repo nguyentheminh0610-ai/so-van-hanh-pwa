@@ -65,11 +65,24 @@ lại cả size-spec.md lẫn size-rules.json.
    Văn phong: xưng "mình", gọi khách "bạn", xen kẽ "ạ"/"á" (không lặp 2
    lần liền), áp dụng công thức 1+1 (trả lời đủ ý + 1 câu hỏi/gợi ý chủ
    động, ví dụ hỏi mốc dài quần nếu chưa biết).
+   **NGẮN GỌN, ĐÚNG MẪU** (chủ shop chốt 2026-10-13): chỉ gửi đúng câu mẫu,
+   **không thêm câu nào ngoài mẫu** — không thêm gợi ý "xuống size nếu thích
+   mặc gọn", không "xắn gấu", không giải thích mẫu nào có/không có size.
+   Đã biết mốc dài khách thích hoặc khách đã trả lời câu hỏi trước thì
+   KHÔNG hỏi thêm câu cuối. Ví dụ đúng: "Dạ bạn thích quét đất thì lấy size
+   XXL nhé ạ, dài quần 102cm là vừa đẹp."
 5. Gửi thẳng cho khách (không cần hỏi chủ shop duyệt trước — đã xác nhận
    mức rủi ro thấp, tương tự các skill reply khác), trừ khi gặp case nằm
    trong mục "chưa chốt" (mục 8 size-spec.md) mà bạn không chắc số liệu
    tạm có đúng với SKU đang hỏi hay không — lúc đó hỏi lại chủ shop thay vì
    tự suy đoán.
+
+## Câu hỏi phụ đã có câu trả lời chuẩn
+
+- **Sợ rộng/chật eo**: CHƯA có câu trả lời chuẩn — không tự trả lời, báo
+  chủ shop.
+- **Mốc dài quần**: chạm gót = gấu quần chạm gót chân (che qua mắt cá);
+  mắt cá = ngắn hơn, ngang mắt cá chân; quét đất = dài chạm sàn.
 
 ## Test nhanh trước khi tin tưởng thay đổi logic
 

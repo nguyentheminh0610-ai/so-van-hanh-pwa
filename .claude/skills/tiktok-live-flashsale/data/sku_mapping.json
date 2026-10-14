@@ -1,0 +1,1695 @@
+{
+  "exported_at": "2026-10-04",
+  "source": "TikTok Seller Center > San pham > Quan ly san pham > Chinh sua hang loat san pham > chon 25 san pham dang hoat dong (Trang hoat dong) > Tat ca thong tin > Tao mau > Tai xuong (file zip 4 phan, sheet Template, cot product_id/sku_id/price/seller_sku)",
+  "note": "current_price la gia ban le tai thoi diem export (04/10/2026), co the da doi theo thoi gian - can doi chieu/refresh dinh ky qua lai buoc tren neu san pham/gia thay doi nhieu.",
+  "rows": [
+    {
+      "product_id": "1732387673143870610",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 02",
+      "sku_id": "1732410783332074642",
+      "seller_sku": "DO02-M",
+      "current_price": 185000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1732387673143870610",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 02",
+      "sku_id": "1732410783332140178",
+      "seller_sku": "DO02-L",
+      "current_price": 235000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1732387673143870610",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 02",
+      "sku_id": "1732410783332205714",
+      "seller_sku": "DO02-XL",
+      "current_price": 235000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1732387673143870610",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 02",
+      "sku_id": "1732410783332271250",
+      "seller_sku": "DO02-XXL",
+      "current_price": 185000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1732395679008720018",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 02",
+      "sku_id": "1732410851446457490",
+      "seller_sku": "XANHLA02-M",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1732395679008720018",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 02",
+      "sku_id": "1732410851446523026",
+      "seller_sku": "XANHLA02-L",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1732395679008720018",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 02",
+      "sku_id": "1732410851446588562",
+      "seller_sku": "XANHLA02-XL",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1732395679008720018",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 02",
+      "sku_id": "1732410851446654098",
+      "seller_sku": "XANHLA02-XXL",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1732395929768395922",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 03 Bản Nâng Cấp",
+      "sku_id": "1732410919666877586",
+      "seller_sku": "DO03BANNANGCAP-M",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395929768395922",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 03 Bản Nâng Cấp",
+      "sku_id": "1732410919666943122",
+      "seller_sku": "DO03BANNANGCAP-L",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395929768395922",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 03 Bản Nâng Cấp",
+      "sku_id": "1732410919667008658",
+      "seller_sku": "DO03BANNANGCAP-XL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395929768395922",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Đỏ 03 Bản Nâng Cấp",
+      "sku_id": "1732410919667074194",
+      "seller_sku": "DO03BANNANGCAP-XXL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395932946367634",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Dạ Đỏ Cao Cấp",
+      "sku_id": "1732410482381063314",
+      "seller_sku": "DADO-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732395932946367634",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Dạ Đỏ Cao Cấp",
+      "sku_id": "1732410482381128850",
+      "seller_sku": "DADO-L",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732395932946367634",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Dạ Đỏ Cao Cấp",
+      "sku_id": "1732410482381194386",
+      "seller_sku": "DADO-XL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732395932946367634",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Dạ Đỏ Cao Cấp",
+      "sku_id": "1732410482381259922",
+      "seller_sku": "DADO-XXL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732396165109613714",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đen Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Đen Đỏ Cao Cấp",
+      "sku_id": "1732410259309757586",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732396165109613714",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đen Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Đen Đỏ Cao Cấp",
+      "sku_id": "1732410259309823122",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732396165109613714",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đen Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Đen Đỏ Cao Cấp",
+      "sku_id": "1732410259309888658",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732396165109613714",
+      "product_name": "Quần Caro Chất Dạ Nhung Màu Đen Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Co giãn Nhiều- Chất Đen Đỏ Cao Cấp",
+      "sku_id": "1732410259309954194",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612039400065170",
+      "seller_sku": "DO02-M",
+      "current_price": 185000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612039400130706",
+      "seller_sku": "DO02-L",
+      "current_price": 235000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612039400196242",
+      "seller_sku": "DO02-XL",
+      "current_price": 235000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612039400261778",
+      "seller_sku": "DO02-XXL",
+      "current_price": 185000,
+      "deal_price": 191100
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921923218",
+      "seller_sku": "XANHLA02-M",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921988754",
+      "seller_sku": "XANHLA02-L",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922054290",
+      "seller_sku": "XANHLA02-XL",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922119826",
+      "seller_sku": "XANHLA02-XXL",
+      "current_price": 185000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621191958856850",
+      "seller_sku": "DO05-M",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621191958922386",
+      "seller_sku": "DO05-L",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621191958987922",
+      "seller_sku": "DO05-XL",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621191959053458",
+      "seller_sku": "DO05-XXL",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621191959118994",
+      "seller_sku": "XANHLA05-M",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621059313468562",
+      "seller_sku": "XANHLA05-L",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621059313534098",
+      "seller_sku": "XANHLA05-XL",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732621059313599634",
+      "seller_sku": "XANHLA05-XXL",
+      "current_price": 250000,
+      "deal_price": 181300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921267858",
+      "seller_sku": "DO03BANNANGCAP-M",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921333394",
+      "seller_sku": "DO03BANNANGCAP-L",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921398930",
+      "seller_sku": "DO03BANNANGCAP-XL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415921464466",
+      "seller_sku": "DO03BANNANGCAP-XXL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922250898",
+      "seller_sku": "XANHLA03-M",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922316434",
+      "seller_sku": "XANHLA03-L",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922381970",
+      "seller_sku": "XANHLA03-XL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1732410415922447506",
+      "seller_sku": "XANHLA03-XL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148229778",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148295314",
+      "seller_sku": "DADEN-L",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148360850",
+      "seller_sku": "DADEN-XL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148426386",
+      "seller_sku": "DADEN-XXL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148557458",
+      "seller_sku": "DADO-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148622994",
+      "seller_sku": "DADO-L",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148688530",
+      "seller_sku": "DADO-XL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731139353148754066",
+      "seller_sku": "DADO-XXL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877543570",
+      "seller_sku": "DEN02-M",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877609106",
+      "seller_sku": "DEN02-L",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877674642",
+      "seller_sku": "DEN02-XL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877740178",
+      "seller_sku": "DEN02-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731390533655431314",
+      "seller_sku": "DO04-M",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731390533655496850",
+      "seller_sku": "DO04-XL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731390536469285010",
+      "seller_sku": "DO04-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1731390536469350546",
+      "seller_sku": "DO04-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877281426",
+      "seller_sku": "DO03-M",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877346962",
+      "seller_sku": "DO03-L",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877412498",
+      "seller_sku": "DO03-XL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1730611992462067858",
+      "product_name": "Quần Kẻ Caro Ống Rộng, Ống Suông Màu Đỏ, Đen Và Xanh Nam Nữ Mặc Đôi Vải Không Xù-CR01",
+      "sku_id": "1730612052877478034",
+      "seller_sku": "DO03-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158664841362",
+      "seller_sku": "DADO-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158664906898",
+      "seller_sku": "DADO-L",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158664972434",
+      "seller_sku": "DADO-XL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158665037970",
+      "seller_sku": "DADO-XXL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158665103506",
+      "seller_sku": "DADEN-M",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158665169042",
+      "seller_sku": "DADEN-L",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158665234578",
+      "seller_sku": "DADEN-XL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1731123145986705554",
+      "product_name": "Quần Kẻ Caro Đỏ Chất Dạ Noel Suông Rộng Nữ Và Nam Dày Màu Đen Và Đỏ Chun Co Giãn, Giải Rút Cao Su Pants",
+      "sku_id": "1731123158665300114",
+      "seller_sku": "DADEN-XXL",
+      "current_price": 250000,
+      "deal_price": 230300
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1734130659540239506",
+      "seller_sku": "CL01-S",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976618837138",
+      "seller_sku": "CL01-M",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976618902674",
+      "seller_sku": "CL01-L",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976618968210",
+      "seller_sku": "CL01-XL",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733258262496314514",
+      "seller_sku": "CL01-XXL",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1734047707032814738",
+      "seller_sku": "CL01-XXXL",
+      "current_price": 210000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619230354",
+      "seller_sku": "CL05-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619295890",
+      "seller_sku": "CL05-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619361426",
+      "seller_sku": "CL05-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733258262496445586",
+      "seller_sku": "CL05-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1734130659540370578",
+      "seller_sku": "CL02-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619033746",
+      "seller_sku": "CL02-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619099282",
+      "seller_sku": "CL02-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619164818",
+      "seller_sku": "CL02-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733258262496380050",
+      "seller_sku": "CL02-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1734130659540436114",
+      "seller_sku": "CL04-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619426962",
+      "seller_sku": "CL04-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619492498",
+      "seller_sku": "CL04-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619558034",
+      "seller_sku": "CL04-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733258262496511122",
+      "seller_sku": "CL04-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619623570",
+      "seller_sku": "CL03-M",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619689106",
+      "seller_sku": "CL03-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1732763976619754642",
+      "seller_sku": "CL03-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733258262496576658",
+      "seller_sku": "CL03-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150938639205522",
+      "seller_sku": "CL06-S",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150938639271058",
+      "seller_sku": "CL06-M",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150938639336594",
+      "seller_sku": "CL06-L",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956232475794",
+      "seller_sku": "CL06-XL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956232541330",
+      "seller_sku": "CL06-XXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956232606866",
+      "seller_sku": "CL06-XXXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233065618",
+      "seller_sku": "CL07-S",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233131154",
+      "seller_sku": "CL07-M",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233196690",
+      "seller_sku": "CL07-L",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233262226",
+      "seller_sku": "CL07-XL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233327762",
+      "seller_sku": "CL07-XXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233852050",
+      "seller_sku": "CL08-S",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233917586",
+      "seller_sku": "CL08-M",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956233983122",
+      "seller_sku": "CL08-L",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234048658",
+      "seller_sku": "CL08-XL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234114194",
+      "seller_sku": "CL08-XXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234179730",
+      "seller_sku": "CL08-XXXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234638482",
+      "seller_sku": "CL09-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234704018",
+      "seller_sku": "CL09-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234769554",
+      "seller_sku": "CL09-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234835090",
+      "seller_sku": "CL09-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234900626",
+      "seller_sku": "CL09-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737150956234966162",
+      "seller_sku": "CL09-XXXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877417618",
+      "seller_sku": "CL13-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877483154",
+      "seller_sku": "CL13-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877548690",
+      "seller_sku": "CL13-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877614226",
+      "seller_sku": "CL13-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877679762",
+      "seller_sku": "CL13-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280877745298",
+      "seller_sku": "CL13-XXXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878204050",
+      "seller_sku": "CL12-S",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878269586",
+      "seller_sku": "CL12-M",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878335122",
+      "seller_sku": "CL12-L",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878400658",
+      "seller_sku": "CL12-XL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878466194",
+      "seller_sku": "CL12-XXL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878531730",
+      "seller_sku": "CL12-XXXL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280878990482",
+      "seller_sku": "CL11-S",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280879056018",
+      "seller_sku": "CL11-M",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280879121554",
+      "seller_sku": "CL11-L",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280879187090",
+      "seller_sku": "CL11-XL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460280879252626",
+      "seller_sku": "CL11-XXL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261913396370",
+      "seller_sku": "CL11-XXXL",
+      "current_price": 169000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261913855122",
+      "seller_sku": "CL10-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261913920658",
+      "seller_sku": "CL10-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261913986194",
+      "seller_sku": "CL10-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261914051730",
+      "seller_sku": "CL10-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737460261914117266",
+      "seller_sku": "CL10-XXXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477737837714",
+      "seller_sku": "CL14-S",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477737903250",
+      "seller_sku": "CL14-M",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477737968786",
+      "seller_sku": "CL14-L",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477738034322",
+      "seller_sku": "CL14-XL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477738099858",
+      "seller_sku": "CL14-XXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732283189140882578",
+      "product_name": "[Hàng Sẵn+Có Túi]Quần Lông Sometime, Quần Nỉ Bông Hello Kitty, Shin, Korumi Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737498477738165394",
+      "seller_sku": "CL14-XXXL",
+      "current_price": 210000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1732306200881366162",
+      "product_name": "Quần Kẻ Caro Noel Xanh Đỏ",
+      "sku_id": "1733705653687518354",
+      "seller_sku": "DO03-M",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732306200881366162",
+      "product_name": "Quần Kẻ Caro Noel Xanh Đỏ",
+      "sku_id": "1733705653687583890",
+      "seller_sku": "DO03-L",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732306200881366162",
+      "product_name": "Quần Kẻ Caro Noel Xanh Đỏ",
+      "sku_id": "1733705653687649426",
+      "seller_sku": "DO03-XL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732306200881366162",
+      "product_name": "Quần Kẻ Caro Noel Xanh Đỏ",
+      "sku_id": "1733705653687714962",
+      "seller_sku": "DO03-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732387458649261202",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton, Co giãn Nhẹ- Đỏ 04",
+      "sku_id": "1732410686269654162",
+      "seller_sku": "DO04-M",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732387458649261202",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton, Co giãn Nhẹ- Đỏ 04",
+      "sku_id": "1732410686269719698",
+      "seller_sku": "DO04-L",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732387458649261202",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton, Co giãn Nhẹ- Đỏ 04",
+      "sku_id": "1732410686269785234",
+      "seller_sku": "DO04-XL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732387458649261202",
+      "product_name": "Quần Caro Màu Đỏ Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton, Co giãn Nhẹ- Đỏ 04",
+      "sku_id": "1732410686269850770",
+      "seller_sku": "DO04-XXL",
+      "current_price": 160000,
+      "deal_price": 97020
+    },
+    {
+      "product_id": "1732395767515415698",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 03",
+      "sku_id": "1732410843278771346",
+      "seller_sku": "XANHLA03-M",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395767515415698",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 03",
+      "sku_id": "1732410843278836882",
+      "seller_sku": "XANHLA03-L",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395767515415698",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 03",
+      "sku_id": "1732410843278902418",
+      "seller_sku": "XANHLA03-XL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1732395767515415698",
+      "product_name": "Quần Caro Màu Xanh Noel Ống Rộng Nam Nữ, Có Dây Rút Bọc Cao Su, Chất Cotton Mềm, Co giãn Vừa-Xanh Lá 03",
+      "sku_id": "1732410843278967954",
+      "seller_sku": "XANHLA03-XXL",
+      "current_price": 250000,
+      "deal_price": 171500
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667319954",
+      "seller_sku": "CT08-M",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667385490",
+      "seller_sku": "CT08-L",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667451026",
+      "seller_sku": "CT08-XL",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667516562",
+      "seller_sku": "CT09-M",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667582098",
+      "seller_sku": "CT09-L",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667647634",
+      "seller_sku": "CT09-XL",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667713170",
+      "seller_sku": "CT10-M",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667778706",
+      "seller_sku": "CT10-L",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1737151047667844242",
+      "seller_sku": "CT10-XL",
+      "current_price": 150000,
+      "deal_price": 116620
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648911713426",
+      "seller_sku": "CT01-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648911778962",
+      "seller_sku": "CT01-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648911844498",
+      "seller_sku": "CT01-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648911910034",
+      "seller_sku": "CT02-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648911975570",
+      "seller_sku": "CT02-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912041106",
+      "seller_sku": "CT02-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912106642",
+      "seller_sku": "CT03-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912172178",
+      "seller_sku": "CT03-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912237714",
+      "seller_sku": "CT03-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912303250",
+      "seller_sku": "CT04-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912368786",
+      "seller_sku": "CT04-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912434322",
+      "seller_sku": "CT04-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912499858",
+      "seller_sku": "CT05-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912565394",
+      "seller_sku": "CT05-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912630930",
+      "seller_sku": "CT05-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912696466",
+      "seller_sku": "CT06-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912762002",
+      "seller_sku": "CT06-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912827538",
+      "seller_sku": "CT06-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912893074",
+      "seller_sku": "CT07-M",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648912958610",
+      "seller_sku": "CT07-L",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733177740146410642",
+      "product_name": "Quần Dài Hoạt Hình Ống Rộng Hello Kitty, Cậu Bé Bút Chì Shin Có Túi Mặc Ở Nhà Vải Thun Thường Thoáng Mát",
+      "sku_id": "1733177648913024146",
+      "seller_sku": "CT07-XL",
+      "current_price": 85000,
+      "deal_price": 83300
+    },
+    {
+      "product_id": "1733705753451725970",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình HelloKitty Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705772214027410",
+      "seller_sku": "CL02-M",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705753451725970",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình HelloKitty Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705772214092946",
+      "seller_sku": "CL02-L",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705753451725970",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình HelloKitty Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705772214158482",
+      "seller_sku": "CL02-XL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705753451725970",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình HelloKitty Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705772214224018",
+      "seller_sku": "CL02-XXL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705850607076498",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Kuromi  Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705777741005970",
+      "seller_sku": "CL05-M",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705850607076498",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Kuromi  Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705777741071506",
+      "seller_sku": "CL05-L",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705850607076498",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Kuromi  Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705777741137042",
+      "seller_sku": "CL05-XL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705850607076498",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Kuromi  Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705777741202578",
+      "seller_sku": "CL05-XXl",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705865788032146",
+      "product_name": "Quần Chất Lông Hoạt Hình Lợn Hồng Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705880945198226",
+      "seller_sku": "CL04-M",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705865788032146",
+      "product_name": "Quần Chất Lông Hoạt Hình Lợn Hồng Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705880945263762",
+      "seller_sku": "CL04-L",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705865788032146",
+      "product_name": "Quần Chất Lông Hoạt Hình Lợn Hồng Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705880945329298",
+      "seller_sku": "CL04-XL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705865788032146",
+      "product_name": "Quần Chất Lông Hoạt Hình Lợn Hồng Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705880945394834",
+      "seller_sku": "CL04-XXL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705881887605906",
+      "product_name": "Quần Chất Lông Hoạt Hình Vịt Xanh Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705882262668434",
+      "seller_sku": "CL03-M",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705881887605906",
+      "product_name": "Quần Chất Lông Hoạt Hình Vịt Xanh Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705882262733970",
+      "seller_sku": "CL03-L",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705881887605906",
+      "product_name": "Quần Chất Lông Hoạt Hình Vịt Xanh Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705867129160850",
+      "seller_sku": "CL03-XL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705881887605906",
+      "product_name": "Quần Chất Lông Hoạt Hình Vịt Xanh Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705867129226386",
+      "seller_sku": "CL03-XXL",
+      "current_price": 145000,
+      "deal_price": 151900
+    },
+    {
+      "product_id": "1733705750182134930",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Shin Cậu Bé Bút Chì Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705762345157778",
+      "seller_sku": "CL01-M",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1733705750182134930",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Shin Cậu Bé Bút Chì Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705762345223314",
+      "seller_sku": "CL01-L",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1733705750182134930",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Shin Cậu Bé Bút Chì Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705762345288850",
+      "seller_sku": "CL01-XL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1733705750182134930",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Shin Cậu Bé Bút Chì Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1733705762345354386",
+      "seller_sku": "CL01-XXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    },
+    {
+      "product_id": "1733705750182134930",
+      "product_name": "Quần Chất Lông 2 Mặt Hoạt Hình Shin Cậu Bé Bút Chì Sometime Ống Rộng Có Túi Mặc Ở Nhà Siêu Ấm",
+      "sku_id": "1734047850158589074",
+      "seller_sku": "CL01-XXXL",
+      "current_price": 169000,
+      "deal_price": 165620
+    }
+  ]
+}
