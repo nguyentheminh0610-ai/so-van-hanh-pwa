@@ -449,7 +449,7 @@ function render(res, opts){
   <div class="zone"><span class="z-num">1</span><span class="z-title">Tổng quan</span><span class="z-note">doanh thu hàng · thực nhận · phí sàn · tổng đơn</span></div>
   ${res.daChotLai ? '<p style="font-size:12px;color:var(--good);margin:0 0 8px;">🔒 Kỳ này đã CHỐT LẠI — trả/hoàn đã gộp thêm dữ liệu của tháng sau.</p>' : ''}
   <div class="kpi-row">
-    <div class="kpi-tile"><div class="k-label">Doanh thu hàng 2 sàn</div><div class="k-value">${fmtCompact(g.doanhThu)}</div><div class="k-sub">Shopee ${fmtCompact(s.doanhThu)} · TikTok ${fmtCompact(t.doanhThu)}</div></div>
+    <div class="kpi-tile"><div class="k-label">${g.doanhThuCu === undefined ? 'Tổng doanh thu 2 sàn (công thức cũ)' : 'Doanh thu hàng 2 sàn'}</div><div class="k-value">${fmtCompact(g.doanhThu)}</div><div class="k-sub">Shopee ${fmtCompact(s.doanhThu)} · TikTok ${fmtCompact(t.doanhThu)}</div></div>
     <div class="kpi-tile"><div class="k-label">Thực nhận 2 sàn</div><div class="k-value">${g.thucNhan === null || g.thucNhan === undefined ? '—' : fmtCompact(g.thucNhan)}</div><div class="k-sub">${g.thucNhan === null || g.thucNhan === undefined ? 'cần tính lại bằng công thức mới' : 'Shopee ' + fmtCompact(s.thucNhan) + ' · TikTok ' + fmtCompact(t.thucNhan)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tổng chi phí sàn</div><div class="k-value">${fmtCompact(g.phiSan)}</div><div class="k-sub">Shopee ${fmtCompact(s.phiSan)} · TikTok ${fmtCompact(t.phiSan)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tổng đơn đặt trong kỳ</div><div class="k-value">${fmtInt(g.tongDon)}</div><div class="k-sub">Shopee ${fmtInt(s.tongDon)} · TikTok ${fmtInt(t.tongDon)}</div></div>
