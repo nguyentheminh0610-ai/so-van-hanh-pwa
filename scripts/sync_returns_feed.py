@@ -184,6 +184,8 @@ def main():
 
     overdue = []
     for row in feed:
+        if row.get("resolved_at"):  # đã bấm "Đã xử lý — ẩn" trên web Sổ Kho
+            continue
         if row.get("shipment_status") != "returned" or scan_hit(row):
             continue
         ref = row.get("returned_on") or row.get("created_on")

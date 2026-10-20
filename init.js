@@ -1222,13 +1222,14 @@ else init();
   }
   try {
     const [feed, scans] = await Promise.all([
-      fetchAll('platform_returns_feed?select=return_tracking,outbound_tracking,shipment_status,returned_on,created_on'),
+      fetchAll('platform_returns_feed?select=return_tracking,outbound_tracking,shipment_status,returned_on,created_on,resolved_at'),
       fetchAll('warehouse_return_checks?select=code'),
     ]);
     const scanned = new Set(scans.map(r => normCode(r.code)).filter(Boolean));
     const today = new Date(new Date().toDateString()).getTime();
     let overdue = 0;
     for (const row of feed){
+      if (row.resolved_at) continue; // đã bấm "Đã xử lý — ẩn" bên Sổ Kho
       if (row.shipment_status !== 'returned') continue;
       const cands = [row.return_tracking || '', ...String(row.outbound_tracking || '').split('+')];
       if (cands.some(c => c && scanned.has(normCode(c)))) continue;
