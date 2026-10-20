@@ -322,6 +322,32 @@ function buildKhuVucHtml(res){
   </div>`;
 }
 
+// ---------- Bảng phí sàn tách từng loại (lỗi #4 doc Chuẩn hoá 10/2026) ----------
+// Nguồn: file tài chính 2 sàn (res.shopee/tiktok.phiSanChiTiet). Tháng lưu
+// bằng công thức cũ chưa có trường này → ẩn bảng, KPI phí sàn vẫn hiện số cũ.
+function buildPhiSanChiTietHtml(res){
+  const sp = res.shopee && res.shopee.phiSanChiTiet;
+  const tt = res.tiktok && res.tiktok.phiSanChiTiet;
+  if (!sp && !tt) return '';
+  const col = (title, bd, cls) => {
+    if (!bd) return `<div class="card"><div class="c-title">${title}</div><p style="font-size:12px;color:var(--ink-faint);">Chưa có — cần file tài chính của sàn này.</p></div>`;
+    const rows = Object.entries(bd)
+      .filter(([, v]) => v !== 0)
+      .map(([k, v]) => {
+        const ghiChu = k.includes('không tính vào phí sàn') || k.includes('không phải phí');
+        return `<tr${ghiChu ? ' style="color:var(--ink-faint);"' : ''}><td>${esc(k)}</td><td class="num">${fmtVND(v)}</td></tr>`;
+      }).join('');
+    return `<div class="card"><div class="c-title"><span class="plat ${cls}"><i></i>${title}</span></div>
+      <table class="dtable"><tbody>${rows}</tbody></table></div>`;
+  };
+  return `
+  <div class="sub-label">Phí sàn tách từng loại <span style="text-transform:none;font-weight:400;">— từ file tài chính; dòng mờ là khoản hiện để biết, không cộng vào "Tổng chi phí sàn"</span></div>
+  <div class="grid cols-2">
+    ${col('Shopee', sp, 'shopee')}
+    ${col('TikTok', tt, 'tiktok')}
+  </div>`;
+}
+
 // ---------- render ----------
 function render(res, opts){
   opts = opts || {};
@@ -420,23 +446,30 @@ function render(res, opts){
   ${warningsHtml}
 
   <!-- ZONE 1 -->
-  <div class="zone"><span class="z-num">1</span><span class="z-title">Tổng quan</span><span class="z-note">doanh thu · phí sàn · AOV · tổng đơn</span></div>
+  <div class="zone"><span class="z-num">1</span><span class="z-title">Tổng quan</span><span class="z-note">doanh thu hàng · thực nhận · phí sàn · tổng đơn</span></div>
+  ${res.daChotLai ? '<p style="font-size:12px;color:var(--good);margin:0 0 8px;">🔒 Kỳ này đã CHỐT LẠI — trả/hoàn đã gộp thêm dữ liệu của tháng sau.</p>' : ''}
   <div class="kpi-row">
-    <div class="kpi-tile"><div class="k-label">Tổng doanh thu 2 sàn</div><div class="k-value">${fmtCompact(g.doanhThu)}</div><div class="k-sub">Shopee ${fmtCompact(s.doanhThu)} · TikTok ${fmtCompact(t.doanhThu)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Doanh thu hàng 2 sàn</div><div class="k-value">${fmtCompact(g.doanhThu)}</div><div class="k-sub">Shopee ${fmtCompact(s.doanhThu)} · TikTok ${fmtCompact(t.doanhThu)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Thực nhận 2 sàn</div><div class="k-value">${g.thucNhan === null || g.thucNhan === undefined ? '—' : fmtCompact(g.thucNhan)}</div><div class="k-sub">${g.thucNhan === null || g.thucNhan === undefined ? 'cần tính lại bằng công thức mới' : 'Shopee ' + fmtCompact(s.thucNhan) + ' · TikTok ' + fmtCompact(t.thucNhan)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tổng chi phí sàn</div><div class="k-value">${fmtCompact(g.phiSan)}</div><div class="k-sub">Shopee ${fmtCompact(s.phiSan)} · TikTok ${fmtCompact(t.phiSan)}</div></div>
-    <div class="kpi-tile"><div class="k-label">AOV trung bình</div><div class="k-value">${fmtVND(g.aov)}</div><div class="k-sub">Shopee ${fmtVND(s.aov)} · TikTok ${fmtVND(t.aov)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tổng đơn đặt trong kỳ</div><div class="k-value">${fmtInt(g.tongDon)}</div><div class="k-sub">Shopee ${fmtInt(s.tongDon)} · TikTok ${fmtInt(t.tongDon)}</div></div>
   </div>
+  <p style="font-size:11.5px;color:var(--ink-faint);margin:4px 0 10px;">
+    <b>Doanh thu hàng</b> = tiền hàng sau giảm giá của shop, TRƯỚC trợ giá sàn, không gồm ship (đơn hoàn thành, theo ngày đặt).
+    <b>Thực nhận</b> = tiền sàn thật sự chuyển về trong kỳ theo file tài chính (đã trừ phí, thuế, điều chỉnh) — 2 số đo 2 việc khác nhau, không trừ chéo.
+    ${g.doanhThuCu !== null && g.doanhThuCu !== undefined ? '<br>Số cũ để đối chiếu (sẽ bỏ sau 1 tháng): doanh thu công thức cũ ' + fmtCompact(g.doanhThuCu) + ' (Shopee ' + fmtCompact(s.doanhThuCu || 0) + ' · TikTok ' + fmtCompact(t.doanhThuCu || 0) + ').' : ''}
+  </p>
   ${buildDailyRevenueChartHtml(res)}
   <div class="sub-label">Chi tiết theo sàn</div>
   <div class="grid cols-2">
-    <div class="card"><div class="c-title">Doanh thu ròng</div>
-      <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtVND(s.doanhThuRong)}</span></div><div class="divider"></div>
-      <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtVND(t.doanhThuRong)}</span></div></div>
+    <div class="card"><div class="c-title">AOV (doanh thu hàng / đơn hoàn thành)</div>
+      <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtVND(s.aov)}</span></div><div class="divider"></div>
+      <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtVND(t.aov)}</span></div></div>
     <div class="card"><div class="c-title">SL đơn hoàn thành</div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtInt(s.hoanThanh)}</span></div><div class="divider"></div>
       <div class="c-row tiktok"><span class="plat tiktok"><i></i>TikTok</span><span class="val">${fmtInt(t.hoanThanh)}</span></div></div>
   </div>
+  ${buildPhiSanChiTietHtml(res)}
 
   <!-- ZONE 2 -->
   <div class="zone"><span class="z-num">2</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>

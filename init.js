@@ -224,6 +224,7 @@ function buildDashboardHTML(){
       </div>
     </div>
     <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
+    <button class="btn-secondary" id="btn-chot-thang" style="display:none;" title="Tính lại tháng đang xem, gộp thêm file Trả/hoàn của tháng sau — đơn trả rơi sang tháng sau không bị bỏ sót nữa">🔒 Chốt lại tháng</button>
     <div class="legend"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok Shop</span></div>
   </div>
   <div id="files-section"></div>
@@ -516,6 +517,20 @@ function renderResults(el, res, opts){
   if (datesLive) datesLive.textContent = fmtDateVN(res.minDate) + ' – ' + fmtDateVN(res.maxDate);
 }
 
+// ---------- Danh mục SKU từ Sapo (sku-catalog.json, sinh bởi tools/build_sku_catalog.py)
+// — tải 1 lần trước khi tính; thiếu file thì calc.js tự rơi về bảng dự phòng
+// (có cảnh báo trên dashboard, combo sẽ không được tách).
+let __skuCatalogPromise = null;
+function ensureSkuCatalog(){
+  if (!__skuCatalogPromise){
+    __skuCatalogPromise = fetch('sku-catalog.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.variants) window.SKU_CATALOG = j; return j; })
+      .catch(() => null);
+  }
+  return __skuCatalogPromise;
+}
+
 async function onCompute(){
   const statusEl = document.getElementById('up-status');
   const btn = document.getElementById('btn-compute');
@@ -527,6 +542,7 @@ async function onCompute(){
     if (!xlsxOk || typeof XLSX === 'undefined'){
       throw new Error('Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo). Thử tắt VPN/ad-blocker, đổi sang wifi/4G khác rồi bấm lại "Tính toán".');
     }
+    await ensureSkuCatalog();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
     currentResult = result;
@@ -770,6 +786,8 @@ function refreshHistorySelect(){
     : 'Chưa lưu tháng nào.';
   const refreshBtn = document.getElementById('btn-refresh-all-history');
   if (refreshBtn) refreshBtn.style.display = HISTORY.length > 0 ? '' : 'none';
+  const chotBtn = document.getElementById('btn-chot-thang');
+  if (chotBtn) chotBtn.style.display = HISTORY.length > 0 ? '' : 'none';
   const multiToggle = document.getElementById('rc-multi-toggle');
   if (multiToggle) multiToggle.style.display = HISTORY.length >= 2 ? '' : 'none';
   if (HISTORY.length < 2) setMultiMode(false);
@@ -1013,6 +1031,7 @@ async function onRefreshAllHistory(){
 
   let okCount = 0;
   const failed = [];
+  await ensureSkuCatalog(); // tính lại cũng cần danh mục SKU để tách combo
 
   for (let i = 0; i < records.length; i++){
     const record = records[i];
@@ -1047,6 +1066,95 @@ async function onRefreshAllHistory(){
     : `Đã cập nhật lại toàn bộ ${okCount} tháng theo công thức mới nhất.`;
 }
 
+// ---------- "Chốt lại tháng" (lỗi #5 doc Chuẩn hoá 10/2026) ----------
+// Số trả/hoàn của tháng N chỉ chuẩn khi gộp thêm yêu cầu trả phát sinh ở
+// tháng N+1 cho đơn đặt tháng N (file tải lúc đầu tháng N+1 chưa có chúng).
+// Nút này: tải lại file gốc của THÁNG ĐANG XEM + file Trả/hoàn Shopee & Trả
+// hàng TikTok của bản ghi THÁNG SAU đã lưu → tính lại → hỏi xác nhận trước
+// khi ghi đè số liệu tháng đang xem (file gốc & tên tháng giữ nguyên).
+function monthOfPeriodStart(periodStart){
+  // period_start các tháng lưu cũ có thể lệch sớm 1 ngày (bug UTC cũ, vd.
+  // Tháng 7 lưu 2026-06-30) — cộng 15 ngày rồi lấy tháng là luôn đúng.
+  const probe = new Date(new Date(periodStart).getTime() + 15 * 86400000);
+  return { y: probe.getFullYear(), m: probe.getMonth() };
+}
+async function onChotLaiThang(){
+  const sel = document.getElementById('history-select');
+  if (!sel || sel.value === 'current'){
+    alert('Chọn 1 tháng ĐÃ LƯU trong ô "Kỳ báo cáo" trước, rồi bấm "Chốt lại tháng".');
+    return;
+  }
+  const entry = HISTORY.find(h => h.id === sel.value);
+  if (!entry || !entry.period_start){
+    alert('Tháng đang xem không có kỳ dữ liệu (period_start) — không xác định được tháng sau.');
+    return;
+  }
+  const cur = monthOfPeriodStart(entry.period_start);
+  const next = HISTORY.find(h => {
+    if (!h.period_start || h.id === entry.id) return false;
+    const p = monthOfPeriodStart(h.period_start);
+    return (p.y === cur.y && p.m === cur.m + 1) || (p.y === cur.y + 1 && cur.m === 11 && p.m === 0);
+  });
+  if (!next){
+    alert('Chưa có bản ghi THÁNG SAU của "' + entry.label + '" trong lịch sử — cần lưu tháng sau (có file Trả/hoàn 2 sàn) trước rồi mới chốt được tháng này.');
+    return;
+  }
+  if (!confirm('Chốt lại "' + entry.label + '"?\n\nSẽ tải lại file gốc của tháng này + file Trả/hoàn của "' + next.label + '", tính lại trả/hoàn đầy đủ, rồi hỏi lần nữa trước khi ghi đè số liệu.')) return;
+
+  const noteEl = document.getElementById('history-note');
+  const setNote = (t) => { if (noteEl) noteEl.textContent = t; };
+  try {
+    const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
+    if (!xlsxOk || typeof XLSX === 'undefined') throw new Error('Không tải được thư viện đọc Excel.');
+    await ensureSkuCatalog();
+    setNote('Đang tải dữ liệu 2 tháng…');
+    const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files') || [];
+    const recCur = rows.find(r => r.id === entry.id), recNext = rows.find(r => r.id === next.id);
+    if (!recCur || !recNext) throw new Error('Không tải được bản ghi 2 tháng.');
+
+    async function fetchStored(f){
+      const resp = await fetch(sbStoragePublicUrl(f.path));
+      if (!resp.ok) throw new Error('Tải file "' + f.name + '" thất bại (HTTP ' + resp.status + ')');
+      const blob = await resp.blob();
+      return new File([blob], f.name, { type: blob.type || 'application/octet-stream' });
+    }
+    const localFiles = {};
+    for (const f of (recCur.files || [])){
+      setNote('Đang tải lại file tháng này: ' + f.name + '…');
+      localFiles[f.key] = await fetchStored(f);
+    }
+    const nextRr = (recNext.files || []).find(f => f.key === 'shopeeReturnRefund');
+    const nextTr = (recNext.files || []).find(f => f.key === 'tiktokReturns');
+    if (!nextRr && !nextTr) throw new Error('Bản ghi "' + next.label + '" không có file Trả/hoàn Shopee lẫn Trả hàng TikTok — không có gì để gộp.');
+    const thieu = [];
+    if (nextRr){ setNote('Đang tải file Trả/hoàn Shopee của tháng sau…'); localFiles.nextShopeeReturnRefund = await fetchStored(nextRr); } else thieu.push('Trả/hoàn Shopee');
+    if (nextTr){ setNote('Đang tải file Trả hàng TikTok của tháng sau…'); localFiles.nextTiktokReturns = await fetchStored(nextTr); } else thieu.push('Trả hàng TikTok');
+    if (thieu.length && !confirm('Tháng sau THIẾU file: ' + thieu.join(', ') + ' — vẫn chốt với phần còn lại?')) { setNote(''); return; }
+
+    setNote('Đang tính lại "' + entry.label + '" (đã gộp trả/hoàn tháng sau)…');
+    const fresh = await computeAll(localFiles);
+    renderResults(document.getElementById('results'), fresh, { label: entry.label + ' (đã chốt)' });
+    switchToTab('dashboard');
+
+    if (!confirm('Số mới đã hiện trên Dashboard.\n\nGHI ĐÈ số liệu đã lưu của "' + entry.label + '" bằng bản đã chốt này? (file gốc và tên tháng giữ nguyên — không hoàn tác được)')){
+      setNote('Đã tính lại nhưng CHƯA lưu — số trên dashboard chỉ là xem thử.');
+      return;
+    }
+    await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(entry.id), {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ data: fresh, updated_at: new Date().toISOString() }),
+    });
+    await refreshHistoryFromServer();
+    const selEl = document.getElementById('history-select');
+    if (selEl){ selEl.value = entry.id; renderRcDropdown(); }
+    setNote('Đã chốt lại "' + entry.label + '" và lưu lên server.');
+  } catch (err){
+    console.error(err);
+    setNote('Chốt lại tháng thất bại: ' + err.message);
+  }
+}
+
 function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
@@ -1058,6 +1166,8 @@ function init(){
   wireRcDropdown();
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
   document.getElementById('btn-refresh-all-history').addEventListener('click', onRefreshAllHistory);
+  document.getElementById('btn-chot-thang').addEventListener('click', onChotLaiThang);
+  ensureSkuCatalog();
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();
