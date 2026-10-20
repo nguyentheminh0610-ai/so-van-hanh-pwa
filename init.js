@@ -1068,3 +1068,73 @@ function init(){
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* ============================================================================
+   Banner "Hoàn về chưa nhận" — đối chiếu bảng platform_returns_feed (job đồng bộ
+   từ Sapo ghi vào, xem scripts/sync_returns_feed.py) với lượt quét đơn hoàn của
+   Sổ Kho (warehouse_return_checks). Chỉ hiện khi có kiện sàn báo ĐÃ TRẢ VỀ quá
+   3 ngày mà kho chưa quét nhận. Chi tiết từng kiện xem ở web Sổ Kho.
+============================================================================ */
+(async function returnAlertBadge(){
+  const GRACE_DAYS = 3;
+  const SOKHO_URL = 'https://nguyentheminh0610-ai.github.io/so-kho-pyjama/';
+  // chuẩn hoá mã vận đơn giống normalizeScanCode bên Sổ Kho (đảo lỗi bộ gõ Telex)
+  function normCode(raw){
+    let s = String(raw || '').trim().toUpperCase(), out = '';
+    for (const ch of s){
+      if (ch === 'Đ'){ out += 'DD'; continue; }
+      const nfd = ch.normalize('NFD');
+      const base = nfd[0], marks = nfd.slice(1);
+      let seq = base;
+      if (marks.includes('̂')) seq += base;
+      if (marks.includes('̆')) seq += 'W';
+      if (marks.includes('̛')) seq += 'W';
+      if (marks.includes('́')) seq += 'S';
+      if (marks.includes('̀')) seq += 'F';
+      if (marks.includes('̉')) seq += 'R';
+      if (marks.includes('̃')) seq += 'X';
+      if (marks.includes('̣')) seq += 'J';
+      out += seq;
+    }
+    return out.replace(/\s+/g, '');
+  }
+  async function fetchAll(path){
+    const rows = [];
+    for (let off = 0; ; off += 1000){
+      const sep = path.includes('?') ? '&' : '?';
+      let chunk;
+      try { chunk = await sbFetch(path + sep + 'limit=1000&offset=' + off); }
+      catch (e){ if (off === 0) throw e; break; }
+      rows.push(...(chunk || []));
+      if (!chunk || chunk.length < 1000) break;
+    }
+    return rows;
+  }
+  try {
+    const [feed, scans] = await Promise.all([
+      fetchAll('platform_returns_feed?select=return_tracking,outbound_tracking,shipment_status,returned_on,created_on'),
+      fetchAll('warehouse_return_checks?select=code'),
+    ]);
+    const scanned = new Set(scans.map(r => normCode(r.code)).filter(Boolean));
+    const today = new Date(new Date().toDateString()).getTime();
+    let overdue = 0;
+    for (const row of feed){
+      if (row.shipment_status !== 'returned') continue;
+      const cands = [row.return_tracking || '', ...String(row.outbound_tracking || '').split('+')];
+      if (cands.some(c => c && scanned.has(normCode(c)))) continue;
+      const ref = row.returned_on || row.created_on;
+      const days = ref ? Math.floor((today - new Date(ref + 'T00:00:00').getTime()) / 86400000) : 0;
+      if (days >= GRACE_DAYS) overdue++;
+    }
+    if (!overdue) return;
+    const wrap = document.querySelector('.wrap') || document.body;
+    const div = document.createElement('div');
+    div.id = 'return-alert-badge';
+    div.style.cssText = 'background:#fff2f2;border:1px solid #e5484d;border-radius:10px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;color:#7d2225;display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+    div.innerHTML = '🔴 <b>' + overdue + ' kiện hoàn</b> sàn báo đã trả về kho quá ' + GRACE_DAYS +
+      ' ngày nhưng chưa được tích nhận — <a href="' + SOKHO_URL + '" target="_blank" rel="noopener" style="color:#c62a2f;font-weight:600;">mở Sổ Kho xem danh sách</a>';
+    wrap.insertBefore(div, wrap.firstChild);
+  } catch (e){
+    console.warn('return alert badge:', e.message); // bảng chưa tạo / lỗi mạng — im lặng bỏ qua
+  }
+})();
