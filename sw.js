@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v16'; // v15: 5 lỗi "Cao" — doanh thu định nghĩa mới, thực nhận, phí sàn thật, SKU catalog Sapo, chốt lại tháng
+const CACHE_NAME = 'vanhanh-shop-v17'; // v17: Zone Lãi lỗ (P&L, hoà vốn, lãi gộp SP) + cost-catalog + giữ chi phí nhập tay khi tính lại
 const ASSETS = [
   './',
   './index.html',

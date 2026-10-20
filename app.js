@@ -260,8 +260,8 @@ function buildAffiliateKocSectionHtml(res){
   <div class="sub-label">CTOR/CTR &amp; hiệu quả lượt xem theo KOC <span style="text-transform:none;font-weight:400;">— GMV tính cả đơn chưa trừ huỷ/hoàn (khác "Doanh thu" ở bảng trên); GMV/1.000 view = doanh thu chia lượt xem, nhân 1.000 — càng cao nghĩa là view chuyển đổi ra tiền càng tốt (cùng chiều với GPM ở bảng trên)</span></div>
   ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
-  <!-- ZONE 6 -->
-  <div class="zone"><span class="z-num">6</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
+  <!-- ZONE 7 -->
+  <div class="zone"><span class="z-num">7</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
@@ -346,6 +346,96 @@ function buildPhiSanChiTietHtml(res){
     ${col('Shopee', sp, 'shopee')}
     ${col('TikTok', tt, 'tiktok')}
   </div>`;
+}
+
+// ---------- ZONE Lãi lỗ (mục 4 doc Chuẩn hoá, 21/10/2026) ----------
+// P&L tháng: Doanh thu hàng → Giá vốn hàng bán (từ cost-catalog.json, combo đã
+// tách) → Lãi gộp → phí sàn thật + QC GMV Max → Lãi sau phí → chi phí vận hành
+// NHẬP TAY (lương kho/lương live/vật tư/khác — lưu vào chính bản ghi tháng)
+// → LÃI RÒNG; kèm biên, điểm hoà vốn và bảng lãi gộp từng SP.
+const PNL_COST_FIELDS = [
+  { key: 'luongKho', label: 'Lương nhân viên kho', hint: 'số "Tổng lương tháng" ở tab 6. Lương của Sổ Kho' },
+  { key: 'luongLive', label: 'Lương nhân viên live', hint: 'số tổng trong sheet lương live' },
+  { key: 'vatTu', label: 'Vật tư đóng gói', hint: 'túi + tem + hộp… cả tháng' },
+  { key: 'adsKhac', label: 'Quảng cáo ngoài GMV Max', hint: 'QC GMV Max đã tự trừ ở trên — chỉ điền khoản khác' },
+  { key: 'khac', label: 'Chi phí khác', hint: 'Sapo, điện nước, thuê kho… nếu có' },
+];
+function buildPnlHtml(res, opts){
+  const p = res.pnl;
+  if (!p) return `
+  <div class="zone"><span class="z-num">2</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · lãi gộp theo SP · hoà vốn</span></div>
+  <div class="card"><p style="font-size:12.5px;color:var(--ink-faint);margin:0;">Tháng này được lưu bằng công thức cũ nên chưa có số Lãi lỗ — bấm "🔄 Cập nhật lại lịch sử" để tính lại.</p></div>`;
+  const cp = res.chiPhiVanHanh || {};
+  const cpTong = PNL_COST_FIELDS.reduce((s, f) => s + (Number(cp[f.key]) || 0), 0);
+  const coChiPhi = PNL_COST_FIELDS.some(f => cp[f.key] !== undefined && cp[f.key] !== null);
+  const laiRong = (p.laiSauPhiSan !== null && coChiPhi) ? p.laiSauPhiSan - cpTong : null;
+  const vnd = (v) => (v === null || v === undefined) ? '—' : fmtVND(v);
+  const pct = (v, base) => (v === null || v === undefined || !base) ? '' : ` <span class="pnl-pct">${fmtPct(v / base, 1)}</span>`;
+
+  const rows = [];
+  const line = (label, value, cls, note) => rows.push(
+    `<div class="pnl-row ${cls || ''}"><span class="pnl-label">${label}${note ? ` <span class="pnl-note">${note}</span>` : ''}</span><span class="pnl-value">${value}</span></div>`);
+  line('Doanh thu hàng', fmtVND(p.doanhThu), 'head');
+  line('− Giá vốn hàng bán', vnd(p.giaVonHangBan), '', p.thieuGiaVonSL ? `(${fmtInt(p.thieuGiaVonSL)} sp chưa có giá vốn — xem cảnh báo)` : '');
+  line('= LÃI GỘP', vnd(p.laiGop) + pct(p.laiGop, p.doanhThu), 'total');
+  line('− Phí sàn (đủ khoản, từ file tài chính)', fmtVND(p.phiSan));
+  if (p.quangCaoGmvMax) line('− Quảng cáo GMV Max (TikTok cấn vào ví)', fmtVND(p.quangCaoGmvMax));
+  line('= Lãi sau phí sàn &amp; quảng cáo', vnd(p.laiSauPhiSan) + pct(p.laiSauPhiSan, p.doanhThu), 'total');
+  for (const f of PNL_COST_FIELDS){
+    const v = cp[f.key];
+    if (v !== undefined && v !== null && Number(v) !== 0) line('− ' + f.label, fmtVND(Number(v)));
+  }
+  line('= <b>LÃI RÒNG</b>', (laiRong === null ? '— <span class="pnl-note">nhập chi phí bên dưới</span>' : '<b>' + fmtVND(laiRong) + '</b>' + pct(laiRong, p.doanhThu)), 'total grand');
+
+  // hoà vốn: đóng góp bình quân/đơn hoàn thành × số đơn = lãi sau phí sàn
+  const donHT = res.tong ? res.tong.hoanThanh : 0;
+  const dongGopDon = (p.laiSauPhiSan !== null && donHT) ? p.laiSauPhiSan / donHT : null;
+  const soNgay = res.skuPerformance && res.skuPerformance.periodDays ? res.skuPerformance.periodDays : 30;
+  let hoaVonHtml = '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Cần giá vốn + chi phí vận hành để tính điểm hoà vốn.</p>';
+  if (dongGopDon !== null && coChiPhi){
+    const donHoaVon = dongGopDon > 0 ? cpTong / dongGopDon : null;
+    hoaVonHtml = `<div class="c-row"><span>Đóng góp bình quân/đơn hoàn thành <span class="pnl-note">(lãi sau phí sàn ÷ ${fmtInt(donHT)} đơn)</span></span><span class="val">${fmtVND(dongGopDon)}</span></div>
+      <div class="divider"></div>
+      <div class="c-row"><span>Chi phí vận hành tháng</span><span class="val">${fmtVND(cpTong)}</span></div>
+      <div class="divider"></div>
+      <div class="c-row"><span><b>Điểm hoà vốn</b></span><span class="val">${donHoaVon === null ? '—' : '<b>' + fmtInt(Math.ceil(donHoaVon)) + ' đơn/tháng</b> ≈ ' + (donHoaVon / soNgay).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' đơn/ngày'}</span></div>
+      <p class="pnl-note" style="margin:8px 0 0;">Bán vượt mức này là tháng bắt đầu có lãi ròng; tháng này đạt ${fmtInt(donHT)} đơn hoàn thành${donHoaVon !== null ? (donHT >= donHoaVon ? ' — ĐÃ VƯỢT hoà vốn ✓' : ' — còn thiếu ' + fmtInt(Math.ceil(donHoaVon - donHT)) + ' đơn') : ''}.</p>`;
+  }
+
+  // form chi phí — lưu vào bản ghi tháng đang xem (hoặc gắn vào số vừa tính)
+  const inputs = PNL_COST_FIELDS.map(f => `
+    <label class="pnl-cost-field"><span>${f.label} <span class="pnl-note">${f.hint}</span></span>
+      <input type="text" id="pnl-cost-${f.key}" inputmode="numeric" placeholder="0" value="${cp[f.key] !== undefined && cp[f.key] !== null ? fmtInt(Number(cp[f.key])) : ''}"></label>`).join('');
+  const canSaveNow = !!(opts && opts.recordId);
+  const formHtml = `
+  <div class="card" id="pnl-cost-card">
+    <div class="c-title">Chi phí vận hành tháng <span style="font-weight:400;color:var(--ink-faint)">(nhập 1 lần/tháng — lưu ngay vào tháng này)</span></div>
+    <div class="pnl-cost-grid">${inputs}</div>
+    <div style="display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap;">
+      <button class="btn-primary" id="pnl-cost-save">${canSaveNow ? 'Lưu chi phí vào tháng này' : 'Áp vào số liệu đang xem'}</button>
+      <span style="font-size:12px;color:var(--ink-faint);" id="pnl-cost-status">${canSaveNow ? '' : 'Đang xem số CHƯA lưu — bấm nút này để áp tạm, chi phí sẽ được lưu cùng khi bấm "Lưu vào lịch sử".'}</span>
+    </div>
+  </div>`;
+
+  // bảng lãi gộp theo SP
+  const items = (res.skuPerformance && res.skuPerformance.items ? res.skuPerformance.items : [])
+    .filter(x => x.doanhThu !== undefined)
+    .slice().sort((a, b) => (b.laiGop === null ? -1 : b.laiGop) - (a.laiGop === null ? -1 : a.laiGop));
+  const spTableHtml = items.length ? `
+  <div class="sub-label">Lãi gộp theo sản phẩm <span style="text-transform:none;font-weight:400;">— doanh thu SP là số phân bổ theo dòng (Shopee chưa trừ voucher mức đơn) nên tổng hơi cao hơn Doanh thu hàng; combo đã tách về SKU con</span></div>
+  <table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">SL</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Lãi gộp</th><th style="text-align:right">Biên</th></tr></thead><tbody>
+    ${items.map(x => `<tr><td>${esc(x.ten)}</td><td class="num">${fmtInt(x.tongSL)}</td><td class="num">${fmtVND(x.doanhThu)}</td><td class="num">${x.thieuGiaVon ? '<span title="thiếu giá vốn ' + fmtInt(x.thieuGiaVon) + ' sp">thiếu</span>' : fmtVND(x.giaVon)}</td><td class="num">${x.laiGop === null ? '—' : fmtVND(x.laiGop)}</td><td class="num">${x.laiGop === null || !x.doanhThu ? '—' : fmtPct(x.laiGop / x.doanhThu, 0)}</td></tr>`).join('')}
+  </tbody></table>` : '';
+
+  return `
+  <!-- ZONE 2: LÃI LỖ -->
+  <div class="zone"><span class="z-num">2</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · hoà vốn · lãi gộp theo SP</span></div>
+  <div class="grid cols-2">
+    <div class="card"><div class="c-title">P&amp;L tháng</div><div class="pnl-table">${rows.join('')}</div></div>
+    <div class="card"><div class="c-title">Điểm hoà vốn</div>${hoaVonHtml}</div>
+  </div>
+  ${formHtml}
+  ${spTableHtml}`;
 }
 
 // ---------- render ----------
@@ -473,12 +563,14 @@ function render(res, opts){
   </div>
   ${buildPhiSanChiTietHtml(res)}
 
-  <!-- ZONE 2 -->
-  <div class="zone"><span class="z-num">2</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
-  <div class="chart-card" style="margin-bottom:14px;">${buildKhuVucHtml(res)}</div>
+  ${buildPnlHtml(res, opts)}
 
   <!-- ZONE 3 -->
-  <div class="zone"><span class="z-num">3</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
+  <div class="zone"><span class="z-num">3</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
+  <div class="chart-card" style="margin-bottom:14px;">${buildKhuVucHtml(res)}</div>
+
+  <!-- ZONE 4 -->
+  <div class="zone"><span class="z-num">4</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
   <div class="grid cols-2">
     <div class="card"><div class="c-title">Tỷ lệ huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(/ tổng đơn đặt)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtPct(s.huyHoanTra/(s.tongDon||1))}</span></div><div class="divider"></div>
@@ -497,8 +589,8 @@ function render(res, opts){
     <div class="col-labels">${reasonLabels}</div>
   </div>
 
-  <!-- ZONE 4 -->
-  <div class="zone"><span class="z-num">4</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
+  <!-- ZONE 5 -->
+  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.slove)}</span>${pill(n4.slove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
@@ -514,8 +606,8 @@ function render(res, opts){
     </div>
   </div>
 
-  <!-- ZONE 5 -->
-  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
+  <!-- ZONE 6 -->
+  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
   <div class="chart-card" style="margin-bottom:14px;"><div class="ct-title">Doanh thu theo kênh</div>${channelHtml}</div>
   <div class="chart-grid">
     <div class="chart-card"><div class="ct-title">CTR theo sản phẩm <span class="ct-note">(kênh Thẻ sản phẩm)</span></div>${ctrHtml}</div>

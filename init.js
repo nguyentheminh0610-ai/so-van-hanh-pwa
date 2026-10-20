@@ -510,6 +510,7 @@ function renderResults(el, res, opts){
   el.innerHTML = render(res, opts);
   el.classList.add('show');
   wireDailyRevenueChart(el, res);
+  wirePnlCostForm(el, res, opts);
   refreshDashboardEmptyState();
   // Widget "Kỳ báo cáo" (gộp chung với "Xem kỳ") nằm ngoài #results, cập
   // nhật riêng khoảng ngày của kỳ đang xem tại đây.
@@ -530,6 +531,60 @@ function ensureSkuCatalog(){
   }
   return __skuCatalogPromise;
 }
+// Bảng giá vốn (cost-catalog.json, sinh từ sheet GiaCong của chủ shop) — cần
+// cho P&L; thiếu thì calc.js tự cảnh báo và để trống phần giá vốn.
+let __costCatalogPromise = null;
+function ensureCostCatalog(){
+  if (!__costCatalogPromise){
+    __costCatalogPromise = fetch('cost-catalog.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.cost) window.COST_CATALOG = j; return j; })
+      .catch(() => null);
+  }
+  return __costCatalogPromise;
+}
+
+// ---------- form "Chi phí vận hành tháng" trong Zone Lãi lỗ (21/10/2026) ----------
+// Chi phí nhập tay (lương kho/live, vật tư, QC khác, khác) lưu vào CHÍNH bản
+// ghi tháng (data.chiPhiVanHanh) — không có bảng riêng. Đang xem tháng ĐÃ LƯU
+// (opts.recordId) thì PATCH lên server ngay; đang xem số vừa tính thì chỉ gắn
+// vào currentResult, sẽ được lưu cùng khi bấm "Lưu vào lịch sử".
+function wirePnlCostForm(container, res, opts){
+  const btn = container.querySelector('#pnl-cost-save');
+  if (!btn) return;
+  const statusEl = container.querySelector('#pnl-cost-status');
+  btn.addEventListener('click', async () => {
+    const cp = {};
+    for (const f of PNL_COST_FIELDS){
+      const el2 = container.querySelector('#pnl-cost-' + f.key);
+      cp[f.key] = el2 ? num(el2.value) : 0;
+    }
+    res.chiPhiVanHanh = cp;
+    const recordId = opts && opts.recordId;
+    if (recordId){
+      btn.disabled = true;
+      if (statusEl) statusEl.textContent = 'Đang lưu…';
+      try {
+        await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(recordId), {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ data: res, updated_at: new Date().toISOString() }),
+        });
+      } catch (err){
+        console.error(err);
+        if (statusEl) statusEl.textContent = 'Lưu thất bại: ' + err.message;
+        btn.disabled = false;
+        return;
+      }
+    }
+    // vẽ lại để P&L ăn ngay chi phí mới (lãi ròng, hoà vốn)
+    renderResults(container, res, opts);
+    const statusNew = container.querySelector('#pnl-cost-status');
+    if (statusNew) statusNew.textContent = recordId
+      ? 'Đã lưu chi phí vào tháng này (' + new Date().toLocaleTimeString('vi-VN') + ').'
+      : 'Đã áp vào số đang xem — bấm "Lưu vào lịch sử" để lưu hẳn.';
+  });
+}
 
 async function onCompute(){
   const statusEl = document.getElementById('up-status');
@@ -542,7 +597,7 @@ async function onCompute(){
     if (!xlsxOk || typeof XLSX === 'undefined'){
       throw new Error('Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo). Thử tắt VPN/ad-blocker, đổi sang wifi/4G khác rồi bấm lại "Tính toán".');
     }
-    await ensureSkuCatalog();
+    await ensureSkuCatalog(); await ensureCostCatalog();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
     currentResult = result;
@@ -953,7 +1008,8 @@ async function onHistorySelectChange(){
   try {
     const rows = await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(v) + '&select=data,label,files');
     if (rows && rows[0]){
-      renderResults(resultsEl, rows[0].data, { label: rows[0].label });
+      // recordId để form Chi phí vận hành (Zone Lãi lỗ) lưu thẳng vào tháng này
+      renderResults(resultsEl, rows[0].data, { label: rows[0].label, recordId: v });
       renderFilesSection(rows[0].files);
       switchToTab('dashboard');
     }
@@ -1022,7 +1078,9 @@ async function onRefreshAllHistory(){
 
   let records;
   try {
-    records = await sbFetch('monthly_reports?select=id,label,files') || [];
+    // chiPhi: giữ lại "Chi phí vận hành" đã nhập tay khi tính lại (data bị thay
+    // nguyên khối — không giữ là mất phần nhập tay của chủ shop)
+    records = await sbFetch('monthly_reports?select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
   } catch (err){
     noteEl.textContent = 'Không lấy được danh sách: ' + err.message;
     btn.disabled = false;
@@ -1031,7 +1089,7 @@ async function onRefreshAllHistory(){
 
   let okCount = 0;
   const failed = [];
-  await ensureSkuCatalog(); // tính lại cũng cần danh mục SKU để tách combo
+  await ensureSkuCatalog(); await ensureCostCatalog(); // tính lại cũng cần danh mục SKU để tách combo
 
   for (let i = 0; i < records.length; i++){
     const record = records[i];
@@ -1046,6 +1104,7 @@ async function onRefreshAllHistory(){
       }
 
       const freshResult = await computeAll(localFiles);
+      if (record.chiPhi) freshResult.chiPhiVanHanh = record.chiPhi; // giữ chi phí nhập tay
 
       await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(record.id), {
         method: 'PATCH',
@@ -1106,9 +1165,9 @@ async function onChotLaiThang(){
   try {
     const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
     if (!xlsxOk || typeof XLSX === 'undefined') throw new Error('Không tải được thư viện đọc Excel.');
-    await ensureSkuCatalog();
+    await ensureSkuCatalog(); await ensureCostCatalog();
     setNote('Đang tải dữ liệu 2 tháng…');
-    const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files') || [];
+    const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
     const recCur = rows.find(r => r.id === entry.id), recNext = rows.find(r => r.id === next.id);
     if (!recCur || !recNext) throw new Error('Không tải được bản ghi 2 tháng.');
 
@@ -1133,7 +1192,8 @@ async function onChotLaiThang(){
 
     setNote('Đang tính lại "' + entry.label + '" (đã gộp trả/hoàn tháng sau)…');
     const fresh = await computeAll(localFiles);
-    renderResults(document.getElementById('results'), fresh, { label: entry.label + ' (đã chốt)' });
+    if (recCur.chiPhi) fresh.chiPhiVanHanh = recCur.chiPhi; // giữ chi phí nhập tay khi chốt lại
+    renderResults(document.getElementById('results'), fresh, { label: entry.label + ' (đã chốt)', recordId: entry.id });
     switchToTab('dashboard');
 
     if (!confirm('Số mới đã hiện trên Dashboard.\n\nGHI ĐÈ số liệu đã lưu của "' + entry.label + '" bằng bản đã chốt này? (file gốc và tên tháng giữ nguyên — không hoàn tác được)')){
@@ -1168,6 +1228,7 @@ function init(){
   document.getElementById('btn-refresh-all-history').addEventListener('click', onRefreshAllHistory);
   document.getElementById('btn-chot-thang').addEventListener('click', onChotLaiThang);
   ensureSkuCatalog();
+  ensureCostCatalog();
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();

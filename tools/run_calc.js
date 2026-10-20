@@ -24,6 +24,9 @@ const aoa = JSON.parse(fs.readFileSync(aoaPath, 'utf8'));
 try {
   globalThis.SKU_CATALOG = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'sku-catalog.json'), 'utf8'));
 } catch (e) { /* chưa có catalog — calc.js tự dùng bảng dự phòng */ }
+try {
+  globalThis.COST_CATALOG = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'cost-catalog.json'), 'utf8'));
+} catch (e) { /* chưa có giá vốn — pnl phần giá vốn sẽ là null */ }
 
 const origLog = console.log; console.log = () => {}; // tắt debug log của calc
 const res = globalThis.__computeAllFromAOA(aoa);
@@ -57,6 +60,19 @@ if (asJson){
       .map(x => x === null || x === undefined ? '—' : (Math.round(x * 100) / 100)).join(' / '));
   const sku = res.skuPerformance && res.skuPerformance.items ? res.skuPerformance.items : [];
   line('  SKU có trong bảng hiệu suất', sku.length + ' mã, tổng SL ' + f(sku.reduce((s, x) => s + x.tongSL, 0)));
+  if (res.pnl){
+    console.log('--- P&L ---');
+    line('  doanh thu hàng', f(res.pnl.doanhThu));
+    line('  giá vốn hàng bán', f(res.pnl.giaVonHangBan) + (res.pnl.thieuGiaVonSL ? ' (thiếu giá vốn ' + res.pnl.thieuGiaVonSL + ' sp)' : ''));
+    line('  LÃI GỘP', f(res.pnl.laiGop));
+    line('  phí sàn', f(res.pnl.phiSan));
+    line('  quảng cáo GMV Max', f(res.pnl.quangCaoGmvMax));
+    line('  LÃI SAU PHÍ SÀN & QC', f(res.pnl.laiSauPhiSan));
+    console.log('--- lãi gộp theo SP (top 8 doanh thu) ---');
+    sku.slice().sort((a, b) => (b.doanhThu || 0) - (a.doanhThu || 0)).slice(0, 8).forEach(x => {
+      line('  ' + x.ten.slice(0, 26), 'DT ' + f(x.doanhThu) + ' | vốn ' + f(x.giaVon) + ' | lãi gộp ' + (x.laiGop === null ? '— (thiếu giá vốn)' : f(x.laiGop)));
+    });
+  }
   console.log('--- cảnh báo (' + res.warnings.length + ') ---');
   for (const w of res.warnings) console.log('  ⚠', w.length > 160 ? w.slice(0, 157) + '…' : w);
 }

@@ -148,6 +148,21 @@ function getSkuCatalog(){
 }
 function normSkuKey(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
 
+// Giá vốn 1 cái theo MÃ SKU GỐC — cost-catalog.json (sinh từ sheet GiaCong cột
+// H của chủ shop, xem ghi chú trong file đó). init.js tải vào
+// window.COST_CATALOG trước khi tính; thiếu file → P&L phần giá vốn hiện "—".
+function getCostCatalog(){
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  const c = g.COST_CATALOG;
+  if (!c || !c.cost) return null;
+  if (!c.__norm){
+    const m = {};
+    for (const [k, v] of Object.entries(c.cost)) m[normSkuKey(k)] = num(v);
+    c.__norm = m;
+  }
+  return c.__norm;
+}
+
 // Dò cột theo TỪ KHOÁ (regex) trên header thật — dùng chung mọi nơi đọc cột
 // theo tên, không so cứng tuyệt đối (sàn hay đổi nhẹ tên cột).
 function findColKey(headerKeys, patterns){
@@ -1152,7 +1167,9 @@ function computeAllFromAOA(aoa){
   // theo mã SKU thô) vì chủ shop xác nhận Shopee đôi khi phải rút ngắn mã SKU
   // so với Sapo/TikTok (giới hạn độ dài Shopee cho phép) nên mã có thể lệch
   // giữa 2 sàn, còn TÊN sản phẩm thì luôn giống hệt nhau ở cả 3 nơi.
-  const SIZE_TOKENS = ['3XL', '2XL', 'XXL', 'XL', 'S', 'M', 'L'];
+  // XXXL đứng trước XXL/XL vì so khớp tuần tự theo ĐUÔI chuỗi — thiếu nó thì
+  // "CL01-XXXL" không tách được size, tra giá vốn theo cả chuỗi và báo thiếu.
+  const SIZE_TOKENS = ['XXXL', '3XL', '2XL', 'XXL', 'XL', 'S', 'M', 'L'];
   function splitSkuSize(code){
     if (!code) return { baseSku: null, size: null };
     const s = String(code).trim();
@@ -1208,54 +1225,89 @@ function computeAllFromAOA(aoa){
   // - không có trong catalog → thử bảng dự phòng; vẫn không có → HIỆN NGUYÊN
   //   MÃ + cảnh báo (trước đây bỏ qua im lặng làm thiếu hẳn combo).
   const skuCatalog = getSkuCatalog();
-  const skuAgg = {}; // key: tên hiển thị -> { name, tongSL, sizes: {size: sl} }
+  const costCatalog = getCostCatalog();
+  const skuAgg = {}; // tên hiển thị -> { name, tongSL, sizes, doanhThu, giaVon }
   const skuUnknown = {}; // mã lạ -> SL (gom cảnh báo 1 lần)
-  function pushSkuAgg(name, size, qty){
-    if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {} };
-    skuAgg[name].tongSL += qty;
+  const costMissing = {}; // mã chưa có giá vốn -> SL (cảnh báo, KHÔNG coi giá vốn = 0 trong im lặng)
+  function pushSkuAgg(name, size, qty, revenue, cost){
+    if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {}, doanhThu: 0, giaVon: 0, thieuGiaVon: 0 };
+    const it = skuAgg[name];
+    it.tongSL += qty;
     const sizeKey = size || '(không rõ size)';
-    skuAgg[name].sizes[sizeKey] = (skuAgg[name].sizes[sizeKey] || 0) + qty;
+    it.sizes[sizeKey] = (it.sizes[sizeKey] || 0) + qty;
+    it.doanhThu += revenue || 0;
+    if (cost === null || cost === undefined) it.thieuGiaVon += qty;
+    else it.giaVon += cost;
   }
-  function addSkuLine(rawCode, qty, depth){
-    if (!rawCode || !qty) return;
+  // Tách 1 dòng bán thành các SKU ĐƠN thật sự xuất kho (combo → các SKU con),
+  // kèm giá vốn từng phần. Trả [] khi không tra được mã.
+  function expandSkuParts(rawCode, qty, depth){
     depth = depth || 0;
     const key = normSkuKey(rawCode);
     if (skuCatalog && depth < 3){ // depth chặn combo lồng combo vòng lặp
       const comboItems = skuCatalog.combos[key];
       if (comboItems && comboItems.length){
-        for (const it of comboItems) addSkuLine(it.sku, qty * (num(it.qty) || 1), depth + 1);
-        return;
+        let out = [];
+        for (const it of comboItems) out = out.concat(expandSkuParts(it.sku, qty * (num(it.qty) || 1), depth + 1));
+        return out;
       }
       const v = skuCatalog.variants[key];
-      if (v){
-        pushSkuAgg(v.name, v.size || splitSkuSize(rawCode).size, qty);
-        return;
-      }
+      if (v) return [{ rawCode, qty, name: v.name, size: v.size || splitSkuSize(rawCode).size }];
     }
     const { baseSku, size } = splitSkuSize(rawCode);
     const { name, matched } = resolveSkuName(baseSku);
-    if (!matched){
-      skuUnknown[String(rawCode)] = (skuUnknown[String(rawCode)] || 0) + qty;
-    }
-    pushSkuAgg(name, size, qty);
+    if (!matched) skuUnknown[String(rawCode)] = (skuUnknown[String(rawCode)] || 0) + qty;
+    return [{ rawCode, qty, name, size }];
+  }
+  // Giá vốn 1 cái theo MÃ GỐC (bỏ đuôi size) — nguồn cost-catalog.json, sinh
+  // từ sheet "GiaCong" cột H của chủ shop.
+  function unitCostOf(rawCode){
+    if (!costCatalog) return null;
+    const { baseSku } = splitSkuSize(rawCode);
+    const v = costCatalog[normSkuKey(baseSku)];
+    return (v === undefined || v === null) ? null : v;
+  }
+  /** 1 dòng bán: tách combo, cộng SL + giá vốn, và CHIA doanh thu dòng cho các
+   *  SKU con theo tỷ trọng giá vốn (combo bán 1 giá nhưng gồm nhiều SP). */
+  function addSkuLine(rawCode, qty, revenue){
+    if (!rawCode || !qty) return;
+    const parts = expandSkuParts(rawCode, qty, 0);
+    if (!parts.length) return;
+    const costs = parts.map(p => {
+      const u = unitCostOf(p.rawCode);
+      if (u === null) costMissing[String(p.rawCode)] = (costMissing[String(p.rawCode)] || 0) + p.qty;
+      return (u === null) ? null : u * p.qty;
+    });
+    const knownTotal = costs.reduce((s, c) => s + (c || 0), 0);
+    parts.forEach((p, i) => {
+      // phân bổ doanh thu: theo giá vốn nếu biết, không thì chia đều
+      const share = knownTotal ? ((costs[i] || 0) / knownTotal) : (1 / parts.length);
+      pushSkuAgg(p.name, p.size, p.qty, (revenue || 0) * share, costs[i]);
+    });
   }
   const skuColMissing = [];
   if (!COL_SP_SKU_SIZE) skuColMissing.push('Shopee: "SKU phân loại hàng"');
   if (!COL_SP_SL) skuColMissing.push('Shopee: "Số lượng"');
   if (!COL_TT_SKU_SIZE) skuColMissing.push('TikTok: "Seller SKU"');
   if (!COL_TT_SL) skuColMissing.push('TikTok: "Quantity"');
+  // Doanh thu DÒNG (để tính lãi gộp theo SP): cùng định nghĩa "doanh thu hàng"
+  // nhưng ở mức dòng — Shopee chưa trừ voucher mức đơn (voucher không chia được
+  // về từng SKU một cách chính xác) nên tổng theo SP cao hơn doanh thu tổng một
+  // chút; bảng SP có ghi chú. P&L TỔNG vẫn dùng doanhThu chuẩn (đã trừ voucher).
   if (COL_SP_SKU_SIZE && COL_SP_SL){
     for (const r of spRows){
       const oid = r['Mã đơn hàng'];
       if (oid === undefined || !(oid in spCompleted)) continue;
-      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]));
+      const lineRev = spRevCanCompute ? (num(r[C_SP_GIA_GOC]) * num(r[C_SP_SL_REV]) - num(r[C_SP_NB_TRO_GIA])) : 0;
+      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]), lineRev);
     }
   }
   if (COL_TT_SKU_SIZE && COL_TT_SL){
     for (const r of ttRows){
       const oid = r['Order ID'];
       if (oid === undefined || !(oid in ttCompleted)) continue;
-      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]));
+      const lineRev = ttRevCanCompute ? (num(r[C_TT_BEFORE]) - num(r[C_TT_SELLER_DISC])) : 0;
+      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]), lineRev);
     }
   }
   if (!skuCatalog){
@@ -1266,12 +1318,21 @@ function computeAllFromAOA(aoa){
       + Object.entries(skuUnknown).map(([k, q]) => `${k} (${q} sp)`).join(', ')
       + ' — nếu là mã mới, chạy lại tools/build_sku_catalog.py để cập nhật danh mục.');
   }
+  if (!costCatalog){
+    warnings.push('Chưa tải được bảng giá vốn (cost-catalog.json) — tab Lãi lỗ sẽ không có Giá vốn hàng bán/Lãi gộp. Kiểm tra file cost-catalog.json có được deploy cùng web không.');
+  } else if (Object.keys(costMissing).length){
+    warnings.push('Lãi lỗ: ' + Object.keys(costMissing).length + ' mã SKU CHƯA CÓ GIÁ VỐN (phần đó đang tính giá vốn = thiếu, lãi gộp sẽ CAO hơn thật): '
+      + Object.entries(costMissing).map(([k, q]) => `${k} (${q} sp)`).join(', ')
+      + ' — bổ sung vào sheet GiaCong rồi nhờ cập nhật lại cost-catalog.json.');
+  }
   const periodDays = (minDate && maxDate) ? Math.round((maxDate - minDate) / 86400000) + 1 : null;
   const SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
   const skuPerformance = {
     periodDays,
     items: Object.values(skuAgg).map(item => ({
       ten: item.name, tongSL: item.tongSL,
+      doanhThu: item.doanhThu, giaVon: item.giaVon, thieuGiaVon: item.thieuGiaVon,
+      laiGop: (costCatalog && !item.thieuGiaVon) ? item.doanhThu - item.giaVon : null,
       slNgay: periodDays ? item.tongSL / periodDays : null,
       sizes: Object.entries(item.sizes)
         .map(([size, sl]) => ({ size, sl, pct: item.tongSL ? sl / item.tongSL : 0 }))
@@ -1444,6 +1505,27 @@ function computeAllFromAOA(aoa){
   const spPhiSanHienThi = (spPhiSanFull !== null) ? spPhiSanFull : spPhiSan;
   const ttPhiSanHienThi = (ttPhiSanFull !== null) ? ttPhiSanFull : ttPhiSan;
 
+  // ---------- P&L (mục 4 doc Chuẩn hoá, 21/10/2026) ----------
+  // Giá vốn hàng bán = Σ giá vốn các SKU đã xuất trong ĐƠN HOÀN THÀNH (đúng tập
+  // đơn của "Doanh thu hàng", combo đã tách thành SKU con). Phần chi phí vận
+  // hành (lương, vật tư, ads) nhập tay 1 lần/tháng ở tab Lãi lỗ, lưu vào chính
+  // bản ghi tháng (data.chiPhiVanHanh) — không nằm trong hàm tính này.
+  const pnlDoanhThu = spRevenue + ttRevenue;
+  const pnlCogs = Object.values(skuAgg).reduce((s, x) => s + x.giaVon, 0);
+  const pnlThieuGiaVonSL = Object.values(skuAgg).reduce((s, x) => s + x.thieuGiaVon, 0);
+  const pnlPhiSan = spPhiSanHienThi + ttPhiSanHienThi;
+  const pnl = {
+    coGiaVon: !!costCatalog,
+    doanhThu: pnlDoanhThu,
+    giaVonHangBan: costCatalog ? pnlCogs : null,
+    thieuGiaVonSL: pnlThieuGiaVonSL,
+    laiGop: costCatalog ? pnlDoanhThu - pnlCogs : null,
+    phiSan: pnlPhiSan,
+    quangCaoGmvMax: ttQuangCaoGmvMax || 0,
+    // lãi sau phí sàn & quảng cáo — TRƯỚC chi phí vận hành nhập tay
+    laiSauPhiSan: costCatalog ? pnlDoanhThu - pnlCogs - pnlPhiSan - (ttQuangCaoGmvMax || 0) : null,
+  };
+
   return {
     warnings, ssWarning, minDate, maxDate,
     shopee: {
@@ -1479,6 +1561,7 @@ function computeAllFromAOA(aoa){
       hoanVeKho: spHoanVeKho + ttHoanVeKho,
     },
     daChotLai: !!(aoa.shopeeReturnRefundNext || aoa.tiktokReturnsNext),
+    pnl,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
     reasonRows,
     hoanVeKhoDetail: hoanVeKhoDetailAll, hoanVeKhoNgoaiKyCount,
@@ -1712,9 +1795,10 @@ function combineMonthlyResults(entries){
     if (!sp) continue;
     totalPeriodDays += sp.periodDays || 0;
     for (const item of (sp.items || [])){
-      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, tongSL: 0, sizes: {} };
+      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, tongSL: 0, sizes: {}, doanhThu: 0, giaVon: 0, thieuGiaVon: 0, coTien: false };
       const m = skuMap[item.ten];
       m.tongSL += item.tongSL;
+      if (item.doanhThu !== undefined){ m.doanhThu += num(item.doanhThu); m.giaVon += num(item.giaVon); m.thieuGiaVon += num(item.thieuGiaVon); m.coTien = true; }
       for (const s of (item.sizes || [])) m.sizes[s.size] = (m.sizes[s.size] || 0) + s.sl;
     }
   }
@@ -1722,10 +1806,29 @@ function combineMonthlyResults(entries){
   const skuItems = Object.values(skuMap).map(m => ({
     ten: m.ten, tongSL: m.tongSL,
     slNgay: totalPeriodDays ? m.tongSL / totalPeriodDays : null,
+    doanhThu: m.coTien ? m.doanhThu : undefined,
+    giaVon: m.coTien ? m.giaVon : undefined,
+    thieuGiaVon: m.coTien ? m.thieuGiaVon : undefined,
+    laiGop: (m.coTien && !m.thieuGiaVon) ? m.doanhThu - m.giaVon : null,
     sizes: Object.entries(m.sizes).map(([size, sl]) => ({ size, sl, pct: m.tongSL ? sl / m.tongSL : 0 }))
       .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
   })).sort((a, b) => b.tongSL - a.tongSL);
   const skuPerformance = Object.keys(skuMap).length ? { periodDays: totalPeriodDays || null, items: skuItems } : null;
+
+  // pnl — cộng các tháng CÓ pnl (tháng lưu công thức cũ chưa có thì bỏ qua);
+  // chi phí vận hành nhập tay (data.chiPhiVanHanh) cộng theo từng khoản.
+  const pnlList = list.map(d => d.pnl).filter(Boolean);
+  const pnl = pnlList.length ? {
+    coGiaVon: pnlList.every(p => p.coGiaVon),
+    doanhThu: pnlList.reduce((s, p) => s + (num(p.doanhThu) || 0), 0),
+    giaVonHangBan: pnlList.some(p => p.giaVonHangBan === null) ? null : pnlList.reduce((s, p) => s + (num(p.giaVonHangBan) || 0), 0),
+    thieuGiaVonSL: pnlList.reduce((s, p) => s + (num(p.thieuGiaVonSL) || 0), 0),
+    laiGop: pnlList.some(p => p.laiGop === null) ? null : pnlList.reduce((s, p) => s + (num(p.laiGop) || 0), 0),
+    phiSan: pnlList.reduce((s, p) => s + (num(p.phiSan) || 0), 0),
+    quangCaoGmvMax: pnlList.reduce((s, p) => s + (num(p.quangCaoGmvMax) || 0), 0),
+    laiSauPhiSan: pnlList.some(p => p.laiSauPhiSan === null) ? null : pnlList.reduce((s, p) => s + (num(p.laiSauPhiSan) || 0), 0),
+  } : null;
+  const chiPhiVanHanh = mergeChiTiet(d => d.chiPhiVanHanh);
 
   // ssWarning — chỉ hiện nếu KHÔNG tháng nào có ShopStats (giống logic 1 tháng)
   const anyShopStats = list.some(d => d.kenh || d.sanPham);
@@ -1739,6 +1842,7 @@ function combineMonthlyResults(entries){
     warnings: [...warnings, ...list.flatMap((d, i) => (d.warnings || []).map(w => `[${entries[i].label}] ${w}`))],
     ssWarning, minDate, maxDate,
     shopee, tiktok, tong,
+    pnl, chiPhiVanHanh,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
     reasonRows,
     hoanVeKhoDetail, hoanVeKhoNgoaiKyCount,

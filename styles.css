@@ -377,3 +377,23 @@
   .install-hint{ display:flex; align-items:center; gap:10px; background:var(--accent-soft); border:1px solid var(--accent); border-radius:9px; padding:10px 14px; margin-bottom:16px; font-size:12.5px; color:var(--ink); }
   .install-hint button{ margin-left:auto; background:var(--accent); color:#fff; border:none; border-radius:7px; padding:7px 14px; font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit; flex:none; }
   .install-hint .ih-close{ background:none; color:var(--ink-faint); margin-left:6px; padding:2px 6px; }
+
+  /* ---------- Zone Lãi lỗ (P&L) — 21/10/2026 ---------- */
+  .pnl-table{ display:flex; flex-direction:column; }
+  .pnl-row{ display:flex; align-items:baseline; justify-content:space-between; gap:12px;
+    padding:7px 0; border-bottom:1px dashed var(--line); font-size:13px; }
+  .pnl-row:last-child{ border-bottom:none; }
+  .pnl-row .pnl-label{ color:var(--ink-soft); }
+  .pnl-row .pnl-value{ font-weight:600; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .pnl-row.head .pnl-label, .pnl-row.head .pnl-value{ font-weight:700; color:var(--ink); }
+  .pnl-row.total{ border-top:1.5px solid var(--line-strong); border-bottom:none; margin-top:2px; }
+  .pnl-row.total .pnl-label{ font-weight:700; color:var(--ink); }
+  .pnl-row.grand .pnl-value{ font-size:17px; }
+  .pnl-pct{ font-size:11px; color:var(--ink-faint); font-weight:500; }
+  .pnl-note{ font-size:11px; color:var(--ink-faint); font-weight:400; }
+  .pnl-cost-grid{ display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px; }
+  .pnl-cost-field{ display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--ink-soft); }
+  .pnl-cost-field input{ border:1px solid var(--line-strong); border-radius:8px; padding:8px 10px;
+    font-size:13.5px; font-weight:600; background:var(--surface); color:var(--ink);
+    font-family:inherit; text-align:right; font-variant-numeric:tabular-nums; }
+  .pnl-cost-field input:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
