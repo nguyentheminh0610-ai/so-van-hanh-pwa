@@ -22,13 +22,22 @@ UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML,
 SYNC_WINDOW_DAYS = 60   # chỉ đồng bộ phiếu trả tạo trong N ngày gần nhất
 PURGE_AFTER_DAYS = 90   # xoá dòng feed cũ hơn N ngày cho bảng gọn
 GRACE_DAYS = 3          # sàn báo "đã trả về" quá N ngày chưa quét -> cảnh báo
+MIN_FEED_DATE = "2026-09-10"  # ngày Sổ Kho bắt đầu có dữ liệu quét — phiếu trả cũ hơn bỏ qua (không thể đối chiếu)
 
 
-def http(url, headers, data=None, method=None):
-    req = urllib.request.Request(url, data=data, headers=headers, method=method)
-    with urllib.request.urlopen(req, timeout=60) as r:
-        body = r.read()
-        return r.status, json.loads(body) if body.strip() else None
+def http(url, headers, data=None, method=None, retries=4):
+    import time
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, data=data, headers=headers, method=method)
+            with urllib.request.urlopen(req, timeout=60) as r:
+                body = r.read()
+                return r.status, json.loads(body) if body.strip() else None
+        except urllib.error.HTTPError as e:
+            if e.code == 429 and attempt < retries:
+                time.sleep(2 * (attempt + 1))  # Sapo rate limit — đợi rồi thử lại
+                continue
+            raise
 
 
 def sapo_headers():
@@ -102,6 +111,7 @@ def main():
         if len(batch) < 250 or batch[-1]["created_on"][:10] < cutoff:
             break
         page += 1
+    cutoff = max(cutoff, MIN_FEED_DATE)
     returns = [r for r in returns if r["created_on"][:10] >= cutoff]
 
     # 2. Feed hiện có -> chỉ fetch chi tiết đơn cho phiếu mới / đổi trạng thái / thiếu mã chiều đi
@@ -127,6 +137,8 @@ def main():
                     trks = [f.get("tracking_number") or f.get("tracking_code")
                             for f in (od["order"].get("fulfillments") or [])]
                     fetched_orders[oid] = "+".join([t for t in trks if t])
+                    import time
+                    time.sleep(0.3)  # tránh rate limit 429 của Sapo khi kéo nhiều đơn
                 except Exception as e:
                     print("WARN: không lấy được đơn %s: %s" % (oid, e), file=sys.stderr)
                     fetched_orders[oid] = ""
@@ -157,7 +169,7 @@ def main():
              data=json.dumps(chunk).encode(), method="POST")
 
     # 4. Dọn dòng quá cũ
-    purge_before = (today - timedelta(days=PURGE_AFTER_DAYS)).isoformat()
+    purge_before = max((today - timedelta(days=PURGE_AFTER_DAYS)).isoformat(), MIN_FEED_DATE)
     http(SUPABASE_URL + "/rest/v1/" + FEED_TABLE + "?created_on=lt." + purge_before,
          sb_headers({"Prefer": "return=minimal"}), method="DELETE")
 
