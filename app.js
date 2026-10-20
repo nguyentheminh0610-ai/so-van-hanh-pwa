@@ -457,6 +457,8 @@ function render(res, opts){
   <p style="font-size:11.5px;color:var(--ink-faint);margin:4px 0 10px;">
     <b>Doanh thu hàng</b> = tiền hàng sau giảm giá của shop, TRƯỚC trợ giá sàn, không gồm ship (đơn hoàn thành, theo ngày đặt).
     <b>Thực nhận</b> = tiền sàn thật sự chuyển về trong kỳ theo file tài chính (đã trừ phí, thuế, điều chỉnh) — 2 số đo 2 việc khác nhau, không trừ chéo.
+    ${t.quangCaoGmvMax ? ' TikTok: quyết toán đơn ' + fmtCompact((t.thucNhan || 0) + t.quangCaoGmvMax) + ' − quảng cáo GMV Max ' + fmtCompact(t.quangCaoGmvMax) + ' bị cấn thẳng vào ví = thực nhận ' + fmtCompact(t.thucNhan || 0) + '.' : ''}
+    ${s.dieuChinh ? ' Shopee: doanh thu đơn hàng ' + fmtCompact((s.thucNhan || 0) - s.dieuChinh) + ' ' + (s.dieuChinh < 0 ? '−' : '+') + ' điều chỉnh ' + fmtCompact(Math.abs(s.dieuChinh)) + ' = thực nhận ' + fmtCompact(s.thucNhan || 0) + '.' : ''}
     ${g.doanhThuCu !== null && g.doanhThuCu !== undefined ? '<br>Số cũ để đối chiếu (sẽ bỏ sau 1 tháng): doanh thu công thức cũ ' + fmtCompact(g.doanhThuCu) + ' (Shopee ' + fmtCompact(s.doanhThuCu || 0) + ' · TikTok ' + fmtCompact(t.doanhThuCu || 0) + ').' : ''}
   </p>
   ${buildDailyRevenueChartHtml(res)}
