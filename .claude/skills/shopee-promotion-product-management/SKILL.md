@@ -37,7 +37,9 @@ re-adds the product.
 
 ## Step 1-4: get into the campaign's edit mode (shared by both directions)
 
-1. Go to Kênh Marketing (`banhang.shopee.vn/portal/marketing`) and click
+1. Dùng **Claude in Chrome** ([[reference_chrome_browsers]]) deviceId Shopee
+   — KHÔNG dùng built-in browser. Go to Kênh Marketing
+   (`banhang.shopee.vn/portal/marketing`) and click
    **"Khuyến Mãi của Shop"**. This opens the "Giảm giá" list page.
 2. Scroll to **"Danh sách chương trình"**. Find the row with status
    **"Đang diễn ra"** whose "Sản phẩm" column thumbnails include the

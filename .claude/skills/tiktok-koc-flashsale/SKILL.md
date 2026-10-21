@@ -1,6 +1,6 @@
 ---
 name: tiktok-koc-flashsale
-description: Add one or more new KOC/creator TikTok usernames into shop SOME.TIME's standing "Flash Sale của nhà sáng tạo" (channel "Chỉ trên LIVE của nhà sáng tạo") on seller-vn.tiktok.com, so those creators can feature the shop's flash-sale pricing in their own LIVE streams. Use this whenever the user says things like "add KOC vào FS", "thêm bạn KOC vào flash sale cho nhà sáng tạo", "thêm KOC vào FS live của KOC", or gives you one or more TikTok usernames to add to the creator flash sale -- even if they don't name the campaign explicitly, since there is normally only one such campaign running at a time. Do NOT confuse this with tiktok-live-flashsale (the shop's own LIVE flash sale, channel "Chỉ trên LIVE") -- they are different campaigns with different purposes and this skill's campaign has NO per-SKU discount prices to set.
+description: Add one or more new KOC/creator TikTok usernames into shop SOME.TIME's standing creator flash sale on seller-vn.tiktok.com -- a "Flash Sale của shop" campaign whose display channel is set to "Chỉ trên LIVE của nhà sáng tạo" (there is no separate "Flash Sale của nhà sáng tạo" campaign type in the filter dropdown, despite what it looks like) -- so those creators can feature the shop's flash-sale pricing in their own LIVE streams. Use this whenever the user says things like "add KOC vào FS", "thêm bạn KOC vào flash sale cho nhà sáng tạo", "thêm KOC vào FS live của KOC", or gives you one or more TikTok usernames to add to the creator flash sale -- even if they don't name the campaign explicitly, since there is normally only one such campaign running at a time. Do NOT confuse this with tiktok-live-flashsale (the shop's own LIVE flash sale, channel "Chỉ trên LIVE") -- they are different campaigns with different purposes and this skill's campaign has NO per-SKU discount prices to set.
 ---
 
 # TikTok Shop KOC Flash Sale (add creators)
@@ -39,13 +39,31 @@ trip.
 
 ## Step 1: find the current campaign
 
-Go to `https://seller-vn.tiktok.com/promotion/marketing-tools/management?tab=1&shop_region=VN`
-("Tất cả trạng thái" tab), open the "Tất cả công cụ khuyến mãi" filter
-dropdown, and select **"Flash Sale của nhà sáng tạo"**. There is normally
-exactly one row with "Đang diễn ra" (ongoing) status -- open it (click the
-name) to see its current creator list, product, and time window before
-duplicating. If there's more than one ongoing row here, or none, stop and
-ask the user which one they mean rather than guessing.
+IMPORTANT: despite the name of this skill, there is no separate "Flash
+Sale của nhà sáng tạo" campaign *type* in Seller Center's filter dropdown
+-- that filter option exists but doesn't reliably match anything (it was
+tested exhaustively against this shop's full campaign history, ~200
+entries back to 2022, with zero matches). The KOC flash sale is actually
+just an ordinary campaign of type **"Flash Sale của shop"** whose
+**"Kênh hiển thị"** (display channel) field is set to "Chỉ trên LIVE của
+nhà sáng tạo" -- that's the field that makes it creator-only. You can
+only see this by opening the campaign's own detail page; the management
+list's "Loại" column just shows "Flash Sale của shop" for it like any
+other flash sale.
+
+Dùng **Claude in Chrome** ([[reference_chrome_browsers]]) deviceId TikTok —
+KHÔNG dùng built-in browser. Go to
+`https://seller-vn.tiktok.com/promotion/marketing-tools/management?tab=1&shop_region=VN`
+("Đang diễn ra" tab), and look through the ongoing "Flash Sale của shop"
+rows (there are usually several -- most are short-lived LIVE flash
+deals). Open each candidate (click the name) and check its detail page:
+the one you want shows **"Kênh hiển thị: Chỉ trên LIVE của nhà sáng tạo"**
+and **"Lựa chọn hàng có sẵn: Chia sẻ hàng có sẵn với nhiều nhà sáng tạo"**,
+plus a "Nhà sáng tạo" section listing the current roster (e.g. "14 nhà
+sáng tạo"). A long-running one (spanning ~2 weeks, vs. the few-hour
+regular shop flash deals) is a good first guess. If you can't find one
+matching this pattern, or find more than one, stop and ask the user
+which campaign they mean rather than guessing.
 
 A TikTok anti-bot captcha ("kéo mảnh ghép vào vị trí") frequently blocks
 this management list from loading. You are not allowed to solve

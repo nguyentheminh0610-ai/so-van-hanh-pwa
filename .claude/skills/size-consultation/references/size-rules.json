@@ -29,7 +29,8 @@
       "measure_table": "B",
       "default_available_sizes": ["M", "L", "XL", "XXL"],
       "cotton_thuong_skus": ["Đỏ 03", "Đỏ 04", "Đen 02"],
-      "cotton_thuong_size_bonus": 1
+      "cotton_thuong_size_bonus": 0,
+      "_cotton_thuong_note": "Chốt 15/10/2026: KHÔNG lên size cho cotton thường"
     },
     "CT": {
       "name": "Quần thun",
@@ -125,7 +126,8 @@
     "underweight_loose": "Dạ bạn lấy size {size} để quần đủ dài tới chạm gót ạ, dài quần {length}cm, form sẽ hơi rộng một chút.",
     "clamped_min": "Dạ size nhỏ nhất của mẫu này là {size} ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé.",
     "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
-    "caro_cotton_thuong_suffix": "Mẫu {ten} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ.",
+    "waist_worry": "Dạ hiện các quần bên mình đều là cạp chun cả, nên không sợ bị rộng/chật eo đâu ạ, bạn cứ yên tâm nha.",
+    "send_size_chart": "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình nha.",
     "missing_height": "Dạ bạn cho mình xin chiều cao và cân nặng để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ.",
     "missing_weight": "Dạ {height} bạn mặc size {size} ({length}cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ."
   },
@@ -163,7 +165,6 @@
 
   "unconfirmed_items": [
     "CT/PJD/PJC/QS dùng tạm bảng A — chưa có bảng đo riêng, cần chủ shop gửi/xác nhận",
-    "Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02) +1 size — áp dụng ở bước B1 trước mốc dài, cần chủ shop chốt có dùng không",
     "Bảng cân nặng caro dùng ngưỡng riêng (mục 3.3) thay vì y hệt quần lông — cần xác nhận",
     "Giới tính không rõ dùng ngưỡng nam (10kg) — cần xác nhận",
     "Combo thiếu cặp size phù hợp → tư vấn mua lẻ 2 quần — cần xác nhận"

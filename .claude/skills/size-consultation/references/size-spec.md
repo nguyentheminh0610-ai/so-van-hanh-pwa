@@ -243,7 +243,7 @@ Bổ sung nên test:
 ## 8. Điểm chưa chốt — cần chủ shop xác nhận trước khi code cứng
 
 1. **Quần thun (CT), Bộ dài/ngắn (PJD/PJC), Quần short (QS)**: chưa có bảng đo riêng. Đề xuất tạm: dùng ngưỡng chiều cao Bảng A, kẹp M–XL, dài quần lấy theo Bảng A (short bỏ qua dài quần). *Cần anh xác nhận hoặc gửi bảng đo.*
-2. **Caro – Cotton thường (Đỏ 03, Đỏ 04, Đen 02) "+1 size"**: bảng công khai khuyên vậy, nhưng tài liệu CSKH nội bộ chưa quy định. Đề xuất: cộng 1 bậc ở **B1** (trước khi xét mốc dài), kẹp tối đa XXL, và nói rõ lý do với khách. *Cần anh chốt có áp dụng không và áp dụng trước hay sau mốc dài.*
+2. ✅ **ĐÃ CHỐT 15/10/2026: KHÔNG lên size** cho cotton thường, tư vấn như caro thường. (Nội dung cũ: **Caro – Cotton thường (Đỏ 03, Đỏ 04, Đen 02) "+1 size"**: bảng công khai khuyên vậy, nhưng tài liệu CSKH nội bộ chưa quy định. Đề xuất: cộng 1 bậc ở **B1** (trước khi xét mốc dài), kẹp tối đa XXL, và nói rõ lý do với khách. *Cần anh chốt có áp dụng không và áp dụng trước hay sau mốc dài.*
 3. **Bảng cân nặng caro**: tài liệu nội bộ nói "áp dụng y hệt quần lông", bảng công khai lại có ngưỡng riêng (M<60, L<70, XL<77, XXL<85). Đặc tả này dùng **ngưỡng caro riêng** (mục 3.3) vì sát thực tế hơn. *Cần anh xác nhận.*
 4. **Giới tính không rõ**: đặc tả dùng ngưỡng nam (10kg). *Xác nhận.*
 5. **Combo**: combo ghi sẵn cặp size (vd "Caro Hồng-M + Caro Xanh-L"); nếu khách cần cặp size không có trong danh sách combo thì tư vấn mua lẻ 2 quần. *Xác nhận.*

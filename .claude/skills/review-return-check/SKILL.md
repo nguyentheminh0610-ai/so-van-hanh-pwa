@@ -5,6 +5,15 @@ description: Check of new public reviews (đánh giá) and return/refund request
 
 # Check đánh giá & trả hàng
 
+## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
+
+Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac)
+→ **DỪNG NGAY**: không mở trình duyệt, không nhắn khách, **không gửi
+Telegram**, chỉ trả lời 1 câu "Bỏ qua: việc này chỉ chạy trên máy Windows."
+Chủ shop chốt 2026-10-21: mọi công việc chạy trên Windows, tránh 2 máy làm
+trùng (khách bị nhắn 2 lần, Telegram nhận 2 báo cáo).
+
+
 ## What this is for
 
 The shop owner's current (2026-10-07) working scope for customer-service
@@ -71,7 +80,8 @@ owner edits these. As of 2026-10-07:
   return/refund request, regardless of the reason the platform shows —
   always use this generic opener, don't pick a reason-specific template.
 
-**TikTok Shop Seller Center:**
+**TikTok Shop Seller Center** — dùng **Claude in Chrome** ([[reference_chrome_browsers]])
+deviceId TikTok, KHÔNG dùng built-in browser:
 - Reviews: `https://seller-vn.tiktok.com/product/rating?shop_region=VN`
   → "Trả lời bài đánh giá" panel → "Đánh giá tiêu cực" (1-2★) / "Đánh giá
   trung lập" (3★), each with a "Trả lời ngay" link → opens the pending-reply
@@ -146,10 +156,23 @@ Exact structure, chốt 2026-10-07:
 - Bình luận trả hàng thêm của khách: <nội dung ô "Nhận xét của khách hàng", nếu có — nếu không có case nào thì nói rõ "không có">
 ```
 
-Anything outside those two sections (a dispute found per Hard rule 4, a
-case skipped per Hard rule 3 because it's already being handled) — mention
-it separately, after the two numbered sections, don't force it into one of
-the bullets above.
+**Gửi ĐÚNG khung trên, không thêm gì** (chủ shop nhắc lại 2026-10-21 vì
+báo cáo bị dài):
+- Không dòng tiêu đề, không lời chào, không emoji.
+- Không thêm gạch đầu dòng nào ngoài 3+3 dòng trong khung. Không ghi chi
+  tiết từng đơn (mã đơn, số tiền, trạng thái hoàn tiền), không ghi số
+  lượng hàng đợi, không ghi "không phản hồi công khai/không nhắn ai".
+- Đánh giá mới = 0 → mục 1 chỉ 1 dòng "Số lượng đánh giá mới: 0".
+- Trả hàng mới = 0 → 3 dòng: `0`, `không có`, `không có`.
+
+Ngoài khung chỉ được thêm **tối đa 1 dòng cuối**, bắt đầu bằng `Lưu ý:`,
+gộp mọi việc cần chủ shop biết, ngắn gọn, vd:
+`Lưu ý: chưa nhắn đơn 586616931475490643 (Chrome bị chặn quyền) — anh nhắn "check trả hàng" khi ở máy.`
+Các case tranh chấp (Hard rule 4) hoặc đã có người xử lý (Hard rule 3)
+cũng gộp vào dòng này. Không có gì thì bỏ hẳn dòng `Lưu ý:`.
+
+Nếu lỗi không check được gì: chỉ gửi 1 dòng
+`Lưu ý: chưa check được đánh giá & trả hàng (<lý do ngắn>) — <anh cần làm gì>.`
 
 ## Reference
 

@@ -5,6 +5,15 @@ description: Reply to TikTok Shop / Shopee chat messages that are genuine produc
 
 # Tư vấn size cho khách (chat TikTok Shop & Shopee)
 
+## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
+
+Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac)
+→ **DỪNG NGAY**: không mở trình duyệt, không nhắn khách, **không gửi
+Telegram**, chỉ trả lời 1 câu "Bỏ qua: việc này chỉ chạy trên máy Windows."
+Chủ shop chốt 2026-10-21: mọi công việc chạy trên Windows, tránh 2 máy làm
+trùng (khách bị nhắn 2 lần, Telegram nhận 2 báo cáo).
+
+
 ## Phạm vi — CHỈ trả lời câu hỏi size thật
 
 Một tin nhắn được coi là "câu hỏi size" khi khách hỏi thẳng "size nào/số đo
@@ -33,10 +42,12 @@ trên.)
 2. **[references/size-rules.json](references/size-rules.json)** — cùng nội
    dung ở dạng dữ liệu máy đọc được (bảng tra cứu, mẫu câu, test case) —
    dùng để tra nhanh khi trả lời, không cần đọc lại toàn bộ spec mỗi lần.
-3. File local `~/Desktop/Tài liệu/du-lieu-cskh-some-a-time.md` — tài liệu
-   CSKH tổng (văn phong, chính sách sàn, vận chuyển, đổi trả...) — đọc khi
-   cần quy tắc ngoài phạm vi size thuần (vd văn phong chung, quy định chat
-   theo sàn).
+3. Tài liệu CSKH tổng `du-lieu-cskh-some-a-time.md` (văn phong, chính sách
+   sàn, vận chuyển, đổi trả...) — trên Windows ở
+   `C:\sokho\so-van-hanh-pwa\tai-lieu\`, trên Mac ở `~/Desktop/Tài liệu/`.
+   Đọc khi cần quy tắc ngoài size thuần. **Chốt 15/10/2026 ghi đè file này ở
+   các điểm:** bỏ công thức 1+1; Caro cotton thường KHÔNG lên size; câu trả
+   lời eo cạp chun (xem mục "Câu hỏi phụ" dưới).
 4. Artifact "Sometime Product Guide" / Claude Doc "Workflow Tư vấn Size" —
    tham chiếu phụ, chỉ đọc khi 2 nguồn trên không đủ.
 
@@ -48,9 +59,14 @@ lại cả size-spec.md lẫn size-rules.json.
 
 ## Quy trình
 
-1. Mở `https://seller-vn.tiktok.com/chat/inbox/current?shop_region=VN` và
-   `https://banhang.shopee.vn/webchat/conversations`, rà các hội thoại
-   "Chưa trả lời"/mới — xem đúng phạm vi ở trên trước khi trả lời.
+1. **Dùng Claude in Chrome** ([[reference_chrome_browsers]]) — KHÔNG dùng
+   built-in browser (không có session đã đăng nhập):
+   - **TikTok Shop**: `select_browser` deviceId TikTok, mở
+     `https://seller-vn.tiktok.com/chat/inbox/current?shop_region=VN`.
+   - **Shopee**: `select_browser` deviceId Shopee, mở
+     `https://banhang.shopee.vn/webchat/conversations`.
+   Rà các hội thoại "Chưa trả lời"/mới — xem đúng phạm vi ở trên trước
+   khi trả lời.
 2. Xác định nhóm sản phẩm (Quần Hoạt Hình / Caro / Thun / Bộ / Short /
    Combo) từ card sản phẩm đính kèm trong hội thoại. Nếu SKU cụ thể có dải
    size riêng (vd chỉ bán M–XL) thì **kẹp theo đúng SKU đó**, không theo
@@ -62,9 +78,10 @@ lại cả size-spec.md lẫn size-rules.json.
    lấy dài quần) để ra đúng 1 size + dài quần + cờ cảnh báo nếu có.
 4. Áp đúng mẫu câu trong size-rules.json.reply_templates theo tình huống
    (bình thường / thừa cân / gầy / kẹp min / kẹp max / thiếu dữ liệu...).
-   Văn phong: xưng "mình", gọi khách "bạn", xen kẽ "ạ"/"á" (không lặp 2
-   lần liền), áp dụng công thức 1+1 (trả lời đủ ý + 1 câu hỏi/gợi ý chủ
-   động, ví dụ hỏi mốc dài quần nếu chưa biết).
+   Văn phong: xưng "mình", gọi khách "bạn", xen kẽ "ạ"/"á", trả lời **đơn
+   giản**. **KHÔNG dùng công thức 1+1** (chủ shop bỏ 15/10/2026) — không tự
+   thêm câu hỏi/gợi ý ngoài mẫu. (Câu hỏi mốc dài nằm sẵn trong mẫu "bình
+   thường" thì giữ nguyên.)
    **NGẮN GỌN, ĐÚNG MẪU** (chủ shop chốt 2026-10-13): chỉ gửi đúng câu mẫu,
    **không thêm câu nào ngoài mẫu** — không thêm gợi ý "xuống size nếu thích
    mặc gọn", không "xắn gấu", không giải thích mẫu nào có/không có size.
@@ -79,8 +96,17 @@ lại cả size-spec.md lẫn size-rules.json.
 
 ## Câu hỏi phụ đã có câu trả lời chuẩn
 
-- **Sợ rộng/chật eo**: CHƯA có câu trả lời chuẩn — không tự trả lời, báo
-  chủ shop.
+- **Sợ rộng/chật eo** (chốt 15/10/2026, áp dụng mọi dòng quần): gửi đúng
+  câu "Dạ hiện các quần bên mình đều là cạp chun cả, nên không sợ bị
+  rộng/chật eo đâu ạ, bạn cứ yên tâm nha."
+- **Gửi ảnh bảng size** (chốt 15/10/2026): KHÔNG gửi mặc định. Chỉ gửi khi
+  khách xin bảng size/số đo chi tiết, hoặc khách đang phân vân / sợ rộng
+  chật — gửi ảnh bảng size của đúng dòng quần (ảnh "Bảng kích cỡ" trên tin
+  đăng) kèm câu "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình
+  nha." Lưu ý: ảnh bảng size trên tin đăng hiện CHƯA khớp đặc tả (chủ shop
+  đang sửa) — khi tư vấn vẫn theo số liệu đặc tả.
+- **Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02)**: KHÔNG khuyên lên size (chốt
+  15/10/2026) — tư vấn như caro thường.
 - **Mốc dài quần**: chạm gót = gấu quần chạm gót chân (che qua mắt cá);
   mắt cá = ngắn hơn, ngang mắt cá chân; quét đất = dài chạm sàn.
 

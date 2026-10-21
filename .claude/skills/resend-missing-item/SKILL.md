@@ -5,6 +5,15 @@ description: Handle a customer report of a missing item from their order ("giao 
 
 # Gửi bù hàng giao thiếu
 
+## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
+
+Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac)
+→ **DỪNG NGAY**: không mở trình duyệt, không nhắn khách, **không gửi
+Telegram**, chỉ trả lời 1 câu "Bỏ qua: việc này chỉ chạy trên máy Windows."
+Chủ shop chốt 2026-10-21: mọi công việc chạy trên Windows, tránh 2 máy làm
+trùng (khách bị nhắn 2 lần, Telegram nhận 2 báo cáo).
+
+
 ## What this is for
 
 Shop owner ships an order short (quên bỏ 1 món vào gói) and finds out when
@@ -81,10 +90,16 @@ time.
 
 ## Step 0 (chạy theo lịch): quét inbox tìm khách báo thiếu hàng
 
-1. Mở inbox TikTok Shop (link ở Quick reference), xem các hội thoại có tin
-   mới từ khách kể từ lượt quét trước (~15 phút). Shopee: chưa có đường đi
-   đã kiểm chứng — lần đầu đi chậm, chụp màn hình từng bước, rồi bổ sung
-   đường đi vào skill này.
+1. **Dùng Claude in Chrome** cho cả 2 sàn — KHÔNG dùng built-in browser
+   (built-in browser không có session đã đăng nhập):
+   - **TikTok Shop**: `select_browser` deviceId TikTok ([[reference_chrome_browsers]]),
+     rồi mở link inbox ở Quick reference.
+   - **Shopee**: `select_browser` deviceId Shopee ([[reference_chrome_browsers]]),
+     rồi mở `https://banhang.shopee.vn/webchat/conversations`.
+   Xem các hội thoại có tin mới từ khách kể từ lượt quét trước (~15 phút).
+   Danh sách Shopee hiện bên trái kèm giờ + preview tin cuối + chấm chưa
+   đọc, đủ để phân loại mà không cần mở từng hội thoại (mở hội thoại sẽ
+   đánh dấu đã đọc, tránh nếu được).
 2. Chỉ xử lý tin nhắn khách **báo thiếu hàng** ("thiếu", "giao thiếu",
    "không có cái quần/áo", "thiếu 1 bộ"...). Mọi tin nhắn khác: bỏ qua,
    không trả lời, không đánh dấu đã đọc nếu tránh được.
@@ -210,12 +225,13 @@ Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn x
    submitting, or SPX will reject/mis-schedule the pickup.
 4. "4. Thông tin bưu gửi" → "Thêm sản phẩm mới", type the item name (free
    text, becomes a reusable saved product), fill giá sản phẩm.
-   **Tên sản phẩm bắt buộc theo mẫu** (chốt 2026-10-14):
+   **Tên sản phẩm bắt buộc theo `.claude/shared/notice_naming.md`**:
    `Gửi bù - <mã đơn gốc> - Quần <tên phân loại> <size>`, vd
-   `Gửi bù - 586437463013230236 - Quần Chất Lông Shin XL`. Ô tên là dạng
+   `Gửi bù - 586437463013230236 - Quần Chất Lông-Shin XL`. Ô tên là dạng
    chọn/tạo: gõ xong phải bấm dòng "tạo mới" trong dropdown, đừng Escape
-   (Escape xoá chữ). Đơn KOC (không phải gửi bù) thì ghi
-   `Quần <tên phân loại> size <size>`, vd `Quần Chất Lông Kuromi size XL`. Số lượng
+   (Escape xoá chữ), và **đừng chọn sản phẩm cũ gợi ý sẵn** (vd
+   `Quần Lông Sometime - Chất Lông-Shin - XL`) — nhãn sẽ in tên sai. Đơn KOC
+   thì ghi `Gửi KOC - <tên KOC> - Quần <tên phân loại> <size>`. Số lượng
    defaults to 1 (correct — you're sending the one missing piece).
    **Khối lượng (weight) field only accepts whole numbers** — typing
    `0.3` gets mangled (the `.` and leading digit get silently dropped).
@@ -246,14 +262,17 @@ Supabase note below).
    `error_type="kho_van"`, `detail_reason="giao_thieu"`, `reason` = short
    free text like `"giao thieu 1 <ten SKU>"`.
 4. Insert into `warehouse_notices`: `category="gui_don_bu"`,
-   `order_code` = the **new SPX** mã vận đơn, `content` = **giống hệt tên
-   sản phẩm trên SPX** (chốt 2026-10-14, cho đồng nhất):
-   `"Gửi bù - <mã đơn gốc> - Quần <tên phân loại> <size>"` — ngắn, không
-   ghi phí ship (learned 2026-10-07). Có dấu tiếng Việt: gửi JSON từ file
+   `order_code` = the **new SPX** mã vận đơn, `content` (chuẩn:
+   `.claude/shared/notice_naming.md`) = `"<mã đơn gốc> - <SL> Quần <tên
+   phân loại> <size>"`, vd `"586635843530425651 - 1 Quần Chất Lông-Shin XL"`
+   — **không ghi lại chữ "Gửi bù"** (app đã hiện nhãn "Gửi đơn bù"), có số
+   lượng, không ghi phí ship. Có dấu tiếng Việt: gửi JSON từ file
    UTF-8 (`--data-binary @file.json`), không gõ thẳng trong `-d`. Đơn KOC:
-   `category="thong_bao_chung"`, content dạng
-   `"Gui KOC <tên KOC> 1 quan <tên phân loại> size <size>"`. `pdf_path` = the exact filename you're
-   about to upload in the next step, `done=false`.
+   `category="thong_bao_chung"`, content
+   `"Gửi KOC - <tên KOC> - <SL> Quần <tên phân loại> <size>"`. `pdf_path` = the exact filename you're
+   about to upload in the next step, `done=false`. **Trước khi upload, đọc
+   PDF xác nhận mã vận đơn in trên nhãn trùng `order_code`** — đừng chỉ lấy
+   "PDF mới nhất" trong Downloads (đã lấy nhầm 2026-10-20).
 5. **⚠️ Upload the actual PDF to Supabase Storage — the `pdf_path` column
    alone does nothing.** The Sổ Kho Pyjama app's "Xem PDF" button builds
    the URL `https://dyvublxyrldmmnsrfvpz.supabase.co/storage/v1/object/public/notices-pdf/<pdf_path>`

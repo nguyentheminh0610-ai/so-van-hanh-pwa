@@ -1,9 +1,18 @@
 ---
 name: check-koc
-description: Check TikTok Shop's "Yêu cầu hàng mẫu" (sample request) queue for shop SOME.TIME, score any genuinely new KOC/creator against the standing rubric in Google Sheet "Bảng Chấm Điểm KOC", and message each one the right canned reply based on the result -- use whenever the shop owner says "vào duyệt koc đi", "check koc", "vào làm việc" (in a KOC/duyệt-KOC chat context), or similar. Also covers the separate "thêm/đổi mẫu" follow-up: once the shop owner says they've approved a sample request for a KOC who was offered an extra/different pattern, find that order on seller-vn.tiktok.com, note what to actually pack, and log it to Sổ Kho. Does NOT cover flash sale roster management (see tiktok-koc-flashsale) or general customer-service chat (see size-consultation / review-return-check).
+description: Check TikTok Shop's "Yêu cầu hàng mẫu" (sample request) queue for shop SOME.TIME, score any genuinely new KOC/creator against the standing rubric in Google Sheet "Bảng Chấm Điểm KOC", and message each one the right canned reply based on the result -- use whenever the shop owner says "vào duyệt koc đi", "check koc", "vào làm việc" (in a KOC/duyệt-KOC chat context), or similar. Also covers the separate "thêm/đổi mẫu" follow-up: once the shop owner says they've approved a sample request for a KOC who was offered an extra/different pattern, find that order on seller-vn.tiktok.com, note what to actually pack, and log it to Sổ Kho. Also covers creating an ad-hoc KOC free-sample order directly on Sapo (sometime-official.mysapo.net) when the shop owner pastes a KOC's name/size/phone/address and says to "tạo đơn gửi koc trên sapo" (real stock deduction, unlike the TikTok-affiliate flow) -- including downloading the shipping label PDF, logging it to Sổ Kho, and sending the PDF to the shop owner so staff don't have to hunt for it. Does NOT cover flash sale roster management (see tiktok-koc-flashsale) or general customer-service chat (see size-consultation / review-return-check).
 ---
 
 # Check KOC (duyệt mẫu free cho nhà sáng tạo)
+
+## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
+
+Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac)
+→ **DỪNG NGAY**: không mở trình duyệt, không nhắn khách, **không gửi
+Telegram**, chỉ trả lời 1 câu "Bỏ qua: việc này chỉ chạy trên máy Windows."
+Chủ shop chốt 2026-10-21: mọi công việc chạy trên Windows, tránh 2 máy làm
+trùng (khách bị nhắn 2 lần, Telegram nhận 2 báo cáo).
+
 
 ## What this is for
 
@@ -174,6 +183,36 @@ asked:
    which case use `Chờ KOC phản hồi thêm mẫu` instead (see Step 5 table).
    **Never leave G blank** — the shop owner wants an explicit value they
    can scan for, not an implied "blank = pending".
+5. **Copy the whole row's formatting from the row directly above it** —
+   a plain value-write into a fresh row does NOT inherit the sheet's
+   borders, background, font, or dropdowns, and leaves the row looking
+   visibly broken (no grid lines, "Đã duyệt" rendered as plain black text
+   instead of bold navy, no dropdown arrow on E/F/G). This happened for
+   real (2026-10-19, rows for taothao2410/qnud_/huyhoanggg999) and had to
+   be fixed after the fact — do it as part of writing the row, not as a
+   follow-up cleanup. Use the Sheets API directly (`update_spreadsheet`
+   batchUpdate), **two separate `copyPaste` requests**, source = the row
+   immediately above (same sheet, `sheetId` 1952146322), destination =
+   the new row(s), columns A–P (index 0–16):
+   - `pasteType: "PASTE_FORMAT"` first — carries borders, background,
+     font, alignment, and (usually) the plain-list dropdown on column G.
+   - `pasteType: "PASTE_DATA_VALIDATION"` on **columns E–F specifically**
+     (index 4–6) as a *second*, separate request — `PASTE_FORMAT` alone
+     does **not** reliably carry over the multi-select "chip" dropdown
+     on E/F (`ONE_OF_RANGE` sourced from `'0.Danh mục SKU'!$F$2:$F$45`,
+     `customUiMode: "CHIP"`, `allowMultipleSelections: true`); without
+     this second pass E/F end up as plain text cells with no dropdown at
+     all, which is the exact defect the shop owner flagged. Don't try to
+     hand-build this validation rule with `setDataValidation` instead of
+     copying it — the API rejects `allowMultipleSelections: true` on a
+     `ONE_OF_RANGE` condition set that way (`BooleanCondition is not
+     expected to allow multiple selections for ConditionTypes that are
+     not ONE_OF_LIST`), even though the exact same shape is valid when
+     it arrives via `copyPaste`. Copying is the only way that works.
+   After both requests, spot-check with `get_spreadsheet`
+   (`includeGridData: true`, `fields: ["sheets.data.rowData.values.dataValidation"]`)
+   on the new row's E:F range and confirm `customUiMode` reads `"CHIP"`
+   with `allowMultipleSelections: true` — not `"ARROW"`.
 
 ## Part 2 — "Thêm/đổi mẫu" follow-up (separate trigger)
 
@@ -209,8 +248,94 @@ whoever's topical).
    `warehouse_notices` (see [[sokho-pyjama-supabase-tables]] for the
    URL/key): `category: "thong_bao_chung"`, `order_code` = the TikTok
    order ID, `content`: prefix with the KOC's name for easy search, e.g.
-   `"KOC {username} thêm mẫu: {same note text}"`.
+   `"KOC {username} thêm mẫu: {same note text}"` (xem `.claude/shared/notice_naming.md`).
 6. Flip Book column G to `Đã duyệt`.
+
+## Part 3 — Ad-hoc KOC order straight on Sapo (real stock deduction)
+
+Separate trigger again: the shop owner pastes a KOC's info directly
+(name, "mẫu: {chiều cao}-{cân nặng}" or a size already picked, phone,
+address) and says something like "tạo đơn gửi koc cho a... trên sapo...
+vì trên sapo trừ kho thật" — this skips the whole TikTok
+affiliate-request flow above entirely (no sheet row, no Book row, no
+TikTok chat message) and goes straight to creating a real sales order so
+the warehouse's real stock count drops. Chốt 2026-10-20.
+
+**Login**: `https://sometime-official.mysapo.net/admin/dashboard` — on
+this machine, already signed in on the Windows Chrome profile named
+**"Minh"** (not the two Chrome profiles used for TikTok/Shopee — see
+[[reference_chrome_browsers]], which needs updating to add this as a
+third mapped profile next time it's touched). If that profile isn't
+connected to Claude in Chrome, ask the shop owner to log in there rather
+than entering credentials yourself.
+
+**Steps**:
+1. `Bán hàng → Đơn hàng → Danh sách đơn hàng → Tạo đơn hàng`.
+2. Add each product by SKU search (`CL01-L`, `CL06-L`, etc. — faster and
+   less ambiguous than typing the Vietnamese name, which returns combos
+   too). Qty stays 1 per SKU unless told otherwise.
+3. **Thêm giảm giá → Thêm giảm giá thủ công cho đơn hàng → loại "%" →
+   100** (reason: `"Mẫu KOC - <tên KOC>"`) — this is a free sample, not a
+   real sale; it must zero the Thành tiền, not just lower it.
+4. Add the customer: search by name first — almost always not found
+   (first-time recipient), so **Thêm mới khách hàng**. Split the pasted
+   full name into Họ / Tên (Vietnamese convention: everything but the
+   last word → Họ). Phone goes in with the `+84` prefix auto-applied.
+5. Address: toggle **"Địa chỉ mới" ON** (2-tier Tỉnh/Thành phố +
+   Phường/Xã, matches the current administrative reform — same thing
+   SPX's own address picker needs, see `resend-missing-item`'s SPX
+   address notes) rather than leaving the legacy 3-tier toggle off. Put
+   the building/apartment detail (e.g.
+   `"(3208A) S302 Vinsmart"`) in "Địa chỉ cụ thể" — don't put the ward
+   name there too, it's already captured by the Phường/Xã field.
+6. Ghi chú (top-level order note, not the address one): đúng mẫu
+   `"Gửi KOC - <tên KOC>"` — chỉ vậy, không thêm chiều cao/cân nặng
+   (chủ shop chốt 2026-10-20).
+7. **Nguồn đơn**: there's no built-in "KOC" source in the dropdown, and
+   creating a custom one navigates away from the draft and loses
+   everything filled in so far — skip it, leave Nguồn đơn blank, rely on
+   the Ghi chú instead. (Chưa thử "Tùy chỉnh nguồn" ở **đơn đã lưu** — có
+   thể làm được sau khi tạo xong, chưa xác nhận.)
+8. Scroll to **Giao hàng**: Tiền thu hộ COD stays `0` (already free).
+   Khối lượng defaults to a tiny placeholder (10g) — bump it to something
+   realistic for the item count (e.g. `600` for 2 quần nỉ) so SPX doesn't
+   mis-rate it. Pick the **SPX** carrier card (usually pre-ranked as a
+   "gợi ý") and its "Chuẩn" service tier; leave "Shop trả" phí vận
+   chuyển.
+9. Click **"Tạo đơn và giao hàng"** (not "Lưu nháp") — this is the real,
+   stock-deducting submit, so treat it with the same confirm-before-send
+   care as `resend-missing-item`'s SPX hard rule: show the filled summary
+   and wait for an explicit "ok" first.
+10. After creation, the order detail page shows **"Phiếu giao hàng" →
+    "In phiếu giao hàng"** — click it. This silently downloads a PDF to
+    `~/Downloads` (random hex filename, same pattern as the SPX-direct
+    flow in `resend-missing-item` Step 4) rather than opening a new
+    preview tab; match by newest-mtime, not by a tab that never appears.
+11. Log it to Sổ Kho so the packing staff doesn't have to hunt for it the
+    next day — **this step is not optional even though the shop owner
+    didn't explicitly ask the first time**; they asked for it after the
+    fact and want it done by default from now on:
+    - Copy the PDF into the scratchpad with a clear name
+      (`<mã_vận_đơn>_koc_<tên_KOC_không_dấu>.pdf`).
+    - Upload it to the Supabase Storage bucket `notices-pdf` (same
+      curl pattern as `resend-missing-item` Step 4; anon key in
+      `so-van-hanh-pwa/init.js`).
+    - Insert into `warehouse_notices`: `category: "thong_bao_chung"`,
+      `order_code` = the SPX mã vận đơn (not the Sapo #order number),
+      `content` = `"Gửi KOC - <tên KOC> - <SL> Quần <tên phân loại> <size> +
+      <SL> Quần <tên phân loại> <size> - đơn Sapo #<mã đơn Sapo>"`, vd
+      `"Gửi KOC - Hoàng Trung Thảo - 1 Quần Chất Lông-Shin L + 1 Quần Chất
+      Lông-Shin 02 L - đơn Sapo #28463"` (chuẩn:
+      `.claude/shared/notice_naming.md`), `pdf_path` = the exact
+      filename just uploaded, `done: false`.
+    - **PDF lấy ngay trong Sapo** (phiếu giao hàng ở bước 10 — có logo SPX
+      Express, mã vận đơn, người nhận KOC, mã đơn #<Sapo>), không lấy từ SPX.
+      **Trước khi upload, đọc PDF**: mã vận đơn + người nhận trên phiếu
+      phải đúng đơn KOC này. Đừng lấy "PDF mới nhất" trong Downloads mù
+      quáng — 2026-10-20 đã upload nhầm nhãn gửi bù vào đơn KOC.
+    - `SendUserFile` the PDF to the shop owner too, same as the SPX
+      direct-resend flow — they asked for this specifically so staff
+      "đỡ phải tìm" the next morning.
 
 ## Operating quirks (read before you hit something weird)
 
