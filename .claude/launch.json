@@ -27,6 +27,15 @@
         "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/1e78f20b-a505-4b64-bf5c-2c40282a36bd/scratchpad/sokho' && exec python3 -m http.server 8795"
       ],
       "port": 8795
+    },
+    {
+      "name": "sokho-staff-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/ea7041ac-2a1a-4f06-b1de-1076ebb52e99/scratchpad/so-kho-pyjama' && exec python3 -m http.server 8801"
+      ],
+      "port": 8801
     }
   ]
 }

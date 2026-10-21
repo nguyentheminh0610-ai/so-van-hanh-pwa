@@ -57,6 +57,11 @@ bookkeeping, just do it and report).
 - Storage bucket: **`notices-pdf`** (public) — see Step 4, this is the
   part that's easy to forget.
 
+**Sapo (để đổi mã đơn hàng của sàn sang mã vận đơn):** key ở
+`~/.config/sapo/credentials.json`, dùng qua
+`scripts/order_to_tracking.sh`. Bắt buộc chạy trước khi ghi sổ lỗi —
+xem Step 4 và `references/sapo_tracking_lookup.md`.
+
 **SPX Express (create a replacement shipment manually, outside the
 marketplace's own fulfillment):** `https://spx.vn/spx-admin/single-order/create`
 → "Single Create". Needs an already-logged-in SPX session in the browser
@@ -242,10 +247,30 @@ Supabase note below).
    size through the tool output).
 2. Copy it into the scratchpad with a clear name, e.g.
    `<mã_vận_đơn>_guibu_<ten_khach>.pdf`.
-3. Insert into `warehouse_error_log`: `code` = **original** order code,
+3. **Tìm MÃ VẬN ĐƠN của đơn gốc trước khi ghi sổ lỗi — đừng dùng mã đơn
+   hàng.** Sổ Kho quét mã vận đơn (`862…`/`854…`/`SPXVN…`/`VTPVN…`), còn
+   màn hình đơn hàng của sàn thường chỉ cho thấy mã đơn hàng (TikTok
+   `586…` 18 số hoặc `404…` 19 số). Ghi nhầm mã đơn hàng thì cột "Người
+   đóng đơn" ở mục 5 và chỉ số lỗi theo nhân viên ở mục 3 ra `—`, không
+   quy được trách nhiệm cho ai (9/13 ca lỗi T10/2026 đã hỏng đúng kiểu
+   này). Chạy:
+   ```bash
+   .claude/skills/resend-missing-item/scripts/order_to_tracking.sh <mã đơn gốc>
+   ```
+   In ra `<mã đơn>  ->  <mã vận đơn>  ->  <ai đã quét>`. Script hỏi Sapo
+   (`/admin/orders.json?query=…` → `fulfillments[].tracking_number`) rồi
+   dò luôn sang `warehouse_outbound_checks`. Chi tiết + các bẫy:
+   `references/sapo_tracking_lookup.md`.
+   - Ra `KHÔNG TÌM THẤY TRONG SAPO` → mã gốc sai, kiểm tra lại, đừng đoán.
+   - Ra `kho chưa quét mã này` → vẫn ghi sổ lỗi bằng mã vận đơn đó, nhưng
+     **báo chủ shop**: đơn đã gửi đi mà không có trong Sổ Kho, tức là kho
+     quên quét hoặc quét sai mã (gặp thật ngày 11/10/2026).
+4. Insert into `warehouse_error_log`: `code` = **mã vận đơn của đơn gốc
+   vừa tra được ở bước 3** (không phải mã đơn hàng của sàn),
    `error_type="kho_van"`, `detail_reason="giao_thieu"`, `reason` = short
-   free text like `"giao thieu 1 <ten SKU>"`.
-4. Insert into `warehouse_notices`: `category="gui_don_bu"`,
+   free text like `"giao thieu 1 <ten SKU>"`. Ghi xong mở mục 5 Sổ Kho
+   kiểm lại: cột "Người đóng đơn" phải ra tên, ra `—` là mã vẫn sai.
+5. Insert into `warehouse_notices`: `category="gui_don_bu"`,
    `order_code` = the **new SPX** mã vận đơn, `content` = **giống hệt tên
    sản phẩm trên SPX** (chốt 2026-10-14, cho đồng nhất):
    `"Gửi bù - <mã đơn gốc> - Quần <tên phân loại> <size>"` — ngắn, không
@@ -254,7 +279,7 @@ Supabase note below).
    `category="thong_bao_chung"`, content dạng
    `"Gui KOC <tên KOC> 1 quan <tên phân loại> size <size>"`. `pdf_path` = the exact filename you're
    about to upload in the next step, `done=false`.
-5. **⚠️ Upload the actual PDF to Supabase Storage — the `pdf_path` column
+6. **⚠️ Upload the actual PDF to Supabase Storage — the `pdf_path` column
    alone does nothing.** The Sổ Kho Pyjama app's "Xem PDF" button builds
    the URL `https://dyvublxyrldmmnsrfvpz.supabase.co/storage/v1/object/public/notices-pdf/<pdf_path>`
    directly from that column; if no object exists there it 404s with
@@ -269,7 +294,7 @@ Supabase note below).
    Verify by opening `.../storage/v1/object/public/notices-pdf/<FILENAME>.pdf`
    in the browser and confirming the label actually renders (wait ~2s,
    first paint can look like a blank dark page in Chrome's PDF viewer).
-6. Send the PDF to the shop owner too (`SendUserFile`). If they report
+7. Send the PDF to the shop owner too (`SendUserFile`). If they report
    "pdf bị lỗi" / a 404 on the chat-delivered copy specifically, that's a
    one-off transfer glitch — just resend (a different filename avoids
    any key collision); it's unrelated to the Sổ Kho storage upload above,
@@ -356,3 +381,6 @@ coordinates:
 
 - `references/sokho_fields.md` — column reference for
   `warehouse_error_log` / `warehouse_notices` + the `notices-pdf` bucket.
+- `references/sapo_tracking_lookup.md` + `scripts/order_to_tracking.sh` —
+  mã đơn hàng của sàn → mã vận đơn, và vì sao sổ lỗi bắt buộc dùng mã vận
+  đơn.

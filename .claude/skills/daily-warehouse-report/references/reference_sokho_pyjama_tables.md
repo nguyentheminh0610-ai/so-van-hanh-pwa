@@ -3,7 +3,8 @@ Sổ Kho Pyjama dùng chung đúng 1 Supabase project với Sổ Vận Hành (`h
 Các bảng liên quan tới mục kiểm soát kho:
 
 **warehouse_error_log** — "sổ lỗi kho" (ghi lỗi khi sản phẩm/dịch vụ có vấn đề):
-- `code` (mã đơn/vận đơn), `staff`
+- `code` — **BẮT BUỘC là MÃ VẬN ĐƠN** (`862…`/`854…`/`SPXVN…`/`VTPVN…`), không phải mã đơn hàng của sàn (TikTok `586…`/`404…`, Shopee `26…`). Mục 5 của app tra ngược mã này sang `warehouse_outbound_checks`/`warehouse_return_checks` để hiện "Người đóng đơn", và mục 3 đếm chỉ số lỗi theo nhân viên từ đó — ghi mã đơn hàng là hỏng cả hai. Đổi mã đơn → mã vận đơn: `.claude/skills/resend-missing-item/scripts/order_to_tracking.sh`
+- `staff` — người **GHI** lỗi (thường là quản lý), KHÔNG phải người gây lỗi
 - `error_type`: `kho_van` (Lỗi shop - Kho vận) | `san_pham` (Lỗi shop - Sản phẩm) | `khach_quan` (Lỗi khách quan)
 - `detail_reason` (tuỳ error_type): kho_van→`giao_thieu`/`giao_nham`; san_pham→`san_pham_loi`; khach_quan→`loi_bang_size`
 - `reason` (text tự do, không bắt buộc)

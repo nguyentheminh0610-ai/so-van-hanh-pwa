@@ -8,7 +8,7 @@ in `so-van-hanh-pwa/init.js`.
 
 | column | notes |
 |---|---|
-| `code` | the **original** order/mã vận đơn (the one that shipped short) |
+| `code` | **MÃ VẬN ĐƠN** của đơn gốc đã gửi thiếu (`862…`/`854…`/`SPXVN…`/`VTPVN…`) — **không phải mã đơn hàng của sàn** (TikTok `586…`/`404…`, Shopee `26…`). Sổ Kho chỉ quét mã vận đơn, nên ghi mã đơn hàng vào đây là cột "Người đóng đơn" (mục 5) và chỉ số lỗi theo nhân viên (mục 3) ra `—` vĩnh viễn. Màn hình đơn của sàn hay chỉ hiện mã đơn hàng → tra sang mã vận đơn bằng `scripts/order_to_tracking.sh`, xem `sapo_tracking_lookup.md` |
 | `error_type` | `kho_van` for a missing-item mistake (vs. `san_pham` product defect, `khach_quan` customer's own fault) |
 | `detail_reason` | `giao_thieu` |
 | `reason` | free text, short — e.g. `"giao thieu 1 Chat Long-Shin, M"` |
