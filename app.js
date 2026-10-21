@@ -160,11 +160,18 @@ function wireDailyRevenueChart(container, res){
 // không tạo màu/font riêng cho phần này. ----------
 const AFF_SEGMENT_COLORS = ['var(--p1)', 'var(--p2)', 'var(--p3)', 'var(--accent)', 'var(--good)', 'var(--proc)'];
 
+// Chốt 21/10/2026 (chủ shop: "phần koc gọn lại cho a 10koc hàng đầu thôi"):
+// cắt top 10 ngay lúc VẼ chứ không phải lúc tính — các tháng đã lưu trong
+// Supabase trước đó vẫn đang giữ 20 dòng, cắt ở calc.js không chạm tới được.
+const KOC_TOP_N = 10;
+function kocTop(rows){ return (rows || []).slice(0, KOC_TOP_N); }
+
 function buildAffiliateTable1Html(rows){
   if (!rows) return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tải file Affiliate Orders tháng này.</p>';
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có đơn "Đã quyết toán" nào trong file Affiliate Orders.</p>';
   // Cột CTOR (từ file Creator List) là tuỳ chọn riêng — chỉ thêm cột khi có ít
   // nhất 1 dòng có giá trị, để bảng vẫn y hệt cũ lúc chưa tải file này.
+  rows = kocTop(rows);
   const hasCtor = rows.some(r => r.ctor !== null && r.ctor !== undefined);
   return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số đơn</th><th style="text-align:right">Doanh thu</th>${hasCtor ? '<th style="text-align:right">CTOR</th>' : ''}</tr></thead><tbody>
     ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soDon)}</td><td class="num">${fmtVND(r.doanhThu)}</td>${hasCtor ? `<td class="num">${r.ctor !== null && r.ctor !== undefined ? fmtPct(r.ctor, 2) : '—'}</td>` : ''}</tr>`).join('')}
@@ -187,6 +194,7 @@ function buildAffContentCellHtml(row){
 function buildAffiliateTable2Html(rows){
   if (!rows) return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tải file Video Analysis tháng này.</p>';
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu video nào trong file Video Analysis.</p>';
+  rows = kocTop(rows);
   return `<table class="dtable"><thead><tr><th>KOC</th><th>Doanh thu đến từ đâu</th><th style="text-align:right">Tỷ lệ xem hết TB</th><th style="text-align:right">CTR TB</th><th style="text-align:right">GPM</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td style="min-width:180px;">${buildAffContentCellHtml(r)}</td><td class="num">${fmtPct(r.completionAvg, 1)}</td><td class="num">${fmtPct(r.ctrAvg, 2)}</td><td class="num">${fmtVND(Math.round(r.gpm))}</td></tr>`).join('')}
   </tbody></table>`;
@@ -196,6 +204,7 @@ function buildAffiliateTable2Html(rows){
 // chọn, độc lập với Bảng 1/2; chỉ được gọi khi aff.liveTable khác null.
 function buildAffiliateLiveTableHtml(rows){
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu buổi LIVE nào trong file Live List.</p>';
+  rows = kocTop(rows);
   return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">Số buổi LIVE</th><th style="text-align:right">GMV từ LIVE</th><th style="text-align:right">CTR TB</th><th style="text-align:right">GPM hiển thị TB</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtInt(r.soBuoiLive)}</td><td class="num">${fmtVND(r.gmvLive)}</td><td class="num">${fmtPct(r.ctrAvg, 2)}</td><td class="num">${fmtVND(Math.round(r.gpmHienThiAvg))}</td></tr>`).join('')}
   </tbody></table>`;
@@ -207,6 +216,7 @@ function buildAffiliateLiveTableHtml(rows){
 // Analysis); chỉ được gọi khi aff.ctorCtrTable khác null.
 function buildAffiliateCtorCtrTableHtml(rows){
   if (!rows.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu nào trong file Creator List.</p>';
+  rows = kocTop(rows);
   return `<table class="dtable"><thead><tr><th>KOC</th><th style="text-align:right">GMV</th><th style="text-align:right">CTOR</th><th style="text-align:right">CTR</th><th style="text-align:right">GMV/1.000 view</th></tr></thead><tbody>
     ${rows.map(r => `<tr><td>${esc(r.koc)}</td><td class="num">${fmtVND(r.gmv)}</td><td class="num">${fmtPct(r.ctor, 2)}</td><td class="num">${fmtPct(r.ctr, 2)}</td><td class="num">${r.gmvTren1000View === null ? '—' : fmtVND(r.gmvTren1000View)}</td></tr>`).join('')}
   </tbody></table>`;
