@@ -1,0 +1,5165 @@
+{
+ "generatedAt": "2026-10-20 12:01",
+ "variants": {
+  "CB-CL06CL08-XXL-XXL": {
+   "name": "Combo: Shin 02 + Patrick 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL08-XL-XL": {
+   "name": "Combo: Shin 02 + Patrick XL/XL",
+   "type": "combo"
+  },
+  "CB-CL06CL08-L-L": {
+   "name": "Combo: Shin 02 + Patrick L/L",
+   "type": "combo"
+  },
+  "CB-CL06CL08-M-M": {
+   "name": "Combo: Shin 02 + Patrick M/M",
+   "type": "combo"
+  },
+  "CB-CL01CL07-XXL-XXL": {
+   "name": "Combo: Shin + Shin 03 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL07-XL-XL": {
+   "name": "Combo: Shin + Shin 03 XL/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL07-L-L": {
+   "name": "Combo: Shin + Shin 03 L/L",
+   "type": "combo"
+  },
+  "CB-CL01CL07-M-M": {
+   "name": "Combo: Shin + Shin 03 M/M",
+   "type": "combo"
+  },
+  "CB-CL11CL12-XL-XL": {
+   "name": "Combo: Caro Hồng + Caro Xanh XL/XL",
+   "type": "combo"
+  },
+  "CB-CL11CL12-XL-L": {
+   "name": "Combo: Caro Hồng + Caro Xanh XL/L",
+   "type": "combo"
+  },
+  "CB-CL11CL12-XL-M": {
+   "name": "Combo: Caro Hồng + Caro Xanh XL/M",
+   "type": "combo"
+  },
+  "CB-CL11CL12-L-L": {
+   "name": "Combo: Caro Hồng + Caro Xanh L/L",
+   "type": "combo"
+  },
+  "CB-CL11CL12-L-M": {
+   "name": "Combo: Caro Hồng + Caro Xanh L/M",
+   "type": "combo"
+  },
+  "CB-CL11CL12-M-XL": {
+   "name": "Combo: Caro Hồng + Caro Xanh M/XL",
+   "type": "combo"
+  },
+  "CB-CL11CL12-M-M": {
+   "name": "Combo: Caro Hồng + Caro Xanh M/M",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XXL-XXL": {
+   "name": "Combo: Shin 03 + Patrick 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XXL-L": {
+   "name": "Combo: Shin 03 + Patrick 2XL/L",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XXL-M": {
+   "name": "Combo: Shin 03 + Patrick 2XL/M",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XL-XXL": {
+   "name": "Combo: Shin 03 + Patrick XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XL-XL": {
+   "name": "Combo: Shin 03 + Patrick XL/XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XL-M": {
+   "name": "Combo: Shin 03 + Patrick XL/M",
+   "type": "combo"
+  },
+  "CB-CL07CL08-L-XXL": {
+   "name": "Combo: Shin 03 + Patrick L/2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-L-XL": {
+   "name": "Combo: Shin 03 + Patrick L/XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-L-L": {
+   "name": "Combo: Shin 03 + Patrick L/L",
+   "type": "combo"
+  },
+  "CB-CL07CL08-M-XXL": {
+   "name": "Combo: Shin 03 + Patrick M/2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-M-XL": {
+   "name": "Combo: Shin 03 + Patrick M/XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-M-L": {
+   "name": "Combo: Shin 03 + Patrick M/L",
+   "type": "combo"
+  },
+  "CB-CL07CL08-M-M": {
+   "name": "Combo: Shin 03 + Patrick M/M",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XXL-XXL": {
+   "name": "Combo: Shin 02 + Shin 03 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XXL-XL": {
+   "name": "Combo: Shin 02 + Shin 03 2XL/XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XXL-L": {
+   "name": "Combo: Shin 02 + Shin 03 2XL/L",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XXL-M": {
+   "name": "Combo: Shin 02 + Shin 03 2XL/M",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XL-XL": {
+   "name": "Combo: Shin 02 + Shin 03 XL/XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XL-L": {
+   "name": "Combo: Shin 02 + Shin 03 XL/L",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XL-M": {
+   "name": "Combo: Shin 02 + Shin 03 XL/M",
+   "type": "combo"
+  },
+  "CB-CL06CL07-L-XXL": {
+   "name": "Combo: Shin 02 + Shin 03 L/2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-L-L": {
+   "name": "Combo: Shin 02 + Shin 03 L/L",
+   "type": "combo"
+  },
+  "CB-CL06CL07-L-M": {
+   "name": "Combo: Shin 02 + Shin 03 L/M",
+   "type": "combo"
+  },
+  "CB-CL06CL07-M-XXL": {
+   "name": "Combo: Shin 02 + Shin 03 M/2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-M-XL": {
+   "name": "Combo: Shin 02 + Shin 03 M/XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-M-M": {
+   "name": "Combo: Shin 02 + Shin 03 M/M",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XXL-XXL": {
+   "name": "Combo: Shin + Patrick 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XXL-XL": {
+   "name": "Combo: Shin + Patrick 2XL/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XXL-L": {
+   "name": "Combo: Shin + Patrick 2XL/L",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XXL-M": {
+   "name": "Combo: Shin + Patrick 2XL/M",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XL-XXL": {
+   "name": "Combo: Shin + Patrick XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XL-XL": {
+   "name": "Combo: Shin + Patrick XL/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XL-L": {
+   "name": "Combo: Shin + Patrick XL/L",
+   "type": "combo"
+  },
+  "CB-CL01CL08-XL-M": {
+   "name": "Combo: Shin + Patrick XL/M",
+   "type": "combo"
+  },
+  "CB-CL01CL08-L-XXL": {
+   "name": "Combo: Shin + Patrick L/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-L-XL": {
+   "name": "Combo: Shin + Patrick L/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-L-L": {
+   "name": "Combo: Shin + Patrick L/L",
+   "type": "combo"
+  },
+  "CB-CL01CL08-L-M": {
+   "name": "Combo: Shin + Patrick L/M",
+   "type": "combo"
+  },
+  "CB-CL01CL08-M-XXL": {
+   "name": "Combo: Shin + Patrick M/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-M-XL": {
+   "name": "Combo: Shin + Patrick M/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL08-M-L": {
+   "name": "Combo: Shin + Patrick M/L",
+   "type": "combo"
+  },
+  "CB-CL01CL08-M-M": {
+   "name": "Combo: Shin + Patrick M/M",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XXL-XXL": {
+   "name": "Combo: Shin + Shin 02 2XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XXL-L": {
+   "name": "Combo: Shin + Shin 02 2XL/L",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XXL-M": {
+   "name": "Combo: Shin + Shin 02 2XL/M",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XL-XXL": {
+   "name": "Combo: Shin + Shin 02 XL/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XL-XL": {
+   "name": "Combo: Shin + Shin 02 XL/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XL-M": {
+   "name": "Combo: Shin + Shin 02 XL/M",
+   "type": "combo"
+  },
+  "CB-CL01CL06-L-XXL": {
+   "name": "Combo: Shin + Shin 02 L/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-L-XL": {
+   "name": "Combo: Shin + Shin 02 L/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-L-L": {
+   "name": "Combo: Shin + Shin 02 L/L",
+   "type": "combo"
+  },
+  "CB-CL01CL06-M-XXL": {
+   "name": "Combo: Shin + Shin 02 M/2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-M-XL": {
+   "name": "Combo: Shin + Shin 02 M/XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-M-L": {
+   "name": "Combo: Shin + Shin 02 M/L",
+   "type": "combo"
+  },
+  "CB-CL01CL06-M-M": {
+   "name": "Combo: Shin + Shin 02 M/M",
+   "type": "combo"
+  },
+  "CB-CL14CL14-XL-XL": {
+   "name": "Combo 2C: Đốm Hồng XL",
+   "type": "combo"
+  },
+  "CB-CL14CL14-L-XL": {
+   "name": "Combo 2C: Đốm Hồng L+XL",
+   "type": "combo"
+  },
+  "CB-CL14CL14-L-L": {
+   "name": "Combo 2C: Đốm Hồng L",
+   "type": "combo"
+  },
+  "CB-CL14CL14-M-XL": {
+   "name": "Combo 2C: Đốm Hồng M+XL",
+   "type": "combo"
+  },
+  "CB-CL14CL14-M-L": {
+   "name": "Combo 2C: Đốm Hồng M+L",
+   "type": "combo"
+  },
+  "CB-CL14CL14-M-M": {
+   "name": "Combo 2C: Đốm Hồng M",
+   "type": "combo"
+  },
+  "CB-CL12CL12-XL-XL": {
+   "name": "Combo 2C: Caro Xanh XL",
+   "type": "combo"
+  },
+  "CB-CL12CL12-L-XL": {
+   "name": "Combo 2C: Caro Xanh L+XL",
+   "type": "combo"
+  },
+  "CB-CL12CL12-L-L": {
+   "name": "Combo 2C: Caro Xanh L",
+   "type": "combo"
+  },
+  "CB-CL12CL12-M-XL": {
+   "name": "Combo 2C: Caro Xanh M+XL",
+   "type": "combo"
+  },
+  "CB-CL12CL12-M-L": {
+   "name": "Combo 2C: Caro Xanh M+L",
+   "type": "combo"
+  },
+  "CB-CL12CL12-M-M": {
+   "name": "Combo 2C: Caro Xanh M",
+   "type": "combo"
+  },
+  "CB-CL11CL11-XL-XL": {
+   "name": "Combo 2C: Caro Hồng XL",
+   "type": "combo"
+  },
+  "CB-CL11CL11-L-XL": {
+   "name": "Combo 2C: Caro Hồng L+XL",
+   "type": "combo"
+  },
+  "CB-CL11CL11-L-L": {
+   "name": "Combo 2C: Caro Hồng L",
+   "type": "combo"
+  },
+  "CB-CL11CL11-M-XL": {
+   "name": "Combo 2C: Caro Hồng M+XL",
+   "type": "combo"
+  },
+  "CB-CL11CL11-M-L": {
+   "name": "Combo 2C: Caro Hồng M+L",
+   "type": "combo"
+  },
+  "CB-CL11CL11-M-M": {
+   "name": "Combo 2C: Caro Hồng M",
+   "type": "combo"
+  },
+  "CB-CL10CL10-XL-XL": {
+   "name": "Combo 2C: Thỏ Nơ XL",
+   "type": "combo"
+  },
+  "CB-CL10CL10-L-XL": {
+   "name": "Combo 2C: Thỏ Nơ L+XL",
+   "type": "combo"
+  },
+  "CB-CL10CL10-L-L": {
+   "name": "Combo 2C: Thỏ Nơ L",
+   "type": "combo"
+  },
+  "CB-CL10CL10-M-XL": {
+   "name": "Combo 2C: Thỏ Nơ M+XL",
+   "type": "combo"
+  },
+  "CB-CL10CL10-M-L": {
+   "name": "Combo 2C: Thỏ Nơ M+L",
+   "type": "combo"
+  },
+  "CB-CL10CL10-M-M": {
+   "name": "Combo 2C: Thỏ Nơ M",
+   "type": "combo"
+  },
+  "CB-CL09CL09-XL-XL": {
+   "name": "Combo 2C: Kitty Hồng XL",
+   "type": "combo"
+  },
+  "CB-CL09CL09-L-XL": {
+   "name": "Combo 2C: Kitty Hồng L+XL",
+   "type": "combo"
+  },
+  "CB-CL09CL09-L-L": {
+   "name": "Combo 2C: Kitty Hồng L",
+   "type": "combo"
+  },
+  "CB-CL09CL09-M-XL": {
+   "name": "Combo 2C: Kitty Hồng M+XL",
+   "type": "combo"
+  },
+  "CB-CL09CL09-M-L": {
+   "name": "Combo 2C: Kitty Hồng M+L",
+   "type": "combo"
+  },
+  "CB-CL09CL09-M-M": {
+   "name": "Combo 2C: Kitty Hồng M",
+   "type": "combo"
+  },
+  "CB-CL08CL08-XXL-XXL": {
+   "name": "Combo 2C: Patrick 2XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-XL-XXL": {
+   "name": "Combo 2C: Patrick XL+2XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-XL-XL": {
+   "name": "Combo 2C: Patrick XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-L-XXL": {
+   "name": "Combo 2C: Patrick L+2XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-L-XL": {
+   "name": "Combo 2C: Patrick L+XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-L-L": {
+   "name": "Combo 2C: Patrick L",
+   "type": "combo"
+  },
+  "CB-CL08CL08-M-XXL": {
+   "name": "Combo 2C: Patrick M+2XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-M-XL": {
+   "name": "Combo 2C: Patrick M+XL",
+   "type": "combo"
+  },
+  "CB-CL08CL08-M-L": {
+   "name": "Combo 2C: Patrick M+L",
+   "type": "combo"
+  },
+  "CB-CL08CL08-M-M": {
+   "name": "Combo 2C: Patrick M",
+   "type": "combo"
+  },
+  "CB-CL07CL07-XXL-XXL": {
+   "name": "Combo 2C: Shin 03 2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-XL-XXL": {
+   "name": "Combo 2C: Shin 03 XL+2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-XL-XL": {
+   "name": "Combo 2C: Shin 03 XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-L-XXL": {
+   "name": "Combo 2C: Shin 03 L+2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-L-XL": {
+   "name": "Combo 2C: Shin 03 L+XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-L-L": {
+   "name": "Combo 2C: Shin 03 L",
+   "type": "combo"
+  },
+  "CB-CL07CL07-M-XXL": {
+   "name": "Combo 2C: Shin 03 M+2XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-M-XL": {
+   "name": "Combo 2C: Shin 03 M+XL",
+   "type": "combo"
+  },
+  "CB-CL07CL07-M-L": {
+   "name": "Combo 2C: Shin 03 M+L",
+   "type": "combo"
+  },
+  "CB-CL07CL07-M-M": {
+   "name": "Combo 2C: Shin 03 M",
+   "type": "combo"
+  },
+  "CB-CL06CL06-XXL-XXL": {
+   "name": "Combo 2C: Shin 02 2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-XL-XXL": {
+   "name": "Combo 2C: Shin 02 XL+2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-XL-XL": {
+   "name": "Combo 2C: Shin 02 XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-L-XXL": {
+   "name": "Combo 2C: Shin 02 L+2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-L-XL": {
+   "name": "Combo 2C: Shin 02 L+XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-L-L": {
+   "name": "Combo 2C: Shin 02 L",
+   "type": "combo"
+  },
+  "CB-CL06CL06-M-XXL": {
+   "name": "Combo 2C: Shin 02 M+2XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-M-XL": {
+   "name": "Combo 2C: Shin 02 M+XL",
+   "type": "combo"
+  },
+  "CB-CL06CL06-M-L": {
+   "name": "Combo 2C: Shin 02 M+L",
+   "type": "combo"
+  },
+  "CB-CL06CL06-M-M": {
+   "name": "Combo 2C: Shin 02 M",
+   "type": "combo"
+  },
+  "CB-CL01CL01-XXL-XXL": {
+   "name": "Combo 2C: Shin 2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-XL-XXL": {
+   "name": "Combo 2C: Shin XL+2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-XL-XL": {
+   "name": "Combo 2C: Shin XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-L-XXL": {
+   "name": "Combo 2C: Shin L+2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-L-XL": {
+   "name": "Combo 2C: Shin L+XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-L-L": {
+   "name": "Combo 2C: Shin L",
+   "type": "combo"
+  },
+  "CB-CL01CL01-M-XXL": {
+   "name": "Combo 2C: Shin M+2XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-M-XL": {
+   "name": "Combo 2C: Shin M+XL",
+   "type": "combo"
+  },
+  "CB-CL01CL01-M-L": {
+   "name": "Combo 2C: Shin M+L",
+   "type": "combo"
+  },
+  "CB-CL01CL01-M-M": {
+   "name": "Combo 2C: Shin M",
+   "type": "combo"
+  },
+  "CB-CL12CL11-XLXXL": {
+   "name": "Combo Caro Xanh-Caro Hồng XLXXL",
+   "type": "combo"
+  },
+  "CB-CL11CL12-L-XL": {
+   "name": "Caro Hồng-L + Caro Xanh-XL",
+   "type": "combo"
+  },
+  "CB-CL11CL12-M-L": {
+   "name": "Caro Hồng-M + Caro Xanh-L",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XXL-XL": {
+   "name": "Patrick-XL + Shin 03-XXL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-XL-L": {
+   "name": "Patrick-L + Shin 03-XL",
+   "type": "combo"
+  },
+  "CB-CL07CL08-L-M": {
+   "name": "Patrick-M + Shin 03-L",
+   "type": "combo"
+  },
+  "CB-CL06CL07-XL-XXL": {
+   "name": "Shin 02-XL + Shin 03-XXL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-L-XL": {
+   "name": "Shin 02-L + Shin 03-XL",
+   "type": "combo"
+  },
+  "CB-CL06CL07-M-L": {
+   "name": "Shin 02-M + Shin 03-L",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XXL-XL": {
+   "name": "Shin 02-XL + Shin 01-XXL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-XL-L": {
+   "name": "Shin 02-L + Shin 01-XL",
+   "type": "combo"
+  },
+  "CB-CL01CL06-L-M": {
+   "name": "Shin 02-M + Shin 01-L",
+   "type": "combo"
+  },
+  "QS-CT-01-M": {
+   "name": "Quần Short-Shin 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "QS-CT-01-L": {
+   "name": "Quần Short-Shin 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "QS-CT-01-XL": {
+   "name": "Quần Short-Shin 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QS-CT-02-M": {
+   "name": "Quần Short-Shin 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "QS-CT-02-L": {
+   "name": "Quần Short-Shin 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "QS-CT-02-XL": {
+   "name": "Quần Short-Shin 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QS-CT-04-M": {
+   "name": "Quần Short-Shin 04",
+   "type": "normal",
+   "size": "M"
+  },
+  "QS-CT-04-L": {
+   "name": "Quần Short-Shin 04",
+   "type": "normal",
+   "size": "L"
+  },
+  "QS-CT-04-XL": {
+   "name": "Quần Short-Shin 04",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJC-CT-01-M": {
+   "name": "Bộ Ngắn-Shin 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJC-CT-01-L": {
+   "name": "Bộ Ngắn-Shin 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJC-CT-01-XL": {
+   "name": "Bộ Ngắn-Shin 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJC-CT-02-M": {
+   "name": "Bộ Ngắn-Shin 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJC-CT-02-L": {
+   "name": "Bộ Ngắn-Shin 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJC-CT-02-XL": {
+   "name": "Bộ Ngắn-Shin 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJC-CT-03-M": {
+   "name": "Bộ Ngắn-Shin 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJC-CT-03-L": {
+   "name": "Bộ Ngắn-Shin 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJC-CT-03-XL": {
+   "name": "Bộ Ngắn-Shin 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJD-CT-01-M": {
+   "name": "Bộ Dài-Shin 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJD-CT-01-L": {
+   "name": "Bộ Dài-Shin 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJD-CT-01-XL": {
+   "name": "Bộ Dài-Shin 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJD-CT-02-M": {
+   "name": "Bộ Dài-Shin 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJD-CT-02-L": {
+   "name": "Bộ Dài-Shin 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJD-CT-02-XL": {
+   "name": "Bộ Dài-Shin 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "PJD-CT-03-M": {
+   "name": "Bộ Dài-Shin 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "PJD-CT-03-L": {
+   "name": "Bộ Dài-Shin 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "PJD-CT-03-XL": {
+   "name": "Bộ Dài-Shin 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT01-M": {
+   "name": "Chất Thun-Màu 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT01-L": {
+   "name": "Chất Thun-Màu 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT01-XL": {
+   "name": "Chất Thun-Màu 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT02-M": {
+   "name": "Chất Thun-Màu 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT02-L": {
+   "name": "Chất Thun-Màu 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT02-XL": {
+   "name": "Chất Thun-Màu 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT03-M": {
+   "name": "Chất Thun-Màu 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT03-L": {
+   "name": "Chất Thun-Màu 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT03-XL": {
+   "name": "Chất Thun-Màu 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT04-M": {
+   "name": "Chất Thun-Màu 04",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT04-L": {
+   "name": "Chất Thun-Màu 04",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT04-XL": {
+   "name": "Chất Thun-Màu 04",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT05-M": {
+   "name": "Chất Thun-Màu 05",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT05-L": {
+   "name": "Chất Thun-Màu 05",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT05-XL": {
+   "name": "Chất Thun-Màu 05",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT06-M": {
+   "name": "Chất Thun-Màu 06",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT06-L": {
+   "name": "Chất Thun-Màu 06",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT06-XL": {
+   "name": "Chất Thun-Màu 06",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT07-M": {
+   "name": "Chất thun-Màu 07",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT07-L": {
+   "name": "Chất thun-Màu 07",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT07-XL": {
+   "name": "Chất thun-Màu 07",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT08-M": {
+   "name": "Chất thun-Shin 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT08-L": {
+   "name": "Chất thun-Shin 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT08-XL": {
+   "name": "Chất thun-Shin 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT09-M": {
+   "name": "Chất thun-Shin 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT09-L": {
+   "name": "Chất thun-Shin 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT09-XL": {
+   "name": "Chất thun-Shin 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CT10-M": {
+   "name": "Chất Thun-Shin 04",
+   "type": "normal",
+   "size": "M"
+  },
+  "CT10-L": {
+   "name": "Chất Thun-Shin 04",
+   "type": "normal",
+   "size": "L"
+  },
+  "CT10-XL": {
+   "name": "Chất Thun-Shin 04",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CBHH10-XXL": {
+   "name": "Combo HH10 XXL",
+   "type": "combo"
+  },
+  "CBHH10-XL": {
+   "name": "Combo HH10 XL",
+   "type": "combo"
+  },
+  "CBHH10-L": {
+   "name": "Combo HH10 L",
+   "type": "combo"
+  },
+  "CBHH10-M": {
+   "name": "Combo HH10 M",
+   "type": "combo"
+  },
+  "CBHH9-XXL": {
+   "name": "Combo HH9 XXL",
+   "type": "combo"
+  },
+  "CBHH9-XL": {
+   "name": "Combo HH9 XL",
+   "type": "combo"
+  },
+  "CBHH9-L": {
+   "name": "Combo HH9 L",
+   "type": "combo"
+  },
+  "CBHH9-M": {
+   "name": "Combo HH9 M",
+   "type": "combo"
+  },
+  "CBHH8-XXL": {
+   "name": "Combo HH8 XXL",
+   "type": "combo"
+  },
+  "CBHH8-XL": {
+   "name": "Combo HH8 XL",
+   "type": "combo"
+  },
+  "CBHH8-L": {
+   "name": "Combo HH8 L",
+   "type": "combo"
+  },
+  "CBHH8-M": {
+   "name": "Combo HH8 M",
+   "type": "combo"
+  },
+  "CBHH7-XXL": {
+   "name": "Combo HH7 XXL",
+   "type": "combo"
+  },
+  "CBHH7-XL": {
+   "name": "Combo HH7 XL",
+   "type": "combo"
+  },
+  "CBHH7-L": {
+   "name": "Combo HH7 L",
+   "type": "combo"
+  },
+  "CBHH7-M": {
+   "name": "Combo HH7 M",
+   "type": "combo"
+  },
+  "CBHH6-XXL": {
+   "name": "Combo HH6 XXL",
+   "type": "combo"
+  },
+  "CBHH6-XL": {
+   "name": "Combo HH6 XL",
+   "type": "combo"
+  },
+  "CBHH6-L": {
+   "name": "Combo HH6 L",
+   "type": "combo"
+  },
+  "CBHH6-M": {
+   "name": "Combo HH6 M",
+   "type": "combo"
+  },
+  "CBHH5-XXL": {
+   "name": "Combo HH5 XXL",
+   "type": "combo"
+  },
+  "CBHH5-XL": {
+   "name": "Combo HH5 XL",
+   "type": "combo"
+  },
+  "CBHH5-L": {
+   "name": "Combo HH5 L",
+   "type": "combo"
+  },
+  "CBHH5-M": {
+   "name": "Combo HH 5 M",
+   "type": "combo"
+  },
+  "CBKT-XLXXL": {
+   "name": "Combo Kitty XLXXL",
+   "type": "combo"
+  },
+  "CBKT-LXXL": {
+   "name": "Combo Kitty LXXL",
+   "type": "combo"
+  },
+  "CBKT-LXL": {
+   "name": "Combo Kitty LXL",
+   "type": "combo"
+  },
+  "CBKT-MXXL": {
+   "name": "Combo Kitty MXXL",
+   "type": "combo"
+  },
+  "CBKT-MXL": {
+   "name": "Combo Kitty MXL",
+   "type": "combo"
+  },
+  "CBKT-ML": {
+   "name": "Combo Kitty ML",
+   "type": "combo"
+  },
+  "CBKRM-XLXXL": {
+   "name": "Combo Kuromi XLXXL",
+   "type": "combo"
+  },
+  "CBKRM-LXXL": {
+   "name": "Combo Kuromi LXXL",
+   "type": "combo"
+  },
+  "CBKRM-LXL": {
+   "name": "Combo Kuromi LXL",
+   "type": "combo"
+  },
+  "CBKRM-MXXL": {
+   "name": "Combo Kuromi MXXL",
+   "type": "combo"
+  },
+  "CBKRM-MXL": {
+   "name": "Combo Kuromi MXL",
+   "type": "combo"
+  },
+  "CBKRM-ML": {
+   "name": "Combo Kuromi ML",
+   "type": "combo"
+  },
+  "CBLH-LXXL": {
+   "name": "Combo Lợn Hồng LXXL",
+   "type": "combo"
+  },
+  "CBLH-LXL": {
+   "name": "Combo Lợn Hồng LXL",
+   "type": "combo"
+  },
+  "CBLH-MXXL": {
+   "name": "Combo Lợn Hồng MXXL",
+   "type": "combo"
+  },
+  "CBLH-MXL": {
+   "name": "Combo Lợn Hồng MXL",
+   "type": "combo"
+  },
+  "CBLH-ML": {
+   "name": "Combo Lợn Hồng ML",
+   "type": "combo"
+  },
+  "CBLH-XLXXL": {
+   "name": "Combo Lợn Hồng XLXXL",
+   "type": "combo"
+  },
+  "CBVX-XLXXL": {
+   "name": "Combo Vịt Xanh XLXXL",
+   "type": "combo"
+  },
+  "CBVX-LXXL": {
+   "name": "Combo Vịt Xanh LXXL",
+   "type": "combo"
+  },
+  "CBVX-LXL": {
+   "name": "Combo Vịt Xanh LXL",
+   "type": "combo"
+  },
+  "CBVX-MXXL": {
+   "name": "Combo Vịt Xanh MXL",
+   "type": "combo"
+  },
+  "CBVX-MXL": {
+   "name": "Combo Vịt Xanh MXL",
+   "type": "combo"
+  },
+  "CBVX-ML": {
+   "name": "Combo Vịt Xanh ML",
+   "type": "combo"
+  },
+  "CBKRM-M": {
+   "name": "Combo 2c Kuromi M",
+   "type": "combo"
+  },
+  "CBKRM-L": {
+   "name": "Combo 2c Kuromi L",
+   "type": "combo"
+  },
+  "CBKRM-XL": {
+   "name": "Combo 2c Kuromi XL",
+   "type": "combo"
+  },
+  "CBKRM-XXL": {
+   "name": "Combo 2c Kuromi XXL",
+   "type": "combo"
+  },
+  "CBVX-XXL": {
+   "name": "Combo 2c Vịt Xanh XXL",
+   "type": "combo"
+  },
+  "CBVX-XL": {
+   "name": "Combo 2c Vịt Xanh XL",
+   "type": "combo"
+  },
+  "CBVX-L": {
+   "name": "Combo 2c Vịt Xanh L",
+   "type": "combo"
+  },
+  "CBVX-M": {
+   "name": "Combo 2c Vịt Xanh M",
+   "type": "combo"
+  },
+  "CBLH-M": {
+   "name": "Combo 2c Lợn Hồng M",
+   "type": "combo"
+  },
+  "CBLH-L": {
+   "name": "Combo 2c Lợn Hồng L",
+   "type": "combo"
+  },
+  "CBLH-XL": {
+   "name": "Combo 2c Lợn Hồng XL",
+   "type": "combo"
+  },
+  "CBLH-XXL": {
+   "name": "Combo 2c Lợn Hồng XXL",
+   "type": "combo"
+  },
+  "CBKT-XXL": {
+   "name": "Combo 2c Kitty XXL",
+   "type": "combo"
+  },
+  "CBKT-XL": {
+   "name": "Combo 2c Kitty XL",
+   "type": "combo"
+  },
+  "CBKT-L": {
+   "name": "Combo 2c Kitty L",
+   "type": "combo"
+  },
+  "CBKT-M": {
+   "name": "Combo 2c Kitty M",
+   "type": "combo"
+  },
+  "CBHH4-XXL": {
+   "name": "Combo HH4 XXL",
+   "type": "combo"
+  },
+  "CBHH4-XL": {
+   "name": "Combo HH4 XL",
+   "type": "combo"
+  },
+  "CBHH4-L": {
+   "name": "Combo HH4 L",
+   "type": "combo"
+  },
+  "CBHH4-M": {
+   "name": "Combo HH4 M",
+   "type": "combo"
+  },
+  "CBHH3-XXL": {
+   "name": "Combo HH3 XXL",
+   "type": "combo"
+  },
+  "CBHH3-XL": {
+   "name": "Combo HH3 XL",
+   "type": "combo"
+  },
+  "CBHH3-L": {
+   "name": "Combo HH3 L",
+   "type": "combo"
+  },
+  "CBHH3-M": {
+   "name": "Combo HH3 M",
+   "type": "combo"
+  },
+  "CBHH2-XXL": {
+   "name": "Combo HH2 XXL",
+   "type": "combo"
+  },
+  "CBHH2-XL": {
+   "name": "Combo HH2 XL",
+   "type": "combo"
+  },
+  "CBHH2-L": {
+   "name": "Combo HH2 L",
+   "type": "combo"
+  },
+  "CBHH2-M": {
+   "name": "Combo HH2 M",
+   "type": "combo"
+  },
+  "CBHH1-XXL": {
+   "name": "Combo HH1 XXL",
+   "type": "combo"
+  },
+  "CBHH1-XL": {
+   "name": "Combo HH1 XL",
+   "type": "combo"
+  },
+  "CBHH1-L": {
+   "name": "Combo HH1 L",
+   "type": "combo"
+  },
+  "CBHH1-M": {
+   "name": "Combo HH1 M",
+   "type": "combo"
+  },
+  "HopQuaTang": {
+   "name": "Hộp Quà Tặng",
+   "type": "normal"
+  },
+  "2TatCaoCoDen": {
+   "name": "2 Tất Cao Cổ Đen",
+   "type": "normal"
+  },
+  "2TatCaoCoTrang": {
+   "name": "2 Tất Cao Cổ Trắng",
+   "type": "normal"
+  },
+  "HopQua+2TatDen": {
+   "name": "Hộp Quà+2 Tất Đen",
+   "type": "normal"
+  },
+  "HopQua+2TatTrang": {
+   "name": "Hộp Quà+2 Tất Trắng",
+   "type": "normal"
+  },
+  "CL01-S": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL01-M": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL01-L": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL01-XL": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL01-XXL": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL01-XXXL": {
+   "name": "Chất Lông-Shin",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL02-S": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL02-M": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL02-L": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL02-XL": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL02-XXL": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL02-XXXL": {
+   "name": "Chất Lông-Hello Kitty",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL03-S": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL03-M": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL03-L": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL03-XL": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL03-XXL": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL03-XXXL": {
+   "name": "Chất Lông-Vịt Xanh",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL04-S": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL04-M": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL04-L": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL04-XL": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL04-XXL": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL04-XXXL": {
+   "name": "Chất Lông-Lợn Hồng",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL05-S": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL05-M": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL05-L": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL05-XL": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL05-XXL": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL05-XXXL": {
+   "name": "Chất Lông-Kuromi",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL06-S": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL06-M": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL06-L": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL06-XL": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL06-XXL": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL06-XXXL": {
+   "name": "Chất Lông-Shin 02",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL07-S": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL07-M": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL07-L": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL07-XL": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL07-XXL": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL07-XXXL": {
+   "name": "Chất Lông-Shin 03",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL08-S": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL08-M": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL08-L": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL08-XL": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL08-XXL": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL08-XXXL": {
+   "name": "Chất Lông-Patrick Star",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL09-S": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL09-M": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL09-L": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL09-XL": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL09-XXL": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL09-XXXL": {
+   "name": "Chất Lông-Hello Kitty Hồng",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL10-S": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL10-M": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL10-L": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL10-XL": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL10-XXL": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL10-XXXL": {
+   "name": "Chất Lông-Thỏ Nơ",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL11-S": {
+   "name": "Chất Lông-Caro Hồng",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL11-M": {
+   "name": "Chất Lông-Caro Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL11-L": {
+   "name": "Chất Lông-Caro Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL11-XL": {
+   "name": "Chất Lông-Caro Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL11-XXXL": {
+   "name": "Chất Lông-Caro Hồng",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL12-S": {
+   "name": "Chất Lông-Caro Xanh",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL12-M": {
+   "name": "Chất Lông-Caro Xanh",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL12-L": {
+   "name": "Chất Lông-Caro Xanh",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL12-XL": {
+   "name": "Chất Lông-Caro Xanh",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL12-XXXL": {
+   "name": "Chất Lông-Caro Xanh",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL13-S": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL13-M": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL13-L": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL13-XL": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL13-XXL": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL13-XXXL": {
+   "name": "Chất Lông-Kẻ Xanh",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "CL14-S": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "S"
+  },
+  "CL14-M": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "CL14-L": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "CL14-XL": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "CL14-XXL": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "CL14-XXXL": {
+   "name": "Chất Lông-Đốm Hồng",
+   "type": "normal",
+   "size": "XXXL"
+  },
+  "SCR-DO-M": {
+   "name": "Đỏ",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-DO-L": {
+   "name": "Đỏ",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-DO-XL": {
+   "name": "Đỏ",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-DEN-M": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-DEN-L": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-DEN-XL": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-HONG-M": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-HONG-L": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-HONG-XL": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-HONGCC-M": {
+   "name": "Hồng Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-HONGCC-L": {
+   "name": "Hồng Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-HONGCC-XL": {
+   "name": "Hồng Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-BE-M": {
+   "name": "Be Nhạt Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-BE-L": {
+   "name": "Be Nhạt Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-BE-XL": {
+   "name": "Be Nhạt Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-XANH-M": {
+   "name": "Xanh Dương Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-XANH-L": {
+   "name": "Xanh Dương Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-XANH-XL": {
+   "name": "Xanh Dương Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-DOCC-M": {
+   "name": "Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-DOCC-L": {
+   "name": "Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-DOCC-XL": {
+   "name": "Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "SCR-DENCC-M": {
+   "name": "Đen Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "SCR-DENCC-L": {
+   "name": "Đen Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "SCR-DENCC-XL": {
+   "name": "Đen Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD06-T-M": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD06-K-L": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD06-D-S": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "S"
+  },
+  "QD06-K-XL": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD06-D-L": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD06-D-XL": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD06-K-M": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD06-T-S": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "S"
+  },
+  "QD06-T-XL": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD06-K-S": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "S"
+  },
+  "QD06-T-L": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD06-D-M": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "M"
+  },
+  "B05-M-L": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "L"
+  },
+  "B05-M-S": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "S"
+  },
+  "B05-T-M": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "M"
+  },
+  "B05-M-XL": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B05-M-M": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "M"
+  },
+  "B05-T-S": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "S"
+  },
+  "B05-T-L": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "L"
+  },
+  "B05-T-XL": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD05-S": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "S"
+  },
+  "QD05-M": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD05-L": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD05-XL": {
+   "name": "Trắng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD08-K-M": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD08-K-L": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD08-K-XL": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD08-C-M": {
+   "name": "3 Sọc",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD08-C-L": {
+   "name": "3 Sọc",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD08-C-XL": {
+   "name": "3 Sọc",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B01-T-S": {
+   "name": "Đen-Gấu Thường",
+   "type": "normal",
+   "size": "S"
+  },
+  "B01-T-M": {
+   "name": "Đen-Gấu Thường",
+   "type": "normal",
+   "size": "M"
+  },
+  "B01-T-L": {
+   "name": "Đen-Gấu Thường",
+   "type": "normal",
+   "size": "L"
+  },
+  "B01-T-XL": {
+   "name": "Đen-Gấu Thường",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B01-T-XXL": {
+   "name": "Đen-Gấu Thường",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "B02-T-S": {
+   "name": "Xanh Nhạt-Gấu Thường",
+   "type": "normal",
+   "size": "S"
+  },
+  "B02-T-M": {
+   "name": "Xanh Nhạt-Gấu Thường",
+   "type": "normal",
+   "size": "M"
+  },
+  "B02-T-L": {
+   "name": "Xanh Nhạt-Gấu Thường",
+   "type": "normal",
+   "size": "L"
+  },
+  "B02-T-XL": {
+   "name": "Xanh Nhạt-Gấu Thường",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B02-T-XXL": {
+   "name": "Xanh Nhạt-Gấu Thường",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "PK03-D": {
+   "name": "Đen",
+   "type": "normal"
+  },
+  "PK03-T": {
+   "name": "Trắng",
+   "type": "normal"
+  },
+  "QN01-S": {
+   "name": "Ống Thường",
+   "type": "normal",
+   "size": "S"
+  },
+  "QN01-M": {
+   "name": "Ống Thường",
+   "type": "normal",
+   "size": "M"
+  },
+  "QN01-L": {
+   "name": "Ống Thường",
+   "type": "normal",
+   "size": "L"
+  },
+  "QN01-XL": {
+   "name": "Ống Thường",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QN01-XXL": {
+   "name": "Ống Thường",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "QN02-S": {
+   "name": "Ông Jogger",
+   "type": "normal",
+   "size": "S"
+  },
+  "QN02-M": {
+   "name": "Ông Jogger",
+   "type": "normal",
+   "size": "M"
+  },
+  "QN02-L": {
+   "name": "Ông Jogger",
+   "type": "normal",
+   "size": "L"
+  },
+  "QN02-XL": {
+   "name": "Ông Jogger",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QN02-XXL": {
+   "name": "Ông Jogger",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "B06-T-XL": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B06-T-M": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "M"
+  },
+  "B06-M-S": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "S"
+  },
+  "B06-T-L": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "L"
+  },
+  "B06-T-S": {
+   "name": "Thường",
+   "type": "normal",
+   "size": "S"
+  },
+  "B06-M-XL": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "XL"
+  },
+  "B06-M-L": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "L"
+  },
+  "B06-M-M": {
+   "name": "Mài (Cắt Gấu)",
+   "type": "normal",
+   "size": "M"
+  },
+  "J07-M-31": {
+   "name": "Mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "J07-T-31": {
+   "name": "Suông",
+   "type": "normal",
+   "size": "31"
+  },
+  "J07-T-32": {
+   "name": "Suông",
+   "type": "normal",
+   "size": "32"
+  },
+  "J07-M-28": {
+   "name": "Mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "J07-M-32": {
+   "name": "Mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "J07-T-30": {
+   "name": "Suông",
+   "type": "normal",
+   "size": "30"
+  },
+  "J07-M-29": {
+   "name": "Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "J07-M-30": {
+   "name": "Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "J07-T-29": {
+   "name": "Suông",
+   "type": "normal",
+   "size": "29"
+  },
+  "J07-T-28": {
+   "name": "Suông",
+   "type": "normal",
+   "size": "28"
+  },
+  "AB01-D-M": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "M"
+  },
+  "AB01-D-L": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "L"
+  },
+  "AB01-D-XL": {
+   "name": "Đen",
+   "type": "normal",
+   "size": "XL"
+  },
+  "AB01-X-M": {
+   "name": "Xanh",
+   "type": "normal",
+   "size": "M"
+  },
+  "AB01-X-L": {
+   "name": "Xanh",
+   "type": "normal",
+   "size": "L"
+  },
+  "AB01-X-XL": {
+   "name": "Xanh",
+   "type": "normal",
+   "size": "XL"
+  },
+  "V01-K-31": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "31"
+  },
+  "V01-K-29": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "29"
+  },
+  "V01-K-32": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "32"
+  },
+  "V01-K-30": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "30"
+  },
+  "V02-28": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "28"
+  },
+  "V02-31": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "31"
+  },
+  "V02-32": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "32"
+  },
+  "V01-D-33": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "33"
+  },
+  "V01-D-32": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "32"
+  },
+  "V02-33": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "33"
+  },
+  "V01-D-28": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "28"
+  },
+  "V01-D-30": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "30"
+  },
+  "V01-D-31": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "31"
+  },
+  "V01-K-33": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "33"
+  },
+  "V02-29": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "29"
+  },
+  "V02-30": {
+   "name": "Cạp Sidetab -Màu Đen",
+   "type": "normal",
+   "size": "30"
+  },
+  "V01-D-29": {
+   "name": "Cạp Thường- Màu Đen",
+   "type": "normal",
+   "size": "29"
+  },
+  "V01-K-28": {
+   "name": "Cạp Thường- Kem Sữa",
+   "type": "normal",
+   "size": "28"
+  },
+  "J01-T-28": {
+   "name": "J01",
+   "type": "normal",
+   "size": "28"
+  },
+  "J01-T-29": {
+   "name": "J01",
+   "type": "normal",
+   "size": "29"
+  },
+  "J01-T-30": {
+   "name": "J01",
+   "type": "normal",
+   "size": "30"
+  },
+  "J01-T-31": {
+   "name": "J01",
+   "type": "normal",
+   "size": "31"
+  },
+  "J01-T-32": {
+   "name": "J01",
+   "type": "normal",
+   "size": "32"
+  },
+  "J01-T-33": {
+   "name": "J01",
+   "type": "normal",
+   "size": "33"
+  },
+  "J01-T-34": {
+   "name": "J01",
+   "type": "normal",
+   "size": "34"
+  },
+  "J02-T-28": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "J02-T-29": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "J02-T-30": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "J02-T-31": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "J02-T-32": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "J02-T-34": {
+   "name": "J02-Gấu thường",
+   "type": "normal",
+   "size": "34"
+  },
+  "J02-M-28": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "J02-M-29": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "J02-M-30": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "J02-M-31": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "J02-M-32": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "J02-M-33": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "33"
+  },
+  "J02-M-34": {
+   "name": "J02-Gấu mài",
+   "type": "normal",
+   "size": "34"
+  },
+  "J03-T-28": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "J03-T-29": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "J03-T-30": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "J03-T-31": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "J03-T-32": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "J03-T-33": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "33"
+  },
+  "J03-T-34": {
+   "name": "J03-Gấu Thường",
+   "type": "normal",
+   "size": "34"
+  },
+  "J03-M-28": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "J03-M-29": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "J03-M-30": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "J03-M-31": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "J03-M-32": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "J03-M-33": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "33"
+  },
+  "J03-M-34": {
+   "name": "J03- Gấu Mài",
+   "type": "normal",
+   "size": "34"
+  },
+  "J04-T-28": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "J04-T-29": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "J04-T-30": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "J04-T-31": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "J04-T-32": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "J04-T-33": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "33"
+  },
+  "J04-T-34": {
+   "name": "J04-Gấu Thường",
+   "type": "normal",
+   "size": "34"
+  },
+  "J04-M-28": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "J04-M-29": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "J04-M-30": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "J04-M-31": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "J04-M-32": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "J04-M-33": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "33"
+  },
+  "J04-M-34": {
+   "name": "J04- Gấu Mài",
+   "type": "normal",
+   "size": "34"
+  },
+  "QD07-K-L": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD07-K-XL": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD07-C-M": {
+   "name": "Trắng trơn",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD07-C-L": {
+   "name": "Trắng trơn",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD07-C-XL": {
+   "name": "Trắng trơn",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD07-K-M": {
+   "name": "Đen Trơn",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD09-K-M": {
+   "name": "Không Giải Rút",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD09-K-L": {
+   "name": "Không Giải Rút",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD09-K-XL": {
+   "name": "Không Giải Rút",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD09-C-M": {
+   "name": "Có Giải Rút",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD09-C-L": {
+   "name": "Có Giải Rút",
+   "type": "normal",
+   "size": "L"
+  },
+  "QD09-C-XL": {
+   "name": "Có Giải Rút",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD04-XL": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "XL"
+  },
+  "QD04-S": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "S"
+  },
+  "QD04-M": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "M"
+  },
+  "QD04-L": {
+   "name": "Kem",
+   "type": "normal",
+   "size": "L"
+  },
+  "X02-M-28": {
+   "name": "X02-Mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "X01-M-29": {
+   "name": "X01-Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "X02-M-26": {
+   "name": "X02-Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "X01-T-31": {
+   "name": "X01-Thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "X01-T-32": {
+   "name": "X01-Thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "X04-M-31": {
+   "name": "X04-Mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "X01-T-28": {
+   "name": "X01-Thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "X02-T-28": {
+   "name": "X02-Thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "X04-T-31": {
+   "name": "X04-Thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "X02-T-31": {
+   "name": "X02-Thường",
+   "type": "normal",
+   "size": "31"
+  },
+  "X02-T-32": {
+   "name": "X02-Thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "X02-M-31": {
+   "name": "X02-Mài",
+   "type": "normal",
+   "size": "31"
+  },
+  "X01-M-30": {
+   "name": "X01-Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "X04-T-30": {
+   "name": "X04-Thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "X04-M-29": {
+   "name": "X04-Mài",
+   "type": "normal",
+   "size": "29"
+  },
+  "X01-T-29": {
+   "name": "X01-Thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "X02-T-29": {
+   "name": "X02-Thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "X0-M-32": {
+   "name": "X01-Mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "X04-M-30": {
+   "name": "X04-Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "X02-M-30": {
+   "name": "X02-Mài",
+   "type": "normal",
+   "size": "30"
+  },
+  "X04-T-29": {
+   "name": "X04-Thường",
+   "type": "normal",
+   "size": "29"
+  },
+  "X01-T-30": {
+   "name": "X01-Thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "X02-T-30": {
+   "name": "X02-Thường",
+   "type": "normal",
+   "size": "30"
+  },
+  "X04-M-28": {
+   "name": "X04-Mài",
+   "type": "normal",
+   "size": "28"
+  },
+  "X04-M-32": {
+   "name": "X04-Thường",
+   "type": "normal",
+   "size": "32"
+  },
+  "X04-T-28": {
+   "name": "X04-Thường",
+   "type": "normal",
+   "size": "28"
+  },
+  "X02-M-32": {
+   "name": "X02-Mài",
+   "type": "normal",
+   "size": "32"
+  },
+  "DO03-M": {
+   "name": "Đỏ 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO03-L": {
+   "name": "Đỏ 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO03-XL": {
+   "name": "Đỏ 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO03-XXL": {
+   "name": "Đỏ 03",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DEN02-M": {
+   "name": "Đen 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "DEN02-L": {
+   "name": "Đen 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "DEN02-XL": {
+   "name": "Đen 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DEN02-XXL": {
+   "name": "Đen 02",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DO04-M": {
+   "name": "Đỏ 04",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO04-L": {
+   "name": "Đỏ 04",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO04-XL": {
+   "name": "Đỏ 04",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO04-XXL": {
+   "name": "Đỏ 04",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "XANHTHAN-M": {
+   "name": "Xanh Than",
+   "type": "normal",
+   "size": "M"
+  },
+  "XANHTHAN-L": {
+   "name": "Xanh Than",
+   "type": "normal",
+   "size": "L"
+  },
+  "XANHTHAN-XL": {
+   "name": "Xanh Than",
+   "type": "normal",
+   "size": "XL"
+  },
+  "XANHTHAN-XXL": {
+   "name": "Xanh Than",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "HONG-M": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "M"
+  },
+  "HONG-L": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "L"
+  },
+  "HONG-XL": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "XL"
+  },
+  "HONG-XXL": {
+   "name": "Hồng",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DO01-M": {
+   "name": "Đỏ 01",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO01-L": {
+   "name": "Đỏ 01",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO01-XL": {
+   "name": "Đỏ 01",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO01-XXL": {
+   "name": "Đỏ 01",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "XANHLA03-M": {
+   "name": "Xanh Lá 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "XANHLA03-L": {
+   "name": "Xanh Lá 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "XANHLA03-XL": {
+   "name": "Xanh Lá 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "XANHLA03-XXL": {
+   "name": "Xanh Lá 03",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DO03BANNANGCAP-M": {
+   "name": "Đỏ 03 Cao Cấp(Noel)",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO03BANNANGCAP-L": {
+   "name": "Đỏ 03 Cao Cấp(Noel)",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO03BANNANGCAP-XL": {
+   "name": "Đỏ 03 Cao Cấp(Noel)",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO03BANNANGCAP-XXL": {
+   "name": "Đỏ 03 Cao Cấp(Noel)",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "XANHLA02-M": {
+   "name": "Xanh Lá 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "XANHLA02-L": {
+   "name": "Xanh Lá 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "XANHLA02-XL": {
+   "name": "Xanh Lá 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "XANHLA02-XXL": {
+   "name": "Xanh Lá 02",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DEN03-M": {
+   "name": "Đen 03",
+   "type": "normal",
+   "size": "M"
+  },
+  "DEN03-L": {
+   "name": "Đen 03",
+   "type": "normal",
+   "size": "L"
+  },
+  "DEN03-XL": {
+   "name": "Đen 03",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DEN03-XXL": {
+   "name": "Đen 03",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DEN04-M": {
+   "name": "Đen 04",
+   "type": "normal",
+   "size": "M"
+  },
+  "DEN04-L": {
+   "name": "Đen 04",
+   "type": "normal",
+   "size": "L"
+  },
+  "DEN04-XL": {
+   "name": "Đen 04",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DEN04-XXL": {
+   "name": "Đen 04",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DADEN-M": {
+   "name": "Chất Dạ Đen Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "DADEN-L": {
+   "name": "Chất Dạ Đen Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "DADEN-XL": {
+   "name": "Chất Dạ Đen Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DADEN-XXL": {
+   "name": "Chất Dạ Đen Cao Cấp",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DADO-M": {
+   "name": "Chất Dạ Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "M"
+  },
+  "DADO-L": {
+   "name": "Chất Dạ Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "L"
+  },
+  "DADO-XL": {
+   "name": "Chất Dạ Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DADO-XXL": {
+   "name": "Chất Dạ Đỏ Cao Cấp",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "XANHLA01-M": {
+   "name": "Xanh Cây Đậm",
+   "type": "normal",
+   "size": "M"
+  },
+  "XANHLA01-L": {
+   "name": "Xanh Cây Đậm",
+   "type": "normal",
+   "size": "L"
+  },
+  "XANHLA01-XL": {
+   "name": "Xanh Cây Đậm",
+   "type": "normal",
+   "size": "XL"
+  },
+  "XANHLA01-XXL": {
+   "name": "Xanh Cây Đậm",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DO02-M": {
+   "name": "Đỏ 02",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO02-L": {
+   "name": "Đỏ 02",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO02-XL": {
+   "name": "Đỏ 02",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO02-XXL": {
+   "name": "Đỏ 02",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "DO05-M": {
+   "name": "Đỏ 05",
+   "type": "normal",
+   "size": "M"
+  },
+  "DO05-L": {
+   "name": "Đỏ 05",
+   "type": "normal",
+   "size": "L"
+  },
+  "DO05-XL": {
+   "name": "Đỏ 05",
+   "type": "normal",
+   "size": "XL"
+  },
+  "DO05-XXL": {
+   "name": "Đỏ 05",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "XANHLA05-M": {
+   "name": "Xanh Lá 05",
+   "type": "normal",
+   "size": "M"
+  },
+  "XANHLA05-L": {
+   "name": "Xanh Lá 05",
+   "type": "normal",
+   "size": "L"
+  },
+  "XANHLA05-XL": {
+   "name": "Xanh Lá 05",
+   "type": "normal",
+   "size": "XL"
+  },
+  "XANHLA05-XXL": {
+   "name": "Xanh Lá 05",
+   "type": "normal",
+   "size": "XXL"
+  },
+  "PK01": {
+   "name": "Đen",
+   "type": "normal"
+  }
+ },
+ "combos": {
+  "CBHH1-M": [
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   }
+  ],
+  "CBHH1-L": [
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CBHH1-XL": [
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH1-XXL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH2-M": [
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   }
+  ],
+  "CBHH2-L": [
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CBHH2-XL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH2-XXL": [
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH3-M": [
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   }
+  ],
+  "CBHH3-L": [
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CBHH3-XL": [
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH3-XXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH4-M": [
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   }
+  ],
+  "CBHH4-L": [
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CBHH4-XL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH4-XXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CBKT-M": [
+   {
+    "sku": "CL02-M",
+    "qty": 2
+   }
+  ],
+  "CBKT-L": [
+   {
+    "sku": "CL02-L",
+    "qty": 2
+   }
+  ],
+  "CBKT-XL": [
+   {
+    "sku": "CL02-XL",
+    "qty": 2
+   }
+  ],
+  "CBKT-XXL": [
+   {
+    "sku": "CL02-XXL",
+    "qty": 2
+   }
+  ],
+  "CBLH-XXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 2
+   }
+  ],
+  "CBLH-XL": [
+   {
+    "sku": "CL04-XL",
+    "qty": 2
+   }
+  ],
+  "CBLH-L": [
+   {
+    "sku": "CL04-L",
+    "qty": 2
+   }
+  ],
+  "CBLH-M": [
+   {
+    "sku": "CL04-M",
+    "qty": 2
+   }
+  ],
+  "CBVX-M": [
+   {
+    "sku": "CL03-M",
+    "qty": 2
+   }
+  ],
+  "CBVX-L": [
+   {
+    "sku": "CL03-L",
+    "qty": 2
+   }
+  ],
+  "CBVX-XL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 2
+   }
+  ],
+  "CBVX-XXL": [
+   {
+    "sku": "CL03-XXL",
+    "qty": 2
+   }
+  ],
+  "CBKRM-XXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 2
+   }
+  ],
+  "CBKRM-XL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 2
+   }
+  ],
+  "CBKRM-L": [
+   {
+    "sku": "CL05-L",
+    "qty": 2
+   }
+  ],
+  "CBKRM-M": [
+   {
+    "sku": "CL05-M",
+    "qty": 2
+   }
+  ],
+  "CBVX-ML": [
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   }
+  ],
+  "CBVX-MXL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   }
+  ],
+  "CBVX-MXXL": [
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   }
+  ],
+  "CBVX-LXL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   }
+  ],
+  "CBVX-LXXL": [
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   }
+  ],
+  "CBVX-XLXXL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   }
+  ],
+  "CBLH-XLXXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   }
+  ],
+  "CBLH-ML": [
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   }
+  ],
+  "CBLH-MXL": [
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   }
+  ],
+  "CBLH-MXXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   }
+  ],
+  "CBLH-LXL": [
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   }
+  ],
+  "CBLH-LXXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   }
+  ],
+  "CBKRM-ML": [
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   }
+  ],
+  "CBKRM-MXL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   }
+  ],
+  "CBKRM-MXXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   }
+  ],
+  "CBKRM-LXL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   }
+  ],
+  "CBKRM-LXXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   }
+  ],
+  "CBKRM-XLXXL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   }
+  ],
+  "CBKT-ML": [
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBKT-MXL": [
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBKT-MXXL": [
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBKT-LXL": [
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   }
+  ],
+  "CBKT-LXXL": [
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   }
+  ],
+  "CBKT-XLXXL": [
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH5-M": [
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBHH5-L": [
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   }
+  ],
+  "CBHH5-XL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH5-XXL": [
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH6-M": [
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBHH6-L": [
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   }
+  ],
+  "CBHH6-XL": [
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH6-XXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH7-M": [
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-M",
+    "qty": 1
+   }
+  ],
+  "CBHH7-L": [
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-L",
+    "qty": 1
+   }
+  ],
+  "CBHH7-XL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH7-XXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL02-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH8-M": [
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   }
+  ],
+  "CBHH8-L": [
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   }
+  ],
+  "CBHH8-XL": [
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH8-XXL": [
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH9-M": [
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-M",
+    "qty": 1
+   }
+  ],
+  "CBHH9-L": [
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-L",
+    "qty": 1
+   }
+  ],
+  "CBHH9-XL": [
+   {
+    "sku": "CL03-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH9-XXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL03-XXL",
+    "qty": 1
+   }
+  ],
+  "CBHH10-M": [
+   {
+    "sku": "CL05-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-M",
+    "qty": 1
+   }
+  ],
+  "CBHH10-L": [
+   {
+    "sku": "CL05-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-L",
+    "qty": 1
+   }
+  ],
+  "CBHH10-XL": [
+   {
+    "sku": "CL05-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-XL",
+    "qty": 1
+   }
+  ],
+  "CBHH10-XXL": [
+   {
+    "sku": "CL05-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL04-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-L-M": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XL-L": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XXL-XL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-M-L": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-L-XL": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XL-XXL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-L-M": [
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XL-L": [
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XXL-XL": [
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-M-L": [
+   {
+    "sku": "CL11-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-L-XL": [
+   {
+    "sku": "CL11-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL12CL11-XLXXL": [
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-M-M": [
+   {
+    "sku": "CL01-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL01CL01-M-L": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-M-XL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-M-XXL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-L-L": [
+   {
+    "sku": "CL01-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL01CL01-L-XL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-L-XXL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-XL-XL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL01CL01-XL-XXL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL01-XXL-XXL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 2
+   }
+  ],
+  "CB-CL06CL06-M-M": [
+   {
+    "sku": "CL06-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL06CL06-M-L": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-M-XL": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-M-XXL": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-L-L": [
+   {
+    "sku": "CL06-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL06CL06-L-XL": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-L-XXL": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-XL-XL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL06CL06-XL-XXL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL06-XXL-XXL": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 2
+   }
+  ],
+  "CB-CL07CL07-M-M": [
+   {
+    "sku": "CL07-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL07CL07-M-L": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-M-XL": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-M-XXL": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-L-L": [
+   {
+    "sku": "CL07-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL07CL07-L-XL": [
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-L-XXL": [
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-XL-XL": [
+   {
+    "sku": "CL07-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL07CL07-XL-XXL": [
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL07-XXL-XXL": [
+   {
+    "sku": "CL07-XXL",
+    "qty": 2
+   }
+  ],
+  "CB-CL08CL08-M-M": [
+   {
+    "sku": "CL08-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL08CL08-M-L": [
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-M-XL": [
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-M-XXL": [
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-L-L": [
+   {
+    "sku": "CL08-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL08CL08-L-XL": [
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-L-XXL": [
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-XL-XL": [
+   {
+    "sku": "CL08-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL08CL08-XL-XXL": [
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL08CL08-XXL-XXL": [
+   {
+    "sku": "CL08-XXL",
+    "qty": 2
+   }
+  ],
+  "CB-CL09CL09-M-M": [
+   {
+    "sku": "CL09-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL09CL09-M-L": [
+   {
+    "sku": "CL09-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL09-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL09CL09-M-XL": [
+   {
+    "sku": "CL09-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL09-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL09CL09-L-L": [
+   {
+    "sku": "CL09-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL09CL09-L-XL": [
+   {
+    "sku": "CL09-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL09-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL09CL09-XL-XL": [
+   {
+    "sku": "CL09-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL10CL10-M-M": [
+   {
+    "sku": "CL10-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL10CL10-M-L": [
+   {
+    "sku": "CL10-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL10-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL10CL10-M-XL": [
+   {
+    "sku": "CL10-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL10-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL10CL10-L-L": [
+   {
+    "sku": "CL10-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL10CL10-L-XL": [
+   {
+    "sku": "CL10-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL10-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL10CL10-XL-XL": [
+   {
+    "sku": "CL10-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL11CL11-M-M": [
+   {
+    "sku": "CL11-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL11CL11-M-L": [
+   {
+    "sku": "CL11-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL11-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL11-M-XL": [
+   {
+    "sku": "CL11-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL11-L-L": [
+   {
+    "sku": "CL11-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL11CL11-L-XL": [
+   {
+    "sku": "CL11-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL11-XL-XL": [
+   {
+    "sku": "CL11-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL12CL12-M-M": [
+   {
+    "sku": "CL12-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL12CL12-M-L": [
+   {
+    "sku": "CL12-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL12CL12-M-XL": [
+   {
+    "sku": "CL12-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL12CL12-L-L": [
+   {
+    "sku": "CL12-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL12CL12-L-XL": [
+   {
+    "sku": "CL12-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL12CL12-XL-XL": [
+   {
+    "sku": "CL12-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL14CL14-M-M": [
+   {
+    "sku": "CL14-M",
+    "qty": 2
+   }
+  ],
+  "CB-CL14CL14-M-L": [
+   {
+    "sku": "CL14-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL14-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL14CL14-M-XL": [
+   {
+    "sku": "CL14-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL14-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL14CL14-L-L": [
+   {
+    "sku": "CL14-L",
+    "qty": 2
+   }
+  ],
+  "CB-CL14CL14-L-XL": [
+   {
+    "sku": "CL14-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL14-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL14CL14-XL-XL": [
+   {
+    "sku": "CL14-XL",
+    "qty": 2
+   }
+  ],
+  "CB-CL01CL06-M-M": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-M-L": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-M-XL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-M-XXL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-L-L": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-L-XL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-L-XXL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XL-M": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XL-XL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XL-XXL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XXL-M": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XXL-L": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL06-XXL-XXL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-M-M": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-M-L": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-M-XL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-M-XXL": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-L-M": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-L-L": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-L-XL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-L-XXL": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XL-M": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XL-L": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XL-XL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XL-XXL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XXL-M": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XXL-L": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XXL-XL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL08-XXL-XXL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-M-M": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-M-XL": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-M-XXL": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-L-M": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-L-L": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-L-XXL": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XL-M": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XL-L": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XL-XL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XXL-M": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XXL-L": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XXL-XL": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL07-XXL-XXL": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-M-M": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-M-L": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-M-XL": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-M-XXL": [
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-L-L": [
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-L-XL": [
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-L-XXL": [
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XL-M": [
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XL-XL": [
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XL-XXL": [
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XXL-M": [
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XXL-L": [
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL07CL08-XXL-XXL": [
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-M-M": [
+   {
+    "sku": "CL11-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-M-XL": [
+   {
+    "sku": "CL11-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-L-M": [
+   {
+    "sku": "CL11-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-L-L": [
+   {
+    "sku": "CL11-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-XL-M": [
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-XL-L": [
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL11CL12-XL-XL": [
+   {
+    "sku": "CL11-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL12-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL07-M-M": [
+   {
+    "sku": "CL01-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL07-L-L": [
+   {
+    "sku": "CL01-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL07-XL-XL": [
+   {
+    "sku": "CL01-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL01CL07-XXL-XXL": [
+   {
+    "sku": "CL01-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL07-XXL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL08-M-M": [
+   {
+    "sku": "CL06-M",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-M",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL08-L-L": [
+   {
+    "sku": "CL06-L",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-L",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL08-XL-XL": [
+   {
+    "sku": "CL06-XL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XL",
+    "qty": 1
+   }
+  ],
+  "CB-CL06CL08-XXL-XXL": [
+   {
+    "sku": "CL06-XXL",
+    "qty": 1
+   },
+   {
+    "sku": "CL08-XXL",
+    "qty": 1
+   }
+  ]
+ }
+}

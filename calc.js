@@ -10,6 +10,10 @@ function nfc(s){ return (typeof s === 'string') ? s.normalize('NFC') : s; }
 
 const RE_VN_THOUSANDS = /^-?\d{1,3}(\.\d{3})+$/;
 const RE_VN_DECIMAL = /^-?\d{1,3}(\.\d{3})*,\d+$/;
+// Định dạng tiếng Anh (lỗi #8 doc Chuẩn hoá 10/2026): "1,234.56" / "1,234,567"
+// — phẩy ngăn nghìn, chấm thập phân. Trước đây rơi vào nhánh "có , không ." →
+// thay , bằng . → "1,234" đọc ra 1.234 (sai cả nghìn lần) mà không cảnh báo.
+const RE_EN_THOUSANDS_DEC = /^-?\d{1,3}(,\d{3})+(\.\d+)?$/;
 
 function num(v){
   if (v === null || v === undefined || v === '' || v === '-') return 0;
@@ -21,6 +25,7 @@ function num(v){
   let s2;
   if (RE_VN_THOUSANDS.test(s)) s2 = s.replace(/\./g, '');
   else if (RE_VN_DECIMAL.test(s)) s2 = s.replace(/\./g, '').replace(',', '.');
+  else if (RE_EN_THOUSANDS_DEC.test(s)) s2 = s.replace(/,/g, '');
   else if (s.includes(',') && !s.includes('.')) s2 = s.replace(',', '.');
   else s2 = s;
   const f = parseFloat(s2);
@@ -92,6 +97,79 @@ function toDate(v){
   if (m) return new Date(+m[1], +m[2]-1, +m[3]);
   m = s.match(/^(\d{2})\/(\d{2})\/(\d{4})/);
   if (m) return new Date(+m[3], +m[2]-1, +m[1]);
+  return null;
+}
+
+// ============================================================
+// Map trạng thái đơn → 4 trạng thái chuẩn (lỗi #7 doc Chuẩn hoá 10/2026):
+// trước đây so CỨNG đúng chuỗi ('Hoàn thành', 'Đã hủy'...) — sàn đổi chữ là
+// huỷ = 0, hoàn thành = 0 mà không ai biết. Giờ map theo bảng + chữ lạ thì
+// CẢNH BÁO ĐỎ trên dashboard (computeAllFromAOA gom unknown qua statusWarn).
+// 4 trạng thái chuẩn: 'hoan_thanh' | 'huy' | 'dang_xu_ly' | 'cho_thanh_toan'
+// ============================================================
+function spStatusNorm(raw){
+  const s = nfc(String(raw || '')).trim();
+  if (s === 'Hoàn thành') return 'hoan_thanh';
+  if (s === 'Đã hủy' || s === 'Đã huỷ') return 'huy';
+  if (s === 'Chưa thanh toán' || s === 'Chờ thanh toán') return 'cho_thanh_toan';
+  // các trạng thái giữa đường Shopee hay gặp — đều là "đang xử lý"
+  if (s.startsWith('Người mua xác nhận')) return 'dang_xu_ly';
+  if (['Đang giao', 'Đã giao', 'Chờ lấy hàng', 'Đang vận chuyển', 'Vận chuyển', 'Đã xử lý', 'Chờ xác nhận', 'Đang xử lý'].includes(s)) return 'dang_xu_ly';
+  return null; // chữ lạ — người gọi tự cảnh báo
+}
+function ttStatusNorm(raw){
+  const s = nfc(String(raw || '')).trim();
+  if (s === 'Đã hoàn tất') return 'hoan_thanh';
+  if (s === 'Đã hủy' || s === 'Đã huỷ') return 'huy';
+  if (s === 'Chưa thanh toán' || s === 'Chờ thanh toán') return 'cho_thanh_toan';
+  if (['Đã vận chuyển', 'Đang vận chuyển', 'Chờ vận chuyển', 'Chờ lấy hàng', 'Đã giao hàng', 'Đang xử lý'].includes(s)) return 'dang_xu_ly';
+  return null;
+}
+
+// ============================================================
+// Danh mục SKU từ Sapo (lỗi #1): sku-catalog.json sinh bởi
+// tools/build_sku_catalog.py — init.js tải vào window.SKU_CATALOG trước khi
+// tính; Node test gán globalThis.SKU_CATALOG. Không có catalog → calc vẫn
+// chạy bằng bảng dự phòng SKU_FALLBACK_NAME trong computeAllFromAOA.
+// ============================================================
+function getSkuCatalog(){
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  const c = g.SKU_CATALOG;
+  if (!c || !c.variants) return null;
+  if (!c.__norm){
+    // build 1 lần: map theo khoá chuẩn hoá (bỏ ký tự lạ, hoa thường) để chấp
+    // mã Shopee bị rút ngắn/lệch ký tự so với Sapo/TikTok
+    const variants = {}, combos = {};
+    for (const [sku, v] of Object.entries(c.variants)) variants[normSkuKey(sku)] = Object.assign({ sku }, v);
+    for (const [sku, items] of Object.entries(c.combos || {})) combos[normSkuKey(sku)] = items;
+    c.__norm = { variants, combos };
+  }
+  return c.__norm;
+}
+function normSkuKey(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
+
+// Giá vốn 1 cái theo MÃ SKU GỐC — cost-catalog.json (sinh từ sheet GiaCong cột
+// H của chủ shop, xem ghi chú trong file đó). init.js tải vào
+// window.COST_CATALOG trước khi tính; thiếu file → P&L phần giá vốn hiện "—".
+function getCostCatalog(){
+  const g = (typeof window !== 'undefined') ? window : globalThis;
+  const c = g.COST_CATALOG;
+  if (!c || !c.cost) return null;
+  if (!c.__norm){
+    const m = {};
+    for (const [k, v] of Object.entries(c.cost)) m[normSkuKey(k)] = num(v);
+    c.__norm = m;
+  }
+  return c.__norm;
+}
+
+// Dò cột theo TỪ KHOÁ (regex) trên header thật — dùng chung mọi nơi đọc cột
+// theo tên, không so cứng tuyệt đối (sàn hay đổi nhẹ tên cột).
+function findColKey(headerKeys, patterns){
+  for (const p of patterns){
+    const hit = headerKeys.find(k => p.test(String(k || '').trim()));
+    if (hit) return hit;
+  }
   return null;
 }
 
@@ -353,14 +431,23 @@ async function computeAll(files){
   const wbVid = files.tiktokVideoAnalysis ? await readWorkbook(files.tiktokVideoAnalysis) : null;
   const wbCreatorList = files.tiktokCreatorList ? await readWorkbook(files.tiktokCreatorList) : null;
   const wbLiveList = files.tiktokLiveList ? await readWorkbook(files.tiktokLiveList) : null;
+  // "Chốt lại tháng" (lỗi #5): file trả/hoàn của THÁNG SAU — tuỳ chọn, chỉ có
+  // khi bấm nút Chốt lại tháng (init.js tự tải từ bản ghi tháng N+1 đã lưu).
+  const wbRrNext = files.nextShopeeReturnRefund ? await readWorkbook(files.nextShopeeReturnRefund) : null;
+  const wbTrNext = files.nextTiktokReturns ? await readWorkbook(files.nextTiktokReturns) : null;
 
   const aoa = {
     shopeeOrders: sheetToAOA(getSheet(wbSp, 'orders')),
     shopeeReturnRefund: sheetToAOA(getSheet(wbRr)),
+    shopeeReturnRefundNext: wbRrNext ? sheetToAOA(getSheet(wbRrNext)) : null,
     tiktokOrders: sheetToAOA(getSheet(wbTt, 'OrderSKUList')),
     tiktokReturns: sheetToAOA(getSheet(wbTr)),
+    tiktokReturnsNext: wbTrNext ? sheetToAOA(getSheet(wbTrNext)) : null,
     income_DoanhThu: sheetToAOA(getSheet(wbInc, 'Doanh thu')),
     income_ServiceFee: sheetToAOA(getSheet(wbInc, 'Service Fee Details')),
+    // chỉ lấy khi sheet Adjustment thật sự tồn tại — getSheet() fallback về
+    // sheet đầu (Summary) sẽ làm findLabeledValue vớ nhầm số ở sheet khác
+    income_Adjustment: wbInc.SheetNames.some(n => nfc(n) === 'Adjustment') ? sheetToAOA(getSheet(wbInc, 'Adjustment')) : null,
     tiktokFinance: sheetToAOA(getSheet(wbFin, 'Chi tiết đơn hàng')),
     ss_DonDaThanhToan: wbSs ? sheetToAOA(getSheet(wbSs, 'Đơn Đã Thanh Toán')) : null,
     ss_NguonTruyCap: wbSs ? sheetToAOA(getSheet(wbSs, 'Nguồn truy cập cho Đơn hàng...')) : null,
@@ -390,7 +477,22 @@ function computeAllFromAOA(aoa){
 
   // ---------- 2) Shopee return_refund ----------
   const rrAOA = aoa.shopeeReturnRefund;
-  const rrRows = rowsAsDicts(rrAOA, 0);
+  let rrRows = rowsAsDicts(rrAOA, 0);
+  // "Chốt lại tháng" (lỗi #5): khi được đưa thêm file trả/hoàn của THÁNG SAU
+  // (aoa.shopeeReturnRefundNext), gộp các yêu cầu trả thuộc đơn ĐẶT trong kỳ
+  // này vào; dòng tháng sau GHI ĐÈ dòng cùng mã đơn (trạng thái mới hơn).
+  if (aoa.shopeeReturnRefundNext){
+    const byOid = {};
+    for (const r of rrRows){ const o = r['Mã đơn hàng']; if (o !== undefined && !(o in byOid)) byOid[o] = r; }
+    let nextCount = 0;
+    for (const r of rowsAsDicts(aoa.shopeeReturnRefundNext, 0)){
+      const o = r['Mã đơn hàng'];
+      if (o === undefined || !(o in spOrders)) continue; // chỉ nhận yêu cầu trả của đơn đặt trong kỳ này
+      byOid[o] = r; nextCount++;
+    }
+    rrRows = Object.values(byOid);
+    warnings.push(`Chốt lại tháng: đã gộp thêm file Trả/hoàn Shopee của tháng sau — ${nextCount} yêu cầu trả thuộc đơn đặt kỳ này được cập nhật theo trạng thái mới nhất.`);
+  }
   const rrOrders = {};
   for (const r of rrRows){
     if (r['Trạng thái Trả hàng/Hoàn tiền'] !== 'Đã hoàn tiền cho Người mua') continue;
@@ -409,20 +511,78 @@ function computeAllFromAOA(aoa){
       warnings.push('Shopee return_refund: "Phương án" lạ chưa từng thấy: ' + phuongAn);
     }
   }
+  // Trạng thái chuẩn hoá (lỗi #7) — chữ lạ gom lại cảnh báo 1 lần
+  const spUnknownStatus = {};
+  function spNorm(r){
+    const n = spStatusNorm(r['Trạng Thái Đơn Hàng']);
+    if (n === null){
+      const raw = String(r['Trạng Thái Đơn Hàng'] || '(trống)');
+      spUnknownStatus[raw] = (spUnknownStatus[raw] || 0) + 1;
+      return 'dang_xu_ly'; // không được bỏ đơn — coi là đang xử lý + cảnh báo
+    }
+    return n;
+  }
   const spCancelledNative = {};
-  for (const [oid, r] of Object.entries(spOrders)) if (r['Trạng Thái Đơn Hàng'] === 'Đã hủy') spCancelledNative[oid] = r;
+  for (const [oid, r] of Object.entries(spOrders)) if (spNorm(r) === 'huy') spCancelledNative[oid] = r;
   const spCancelAllIds = new Set([...Object.keys(spCancelledNative), ...Object.keys(spReclassToCancel)]);
 
   const spRefundedIds = new Set([...Object.keys(spDonTra), ...Object.keys(spDonHoan), ...Object.keys(spReclassToCancel)]);
   const spCompleted = {};
   for (const [oid, r] of Object.entries(spOrders)){
-    if (r['Trạng Thái Đơn Hàng'] === 'Hoàn thành' && !spRefundedIds.has(oid)) spCompleted[oid] = r;
+    if (spNorm(r) === 'hoan_thanh' && !spRefundedIds.has(oid)) spCompleted[oid] = r;
   }
-  const spRevenue = Object.values(spCompleted).reduce((s, r) => s + num(r['Tổng giá trị đơn hàng (VND)']), 0);
+  if (Object.keys(spUnknownStatus).length){
+    warnings.push('Shopee: gặp trạng thái đơn LẠ chưa có trong bảng map (đang tạm tính là "đang xử lý"): '
+      + Object.entries(spUnknownStatus).map(([k, c]) => `"${k}" (${c} đơn)`).join(', ')
+      + ' — cần bổ sung vào spStatusNorm() kẻo đếm huỷ/hoàn thành bị sai.');
+  }
 
+  // ---------- Doanh thu hàng theo ĐỊNH NGHĨA ĐÃ CHỐT 20/10/2026 (lỗi #2):
+  // tiền hàng sau giảm giá CỦA SHOP, trước trợ giá sàn, không gồm ship.
+  // Shopee: Σ dòng (Giá gốc × SL − "Tổng số tiền được người bán trợ giá")
+  //         − "Mã giảm giá của Shop" − "Giảm giá từ Combo của Shop" (1 lần/đơn).
+  // BẪY (đã kiểm chứng trên file + seller center 20/10): Giá gốc/Giá ưu đãi là
+  // ĐƠN GIÁ 1 cái; "Người bán trợ giá"/"Tổng số tiền được người bán trợ giá"
+  // là TỔNG CẢ DÒNG; 2 cột mã giảm giá là số mức ĐƠN lặp trên mọi dòng SKU.
+  const spHdrKeys = spRows.length ? Object.keys(spRows[0]) : [];
+  const C_SP_GIA_GOC = findColKey(spHdrKeys, [/^giá\s*gốc$/i]);
+  const C_SP_SL_REV = findColKey(spHdrKeys, [/^số\s*lượng$/i]);
+  const C_SP_NB_TRO_GIA = findColKey(spHdrKeys, [/^tổng\s*số\s*tiền\s*được\s*người\s*bán\s*trợ\s*giá$/i, /^người\s*bán\s*trợ\s*giá$/i]);
+  const C_SP_MA_GG_SHOP = findColKey(spHdrKeys, [/^mã\s*giảm\s*giá\s*của\s*shop$/i]);
+  const C_SP_GG_COMBO_SHOP = findColKey(spHdrKeys, [/^giảm\s*giá\s*từ\s*combo\s*của\s*shop$/i]);
+  const spRevCanCompute = !!(C_SP_GIA_GOC && C_SP_SL_REV && C_SP_NB_TRO_GIA);
+  const spOrderRevenue = {}; // mã đơn -> doanh thu hàng theo định nghĩa
+  if (spRevCanCompute){
+    const seenVoucher = new Set();
+    for (const r of spRows){
+      const oid = r['Mã đơn hàng'];
+      if (oid === undefined || oid === null) continue;
+      if (!(oid in spOrderRevenue)) spOrderRevenue[oid] = 0;
+      spOrderRevenue[oid] += num(r[C_SP_GIA_GOC]) * num(r[C_SP_SL_REV]) - num(r[C_SP_NB_TRO_GIA]);
+      if (!seenVoucher.has(oid)){
+        seenVoucher.add(oid); // mức đơn — trừ đúng 1 lần
+        spOrderRevenue[oid] -= num(C_SP_MA_GG_SHOP ? r[C_SP_MA_GG_SHOP] : 0) + num(C_SP_GG_COMBO_SHOP ? r[C_SP_GG_COMBO_SHOP] : 0);
+      }
+    }
+  } else {
+    warnings.push('Shopee: thiếu cột để tính "Doanh thu hàng" theo định nghĩa mới (cần "Giá gốc", "Số lượng", "Tổng số tiền được người bán trợ giá") — đang dùng tạm công thức cũ "Tổng giá trị đơn hàng (VND)". Cột đọc được: ' + spHdrKeys.join(' | '));
+  }
+  const spRevenueCu = Object.values(spCompleted).reduce((s, r) => s + num(r['Tổng giá trị đơn hàng (VND)']), 0);
+  const spRevenue = spRevCanCompute
+    ? Object.keys(spCompleted).reduce((s, oid) => s + (spOrderRevenue[oid] || 0), 0)
+    : spRevenueCu;
+  // GMV đặt = doanh thu hàng của MỌI đơn đặt trong kỳ chưa huỷ (kể cả đang
+  // giao/đang xử lý) — phục vụ biểu đồ 2 đường và P&L sau này.
+  const spGmvDat = spRevCanCompute
+    ? Object.keys(spOrders).reduce((s, oid) => s + (spCancelAllIds.has(oid) ? 0 : (spOrderRevenue[oid] || 0)), 0)
+    : null;
+
+  // Phí sàn ƯỚC TÍNH từ file đơn hàng (công thức cũ) — chỉ còn dùng cho
+  // Slove/Tlove (giữ nguyên định nghĩa 2 chỉ số đã quen); "Tổng chi phí sàn"
+  // trên dashboard đã chuyển sang phí THẬT từ file tài chính (mục 6b dưới).
   let spPhiSan = 0, spTroGia = 0;
   for (const r of Object.values(spOrders)){
-    if (r['Trạng Thái Đơn Hàng'] === 'Đã hủy') continue;
+    if (spNorm(r) === 'huy') continue;
     spPhiSan += num(r['Phí cố định']) + num(r['Phí Dịch Vụ']) + num(r['Phí xử lý giao dịch']);
     spTroGia += num(r['Được Shopee trợ giá']) + num(r['Mã giảm giá của Shopee']) + num(r['Phí vận chuyển tài trợ bởi Shopee (dự kiến)']);
   }
@@ -475,6 +635,26 @@ function computeAllFromAOA(aoa){
       ngay: r['Thời gian hoàn trả hàng thành công'] || null,
       maVanDon: r['Mã vận đơn trả hàng'] || null,
       ngayDatHang: r['Ngày đặt hàng'] || null,
+      trangThai: r['Trạng thái Trả hàng/Hoàn tiền'] || null,
+    });
+  }
+  // (lỗi #5) Đơn trả CHƯA chốt hoàn tiền nhưng ĐÃ có mã vận đơn trả (hàng đang
+  // trên đường về kho) — trước đây bị bỏ qua hoàn toàn tới khi "Đã hoàn tiền
+  // cho Người mua", giờ vào danh sách hoàn về kho kèm cột trạng thái.
+  const spDonTraIds = new Set(Object.keys(spDonTra));
+  const spTraDangXuLySeen = new Set();
+  for (const r of rrRows){
+    const oid = r['Mã đơn hàng'];
+    if (oid === undefined || spDonTraIds.has(oid) || spTraDangXuLySeen.has(oid)) continue;
+    const mvd = r['Mã vận đơn trả hàng'];
+    if (!mvd || String(mvd).trim() === '') continue;
+    spTraDangXuLySeen.add(oid);
+    spHoanVeKhoDetail.push({
+      oid, sanPham: 'Shopee', loai: 'Đơn trả ĐANG XỬ LÝ (có mã vận đơn trả)',
+      ngay: r['Thời gian hoàn trả hàng thành công'] || null,
+      maVanDon: mvd,
+      ngayDatHang: r['Ngày đặt hàng'] || null,
+      trangThai: r['Trạng thái Trả hàng/Hoàn tiền'] || null,
     });
   }
   for (const oid of Object.keys(spReclassToCancel)){
@@ -513,7 +693,23 @@ function computeAllFromAOA(aoa){
   // gửi lại), ưu tiên dòng "Return and refund" (hàng thực sự gửi trả) hơn
   // "Refund only" (không có hàng vật lý quay lại) vì mục đích đối chiếu kho.
   const trAOA = aoa.tiktokReturns;
-  const trRows = rowsAsDicts(trAOA, 0);
+  let trRows = rowsAsDicts(trAOA, 0);
+  // "Chốt lại tháng" (lỗi #5): gộp file trả hàng TikTok của tháng sau — chỉ
+  // nhận yêu cầu trả thuộc đơn đặt kỳ này; dòng tháng sau ghi đè theo
+  // "Return Order ID" (trạng thái mới hơn).
+  if (aoa.tiktokReturnsNext){
+    const byRid = {};
+    const ridOf = (r, i) => (r['Return Order ID'] !== undefined && r['Return Order ID'] !== null) ? String(r['Return Order ID']) : ('row' + i);
+    trRows.forEach((r, i) => { byRid[ridOf(r, i)] = r; });
+    let nextCount = 0;
+    rowsAsDicts(aoa.tiktokReturnsNext, 0).forEach((r, i) => {
+      const oid = r['Order ID'];
+      if (oid === undefined || !(oid in ttOrders)) return;
+      byRid[ridOf(r, 'next' + i)] = r; nextCount++;
+    });
+    trRows = Object.values(byRid);
+    warnings.push(`Chốt lại tháng: đã gộp thêm file Trả hàng TikTok của tháng sau — ${nextCount} yêu cầu trả thuộc đơn đặt kỳ này được cập nhật theo trạng thái mới nhất.`);
+  }
   const trOrders = {};
   const trMultiOids = new Set();
   for (const r of trRows){
@@ -538,15 +734,59 @@ function computeAllFromAOA(aoa){
     else if (r['Return Type'] === 'Refund only') ttDonHoan[oid] = r;
     else warnings.push('TikTok trả hàng: "Return Type" lạ: ' + r['Return Type']);
   }
+  // Trạng thái chuẩn hoá TikTok (lỗi #7)
+  const ttUnknownStatus = {};
+  function ttNorm(r){
+    const n = ttStatusNorm(r['Order Status']);
+    if (n === null){
+      const raw = String(r['Order Status'] || '(trống)');
+      ttUnknownStatus[raw] = (ttUnknownStatus[raw] || 0) + 1;
+      return 'dang_xu_ly';
+    }
+    return n;
+  }
   const ttCancelledNative = {};
-  for (const [oid, r] of Object.entries(ttOrders)) if (r['Order Status'] === 'Đã hủy') ttCancelledNative[oid] = r;
+  for (const [oid, r] of Object.entries(ttOrders)) if (ttNorm(r) === 'huy') ttCancelledNative[oid] = r;
 
   const ttRefundedIds = new Set([...Object.keys(ttDonTra), ...Object.keys(ttDonHoan)]);
   const ttCompleted = {};
   for (const [oid, r] of Object.entries(ttOrders)){
-    if (r['Order Status'] === 'Đã hoàn tất' && !ttRefundedIds.has(oid)) ttCompleted[oid] = r;
+    if (ttNorm(r) === 'hoan_thanh' && !ttRefundedIds.has(oid)) ttCompleted[oid] = r;
   }
-  const ttRevenue = Object.values(ttCompleted).reduce((s, r) => s + num(r['Order Amount']), 0);
+  if (Object.keys(ttUnknownStatus).length){
+    warnings.push('TikTok: gặp trạng thái đơn LẠ chưa có trong bảng map (đang tạm tính là "đang xử lý"): '
+      + Object.entries(ttUnknownStatus).map(([k, c]) => `"${k}" (${c} đơn)`).join(', ')
+      + ' — cần bổ sung vào ttStatusNorm() kẻo đếm huỷ/hoàn thành bị sai.');
+  }
+
+  // ---------- Doanh thu hàng TikTok theo ĐỊNH NGHĨA ĐÃ CHỐT (lỗi #2):
+  // Σ dòng SKU (SKU Subtotal Before Discount − SKU Seller Discount) theo đơn
+  // — trước trợ giá sàn (Platform Discount), không gồm ship. 2 cột này là
+  // TỔNG CẢ DÒNG (TikTok tự ghi chú trong file). Công thức cũ "Order Amount"
+  // = tiền khách trả (lẫn ship khách trả, đã trừ trợ giá sàn) — giữ lại để so.
+  const ttHdrKeys = ttRows.length ? Object.keys(ttRows[0]) : [];
+  const C_TT_BEFORE = findColKey(ttHdrKeys, [/^sku\s*subtotal\s*before\s*discount$/i]);
+  const C_TT_SELLER_DISC = findColKey(ttHdrKeys, [/^sku\s*seller\s*discount$/i]);
+  const ttRevCanCompute = !!(C_TT_BEFORE && C_TT_SELLER_DISC);
+  const ttOrderRevenue = {};
+  if (ttRevCanCompute){
+    for (const r of ttRows){
+      const oid = r['Order ID'];
+      // bỏ dòng mô tả cột (dòng 2 của file TikTok) và dòng không có ID thật
+      if (oid === undefined || oid === null || !/^\d{6,}$/.test(String(oid).trim())) continue;
+      if (!(oid in ttOrderRevenue)) ttOrderRevenue[oid] = 0;
+      ttOrderRevenue[oid] += num(r[C_TT_BEFORE]) - num(r[C_TT_SELLER_DISC]);
+    }
+  } else {
+    warnings.push('TikTok: thiếu cột "SKU Subtotal Before Discount"/"SKU Seller Discount" để tính "Doanh thu hàng" theo định nghĩa mới — đang dùng tạm công thức cũ "Order Amount". Cột đọc được: ' + ttHdrKeys.join(' | '));
+  }
+  const ttRevenueCu = Object.values(ttCompleted).reduce((s, r) => s + num(r['Order Amount']), 0);
+  const ttRevenue = ttRevCanCompute
+    ? Object.keys(ttCompleted).reduce((s, oid) => s + (ttOrderRevenue[oid] || 0), 0)
+    : ttRevenueCu;
+  const ttGmvDat = ttRevCanCompute
+    ? Object.keys(ttOrders).reduce((s, oid) => s + ((oid in ttCancelledNative) ? 0 : (ttOrderRevenue[oid] || 0)), 0)
+    : null;
 
   // ---------- 5) TikTok tài chính — Chi tiết đơn hàng ----------
   // Trước đây so khớp CỨNG đúng tên cột (vd. "Loại giao dịch" === 'Đơn hàng',
@@ -561,19 +801,11 @@ function computeAllFromAOA(aoa){
   const finRows = rowsAsDicts(finAOA, 0);
   const finHeaderKeys = finRows.length ? Object.keys(finRows[0]) : ((finAOA[0] || []).map(nfc).filter(v => v !== null && v !== undefined && v !== ''));
 
-  function findColKey(headerKeys, patterns){
-    for (const p of patterns){
-      const hit = headerKeys.find(k => p.test(String(k || '').trim()));
-      if (hit) return hit;
-    }
-    return null;
-  }
-
   const COL_LOAI_GD = findColKey(finHeaderKeys, [/^loại\s*giao\s*dịch$/i, /loại.*giao.*dịch/i]);
   const COL_PHI_XU_LY = findColKey(finHeaderKeys, [/phí.*xử\s*lý.*đơn/i]);
   const COL_PHI_GIAO_DICH = findColKey(finHeaderKeys, [/^phí\s*giao\s*dịch$/i, /^phí\s*giao\s*dịch\b/i]);
   const COL_HOA_HONG = findColKey(finHeaderKeys, [/phí.*hoa\s*hồng/i, /hoa\s*hồng.*tiktok/i]);
-  const COL_GIAM_GIA_NEN_TANG = findColKey(finHeaderKeys, [/giảm\s*giá.*nền\s*tảng/i]);
+  const COL_GIAM_GIA_NEN_TANG = findColKey(finHeaderKeys, [/^giảm\s*giá\s*của\s*nền\s*tảng$/i, /giảm\s*giá.*nền\s*tảng/i]);
   const COL_GIAM_PHI_VC = findColKey(finHeaderKeys, [/tiktok.*giảm.*phí.*vận\s*chuyển/i, /giảm.*phí.*vận\s*chuyển.*khách/i]);
 
   const missingFinCols = [];
@@ -603,6 +835,63 @@ function computeAllFromAOA(aoa){
     'header thực tế đọc được:', finHeaderKeys);
   console.log('[debug Tlove] ttTroGia (tử số — Chi phí sàn đã hỗ trợ) =', ttTroGia,
     '| ttPhiSan (mẫu số — Tổng chi phí sàn) =', ttPhiSan, '| tlove =', ttPhiSan ? ttTroGia / ttPhiSan : 0);
+
+  // ---------- 5b) TikTok: THỰC NHẬN + PHÍ SÀN THẬT từ file tài chính (lỗi #3, #4)
+  // Thực nhận = Σ "Tổng số tiền quyết toán" trên MỌI dòng (gồm cả dòng trừ
+  // tiền quảng cáo GMV Max) — đúng số tiền sàn thật sự chuyển về.
+  // Phí sàn thật = Σ |"Tổng phí"| các dòng "Đơn hàng" TRỪ thuế khấu trừ (thuế
+  // là nghĩa vụ thuế của shop, hiện thành dòng riêng, không phải phí sàn).
+  const C_FIN_QT = findColKey(finHeaderKeys, [/^tổng\s*số\s*tiền\s*quyết\s*toán$/i]);
+  const C_FIN_TONG_PHI = findColKey(finHeaderKeys, [/^tổng\s*phí$/i]);
+  const C_FIN_AFF = findColKey(finHeaderKeys, [/^hoa\s*hồng\s*liên\s*kết$/i]);
+  const C_FIN_AFF_QC = findColKey(finHeaderKeys, [/^hoa\s*hồng\s*liên\s*kết\s*quảng\s*cáo\s*cửa\s*hàng$/i]);
+  const C_FIN_AFF_DT = findColKey(finHeaderKeys, [/^hoa\s*hồng\s*của\s*đối\s*tác\s*liên\s*kết$/i]);
+  const C_FIN_AFF_DT_QC = findColKey(finHeaderKeys, [/^hoa\s*hồng\s*quảng\s*cáo\s*cửa\s*hàng\s*của\s*đối\s*tác/i]);
+  const C_FIN_SHIP_NB = findColKey(finHeaderKeys, [/^phí\s*vận\s*chuyển\s*của\s*người\s*bán$/i]);
+  const C_FIN_SHIP_TT = findColKey(finHeaderKeys, [/^phí\s*vận\s*chuyển\s*thực\s*tế$/i]);
+  const C_FIN_SHIP_CK = findColKey(finHeaderKeys, [/^chiết\s*khấu\s*phí\s*vận\s*chuyển\s*của\s*nền\s*tảng$/i]);
+  const C_FIN_SHIP_TRA = findColKey(finHeaderKeys, [/^phí\s*vận\s*chuyển\s*trả\s*hàng\s*thực\s*tế$/i]);
+  const C_FIN_THUE_GTGT = findColKey(finHeaderKeys, [/^thuế\s*gtgt\s*do\s*tiktok/i]);
+  const C_FIN_THUE_TNCN = findColKey(finHeaderKeys, [/^thuế\s*tncn\s*do\s*tiktok/i]);
+  let ttThucNhan = null, ttPhiSanFull = null, ttPhiSanChiTiet = null, ttQuangCaoGmvMax = 0;
+  if (C_FIN_QT && finRows.length){
+    ttThucNhan = 0;
+    const bd = { 'Phí giao dịch': 0, 'Hoa hồng TikTok Shop': 0, 'Phí xử lý đơn hàng': 0,
+      'Hoa hồng affiliate (liên kết)': 0, 'Phí vận chuyển shop chịu': 0, 'Phí vận chuyển trả hàng': 0, 'Phí khác': 0 };
+    let tongPhiAbs = 0, thueAbs = 0;
+    for (const r of finRows){
+      const loai = String(r[COL_LOAI_GD] || '').trim();
+      if (!loai) continue;
+      ttThucNhan += num(r[C_FIN_QT]);
+      if (loai !== 'Đơn hàng'){
+        if (/quảng\s*cáo/i.test(loai)) ttQuangCaoGmvMax += Math.abs(num(r[C_FIN_QT]));
+        continue;
+      }
+      const phiGD = Math.abs(num(COL_PHI_GIAO_DICH ? r[COL_PHI_GIAO_DICH] : 0));
+      const hhTT = Math.abs(num(COL_HOA_HONG ? r[COL_HOA_HONG] : 0));
+      const phiXL = Math.abs(num(COL_PHI_XU_LY ? r[COL_PHI_XU_LY] : 0));
+      const aff = Math.abs(num(C_FIN_AFF ? r[C_FIN_AFF] : 0)) + Math.abs(num(C_FIN_AFF_QC ? r[C_FIN_AFF_QC] : 0))
+        + Math.abs(num(C_FIN_AFF_DT ? r[C_FIN_AFF_DT] : 0)) + Math.abs(num(C_FIN_AFF_DT_QC ? r[C_FIN_AFF_DT_QC] : 0));
+      // ship shop chịu = −(phí VC người bán + phí VC thực tế + chiết khấu nền
+      // tảng) — phí là số âm, chiết khấu là số dương; khớp nhau thì = 0.
+      const ship = -(num(C_FIN_SHIP_NB ? r[C_FIN_SHIP_NB] : 0) + num(C_FIN_SHIP_TT ? r[C_FIN_SHIP_TT] : 0) + num(C_FIN_SHIP_CK ? r[C_FIN_SHIP_CK] : 0));
+      const shipTra = Math.abs(num(C_FIN_SHIP_TRA ? r[C_FIN_SHIP_TRA] : 0));
+      const thue = Math.abs(num(C_FIN_THUE_GTGT ? r[C_FIN_THUE_GTGT] : 0)) + Math.abs(num(C_FIN_THUE_TNCN ? r[C_FIN_THUE_TNCN] : 0));
+      const tongPhi = Math.abs(num(C_FIN_TONG_PHI ? r[C_FIN_TONG_PHI] : 0));
+      bd['Phí giao dịch'] += phiGD; bd['Hoa hồng TikTok Shop'] += hhTT; bd['Phí xử lý đơn hàng'] += phiXL;
+      bd['Hoa hồng affiliate (liên kết)'] += aff; bd['Phí vận chuyển shop chịu'] += ship; bd['Phí vận chuyển trả hàng'] += shipTra;
+      tongPhiAbs += tongPhi; thueAbs += thue;
+    }
+    ttPhiSanFull = C_FIN_TONG_PHI
+      ? Math.max(0, tongPhiAbs - thueAbs)
+      : Object.values(bd).reduce((s, v) => s + v, 0);
+    bd['Phí khác'] = Math.max(0, ttPhiSanFull - (bd['Phí giao dịch'] + bd['Hoa hồng TikTok Shop'] + bd['Phí xử lý đơn hàng'] + bd['Hoa hồng affiliate (liên kết)'] + bd['Phí vận chuyển shop chịu'] + bd['Phí vận chuyển trả hàng']));
+    bd['Thuế khấu trừ (không tính vào phí sàn)'] = thueAbs;
+    if (ttQuangCaoGmvMax > 0) bd['Quảng cáo GMV Max (trừ vào quyết toán, không tính vào phí sàn)'] = ttQuangCaoGmvMax;
+    ttPhiSanChiTiet = bd;
+  } else {
+    warnings.push('TikTok: không tìm thấy cột "Tổng số tiền quyết toán" trong file tài chính — chưa tính được THỰC NHẬN và phí sàn thật. Cột đọc được: ' + finHeaderKeys.join(' | '));
+  }
 
   function ttIsShopErrorCancel(reason){
     if (!reason) return false;
@@ -641,6 +930,24 @@ function computeAllFromAOA(aoa){
       oid, sanPham: 'TikTok', loai: 'Đơn trả (khách gửi trả hàng)',
       ngay: r['Refund Time'] || null, maVanDon: r['Return Logistics Tracking ID'] || null,
       ngayDatHang,
+      trangThai: r['Return Status'] || null,
+    });
+  }
+  // (lỗi #5) Đơn trả TikTok CHƯA Completed nhưng đã có mã vận đơn trả — hàng
+  // đang về kho, vào danh sách kèm trạng thái (trước đây bị bỏ tới khi Completed).
+  const ttTraSeen = new Set(Object.keys(ttDonTra));
+  for (const r of trRows){
+    const oid = r['Order ID'];
+    if (oid === undefined || ttTraSeen.has(oid)) continue;
+    if (r['Return Status'] === 'Completed') continue; // đã xử lý ở trOrders (Refund only không có hàng về)
+    const mvd = r['Return Logistics Tracking ID'];
+    if (!mvd || String(mvd).trim() === '') continue;
+    ttTraSeen.add(oid);
+    ttHoanVeKhoDetail.push({
+      oid, sanPham: 'TikTok', loai: 'Đơn trả ĐANG XỬ LÝ (có mã vận đơn trả)',
+      ngay: r['Time Requested'] || null, maVanDon: mvd,
+      ngayDatHang: (ttOrders[oid] && ttOrders[oid]['Created Time']) || null,
+      trangThai: r['Return Status'] || null,
     });
   }
 
@@ -655,10 +962,60 @@ function computeAllFromAOA(aoa){
   }
   const piShipRatio = piShipPhi ? piShipHoan / piShipPhi : 0;
 
-  // ---------- 7) Income — Service Fee Details (Voucher Xtra) ----------
+  // ---------- 7) Income — Service Fee Details (Voucher Xtra + Phí Hạ Tầng) ----------
   const sfdAOA = aoa.income_ServiceFee;
   const sfdRows = rowsAsDicts(sfdAOA, 1);
   const voucherXtraTotal = sfdRows.reduce((s, r) => s + Math.abs(num(r['Voucher Xtra'])), 0);
+  const phiHaTangTotal = sfdRows.reduce((s, r) => s + Math.abs(num(r['Phí Hạ Tầng'])), 0);
+
+  // ---------- 7b) Shopee: THỰC NHẬN + PHÍ SÀN THẬT từ file Income (lỗi #3, #4)
+  // Thực nhận = Σ "Tổng tiền đã thanh toán" (dòng Order, sheet "Doanh thu")
+  //            + "Tổng số tiền điều chỉnh" (sheet Adjustment, nếu có).
+  // Phí sàn thật = cộng đủ các loại phí trên từng đơn đã phát hành + Voucher
+  // Xtra + Phí Hạ Tầng (sheet Service Fee Details). Thuế khấu trừ hiện riêng,
+  // không tính vào phí sàn.
+  const incHdrKeys = incRows.length ? Object.keys(incRows[0]) : [];
+  const C_INC_PAID = findColKey(incHdrKeys, [/^tổng\s*tiền\s*đã\s*thanh\s*toán$/i]);
+  const C_INC_PHI_CD = findColKey(incHdrKeys, [/^phí\s*cố\s*định$/i]);
+  const C_INC_PHI_DV = findColKey(incHdrKeys, [/^phí\s*dịch\s*vụ$/i]);
+  const C_INC_PHI_XLGD = findColKey(incHdrKeys, [/^phí\s*xử\s*lý\s*giao\s*dịch$/i]);
+  const C_INC_HH_TTLK = findColKey(incHdrKeys, [/^phí\s*hoa\s*hồng\s*tiếp\s*thị\s*liên\s*kết$/i]);
+  const C_INC_PISHIP = findColKey(incHdrKeys, [/^phí\s*dịch\s*vụ\s*piship$/i]);
+  const C_INC_HIEN_THI = findColKey(incHdrKeys, [/^phí\s*dịch\s*vụ\s*hiển\s*thị/i]);
+  const C_INC_VC_TRA_1 = findColKey(incHdrKeys, [/^phí\s*vận\s*chuyển\s*trả\s*hàng\s*\(đơn\s*trả/i]);
+  const C_INC_VC_TRA_2 = findColKey(incHdrKeys, [/^phí\s*vận\s*chuyển\s*trả\s*hàng\s*\(đơn\s*giao/i]);
+  const C_INC_THUE_GTGT = findColKey(incHdrKeys, [/^thuế\s*gtgt$/i]);
+  const C_INC_THUE_TNCN = findColKey(incHdrKeys, [/^thuế\s*tncn$/i]);
+  let spThucNhan = null, spPhiSanFull = null, spPhiSanChiTiet = null, spDieuChinh = 0;
+  if (C_INC_PAID && incOrderRows.length){
+    if (aoa.income_Adjustment){
+      const adjRaw = findLabeledValue(aoa.income_Adjustment, 'Tổng số tiền điều chỉnh');
+      if (adjRaw !== null && adjRaw !== undefined) spDieuChinh = num(adjRaw);
+    }
+    spThucNhan = incOrderRows.reduce((s, r) => s + num(r[C_INC_PAID]), 0) + spDieuChinh;
+    const bd = { 'Phí cố định': 0, 'Phí dịch vụ': 0, 'Phí xử lý giao dịch': 0,
+      'Hoa hồng affiliate (tiếp thị liên kết)': 0, 'Phí dịch vụ PiShip': 0, 'Phí hiển thị NTTD': 0,
+      'Phí vận chuyển trả hàng': 0 };
+    let thueAbs = 0;
+    for (const r of incOrderRows){
+      bd['Phí cố định'] += Math.abs(num(C_INC_PHI_CD ? r[C_INC_PHI_CD] : 0));
+      bd['Phí dịch vụ'] += Math.abs(num(C_INC_PHI_DV ? r[C_INC_PHI_DV] : 0));
+      bd['Phí xử lý giao dịch'] += Math.abs(num(C_INC_PHI_XLGD ? r[C_INC_PHI_XLGD] : 0));
+      bd['Hoa hồng affiliate (tiếp thị liên kết)'] += Math.abs(num(C_INC_HH_TTLK ? r[C_INC_HH_TTLK] : 0));
+      bd['Phí dịch vụ PiShip'] += Math.abs(num(C_INC_PISHIP ? r[C_INC_PISHIP] : 0));
+      bd['Phí hiển thị NTTD'] += Math.abs(num(C_INC_HIEN_THI ? r[C_INC_HIEN_THI] : 0));
+      bd['Phí vận chuyển trả hàng'] += Math.abs(num(C_INC_VC_TRA_1 ? r[C_INC_VC_TRA_1] : 0)) + Math.abs(num(C_INC_VC_TRA_2 ? r[C_INC_VC_TRA_2] : 0));
+      thueAbs += Math.abs(num(C_INC_THUE_GTGT ? r[C_INC_THUE_GTGT] : 0)) + Math.abs(num(C_INC_THUE_TNCN ? r[C_INC_THUE_TNCN] : 0));
+    }
+    bd['Voucher Xtra (Freeship Xtra)'] = voucherXtraTotal;
+    bd['Phí hạ tầng'] = phiHaTangTotal;
+    spPhiSanFull = Object.values(bd).reduce((s, v) => s + v, 0);
+    bd['Thuế khấu trừ (không tính vào phí sàn)'] = thueAbs;
+    if (spDieuChinh !== 0) bd['Điều chỉnh (đã cộng vào thực nhận, không phải phí)'] = spDieuChinh;
+    spPhiSanChiTiet = bd;
+  } else {
+    warnings.push('Shopee: không tìm thấy cột "Tổng tiền đã thanh toán" trong file Income (sheet "Doanh thu") — chưa tính được THỰC NHẬN và phí sàn thật. Cột đọc được: ' + incHdrKeys.join(' | '));
+  }
 
   // ---------- 8) Slove / Tlove ----------
   const sloveHotro = spTroGia, slovePhi = spPhiSan + piShipPhi;
@@ -756,8 +1113,9 @@ function computeAllFromAOA(aoa){
     if (!dailyMap[k]) dailyMap[k] = { date: k, shopee: 0, tiktok: 0 };
     dailyMap[k][field] += amount;
   }
-  for (const r of Object.values(spCompleted)) addDaily(r['Ngày đặt hàng'], 'shopee', num(r['Tổng giá trị đơn hàng (VND)']));
-  for (const r of Object.values(ttCompleted)) addDaily(r['Created Time'], 'tiktok', num(r['Order Amount']));
+  // số theo ngày cũng dùng "Doanh thu hàng" định nghĩa mới (khớp với KPI tổng)
+  for (const [oid, r] of Object.entries(spCompleted)) addDaily(r['Ngày đặt hàng'], 'shopee', spRevCanCompute ? (spOrderRevenue[oid] || 0) : num(r['Tổng giá trị đơn hàng (VND)']));
+  for (const [oid, r] of Object.entries(ttCompleted)) addDaily(r['Created Time'], 'tiktok', ttRevCanCompute ? (ttOrderRevenue[oid] || 0) : num(r['Order Amount']));
   const dailyRevenue = Object.values(dailyMap).sort((a, b) => a.date.localeCompare(b.date));
 
   // Đánh dấu các đơn "hoàn về kho" mà NGÀY ĐẶT HÀNG rơi ra ngoài khoảng kỳ báo
@@ -809,7 +1167,9 @@ function computeAllFromAOA(aoa){
   // theo mã SKU thô) vì chủ shop xác nhận Shopee đôi khi phải rút ngắn mã SKU
   // so với Sapo/TikTok (giới hạn độ dài Shopee cho phép) nên mã có thể lệch
   // giữa 2 sàn, còn TÊN sản phẩm thì luôn giống hệt nhau ở cả 3 nơi.
-  const SIZE_TOKENS = ['3XL', '2XL', 'XXL', 'XL', 'S', 'M', 'L'];
+  // XXXL đứng trước XXL/XL vì so khớp tuần tự theo ĐUÔI chuỗi — thiếu nó thì
+  // "CL01-XXXL" không tách được size, tra giá vốn theo cả chuỗi và báo thiếu.
+  const SIZE_TOKENS = ['XXXL', '3XL', '2XL', 'XXL', 'XL', 'S', 'M', 'L'];
   function splitSkuSize(code){
     if (!code) return { baseSku: null, size: null };
     const s = String(code).trim();
@@ -820,14 +1180,15 @@ function computeAllFromAOA(aoa){
     }
     return { baseSku: s, size: null }; // không tách được size — coi cả chuỗi là mã SKU gốc
   }
-  // Bảng tra cứu SKU -> Tên hiển thị, lấy từ tài liệu "quy-tac-dat-ten-sku-va-danh-sach-san-pham"
-  // (chủ shop cung cấp 2026-09-11). Mã nào chưa có trong bảng này thì hiện
-  // nguyên mã gốc + báo cảnh báo để chủ shop bổ sung, không làm mất dữ liệu.
+  // Bảng tra cứu SKU DỰ PHÒNG — chỉ dùng khi chưa tải được sku-catalog.json
+  // (danh mục thật từ API Sapo, sinh bởi tools/build_sku_catalog.py — lỗi #1
+  // doc Chuẩn hoá 10/2026). Đã sửa 2 lỗi bảng cứng cũ theo Sapo/sheet Sku:
+  // CL11 = Caro Hồng (trước ghi nhầm Thỏ Nơ), thêm QS-CT-04.
   const SKU_DISPLAY_NAME = {
     CL01: 'Chất Lông-Shin', CL02: 'Chất Lông-Hello Kitty', CL03: 'Chất Lông-Vịt Xanh',
     CL04: 'Chất Lông-Lợn Hồng', CL05: 'Chất Lông-Kuromi', CL06: 'Chất Lông-Shin 02',
     CL07: 'Chất Lông-Shin 03', CL08: 'Chất Lông-Patrick Star', CL09: 'Chất Lông-Hello Kitty Hồng',
-    CL10: 'Chất Lông-Thỏ Nơ', CL11: 'Chất Lông-Thỏ Nơ', CL12: 'Chất Lông-Caro Xanh',
+    CL10: 'Chất Lông-Thỏ Nơ', CL11: 'Chất Lông-Caro Hồng', CL12: 'Chất Lông-Caro Xanh',
     CL13: 'Chất Lông-Kẻ Xanh', CL14: 'Chất Lông-Đốm Hồng',
     CT01: 'Chất Thun-Màu 01', CT02: 'Chất Thun-Màu 02', CT03: 'Chất Thun-Màu 03',
     CT04: 'Chất Thun-Màu 04', CT05: 'Chất Thun-Màu 05', CT06: 'Chất Thun-Màu 06',
@@ -838,8 +1199,8 @@ function computeAllFromAOA(aoa){
     'PJD-CT-01': 'Bộ Dài-Shin 01', 'PJD-CT-02': 'Bộ Dài-Shin 02', 'PJD-CT-03': 'Bộ Dài-Shin 03',
     'PJC-CT-01': 'Bộ Ngắn-Shin 01', 'PJC-CT-02': 'Bộ Ngắn-Shin 02', 'PJC-CT-03': 'Bộ Ngắn-Shin 03',
     'QS-CT-01': 'Quần Short-Shin 01', 'QS-CT-02': 'Quần Short-Shin 02', 'QS-CT-03': 'Quần Short-Shin 03',
+    'QS-CT-04': 'Quần Short-Shin 04',
   };
-  function normSkuKey(s){ return String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
   const SKU_DISPLAY_NAME_NORM = {};
   for (const [k, v] of Object.entries(SKU_DISPLAY_NAME)) SKU_DISPLAY_NAME_NORM[normSkuKey(k)] = v;
   function resolveSkuName(baseSku){
@@ -857,40 +1218,112 @@ function computeAllFromAOA(aoa){
   const COL_TT_SKU_SIZE = findColKey(skuFinHdrTt, [/^seller\s*sku$/i, /seller.*sku/i]);
   const COL_TT_SL = findColKey(skuFinHdrTt, [/^quantity$/i]);
 
-  // Chủ shop xác nhận (2026-09-15): CHỈ tính các mã SKU có trong bảng tra cứu
-  // (`SKU_DISPLAY_NAME` ở trên, lấy từ quy-tac-dat-ten-sku-va-danh-sach-san-pham.md)
-  // — mã nào không có trong bảng là SKU cũ đã ngừng bán, KHÔNG cần quan tâm nữa
-  // nên bỏ qua hẳn (không hiện, không cảnh báo), tránh danh sách lẫn lộn giữa
-  // tên sản phẩm thật và mã thô nhìn rối mắt.
-  const skuAgg = {}; // key: tên hiển thị -> { name, tongSL, sizes: {size: sl} }
-  function addSkuLine(rawCode, qty){
-    if (!rawCode || !qty) return;
+  // (lỗi #1, sửa 10/2026) Tra theo DANH MỤC SAPO trước (sku-catalog.json):
+  // - mã combo (CB-…/CBHH…) → TÁCH thành các SKU con × số lượng (lấy thành
+  //   phần thật từ Sapo combos.json, không suy từ chuỗi mã);
+  // - mã thường → tên mẫu + size từ Sapo (option1/option2);
+  // - không có trong catalog → thử bảng dự phòng; vẫn không có → HIỆN NGUYÊN
+  //   MÃ + cảnh báo (trước đây bỏ qua im lặng làm thiếu hẳn combo).
+  const skuCatalog = getSkuCatalog();
+  const costCatalog = getCostCatalog();
+  const skuAgg = {}; // tên hiển thị -> { name, tongSL, sizes, doanhThu, giaVon }
+  const skuUnknown = {}; // mã lạ -> SL (gom cảnh báo 1 lần)
+  const costMissing = {}; // mã chưa có giá vốn -> SL (cảnh báo, KHÔNG coi giá vốn = 0 trong im lặng)
+  function pushSkuAgg(name, size, qty, revenue, cost){
+    if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {}, doanhThu: 0, giaVon: 0, thieuGiaVon: 0 };
+    const it = skuAgg[name];
+    it.tongSL += qty;
+    const sizeKey = size || '(không rõ size)';
+    it.sizes[sizeKey] = (it.sizes[sizeKey] || 0) + qty;
+    it.doanhThu += revenue || 0;
+    if (cost === null || cost === undefined) it.thieuGiaVon += qty;
+    else it.giaVon += cost;
+  }
+  // Tách 1 dòng bán thành các SKU ĐƠN thật sự xuất kho (combo → các SKU con),
+  // kèm giá vốn từng phần. Trả [] khi không tra được mã.
+  function expandSkuParts(rawCode, qty, depth){
+    depth = depth || 0;
+    const key = normSkuKey(rawCode);
+    if (skuCatalog && depth < 3){ // depth chặn combo lồng combo vòng lặp
+      const comboItems = skuCatalog.combos[key];
+      if (comboItems && comboItems.length){
+        let out = [];
+        for (const it of comboItems) out = out.concat(expandSkuParts(it.sku, qty * (num(it.qty) || 1), depth + 1));
+        return out;
+      }
+      const v = skuCatalog.variants[key];
+      if (v) return [{ rawCode, qty, name: v.name, size: v.size || splitSkuSize(rawCode).size }];
+    }
     const { baseSku, size } = splitSkuSize(rawCode);
     const { name, matched } = resolveSkuName(baseSku);
-    if (!matched) return; // SKU không có trong bảng tra cứu — bỏ qua
-    if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {} };
-    skuAgg[name].tongSL += qty;
-    const sizeKey = size || '(không rõ size)';
-    skuAgg[name].sizes[sizeKey] = (skuAgg[name].sizes[sizeKey] || 0) + qty;
+    if (!matched) skuUnknown[String(rawCode)] = (skuUnknown[String(rawCode)] || 0) + qty;
+    return [{ rawCode, qty, name, size }];
+  }
+  // Giá vốn 1 cái theo MÃ GỐC (bỏ đuôi size) — nguồn cost-catalog.json, sinh
+  // từ sheet "GiaCong" cột H của chủ shop.
+  function unitCostOf(rawCode){
+    if (!costCatalog) return null;
+    const { baseSku } = splitSkuSize(rawCode);
+    const v = costCatalog[normSkuKey(baseSku)];
+    return (v === undefined || v === null) ? null : v;
+  }
+  /** 1 dòng bán: tách combo, cộng SL + giá vốn, và CHIA doanh thu dòng cho các
+   *  SKU con theo tỷ trọng giá vốn (combo bán 1 giá nhưng gồm nhiều SP). */
+  function addSkuLine(rawCode, qty, revenue){
+    if (!rawCode || !qty) return;
+    const parts = expandSkuParts(rawCode, qty, 0);
+    if (!parts.length) return;
+    const costs = parts.map(p => {
+      const u = unitCostOf(p.rawCode);
+      if (u === null) costMissing[String(p.rawCode)] = (costMissing[String(p.rawCode)] || 0) + p.qty;
+      return (u === null) ? null : u * p.qty;
+    });
+    const knownTotal = costs.reduce((s, c) => s + (c || 0), 0);
+    parts.forEach((p, i) => {
+      // phân bổ doanh thu: theo giá vốn nếu biết, không thì chia đều
+      const share = knownTotal ? ((costs[i] || 0) / knownTotal) : (1 / parts.length);
+      pushSkuAgg(p.name, p.size, p.qty, (revenue || 0) * share, costs[i]);
+    });
   }
   const skuColMissing = [];
   if (!COL_SP_SKU_SIZE) skuColMissing.push('Shopee: "SKU phân loại hàng"');
   if (!COL_SP_SL) skuColMissing.push('Shopee: "Số lượng"');
   if (!COL_TT_SKU_SIZE) skuColMissing.push('TikTok: "Seller SKU"');
   if (!COL_TT_SL) skuColMissing.push('TikTok: "Quantity"');
+  // Doanh thu DÒNG (để tính lãi gộp theo SP): cùng định nghĩa "doanh thu hàng"
+  // nhưng ở mức dòng — Shopee chưa trừ voucher mức đơn (voucher không chia được
+  // về từng SKU một cách chính xác) nên tổng theo SP cao hơn doanh thu tổng một
+  // chút; bảng SP có ghi chú. P&L TỔNG vẫn dùng doanhThu chuẩn (đã trừ voucher).
   if (COL_SP_SKU_SIZE && COL_SP_SL){
     for (const r of spRows){
       const oid = r['Mã đơn hàng'];
       if (oid === undefined || !(oid in spCompleted)) continue;
-      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]));
+      const lineRev = spRevCanCompute ? (num(r[C_SP_GIA_GOC]) * num(r[C_SP_SL_REV]) - num(r[C_SP_NB_TRO_GIA])) : 0;
+      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]), lineRev);
     }
   }
   if (COL_TT_SKU_SIZE && COL_TT_SL){
     for (const r of ttRows){
       const oid = r['Order ID'];
       if (oid === undefined || !(oid in ttCompleted)) continue;
-      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]));
+      const lineRev = ttRevCanCompute ? (num(r[C_TT_BEFORE]) - num(r[C_TT_SELLER_DISC])) : 0;
+      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]), lineRev);
     }
+  }
+  if (!skuCatalog){
+    warnings.push('Chưa tải được danh mục SKU từ Sapo (sku-catalog.json) — bảng Hiệu suất SKU/size đang dùng bảng dự phòng trong code: combo KHÔNG được tách thành SKU con. Kiểm tra file sku-catalog.json có được deploy cùng web không.');
+  }
+  if (Object.keys(skuUnknown).length){
+    warnings.push('Hiệu suất SKU/size: ' + Object.keys(skuUnknown).length + ' mã SKU không có trong danh mục Sapo (đang hiện nguyên mã, KHÔNG bỏ): '
+      + Object.entries(skuUnknown).map(([k, q]) => `${k} (${q} sp)`).join(', ')
+      + ' — nếu là mã mới, chạy lại tools/build_sku_catalog.py để cập nhật danh mục.');
+  }
+  if (!costCatalog){
+    warnings.push('Chưa tải được bảng giá vốn (cost-catalog.json) — tab Lãi lỗ sẽ không có Giá vốn hàng bán/Lãi gộp. Kiểm tra file cost-catalog.json có được deploy cùng web không.');
+  } else if (Object.keys(costMissing).length){
+    warnings.push('Lãi lỗ: ' + Object.keys(costMissing).length + ' mã SKU CHƯA CÓ GIÁ VỐN (phần đó đang tính giá vốn = thiếu, lãi gộp sẽ CAO hơn thật): '
+      + Object.entries(costMissing).map(([k, q]) => `${k} (${q} sp)`).join(', ')
+      + ' — bổ sung vào sheet GiaCong rồi nhờ cập nhật lại cost-catalog.json.');
   }
   const periodDays = (minDate && maxDate) ? Math.round((maxDate - minDate) / 86400000) + 1 : null;
   const SIZE_ORDER = ['S', 'M', 'L', 'XL', 'XXL', '2XL', '3XL', '(không rõ size)'];
@@ -898,6 +1331,8 @@ function computeAllFromAOA(aoa){
     periodDays,
     items: Object.values(skuAgg).map(item => ({
       ten: item.name, tongSL: item.tongSL,
+      doanhThu: item.doanhThu, giaVon: item.giaVon, thieuGiaVon: item.thieuGiaVon,
+      laiGop: (costCatalog && !item.thieuGiaVon) ? item.doanhThu - item.giaVon : null,
       slNgay: periodDays ? item.tongSL / periodDays : null,
       sizes: Object.entries(item.sizes)
         .map(([size, sl]) => ({ size, sl, pct: item.tongSL ? sl / item.tongSL : 0 }))
@@ -1057,30 +1492,76 @@ function computeAllFromAOA(aoa){
     ? { table1: kocTable1, table2: kocTable2, liveTable: kocLiveTable, ctorCtrTable: kocCtorCtrTable }
     : null;
 
+  // Tự kiểm (lỗi #8): tiền trung bình/đơn < 1.000đ nghĩa là gần như chắc chắn
+  // parse số sai định dạng (vd. file xuất kiểu Anh) — cảnh báo ngay.
+  const tongHoanThanhCheck = Object.keys(spCompleted).length + Object.keys(ttCompleted).length;
+  if (tongHoanThanhCheck > 0 && (spRevenue + ttRevenue) / tongHoanThanhCheck < 1000){
+    warnings.push('TỰ KIỂM: doanh thu trung bình/đơn < 1.000đ — gần như chắc chắn file đang dùng định dạng số khác (phẩy/chấm) và bị đọc sai. KHÔNG tin các số tiền của kỳ này cho tới khi kiểm tra lại file.');
+  }
+
+  // Phí sàn hiển thị: ưu tiên phí THẬT từ file tài chính (lỗi #4); thiếu file
+  // thì rơi về số ước tính cũ từ file đơn hàng (spPhiSan/ttPhiSan — vẫn là
+  // mẫu số của Slove/Tlove để giữ nguyên định nghĩa 2 chỉ số đó).
+  const spPhiSanHienThi = (spPhiSanFull !== null) ? spPhiSanFull : spPhiSan;
+  const ttPhiSanHienThi = (ttPhiSanFull !== null) ? ttPhiSanFull : ttPhiSan;
+
+  // ---------- P&L (mục 4 doc Chuẩn hoá, 21/10/2026) ----------
+  // Giá vốn hàng bán = Σ giá vốn các SKU đã xuất trong ĐƠN HOÀN THÀNH (đúng tập
+  // đơn của "Doanh thu hàng", combo đã tách thành SKU con). Phần chi phí vận
+  // hành (lương, vật tư, ads) nhập tay 1 lần/tháng ở tab Lãi lỗ, lưu vào chính
+  // bản ghi tháng (data.chiPhiVanHanh) — không nằm trong hàm tính này.
+  const pnlDoanhThu = spRevenue + ttRevenue;
+  const pnlCogs = Object.values(skuAgg).reduce((s, x) => s + x.giaVon, 0);
+  const pnlThieuGiaVonSL = Object.values(skuAgg).reduce((s, x) => s + x.thieuGiaVon, 0);
+  const pnlPhiSan = spPhiSanHienThi + ttPhiSanHienThi;
+  const pnl = {
+    coGiaVon: !!costCatalog,
+    doanhThu: pnlDoanhThu,
+    giaVonHangBan: costCatalog ? pnlCogs : null,
+    thieuGiaVonSL: pnlThieuGiaVonSL,
+    laiGop: costCatalog ? pnlDoanhThu - pnlCogs : null,
+    phiSan: pnlPhiSan,
+    quangCaoGmvMax: ttQuangCaoGmvMax || 0,
+    // lãi sau phí sàn & quảng cáo — TRƯỚC chi phí vận hành nhập tay
+    laiSauPhiSan: costCatalog ? pnlDoanhThu - pnlCogs - pnlPhiSan - (ttQuangCaoGmvMax || 0) : null,
+  };
+
   return {
     warnings, ssWarning, minDate, maxDate,
     shopee: {
       tongDon: Object.keys(spOrders).length, hoanThanh: Object.keys(spCompleted).length,
-      doanhThu: spRevenue, phiSan: spPhiSan, troGia: spTroGia, doanhThuRong: spRevenue - spPhiSan,
+      doanhThu: spRevenue, doanhThuCu: spRevenueCu, gmvDat: spGmvDat,
+      thucNhan: spThucNhan, dieuChinh: spDieuChinh,
+      phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
+      troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
       huyHoanTra: spHuyHoanTra, loiShop: spErrTotal, hoanVeKho: spHoanVeKho,
       aov: Object.keys(spCompleted).length ? spRevenue / Object.keys(spCompleted).length : 0,
     },
     tiktok: {
       tongDon: Object.keys(ttOrders).length, hoanThanh: Object.keys(ttCompleted).length,
-      doanhThu: ttRevenue, phiSan: ttPhiSan, troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSan,
+      doanhThu: ttRevenue, doanhThuCu: ttRevenueCu, gmvDat: ttGmvDat,
+      thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
+      phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
+      troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
       huyHoanTra: ttHuyHoanTra, loiShop: ttErrTotal, hoanVeKho: ttHoanVeKho,
       aov: Object.keys(ttCompleted).length ? ttRevenue / Object.keys(ttCompleted).length : 0,
     },
     tong: {
       doanhThu: spRevenue + ttRevenue, tongDon, hoanThanh: Object.keys(spCompleted).length + Object.keys(ttCompleted).length,
-      phiSan: spPhiSan + ttPhiSan, doanhThuRong: (spRevenue - spPhiSan) + (ttRevenue - ttPhiSan),
+      doanhThuCu: spRevenueCu + ttRevenueCu,
+      gmvDat: (spGmvDat !== null && ttGmvDat !== null) ? spGmvDat + ttGmvDat : null,
+      thucNhan: (spThucNhan !== null && ttThucNhan !== null) ? spThucNhan + ttThucNhan : null,
+      phiSan: spPhiSanHienThi + ttPhiSanHienThi,
+      doanhThuRong: (spRevenue - spPhiSanHienThi) + (ttRevenue - ttPhiSanHienThi),
       aov: (Object.keys(spCompleted).length + Object.keys(ttCompleted).length) ? (spRevenue + ttRevenue) / (Object.keys(spCompleted).length + Object.keys(ttCompleted).length) : 0,
       huyHoanTra: spHuyHoanTra + ttHuyHoanTra, tyLeHuyHoanTra: tongDon ? (spHuyHoanTra + ttHuyHoanTra) / tongDon : 0,
       loiShop: spErrTotal + ttErrTotal, tyLeLoiShop: tongDon ? (spErrTotal + ttErrTotal) / tongDon : 0,
       hoanVeKho: spHoanVeKho + ttHoanVeKho,
     },
+    daChotLai: !!(aoa.shopeeReturnRefundNext || aoa.tiktokReturnsNext),
+    pnl,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
     reasonRows,
     hoanVeKhoDetail: hoanVeKhoDetailAll, hoanVeKhoNgoaiKyCount,
@@ -1123,10 +1604,35 @@ function combineMonthlyResults(entries){
 
   function sumField(getter){ return list.reduce((s, d) => s + (num(getter(d)) || 0), 0); }
   function safeDiv(a, b){ return b ? a / b : 0; }
+  // Trường MỚI (10/2026) có thể thiếu ở tháng lưu bằng công thức cũ: chỉ cộng
+  // khi có, và trả null khi KHÔNG tháng nào có (UI sẽ hiện "—").
+  function sumOptional(getter){
+    let s = 0, any = false;
+    for (const d of list){
+      const v = getter(d);
+      if (v !== null && v !== undefined){ s += num(v) || 0; any = true; }
+    }
+    return any ? s : null;
+  }
+  function mergeChiTiet(getter){
+    const out = {};
+    let any = false;
+    for (const d of list){
+      const m = getter(d);
+      if (!m) continue;
+      any = true;
+      for (const [k, v] of Object.entries(m)) out[k] = (out[k] || 0) + (num(v) || 0);
+    }
+    return any ? out : null;
+  }
 
   const shopee = {
     tongDon: sumField(d => d.shopee.tongDon), hoanThanh: sumField(d => d.shopee.hoanThanh),
     doanhThu: sumField(d => d.shopee.doanhThu), phiSan: sumField(d => d.shopee.phiSan),
+    doanhThuCu: sumOptional(d => d.shopee.doanhThuCu), gmvDat: sumOptional(d => d.shopee.gmvDat),
+    thucNhan: sumOptional(d => d.shopee.thucNhan),
+    phiSanUocTinh: sumField(d => (d.shopee.phiSanUocTinh !== undefined && d.shopee.phiSanUocTinh !== null) ? d.shopee.phiSanUocTinh : d.shopee.phiSan),
+    phiSanChiTiet: mergeChiTiet(d => d.shopee.phiSanChiTiet),
     troGia: sumField(d => d.shopee.troGia),
     huy: sumField(d => d.shopee.huy), tra: sumField(d => d.shopee.tra), hoan: sumField(d => d.shopee.hoan),
     huyHoanTra: sumField(d => d.shopee.huyHoanTra), loiShop: sumField(d => d.shopee.loiShop),
@@ -1138,6 +1644,10 @@ function combineMonthlyResults(entries){
   const tiktok = {
     tongDon: sumField(d => d.tiktok.tongDon), hoanThanh: sumField(d => d.tiktok.hoanThanh),
     doanhThu: sumField(d => d.tiktok.doanhThu), phiSan: sumField(d => d.tiktok.phiSan),
+    doanhThuCu: sumOptional(d => d.tiktok.doanhThuCu), gmvDat: sumOptional(d => d.tiktok.gmvDat),
+    thucNhan: sumOptional(d => d.tiktok.thucNhan), quangCaoGmvMax: sumOptional(d => d.tiktok.quangCaoGmvMax),
+    phiSanUocTinh: sumField(d => (d.tiktok.phiSanUocTinh !== undefined && d.tiktok.phiSanUocTinh !== null) ? d.tiktok.phiSanUocTinh : d.tiktok.phiSan),
+    phiSanChiTiet: mergeChiTiet(d => d.tiktok.phiSanChiTiet),
     troGia: sumField(d => d.tiktok.troGia),
     huy: sumField(d => d.tiktok.huy), tra: sumField(d => d.tiktok.tra), hoan: sumField(d => d.tiktok.hoan),
     huyHoanTra: sumField(d => d.tiktok.huyHoanTra), loiShop: sumField(d => d.tiktok.loiShop),
@@ -1153,6 +1663,9 @@ function combineMonthlyResults(entries){
   const tongLoiShop = shopee.loiShop + tiktok.loiShop;
   const tong = {
     doanhThu: tongDoanhThu, tongDon, hoanThanh: tongHoanThanh,
+    doanhThuCu: (shopee.doanhThuCu !== null && tiktok.doanhThuCu !== null) ? shopee.doanhThuCu + tiktok.doanhThuCu : null,
+    gmvDat: (shopee.gmvDat !== null && tiktok.gmvDat !== null) ? shopee.gmvDat + tiktok.gmvDat : null,
+    thucNhan: (shopee.thucNhan !== null && tiktok.thucNhan !== null) ? shopee.thucNhan + tiktok.thucNhan : null,
     phiSan: shopee.phiSan + tiktok.phiSan, doanhThuRong: shopee.doanhThuRong + tiktok.doanhThuRong,
     aov: safeDiv(tongDoanhThu, tongHoanThanh),
     huyHoanTra: tongHuyHoanTra, tyLeHuyHoanTra: safeDiv(tongHuyHoanTra, tongDon),
@@ -1174,9 +1687,11 @@ function combineMonthlyResults(entries){
       if (d.raw.shopeeTroGia !== null && d.raw.shopeeTroGia !== undefined){ shopeeTroGiaSum += num(d.raw.shopeeTroGia) || 0; hasVoucherData = true; }
     }
   }
-  const slovePhi = shopee.phiSan + piShipPhiSum; // xấp xỉ nếu có tháng thiếu raw (thiếu phần piShipPhi của tháng đó)
+  // Slove/Tlove giữ ĐÚNG định nghĩa cũ: mẫu số là phí ƯỚC TÍNH từ file đơn
+  // hàng (phiSanUocTinh) — không phải phí thật từ file tài chính (phiSan mới).
+  const slovePhi = shopee.phiSanUocTinh + piShipPhiSum; // xấp xỉ nếu có tháng thiếu raw (thiếu phần piShipPhi của tháng đó)
   const slove = safeDiv(shopee.troGia, slovePhi);
-  const tlove = safeDiv(tiktok.troGia, tiktok.phiSan);
+  const tlove = safeDiv(tiktok.troGia, tiktok.phiSanUocTinh);
   const piShipRatio = safeDiv(piShipHoanSum, piShipPhiSum);
   const voucherExtra = hasVoucherData ? safeDiv(shopeeTroGiaSum, voucherXtraSum) : null;
   if (monthsMissingRaw.length){
@@ -1280,9 +1795,10 @@ function combineMonthlyResults(entries){
     if (!sp) continue;
     totalPeriodDays += sp.periodDays || 0;
     for (const item of (sp.items || [])){
-      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, tongSL: 0, sizes: {} };
+      if (!skuMap[item.ten]) skuMap[item.ten] = { ten: item.ten, tongSL: 0, sizes: {}, doanhThu: 0, giaVon: 0, thieuGiaVon: 0, coTien: false };
       const m = skuMap[item.ten];
       m.tongSL += item.tongSL;
+      if (item.doanhThu !== undefined){ m.doanhThu += num(item.doanhThu); m.giaVon += num(item.giaVon); m.thieuGiaVon += num(item.thieuGiaVon); m.coTien = true; }
       for (const s of (item.sizes || [])) m.sizes[s.size] = (m.sizes[s.size] || 0) + s.sl;
     }
   }
@@ -1290,10 +1806,29 @@ function combineMonthlyResults(entries){
   const skuItems = Object.values(skuMap).map(m => ({
     ten: m.ten, tongSL: m.tongSL,
     slNgay: totalPeriodDays ? m.tongSL / totalPeriodDays : null,
+    doanhThu: m.coTien ? m.doanhThu : undefined,
+    giaVon: m.coTien ? m.giaVon : undefined,
+    thieuGiaVon: m.coTien ? m.thieuGiaVon : undefined,
+    laiGop: (m.coTien && !m.thieuGiaVon) ? m.doanhThu - m.giaVon : null,
     sizes: Object.entries(m.sizes).map(([size, sl]) => ({ size, sl, pct: m.tongSL ? sl / m.tongSL : 0 }))
       .sort((a, b) => SIZE_ORDER.indexOf(a.size) - SIZE_ORDER.indexOf(b.size)),
   })).sort((a, b) => b.tongSL - a.tongSL);
   const skuPerformance = Object.keys(skuMap).length ? { periodDays: totalPeriodDays || null, items: skuItems } : null;
+
+  // pnl — cộng các tháng CÓ pnl (tháng lưu công thức cũ chưa có thì bỏ qua);
+  // chi phí vận hành nhập tay (data.chiPhiVanHanh) cộng theo từng khoản.
+  const pnlList = list.map(d => d.pnl).filter(Boolean);
+  const pnl = pnlList.length ? {
+    coGiaVon: pnlList.every(p => p.coGiaVon),
+    doanhThu: pnlList.reduce((s, p) => s + (num(p.doanhThu) || 0), 0),
+    giaVonHangBan: pnlList.some(p => p.giaVonHangBan === null) ? null : pnlList.reduce((s, p) => s + (num(p.giaVonHangBan) || 0), 0),
+    thieuGiaVonSL: pnlList.reduce((s, p) => s + (num(p.thieuGiaVonSL) || 0), 0),
+    laiGop: pnlList.some(p => p.laiGop === null) ? null : pnlList.reduce((s, p) => s + (num(p.laiGop) || 0), 0),
+    phiSan: pnlList.reduce((s, p) => s + (num(p.phiSan) || 0), 0),
+    quangCaoGmvMax: pnlList.reduce((s, p) => s + (num(p.quangCaoGmvMax) || 0), 0),
+    laiSauPhiSan: pnlList.some(p => p.laiSauPhiSan === null) ? null : pnlList.reduce((s, p) => s + (num(p.laiSauPhiSan) || 0), 0),
+  } : null;
+  const chiPhiVanHanh = mergeChiTiet(d => d.chiPhiVanHanh);
 
   // ssWarning — chỉ hiện nếu KHÔNG tháng nào có ShopStats (giống logic 1 tháng)
   const anyShopStats = list.some(d => d.kenh || d.sanPham);
@@ -1307,6 +1842,7 @@ function combineMonthlyResults(entries){
     warnings: [...warnings, ...list.flatMap((d, i) => (d.warnings || []).map(w => `[${entries[i].label}] ${w}`))],
     ssWarning, minDate, maxDate,
     shopee, tiktok, tong,
+    pnl, chiPhiVanHanh,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
     reasonRows,
     hoanVeKhoDetail, hoanVeKhoNgoaiKyCount,

@@ -1,0 +1,49 @@
+{
+  "permissions": {
+    "defaultMode": "dontAsk",
+    "allow": [
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "WebFetch",
+      "WebSearch",
+      "Artifact",
+      "Monitor",
+      "TaskOutput",
+      "TaskStop",
+      "NotebookEdit",
+      "mcp__claude-in-chrome",
+      "mcp__Claude_Browser",
+      "mcp__Claude_Code_iOS_Simulator",
+      "mcp__9d1e41fc-1d00-426a-be06-b2f8c6ea50f3",
+      "mcp__7eef2991-a195-4045-9b68-53d97da154b7",
+      "mcp__1a59c906-04da-521d-bda7-7f71b9f9e01c",
+      "mcp__1d84f3da-ff77-4325-abd0-7a65ef72c85a",
+      "mcp__aa62f438-ae23-4f0b-8e09-cc91ce713f80",
+      "mcp__0e794290-c8e9-4ae3-a103-83f79598f12d",
+      "mcp__scheduled-tasks",
+      "mcp__visualize",
+      "mcp__ccd_session",
+      "mcp__ccd_session_mgmt",
+      "mcp__ccd_directory",
+      "mcp__terminal",
+      "mcp__95b62d2a-965b-448f-9dca-be8e5c6f8014"
+    ],
+    "ask": [
+      "Bash(rm *)",
+      "Bash(* rm -*)",
+      "Bash(rmdir *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(* --force*)",
+      "Bash(* DELETE *)",
+      "Bash(* delete *)",
+      "Bash(* TRUNCATE *)",
+      "Bash(* DROP *)"
+    ]
+  }
+}

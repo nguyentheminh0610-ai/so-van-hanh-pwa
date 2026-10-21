@@ -1,6 +1,6 @@
 ---
 name: daily-warehouse-report
-description: Run the "3 báo cáo đối chiếu sàn" (+ bonus Báo cáo 4) daily warehouse check and send it to the shop owner via Telegram -- use whenever the shop owner asks to "check kho hôm nay", "check 3 báo cáo", "báo cáo đối chiếu sàn", or at 17:30 every day without being asked, since this is a daily recurring task that must never be skipped. Covers: cross-checking TikTok/Shopee "packed, waiting on shipper" orders against Sổ Kho's "Tích đơn đi" record (shipper pickup confirmation + packed-but-undispatched detection), cross-checking against "Đơn đã in nhưng chưa đóng được" for discrepancies, finding orders forgotten within the last 48h that were never even printed, and checking resend/"gửi bù" shipments from the last 48h against Sổ Kho to catch replacement orders that were created but never actually dispatched -- then sending the result as a Telegram message.
+description: Run the "3 báo cáo đối chiếu sàn" (+ bonus Báo cáo 4) daily warehouse check and send it to the shop owner via Telegram -- use whenever the shop owner asks to "check kho hôm nay", "check 3 báo cáo", "báo cáo đối chiếu sàn", or at 17:30 every day without being asked, since this is a daily recurring task that must never be skipped. Covers: cross-checking TikTok/Shopee "packed, waiting on shipper" orders against Sổ Kho's "Tích đơn đi" record (shipper pickup confirmation + packed-but-undispatched detection), cross-checking against "Đơn đã in nhưng chưa đóng được" for discrepancies, finding orders forgotten within the last 48h that were never even printed, checking resend/"gửi bù" shipments from the last 48h against Sổ Kho to catch replacement orders that were created but never actually dispatched, and (Báo cáo 5) syncing Sapo's return-order list into Supabase then flagging returns the platform says arrived back at the warehouse 3+ days ago but were never scanned into Sổ Kho -- then sending the result as a Telegram message.
 ---
 
 # Báo cáo kho hàng ngày — 3 báo cáo đối chiếu sàn
@@ -67,6 +67,13 @@ it and send the report, no need to ask first.
   "<mã gốc> - 1 Quần ..."; dòng cũ trước 2026-10-20 có thể là
   "Gui bu ... - don goc #<mã gốc>"), `created_at`, `done`/`done_at`. Dùng cho
   Báo cáo 4 (bổ sung 2026-10-09).
+- `platform_returns_feed` (phiếu trả hàng đồng bộ từ Sapo, dùng cho Báo
+  cáo 5 — script `scripts/sync_returns_feed.py` tự ghi/đọc, không cần
+  query tay): `sapo_return_id`, `order_name`, `platform`, `return_type`
+  (`delivery_failed`=bom | `return_and_refund`=đổi trả),
+  `shipment_status` (`returning`→`returned`), `returned_on`,
+  `return_tracking` (mã vận đơn chiều hoàn), `outbound_tracking` (mã
+  chiều đi, nhiều mã nối bằng "+"), `qty`.
 - **"Tích đơn đi" ý nghĩa thật** (verified từ chính UI app, 2026-10-07):
   *"Lưu lại phòng khi đơn thất lạc trên đường tới kho vận chuyển — chỉ cần
   nhập mã."* I.e. nhân viên tích khi đơn đã thực sự rời kho — không tự
@@ -154,9 +161,34 @@ Taxonomy đầy đủ 2 sàn: [reference_platform_order_status_definitions](refe
    1 lần thiếu hàng rồi). **Sạch (tất cả đã tích) → KHÔNG viết gì vào báo
    cáo cho mục này, kể cả không xác nhận "đã ổn" — im lặng bỏ qua hoàn
    toàn** (chốt 2026-10-09, chỉ báo khi có vấn đề thật).
-6. Gửi qua Telegram đúng form trong [reference_3_reports_doi_chieu_san](references/reference_3_reports_doi_chieu_san.md)
+6. **Báo cáo 5 — Hoàn về chưa nhận** (bổ sung 2026-10-20): chạy
+   `python3 scripts/sync_returns_feed.py` từ thư mục gốc repo
+   `so-van-hanh-pwa` (máy Mac; cần `~/.config/sapo/credentials.json`).
+   Script tự làm trọn: đồng bộ phiếu trả hàng Sapo
+   (`/admin/order_returns.json`, private app key, 60 ngày gần nhất) vào
+   bảng Supabase `platform_returns_feed` (web Sổ Kho + Sổ Vận Hành đọc
+   bảng này để hiện khối "🔴 Hoàn về chưa nhận"), rồi in JSON gồm:
+   - `overdue`: kiện sàn báo **đã trả về** ≥3 ngày mà Sổ Kho chưa quét
+     (đã khớp cả mã vận đơn chiều hoàn LẪN chiều đi, đã chuẩn hoá lỗi
+     bộ gõ Telex) → đưa vào báo cáo: mã + đơn gốc + sàn + số ngày trễ.
+   - `strange_scans_7d`: lượt quét 7 ngày gần đây không khớp phiếu trả
+     nào VÀ tra Sapo cũng không ra đơn (mã lỗi/mã lạ) → liệt kê để chủ
+     shop xem. Lượt quét không khớp nhưng TRA RA đơn trên Sapo là đơn
+     bom/huỷ trước khi gửi — bình thường, script tự bỏ qua, không báo.
+   **Cả 2 danh sách rỗng → im lặng bỏ qua mục 5** (giống quy tắc Báo
+   cáo 4). Nếu script lỗi (mất mạng, key hỏng) thì ghi 1 dòng
+   "Báo cáo 5 lỗi: <lý do>" chứ không bịa kết quả.
+
+   Form thêm vào sau mục 4 (chỉ khi có phát sinh):
+   ```
+   5. Hoàn về chưa nhận (sàn báo đã trả về ≥3 ngày):[N] kiện
+      - [mã vận đơn] — [sàn], đơn [mã đơn], sàn báo về [dd/mm], trễ [X] ngày
+      ...
+      Mã quét lạ 7 ngày (không tra ra đơn nào): [mã] ([ngày quét]) ...
+   ```
+7. Gửi qua Telegram đúng form trong [reference_3_reports_doi_chieu_san](references/reference_3_reports_doi_chieu_san.md)
    (tiêu đề "📋 Báo cáo đối chiếu sàn — [ngày]"), rút gọn thành 1 câu nếu
-   cả 3 báo cáo đầu đều sạch VÀ Báo cáo 4 cũng không có đơn lệch.
+   cả 3 báo cáo đầu đều sạch VÀ Báo cáo 4 + Báo cáo 5 cũng không có gì.
 
 ## Reference
 

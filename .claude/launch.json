@@ -1,0 +1,32 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "sokho-test",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/0ac82ebb-30cb-4814-af90-6fd404b53020/scratchpad' && exec python3 -m http.server 8777"
+      ],
+      "port": 8777
+    },
+    {
+      "name": "sovanhanh-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/1e78f20b-a505-4b64-bf5c-2c40282a36bd/scratchpad/site' && exec python3 -m http.server 8793"
+      ],
+      "port": 8793
+    },
+    {
+      "name": "sokho-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/1e78f20b-a505-4b64-bf5c-2c40282a36bd/scratchpad/sokho' && exec python3 -m http.server 8795"
+      ],
+      "port": 8795
+    }
+  ]
+}

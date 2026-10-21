@@ -224,6 +224,7 @@ function buildDashboardHTML(){
       </div>
     </div>
     <button class="btn-secondary" id="btn-refresh-all-history" style="display:none;">🔄 Cập nhật lại lịch sử</button>
+    <button class="btn-secondary" id="btn-chot-thang" style="display:none;" title="Tính lại tháng đang xem, gộp thêm file Trả/hoàn của tháng sau — đơn trả rơi sang tháng sau không bị bỏ sót nữa">🔒 Chốt lại tháng</button>
     <div class="legend"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok Shop</span></div>
   </div>
   <div id="files-section"></div>
@@ -509,11 +510,233 @@ function renderResults(el, res, opts){
   el.innerHTML = render(res, opts);
   el.classList.add('show');
   wireDailyRevenueChart(el, res);
+  wirePnlCostForm(el, res, opts);
+  wireZoneControls(el, res, opts);
   refreshDashboardEmptyState();
   // Widget "Kỳ báo cáo" (gộp chung với "Xem kỳ") nằm ngoài #results, cập
   // nhật riêng khoảng ngày của kỳ đang xem tại đây.
   const datesLive = document.getElementById('rc-dates-live');
   if (datesLive) datesLive.textContent = fmtDateVN(res.minDate) + ' – ' + fmtDateVN(res.maxDate);
+}
+
+// ---------- Danh mục SKU từ Sapo (sku-catalog.json, sinh bởi tools/build_sku_catalog.py)
+// — tải 1 lần trước khi tính; thiếu file thì calc.js tự rơi về bảng dự phòng
+// (có cảnh báo trên dashboard, combo sẽ không được tách).
+let __skuCatalogPromise = null;
+function ensureSkuCatalog(){
+  if (!__skuCatalogPromise){
+    __skuCatalogPromise = fetch('sku-catalog.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.variants) window.SKU_CATALOG = j; return j; })
+      .catch(() => null);
+  }
+  return __skuCatalogPromise;
+}
+// Bảng giá vốn (cost-catalog.json, sinh từ sheet GiaCong của chủ shop) — cần
+// cho P&L; thiếu thì calc.js tự cảnh báo và để trống phần giá vốn.
+let __costCatalogPromise = null;
+function ensureCostCatalog(){
+  if (!__costCatalogPromise){
+    __costCatalogPromise = fetch('cost-catalog.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.cost) window.COST_CATALOG = j; return j; })
+      .catch(() => null);
+  }
+  return __costCatalogPromise;
+}
+
+// Snapshot tồn kho từ Sapo (inventory-snapshot.json, tools/sync_inventory.py)
+// — cần cho Zone Tồn kho; thiếu thì zone tự hiện ghi chú.
+let __inventoryPromise = null;
+function ensureInventory(){
+  if (!__inventoryPromise){
+    __inventoryPromise = fetch('inventory-snapshot.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.inventory) window.INVENTORY = j; return j; })
+      .catch(() => null);
+  }
+  return __inventoryPromise;
+}
+
+// Tốc độ bán 28 ngày gần nhất (sales-velocity.json, tools/sync_daily.py chạy
+// mỗi sáng bằng launchd — script thuần, không tốn token AI).
+let __velocityPromise = null;
+function ensureVelocity(){
+  if (!__velocityPromise){
+    __velocityPromise = fetch('sales-velocity.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.sold) window.SALES_VELOCITY = j; return j; })
+      .catch(() => null);
+  }
+  return __velocityPromise;
+}
+
+// ---------- nút Áp dụng của Zone Tồn kho + card Gói hoàn phí VC (21/10/2026) ----------
+// Lưu thông số vào localStorage rồi vẽ lại — buildInventoryHtml/buildShipRefundPackHtml
+// tự đọc localStorage khi render.
+function wireZoneControls(container, res, opts){
+  const invBtn = container.querySelector('#inv-apply');
+  if (invBtn) invBtn.addEventListener('click', () => {
+    try {
+      localStorage.setItem('svh_lead_time', String(num(container.querySelector('#inv-lead').value) || 20));
+      localStorage.setItem('svh_lead_buffer', String(num(container.querySelector('#inv-buffer').value) || 7));
+      localStorage.setItem('svh_cover_days', String(num(container.querySelector('#inv-cover').value) || 30));
+    } catch (e){}
+    renderResults(container, res, opts);
+  });
+  const packBtn = container.querySelector('#pack-apply');
+  if (packBtn) packBtn.addEventListener('click', () => {
+    try {
+      localStorage.setItem('svh_pack_sp', String(num(container.querySelector('#pack-gia-sp').value) || 2700));
+      localStorage.setItem('svh_pack_tt', String(num(container.querySelector('#pack-gia-tt').value) || 3000));
+    } catch (e){}
+    renderResults(container, res, opts);
+  });
+}
+
+// ---------- lương nhân viên kho — web tự tính từ Supabase Sổ Kho (21/10/2026) ----------
+// Đúng quy chế tab 6 Sổ Kho: MAX(lương sàn theo mùa; đơn người đó quét × 500đ)
+// + kiện khách trả (doi_tra) × 2.000đ + thưởng chất lượng theo tỷ lệ lỗi chung
+// (chuyên cần/gắn bó chủ shop tự quyết nên không tự cộng). Quản lý không tính.
+const PAYROLL_MANAGERS = ['minh', 'minh nguyễn thế'];
+async function tinhLuongKhoThang(y, m){ // m: 1-12
+  const start = `${y}-${String(m).padStart(2, '0')}-01`;
+  const endDate = new Date(y, m, 0);
+  const end = `${y}-${String(m).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+  async function all(path){
+    let out = [], off = 0;
+    while (true){
+      const rows = await sbFetch(path + `&order=id.asc&limit=1000&offset=${off}`) || [];
+      out = out.concat(rows);
+      if (rows.length < 1000) break;
+      off += 1000;
+    }
+    return out;
+  }
+  const [outb, rets, errs] = await Promise.all([
+    all(`warehouse_outbound_checks?select=staff,scan_date&scan_date=gte.${start}&scan_date=lte.${end}`),
+    all(`warehouse_return_checks?select=staff,return_type&scan_date=gte.${start}&scan_date=lte.${end}`),
+    all(`warehouse_error_log?select=error_type&created_at=gte.${start}T00:00:00&created_at=lte.${end}T23:59:59`),
+  ]);
+  const isManager = (st) => PAYROLL_MANAGERS.includes(String(st || '').trim().toLowerCase());
+  const looksCode = (st) => /^(SPX|VTP|GHN|GHTK|JT|VNP)/i.test(String(st || '').replace(/\s+/g, '')) || /^[0-9]{8,}$/.test(String(st || ''));
+  const base = (m >= 9 || m <= 2) ? 3000000 : 1500000; // cao điểm 1/9–hết 2
+  const errKhoVan = errs.filter(e => e.error_type === 'kho_van').length;
+  const denom = outb.length + rets.length;
+  const rate = denom ? errKhoVan / denom : null;
+  const qualityBonus = rate === null ? 0 : (rate < 0.005 ? 500000 : (rate <= 0.01 ? 250000 : 0));
+  const per = {};
+  for (const r of outb){
+    const st = String(r.staff || '').trim();
+    if (!st || isManager(st) || looksCode(st)) continue;
+    per[st] = per[st] || { don: 0, hoan: 0 };
+    per[st].don++;
+  }
+  for (const r of rets){
+    const st = String(r.staff || '').trim();
+    if (!st || isManager(st) || looksCode(st)) continue;
+    per[st] = per[st] || { don: 0, hoan: 0 };
+    if (r.return_type !== 'boom') per[st].hoan++; // kiện huỷ = 0đ (chốt 20/10)
+  }
+  let tong = 0;
+  const chiTiet = [];
+  for (const [st, d] of Object.entries(per)){
+    const luong = Math.max(base, d.don * 500) + d.hoan * 2000 + qualityBonus;
+    tong += luong;
+    chiTiet.push(`${st}: ${luong.toLocaleString('vi-VN')}đ (${d.don} đơn, ${d.hoan} kiện hoàn, thưởng CL ${qualityBonus.toLocaleString('vi-VN')}đ)`);
+  }
+  return { tong, chiTiet };
+}
+
+// ---------- lương nhân viên live (21/10/2026) ----------
+// Web tĩnh KHÔNG fetch thẳng Google Sheets được (CORS), nên tools/sync_daily.py
+// tải hộ mỗi sáng và ghi ra payroll-live.json { byMonth: { "2026-10": 1953952 } }.
+let __payrollLivePromise = null;
+function ensurePayrollLive(){
+  if (!__payrollLivePromise){
+    __payrollLivePromise = fetch('payroll-live.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null);
+  }
+  return __payrollLivePromise;
+}
+async function layLuongLiveThang(y, m){
+  const j = await ensurePayrollLive();
+  if (!j || !j.byMonth) return null;
+  const v = j.byMonth[`${y}-${String(m).padStart(2, '0')}`];
+  return (v === undefined || v === null) ? null : Number(v);
+}
+
+// ---------- form "Chi phí vận hành tháng" trong Zone Lãi lỗ (21/10/2026) ----------
+// Chi phí nhập tay (lương kho/live, vật tư, QC khác, khác) lưu vào CHÍNH bản
+// ghi tháng (data.chiPhiVanHanh) — không có bảng riêng. Đang xem tháng ĐÃ LƯU
+// (opts.recordId) thì PATCH lên server ngay; đang xem số vừa tính thì chỉ gắn
+// vào currentResult, sẽ được lưu cùng khi bấm "Lưu vào lịch sử".
+function wirePnlCostForm(container, res, opts){
+  const btn = container.querySelector('#pnl-cost-save');
+  if (!btn) return;
+  const statusEl = container.querySelector('#pnl-cost-status');
+
+  // nút ⟳ tự lấy lương: xác định tháng đang xem từ minDate của kỳ
+  container.querySelectorAll('[data-auto]').forEach(b => b.addEventListener('click', async () => {
+    const key = b.getAttribute('data-auto');
+    const input = container.querySelector('#pnl-cost-' + key);
+    const d = res.minDate ? new Date(res.minDate) : null;
+    if (!d || isNaN(d)){ if (statusEl) statusEl.textContent = 'Không xác định được tháng của kỳ đang xem.'; return; }
+    const y = d.getFullYear(), m = d.getMonth() + 1;
+    const old = b.textContent; b.textContent = '…'; b.disabled = true;
+    try {
+      if (key === 'luongKho'){
+        const r = await tinhLuongKhoThang(y, m);
+        input.value = fmtInt(r.tong);
+        if (statusEl) statusEl.textContent = r.chiTiet.length
+          ? `Lương kho tháng ${m}/${y}: ${r.chiTiet.join(' · ')} — bấm "Lưu" để ghi vào tháng này.`
+          : `Tháng ${m}/${y} chưa có nhân viên kho nào quét đơn (ngoài quản lý) → 0đ.`;
+      } else if (key === 'luongLive'){
+        const v = await layLuongLiveThang(y, m);
+        if (v === null){
+          if (statusEl) statusEl.textContent = `Chưa có số lương live cho tháng ${m}/${y} trong sheet (hoặc tab tháng đó chưa được khai báo) — nhập tay cũng được.`;
+        } else {
+          input.value = fmtInt(v);
+          if (statusEl) statusEl.textContent = `Lương live tháng ${m}/${y}: ${fmtVND(v)} (đọc từ sheet) — bấm "Lưu" để ghi.`;
+        }
+      }
+    } catch (err){
+      console.error(err);
+      if (statusEl) statusEl.textContent = 'Không lấy được: ' + err.message;
+    } finally { b.textContent = old; b.disabled = false; }
+  }));
+  btn.addEventListener('click', async () => {
+    const cp = {};
+    for (const f of PNL_COST_FIELDS){
+      const el2 = container.querySelector('#pnl-cost-' + f.key);
+      cp[f.key] = el2 ? num(el2.value) : 0;
+    }
+    res.chiPhiVanHanh = cp;
+    const recordId = opts && opts.recordId;
+    if (recordId){
+      btn.disabled = true;
+      if (statusEl) statusEl.textContent = 'Đang lưu…';
+      try {
+        await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(recordId), {
+          method: 'PATCH',
+          headers: { 'Prefer': 'return=minimal' },
+          body: JSON.stringify({ data: res, updated_at: new Date().toISOString() }),
+        });
+      } catch (err){
+        console.error(err);
+        if (statusEl) statusEl.textContent = 'Lưu thất bại: ' + err.message;
+        btn.disabled = false;
+        return;
+      }
+    }
+    // vẽ lại để P&L ăn ngay chi phí mới (lãi ròng, hoà vốn)
+    renderResults(container, res, opts);
+    const statusNew = container.querySelector('#pnl-cost-status');
+    if (statusNew) statusNew.textContent = recordId
+      ? 'Đã lưu chi phí vào tháng này (' + new Date().toLocaleTimeString('vi-VN') + ').'
+      : 'Đã áp vào số đang xem — bấm "Lưu vào lịch sử" để lưu hẳn.';
+  });
 }
 
 async function onCompute(){
@@ -527,6 +750,7 @@ async function onCompute(){
     if (!xlsxOk || typeof XLSX === 'undefined'){
       throw new Error('Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo). Thử tắt VPN/ad-blocker, đổi sang wifi/4G khác rồi bấm lại "Tính toán".');
     }
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
     currentResult = result;
@@ -770,6 +994,8 @@ function refreshHistorySelect(){
     : 'Chưa lưu tháng nào.';
   const refreshBtn = document.getElementById('btn-refresh-all-history');
   if (refreshBtn) refreshBtn.style.display = HISTORY.length > 0 ? '' : 'none';
+  const chotBtn = document.getElementById('btn-chot-thang');
+  if (chotBtn) chotBtn.style.display = HISTORY.length > 0 ? '' : 'none';
   const multiToggle = document.getElementById('rc-multi-toggle');
   if (multiToggle) multiToggle.style.display = HISTORY.length >= 2 ? '' : 'none';
   if (HISTORY.length < 2) setMultiMode(false);
@@ -933,9 +1159,11 @@ async function onHistorySelectChange(){
   const noteEl = document.getElementById('history-note');
   noteEl.textContent = 'Đang tải…';
   try {
+    await Promise.all([ensureSkuCatalog(), ensureCostCatalog(), ensureInventory(), ensureVelocity()]); // Zone Lãi lỗ + Tồn kho cần
     const rows = await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(v) + '&select=data,label,files');
     if (rows && rows[0]){
-      renderResults(resultsEl, rows[0].data, { label: rows[0].label });
+      // recordId để form Chi phí vận hành (Zone Lãi lỗ) lưu thẳng vào tháng này
+      renderResults(resultsEl, rows[0].data, { label: rows[0].label, recordId: v });
       renderFilesSection(rows[0].files);
       switchToTab('dashboard');
     }
@@ -1004,7 +1232,9 @@ async function onRefreshAllHistory(){
 
   let records;
   try {
-    records = await sbFetch('monthly_reports?select=id,label,files') || [];
+    // chiPhi: giữ lại "Chi phí vận hành" đã nhập tay khi tính lại (data bị thay
+    // nguyên khối — không giữ là mất phần nhập tay của chủ shop)
+    records = await sbFetch('monthly_reports?select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
   } catch (err){
     noteEl.textContent = 'Không lấy được danh sách: ' + err.message;
     btn.disabled = false;
@@ -1013,6 +1243,7 @@ async function onRefreshAllHistory(){
 
   let okCount = 0;
   const failed = [];
+  await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity(); // tính lại cũng cần danh mục SKU để tách combo
 
   for (let i = 0; i < records.length; i++){
     const record = records[i];
@@ -1027,6 +1258,7 @@ async function onRefreshAllHistory(){
       }
 
       const freshResult = await computeAll(localFiles);
+      if (record.chiPhi) freshResult.chiPhiVanHanh = record.chiPhi; // giữ chi phí nhập tay
 
       await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(record.id), {
         method: 'PATCH',
@@ -1047,6 +1279,96 @@ async function onRefreshAllHistory(){
     : `Đã cập nhật lại toàn bộ ${okCount} tháng theo công thức mới nhất.`;
 }
 
+// ---------- "Chốt lại tháng" (lỗi #5 doc Chuẩn hoá 10/2026) ----------
+// Số trả/hoàn của tháng N chỉ chuẩn khi gộp thêm yêu cầu trả phát sinh ở
+// tháng N+1 cho đơn đặt tháng N (file tải lúc đầu tháng N+1 chưa có chúng).
+// Nút này: tải lại file gốc của THÁNG ĐANG XEM + file Trả/hoàn Shopee & Trả
+// hàng TikTok của bản ghi THÁNG SAU đã lưu → tính lại → hỏi xác nhận trước
+// khi ghi đè số liệu tháng đang xem (file gốc & tên tháng giữ nguyên).
+function monthOfPeriodStart(periodStart){
+  // period_start các tháng lưu cũ có thể lệch sớm 1 ngày (bug UTC cũ, vd.
+  // Tháng 7 lưu 2026-06-30) — cộng 15 ngày rồi lấy tháng là luôn đúng.
+  const probe = new Date(new Date(periodStart).getTime() + 15 * 86400000);
+  return { y: probe.getFullYear(), m: probe.getMonth() };
+}
+async function onChotLaiThang(){
+  const sel = document.getElementById('history-select');
+  if (!sel || sel.value === 'current'){
+    alert('Chọn 1 tháng ĐÃ LƯU trong ô "Kỳ báo cáo" trước, rồi bấm "Chốt lại tháng".');
+    return;
+  }
+  const entry = HISTORY.find(h => h.id === sel.value);
+  if (!entry || !entry.period_start){
+    alert('Tháng đang xem không có kỳ dữ liệu (period_start) — không xác định được tháng sau.');
+    return;
+  }
+  const cur = monthOfPeriodStart(entry.period_start);
+  const next = HISTORY.find(h => {
+    if (!h.period_start || h.id === entry.id) return false;
+    const p = monthOfPeriodStart(h.period_start);
+    return (p.y === cur.y && p.m === cur.m + 1) || (p.y === cur.y + 1 && cur.m === 11 && p.m === 0);
+  });
+  if (!next){
+    alert('Chưa có bản ghi THÁNG SAU của "' + entry.label + '" trong lịch sử — cần lưu tháng sau (có file Trả/hoàn 2 sàn) trước rồi mới chốt được tháng này.');
+    return;
+  }
+  if (!confirm('Chốt lại "' + entry.label + '"?\n\nSẽ tải lại file gốc của tháng này + file Trả/hoàn của "' + next.label + '", tính lại trả/hoàn đầy đủ, rồi hỏi lần nữa trước khi ghi đè số liệu.')) return;
+
+  const noteEl = document.getElementById('history-note');
+  const setNote = (t) => { if (noteEl) noteEl.textContent = t; };
+  try {
+    const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
+    if (!xlsxOk || typeof XLSX === 'undefined') throw new Error('Không tải được thư viện đọc Excel.');
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity();
+    setNote('Đang tải dữ liệu 2 tháng…');
+    const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
+    const recCur = rows.find(r => r.id === entry.id), recNext = rows.find(r => r.id === next.id);
+    if (!recCur || !recNext) throw new Error('Không tải được bản ghi 2 tháng.');
+
+    async function fetchStored(f){
+      const resp = await fetch(sbStoragePublicUrl(f.path));
+      if (!resp.ok) throw new Error('Tải file "' + f.name + '" thất bại (HTTP ' + resp.status + ')');
+      const blob = await resp.blob();
+      return new File([blob], f.name, { type: blob.type || 'application/octet-stream' });
+    }
+    const localFiles = {};
+    for (const f of (recCur.files || [])){
+      setNote('Đang tải lại file tháng này: ' + f.name + '…');
+      localFiles[f.key] = await fetchStored(f);
+    }
+    const nextRr = (recNext.files || []).find(f => f.key === 'shopeeReturnRefund');
+    const nextTr = (recNext.files || []).find(f => f.key === 'tiktokReturns');
+    if (!nextRr && !nextTr) throw new Error('Bản ghi "' + next.label + '" không có file Trả/hoàn Shopee lẫn Trả hàng TikTok — không có gì để gộp.');
+    const thieu = [];
+    if (nextRr){ setNote('Đang tải file Trả/hoàn Shopee của tháng sau…'); localFiles.nextShopeeReturnRefund = await fetchStored(nextRr); } else thieu.push('Trả/hoàn Shopee');
+    if (nextTr){ setNote('Đang tải file Trả hàng TikTok của tháng sau…'); localFiles.nextTiktokReturns = await fetchStored(nextTr); } else thieu.push('Trả hàng TikTok');
+    if (thieu.length && !confirm('Tháng sau THIẾU file: ' + thieu.join(', ') + ' — vẫn chốt với phần còn lại?')) { setNote(''); return; }
+
+    setNote('Đang tính lại "' + entry.label + '" (đã gộp trả/hoàn tháng sau)…');
+    const fresh = await computeAll(localFiles);
+    if (recCur.chiPhi) fresh.chiPhiVanHanh = recCur.chiPhi; // giữ chi phí nhập tay khi chốt lại
+    renderResults(document.getElementById('results'), fresh, { label: entry.label + ' (đã chốt)', recordId: entry.id });
+    switchToTab('dashboard');
+
+    if (!confirm('Số mới đã hiện trên Dashboard.\n\nGHI ĐÈ số liệu đã lưu của "' + entry.label + '" bằng bản đã chốt này? (file gốc và tên tháng giữ nguyên — không hoàn tác được)')){
+      setNote('Đã tính lại nhưng CHƯA lưu — số trên dashboard chỉ là xem thử.');
+      return;
+    }
+    await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(entry.id), {
+      method: 'PATCH',
+      headers: { 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ data: fresh, updated_at: new Date().toISOString() }),
+    });
+    await refreshHistoryFromServer();
+    const selEl = document.getElementById('history-select');
+    if (selEl){ selEl.value = entry.id; renderRcDropdown(); }
+    setNote('Đã chốt lại "' + entry.label + '" và lưu lên server.');
+  } catch (err){
+    console.error(err);
+    setNote('Chốt lại tháng thất bại: ' + err.message);
+  }
+}
+
 function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
@@ -1058,6 +1380,11 @@ function init(){
   wireRcDropdown();
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
   document.getElementById('btn-refresh-all-history').addEventListener('click', onRefreshAllHistory);
+  document.getElementById('btn-chot-thang').addEventListener('click', onChotLaiThang);
+  ensureSkuCatalog();
+  ensureCostCatalog();
+  ensureInventory();
+  ensureVelocity();
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();
@@ -1068,3 +1395,74 @@ function init(){
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
 else init();
+
+/* ============================================================================
+   Banner "Hoàn về chưa nhận" — đối chiếu bảng platform_returns_feed (job đồng bộ
+   từ Sapo ghi vào, xem scripts/sync_returns_feed.py) với lượt quét đơn hoàn của
+   Sổ Kho (warehouse_return_checks). Chỉ hiện khi có kiện sàn báo ĐÃ TRẢ VỀ quá
+   3 ngày mà kho chưa quét nhận. Chi tiết từng kiện xem ở web Sổ Kho.
+============================================================================ */
+(async function returnAlertBadge(){
+  const GRACE_DAYS = 3;
+  const SOKHO_URL = 'https://nguyentheminh0610-ai.github.io/so-kho-pyjama/';
+  // chuẩn hoá mã vận đơn giống normalizeScanCode bên Sổ Kho (đảo lỗi bộ gõ Telex)
+  function normCode(raw){
+    let s = String(raw || '').trim().toUpperCase(), out = '';
+    for (const ch of s){
+      if (ch === 'Đ'){ out += 'DD'; continue; }
+      const nfd = ch.normalize('NFD');
+      const base = nfd[0], marks = nfd.slice(1);
+      let seq = base;
+      if (marks.includes('̂')) seq += base;
+      if (marks.includes('̆')) seq += 'W';
+      if (marks.includes('̛')) seq += 'W';
+      if (marks.includes('́')) seq += 'S';
+      if (marks.includes('̀')) seq += 'F';
+      if (marks.includes('̉')) seq += 'R';
+      if (marks.includes('̃')) seq += 'X';
+      if (marks.includes('̣')) seq += 'J';
+      out += seq;
+    }
+    return out.replace(/\s+/g, '');
+  }
+  async function fetchAll(path){
+    const rows = [];
+    for (let off = 0; ; off += 1000){
+      const sep = path.includes('?') ? '&' : '?';
+      let chunk;
+      try { chunk = await sbFetch(path + sep + 'limit=1000&offset=' + off); }
+      catch (e){ if (off === 0) throw e; break; }
+      rows.push(...(chunk || []));
+      if (!chunk || chunk.length < 1000) break;
+    }
+    return rows;
+  }
+  try {
+    const [feed, scans] = await Promise.all([
+      fetchAll('platform_returns_feed?select=return_tracking,outbound_tracking,shipment_status,returned_on,created_on,resolved_at'),
+      fetchAll('warehouse_return_checks?select=code'),
+    ]);
+    const scanned = new Set(scans.map(r => normCode(r.code)).filter(Boolean));
+    const today = new Date(new Date().toDateString()).getTime();
+    let overdue = 0;
+    for (const row of feed){
+      if (row.resolved_at) continue; // đã bấm "Đã xử lý — ẩn" bên Sổ Kho
+      if (row.shipment_status !== 'returned') continue;
+      const cands = [row.return_tracking || '', ...String(row.outbound_tracking || '').split('+')];
+      if (cands.some(c => c && scanned.has(normCode(c)))) continue;
+      const ref = row.returned_on || row.created_on;
+      const days = ref ? Math.floor((today - new Date(ref + 'T00:00:00').getTime()) / 86400000) : 0;
+      if (days >= GRACE_DAYS) overdue++;
+    }
+    if (!overdue) return;
+    const wrap = document.querySelector('.wrap') || document.body;
+    const div = document.createElement('div');
+    div.id = 'return-alert-badge';
+    div.style.cssText = 'background:#fff2f2;border:1px solid #e5484d;border-radius:10px;padding:10px 14px;margin:0 0 12px;font-size:13.5px;color:#7d2225;display:flex;gap:8px;align-items:center;flex-wrap:wrap;';
+    div.innerHTML = '🔴 <b>' + overdue + ' kiện hoàn</b> sàn báo đã trả về kho quá ' + GRACE_DAYS +
+      ' ngày nhưng chưa được tích nhận — <a href="' + SOKHO_URL + '" target="_blank" rel="noopener" style="color:#c62a2f;font-weight:600;">mở Sổ Kho xem danh sách</a>';
+    wrap.insertBefore(div, wrap.firstChild);
+  } catch (e){
+    console.warn('return alert badge:', e.message); // bảng chưa tạo / lỗi mạng — im lặng bỏ qua
+  }
+})();
