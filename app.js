@@ -230,24 +230,25 @@ function buildSkuPerformanceHtml(res){
   if (!sp || !sp.items || !sp.items.length){
     return '<p style="font-size:12px;color:var(--ink-faint);">Chưa tính được — kiểm tra mục cảnh báo ở trên (cột SKU/số lượng chưa đọc được).</p>';
   }
+  // Gọn lại 21/10 (yêu cầu chủ shop): mỗi mẫu đúng 1 DÒNG BẢNG thay cho 1 khối
+  // 3 tầng — thanh tỷ trọng size nằm luôn trong ô, bỏ legend rời (đã có nhãn
+  // trong lát + tooltip), thêm cột "size bán chạy" để nhìn là ra quyết định.
   const dayNote = sp.periodDays ? `SL bán trung bình/ngày (chia cho ${sp.periodDays} ngày của kỳ đang xem) và tỷ trọng theo size:` : 'SL bán trung bình/ngày và tỷ trọng theo size:';
   const rowsHtml = sp.items.map(item => {
     const barHtml = item.sizes.map(s => {
-      const showLabel = s.pct >= 0.08; // lát quá hẹp thì bỏ chữ, tránh đè lên nhau
+      const showLabel = s.pct >= 0.12; // lát quá hẹp thì bỏ chữ, tránh đè lên nhau
       return `<div class="sku-size-seg" style="width:${(s.pct * 100).toFixed(2)}%; background:${skuSizeColor(s.size)};" title="${esc(s.size)}: ${fmtInt(s.sl)} sp (${fmtPct(s.pct, 0)})">${showLabel ? `<span>${esc(s.size)} ${fmtPct(s.pct, 0)}</span>` : ''}</div>`;
     }).join('');
-    const legendHtml = item.sizes.map(s => `<span class="sku-size-legend-item"><i style="background:${skuSizeColor(s.size)}"></i>${esc(s.size)} ${fmtPct(s.pct, 0)}</span>`).join('');
-    return `
-    <div class="sku-perf-row">
-      <div class="sku-perf-head">
-        <span class="sku-perf-name">${esc(item.ten)}</span>
-        <span class="sku-perf-day"><b>${item.slNgay === null ? '—' : item.slNgay.toFixed(1)}</b> sp/ngày</span>
-      </div>
-      <div class="sku-size-bar">${barHtml}</div>
-      <div class="sku-size-legend">${legendHtml}</div>
-    </div>`;
+    const top = item.sizes.slice().sort((a, b) => b.sl - a.sl)[0];
+    return `<tr>
+      <td>${esc(item.ten)}</td>
+      <td class="num"><b>${item.slNgay === null ? '—' : item.slNgay.toFixed(1)}</b></td>
+      <td class="sku-size-cell"><div class="sku-size-bar" style="margin:0;">${barHtml}</div></td>
+      <td class="num">${top ? esc(top.size) + ' <span class="pnl-pct">' + fmtPct(top.pct, 0) + '</span>' : '—'}</td>
+    </tr>`;
   }).join('');
-  return `<div class="sku-perf-note">${esc(dayNote)}</div><div class="sku-perf-list">${rowsHtml}</div>`;
+  return `<div class="sku-perf-note">${esc(dayNote)}</div>
+  <table class="dtable"><thead><tr><th>Mẫu</th><th style="text-align:right">sp/ngày</th><th>Tỷ trọng size</th><th style="text-align:right">Size bán chạy</th></tr></thead><tbody>${rowsHtml}</tbody></table>`;
 }
 
 function buildAffiliateKocSectionHtml(res){
@@ -261,65 +262,11 @@ function buildAffiliateKocSectionHtml(res){
   ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
   <!-- ZONE 7 -->
-  <div class="zone"><span class="z-num">8</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
+  <div class="zone"><span class="z-num">7</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — 10 KOC hàng đầu mỗi bảng</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
   ${buildAffiliateTable2Html(aff.table2)}${liveSectionHtml}${ctorCtrSectionHtml}`;
-}
-
-// ---------- Khách hàng theo khu vực — donut % số đơn theo tỉnh/thành (gộp 2
-// sàn). Tái dùng đúng component donut sẵn có (.donut-body/.donut-ring/
-// conic-gradient/.donut-legend/.dl-row); 6 lát tỉnh = 6 sắc độ nhạt dần của
-// đúng màu chủ đạo --accent (color-mix với --surface, không thêm màu mới),
-// lát "Khác" = --ink-faint (xám muted có sẵn). ----------
-const REGION_SHADES = [
-  'var(--accent)',
-  'color-mix(in srgb, var(--accent) 80%, var(--surface))',
-  'color-mix(in srgb, var(--accent) 64%, var(--surface))',
-  'color-mix(in srgb, var(--accent) 50%, var(--surface))',
-  'color-mix(in srgb, var(--accent) 38%, var(--surface))',
-  'color-mix(in srgb, var(--accent) 28%, var(--surface))',
-];
-
-function buildKhuVucHtml(res){
-  const kv = res.khuVuc;
-  if (!kv || !kv.total || !kv.rows || !kv.rows.length){
-    return '<div class="ct-title">Khách hàng theo khu vực</div><p style="font-size:12px;color:var(--ink-faint);">Chưa đọc được cột tỉnh/thành từ file "tất cả đơn hàng".</p>';
-  }
-  const rows = kv.rows.map((r, i) => ({
-    ten: r.ten,
-    soDon: r.soDon,
-    pct: kv.total ? r.soDon / kv.total : 0,
-    color: r.isKhac ? 'var(--ink-faint)' : REGION_SHADES[i % REGION_SHADES.length],
-  }));
-  let acc = 0;
-  const stops = [];
-  const sliceLabels = [];
-  for (const r of rows){
-    const pct = r.pct * 100;
-    stops.push(`${r.color} ${acc.toFixed(2)}% ${(acc + pct).toFixed(2)}%`);
-    if (r.pct >= 0.04){
-      const mid = (acc + pct / 2) / 100; // tỉ lệ tính từ đỉnh, theo chiều kim đồng hồ
-      const x = 95 + 82 * Math.sin(2 * Math.PI * mid);
-      const y = 95 - 82 * Math.cos(2 * Math.PI * mid);
-      sliceLabels.push(`<span class="region-slice-lbl" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;">${fmtPct(r.pct, 0)}</span>`);
-    }
-    acc += pct;
-  }
-  const legendRows = rows.map(r =>
-    `<div class="dl-row"><i style="background:${r.color}"></i><span class="dl-name">${esc(r.ten)}</span><span class="dl-count">${fmtInt(r.soDon)} đơn</span><span class="dl-pct">${fmtPct(r.pct, 1)}</span></div>`
-  ).join('');
-  return `<div class="ct-title">Khách hàng theo khu vực <span class="ct-note">(% số đơn, gộp Shopee + TikTok)</span></div>
-  <div class="donut-body">
-    <div class="region-donut-wrap">
-      <div class="donut-ring" style="background:conic-gradient(${stops.join(', ')})">
-        <div class="donut-center"><span class="d-val">${fmtInt(kv.total)}</span><span class="d-lbl">tổng SL đơn</span></div>
-      </div>
-      ${sliceLabels.join('')}
-    </div>
-    <div class="donut-legend">${legendRows}</div>
-  </div>`;
 }
 
 // ---------- Bảng phí sàn tách từng loại (lỗi #4 doc Chuẩn hoá 10/2026) ----------
@@ -438,13 +385,17 @@ function buildPnlHtml(res, opts){
     .filter(x => x.doanhThu !== undefined)
     .slice().sort((a, b) => (b.laiGop === null ? -1 : b.laiGop) - (a.laiGop === null ? -1 : a.laiGop));
   const tongDtSp = items.reduce((s2, x) => s2 + (x.doanhThu || 0), 0);
+  // Chủ shop chốt 21/10: bảng này chỉ cần doanh thu + lãi cuối cùng (lãi ròng
+  // từng SP = lãi gộp − phí sàn phân bổ theo % doanh thu). Các cột trung gian
+  // (giá vốn, lãi gộp, biên, phí sàn phân bổ) đã bỏ cho gọn.
   const spTableHtml = items.length ? `
-  <div class="sub-label">Lãi theo sản phẩm <span style="text-transform:none;font-weight:400;">— phí sàn PHÂN BỔ theo % doanh thu từng SP (xấp xỉ); doanh thu SP phân bổ theo dòng nên tổng hơi cao hơn Doanh thu hàng; combo đã tách về SKU con; chưa trừ chi phí hoàn và ads theo SP (chờ dữ liệu)</span></div>
-  <table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">SL</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Lãi gộp</th><th style="text-align:right">Biên gộp</th><th style="text-align:right">Phí sàn phân bổ</th><th style="text-align:right">Lãi sau phí sàn</th></tr></thead><tbody>
+  <div class="sub-label">Lãi theo sản phẩm <span style="text-transform:none;font-weight:400;">— lãi cuối = doanh thu − giá vốn − phí sàn phân bổ theo % doanh thu (xấp xỉ); combo đã tách về SKU con; chưa trừ chi phí hoàn và ads theo SP</span></div>
+  <table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">SL</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Lãi cuối</th></tr></thead><tbody>
     ${items.map(x => {
       const phiPB = tongDtSp ? p.phiSan * ((x.doanhThu || 0) / tongDtSp) : 0;
       const laiSauPhi = x.laiGop === null ? null : x.laiGop - phiPB;
-      return `<tr><td>${esc(x.ten)}</td><td class="num">${fmtInt(x.tongSL)}</td><td class="num">${fmtVND(x.doanhThu)}</td><td class="num">${x.thieuGiaVon ? '<span title="thiếu giá vốn ' + fmtInt(x.thieuGiaVon) + ' sp">thiếu</span>' : fmtVND(x.giaVon)}</td><td class="num">${x.laiGop === null ? '—' : fmtVND(x.laiGop)}</td><td class="num">${x.laiGop === null || !x.doanhThu ? '—' : fmtPct(x.laiGop / x.doanhThu, 0)}</td><td class="num">${fmtVND(phiPB)}</td><td class="num">${laiSauPhi === null ? '—' : '<b>' + fmtVND(laiSauPhi) + '</b>'}</td></tr>`;
+      const bien = (laiSauPhi !== null && x.doanhThu) ? ` <span class="pnl-pct">${fmtPct(laiSauPhi / x.doanhThu, 0)}</span>` : '';
+      return `<tr><td>${esc(x.ten)}</td><td class="num">${fmtInt(x.tongSL)}</td><td class="num">${fmtVND(x.doanhThu)}</td><td class="num">${laiSauPhi === null ? '<span title="thiếu giá vốn ' + fmtInt(x.thieuGiaVon || 0) + ' sp">thiếu giá vốn</span>' : '<b>' + fmtVND(laiSauPhi) + '</b>' + bien}</td></tr>`;
     }).join('')}
   </tbody></table>` : '';
 
@@ -642,34 +593,83 @@ function buildInventoryHtml(res){
 // ước tính nếu đăng ký gói = số đơn hoàn thành × đơn giá gói, (3) ĐỀ XUẤT.
 // Đơn giá gói chỉnh được (Shopee mặc định 2.700đ/đơn — đo từ chính tháng 7 còn
 // dùng gói: 534.600đ ÷ ~198 đơn; TikTok tạm 3.000đ/đơn — sửa khi có giá thật).
+// Tách riêng 2 sàn (yêu cầu chủ shop 21/10) vì mỗi sàn một gói, một đơn giá và
+// một cách tính khác nhau — gộp lại thì không trả lời được "sàn nào nên đăng ký".
+// So sánh đúng 2 phương án trên CÙNG một tháng:
+//   không gói  = shop tự chịu toàn bộ ship hoàn/huỷ (o.tuTra)
+//   có gói     = ship hoàn/huỷ + phí gói − phần gói hoàn lại (o.coGoi)
+// Tháng nào file đã có phí gói thật (Shopee bật PiShip) thì "có gói" là SỐ THẬT,
+// tháng chưa dùng gói thì "có gói" = số đơn × đơn giá gói (coi như gói hoàn hết
+// ship hoàn, tức ước tính CÓ LỢI NHẤT cho gói — gói vẫn đắt thì chắc chắn đắt).
+function packCardHtml(o){
+  const chenh = o.tuTra - o.coGoi;          // >0 = dùng gói rẻ hơn
+  const nen = chenh > 0;
+  const deXuat = o.dangDungGoi
+    ? (nen ? 'NÊN GIỮ — gói đang tiết kiệm ' + fmtVND(chenh) + '/tháng'
+           : 'NÊN HUỶ — gói đang làm shop tốn thêm ' + fmtVND(-chenh) + '/tháng')
+    : (nen ? 'NÊN ĐĂNG KÝ — tiết kiệm ~' + fmtVND(chenh) + '/tháng'
+           : 'KHÔNG NÊN — tốn thêm ~' + fmtVND(-chenh) + '/tháng');
+  return `
+  <div class="card single"><div class="c-title"><span class="plat ${o.cls}"><i></i>${o.ten}</span> — ${o.tenGoi}</div>
+    ${o.coDuLieu ? `
+    <div class="pnl-row"><span class="pnl-label">1. KHÔNG dùng gói: shop tự trả ship hoàn/huỷ <span class="pnl-note">${o.ghiChu1}</span></span><span class="pnl-value">${fmtVND(o.tuTra)}</span></div>
+    <div class="pnl-row"><span class="pnl-label">2. ${o.dangDungGoi ? 'CÓ gói (đang dùng tháng này)' : 'CÓ gói (ước tính)'} <span class="pnl-note">${o.ghiChu2}</span></span><span class="pnl-value">${fmtVND(o.coGoi)}</span></div>
+    <div class="pnl-row total"><span class="pnl-label">3. ĐỀ XUẤT</span><span class="pnl-value" style="color:${nen ? 'var(--good)' : 'var(--warn)'};">${deXuat}</span></div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
+      <label class="inv-cfg">Giá gói <input type="number" id="pack-gia-${o.key}" min="0" value="${o.giaGoi}"> đ/đơn</label>
+      <button class="btn-secondary pack-apply" style="padding:5px 12px;">Áp dụng</button>
+    </div>`
+    : '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Tháng này lưu bằng công thức cũ — bấm "🔄 Cập nhật lại lịch sử" để có số phí vận chuyển hoàn/huỷ.</p>'}
+  </div>`;
+}
+
 function buildShipRefundPackHtml(res){
   const s2 = res.shopee || {}, t2 = res.tiktok || {};
-  const shipSp = (s2.phiSanChiTiet && Number(s2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
-  const shipTt = (t2.phiSanChiTiet && Number(t2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
-  const daTra = shipSp + shipTt;
   let giaSp = 2700, giaTt = 3000;
   try {
     giaSp = Number(localStorage.getItem('svh_pack_sp')) || 2700;
     giaTt = Number(localStorage.getItem('svh_pack_tt')) || 3000;
   } catch (e){}
-  const donSp = s2.hoanThanh || 0, donTt = t2.hoanThanh || 0;
-  const uocTinh = donSp * giaSp + donTt * giaTt;
-  const coDuLieu = !!(s2.phiSanChiTiet || t2.phiSanChiTiet);
-  const chenh = daTra - uocTinh;
-  const nenDangKy = chenh > 0;
-  return `
-  <div class="card single"><div class="c-title">Gói hoàn phí vận chuyển (PiShip…) — nên đăng ký không?</div>
-    ${coDuLieu ? `
-    <div class="pnl-row"><span class="pnl-label">1. Ship hoàn/huỷ shop ĐÃ TỰ TRẢ tháng này <span class="pnl-note">(Shopee ${fmtVND(shipSp)} · TikTok ${fmtVND(shipTt)})</span></span><span class="pnl-value">${fmtVND(daTra)}</span></div>
-    <div class="pnl-row"><span class="pnl-label">2. Nếu đăng ký gói, phí ước tính <span class="pnl-note">(${fmtInt(donSp)} đơn Shopee × ${fmtInt(giaSp)}đ + ${fmtInt(donTt)} đơn TikTok × ${fmtInt(giaTt)}đ)</span></span><span class="pnl-value">${fmtVND(uocTinh)}</span></div>
-    <div class="pnl-row total"><span class="pnl-label">3. ĐỀ XUẤT</span><span class="pnl-value" style="color:${nenDangKy ? 'var(--good)' : 'var(--warn)'};">${nenDangKy ? 'NÊN ĐĂNG KÝ — tiết kiệm ~' + fmtVND(chenh) + '/tháng' : 'KHÔNG NÊN — tốn thêm ~' + fmtVND(-chenh) + '/tháng'}</span></div>
-    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
-      <label class="inv-cfg">Giá gói Shopee <input type="number" id="pack-gia-sp" min="0" value="${giaSp}"> đ/đơn</label>
-      <label class="inv-cfg">TikTok <input type="number" id="pack-gia-tt" min="0" value="${giaTt}"> đ/đơn</label>
-      <button class="btn-secondary" id="pack-apply" style="padding:5px 12px;">Áp dụng</button>
-    </div>`
-    : '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Tháng này lưu bằng công thức cũ — bấm "Cập nhật lại lịch sử" để có số phí vận chuyển trả hàng.</p>'}
-  </div>`;
+
+  // --- Shopee: file Income tách sẵn 2 loại ship hoàn + chính phí gói PiShip,
+  // nên tháng nào đang dùng gói thì chấm điểm bằng SỐ THẬT, không phải ước tính.
+  const sh = s2.shipHoan;
+  const spDaTra = sh
+    ? (Number(sh.traHang) || 0) + (Number(sh.giaoKhongTC) || 0)
+    : (s2.phiSanChiTiet && Number(s2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
+  const spDungGoi = !!(sh && Number(sh.goiPhi) > 0);
+  const spGoiPhi = spDungGoi ? Number(sh.goiPhi) || 0 : 0;
+  const spGoiHoan = spDungGoi ? Number(sh.goiHoan) || 0 : 0;
+  const spCard = packCardHtml({
+    ten: 'Shopee', cls: 'shopee', key: 'sp', tenGoi: 'gói PiShip',
+    coDuLieu: !!(sh || s2.phiSanChiTiet), dangDungGoi: spDungGoi,
+    tuTra: spDaTra,
+    coGoi: spDungGoi ? spDaTra + spGoiPhi - spGoiHoan : (s2.hoanThanh || 0) * giaSp,
+    giaGoi: giaSp,
+    ghiChu1: sh
+      ? `(đơn trả hàng/hoàn tiền ${fmtVND(Number(sh.traHang) || 0)} + đơn giao không thành công ${fmtVND(Number(sh.giaoKhongTC) || 0)})`
+      : '(cột "Phí vận chuyển trả hàng" file Income)',
+    ghiChu2: spDungGoi
+      ? `(ship hoàn ${fmtVND(spDaTra)} + phí dịch vụ PiShip thật ${fmtVND(spGoiPhi)} − PiShip hoàn lại ${fmtVND(spGoiHoan)})`
+      : `(${fmtInt(s2.hoanThanh || 0)} đơn hoàn thành × ${fmtInt(giaSp)}đ, coi như gói hoàn hết ship hoàn)`,
+  });
+
+  // --- TikTok: KHÔNG lấy tổng "Phí vận chuyển shop chịu" (gồm cả đơn bán bình
+  // thường) mà chỉ lấy phần ship của đúng các đơn CÓ HOÀN TIỀN + phí VC trả hàng.
+  const th = t2.shipHoan;
+  const ttDaTra = th
+    ? (Number(th.traHang) || 0) + (Number(th.shipShopChiu) || 0)
+    : (t2.phiSanChiTiet && Number(t2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
+  const ttCard = packCardHtml({
+    ten: 'TikTok', cls: 'tiktok', key: 'tt', tenGoi: 'gói hoàn phí vận chuyển',
+    coDuLieu: !!(th || t2.phiSanChiTiet), dangDungGoi: false,
+    tuTra: ttDaTra, coGoi: (t2.hoanThanh || 0) * giaTt, giaGoi: giaTt,
+    ghiChu1: th
+      ? `(phí VC trả hàng thực tế ${fmtVND(Number(th.traHang) || 0)} + ship shop chịu trên ${fmtInt(Number(th.soDon) || 0)} đơn có hoàn tiền ${fmtVND(Number(th.shipShopChiu) || 0)}) — TikTok tự gánh gần hết ship hoàn nên số này nhỏ hơn Shopee`
+      : '(tháng cũ: chỉ có cột "Phí vận chuyển trả hàng thực tế")',
+    ghiChu2: `(${fmtInt(t2.hoanThanh || 0)} đơn hoàn thành × ${fmtInt(giaTt)}đ, coi như gói hoàn hết ship hoàn — sửa đơn giá khi biết giá thật)`,
+  });
+  return spCard + ttCard;
 }
 
 // ---------- render ----------
@@ -732,31 +732,6 @@ function render(res, opts){
     </div>`;
   }
 
-  // product CTR / conversion columns
-  let ctrHtml = '', convHtml = '', prodTableHtml = '';
-  if (res.sanPham && res.sanPham.length){
-    const prods = res.sanPham;
-    const maxCtr = Math.max(...prods.map(p => p.ctr), 0.0001);
-    const maxConv = Math.max(...prods.map(p => p.chuyenDoi), 0.0001);
-    const worstConvIdx = prods.reduce((wi, p, i, arr) => p.chuyenDoi < arr[wi].chuyenDoi ? i : wi, 0);
-    const shortName = (nm) => {
-      if (!nm) return '(?)';
-      const words = nm.split(/[,\s]+/).filter(Boolean);
-      return words.slice(0, 3).join(' ');
-    };
-    ctrHtml = `<div class="colchart-wrap">${prods.map(p =>
-      `<div class="col-item"><span class="bar-val">${fmtPct(p.ctr,2)}</span><div class="bar" style="height:${Math.round(p.ctr/maxCtr*150)}px; background:var(--accent)"></div></div>`
-    ).join('')}</div><div class="col-labels">${prods.map(p => `<span>${esc(shortName(p.ten))}</span>`).join('')}</div>`;
-    convHtml = `<div class="colchart-wrap">${prods.map((p,i) =>
-      `<div class="col-item"><span class="bar-val" style="${i===worstConvIdx?'color:var(--warn)':''}">${fmtPct(p.chuyenDoi,2)}</span><div class="bar" style="height:${Math.round(p.chuyenDoi/maxConv*150)}px; background:${i===worstConvIdx?'var(--warn)':'var(--ink-faint)'}"></div>${i===worstConvIdx?'<span class="col-flag">thấp nhất</span>':''}</div>`
-    ).join('')}</div><div class="col-labels">${prods.map(p => `<span>${esc(shortName(p.ten))}</span>`).join('')}</div>`;
-    prodTableHtml = `<table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">Doanh số</th><th style="text-align:right">CTR</th><th style="text-align:right">Tỷ lệ chuyển đổi</th></tr></thead><tbody>
-      ${prods.map(p => `<tr><td>${esc(p.ten)}</td><td class="num">${fmtVND(p.doanhSo)}</td><td class="num">${fmtPct(p.ctr,2)}</td><td class="num">${fmtPct(p.chuyenDoi,2)}</td></tr>`).join('')}
-    </tbody></table>`;
-  } else {
-    ctrHtml = convHtml = '<p style="font-size:12px;color:var(--ink-faint);">Chưa có dữ liệu (cần file Shop Stats).</p>';
-  }
-
 
   const warningsHtml = (res.warnings && res.warnings.length) || res.ssWarning
     ? `<div class="card" style="border-color:var(--warn); margin-bottom:16px;">
@@ -801,12 +776,8 @@ function render(res, opts){
 
   ${buildInventoryHtml(res)}
 
-  <!-- ZONE 4 -->
-  <div class="zone"><span class="z-num">4</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
-  <div class="chart-card" style="margin-bottom:14px;">${buildKhuVucHtml(res)}</div>
-
-  <!-- ZONE 4 -->
-  <div class="zone"><span class="z-num">5</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
+  <!-- ZONE 4 (chủ shop bỏ zone "Khách hàng theo khu vực" ngày 21/10/2026) -->
+  <div class="zone"><span class="z-num">4</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
   <div class="grid cols-2">
     <div class="card"><div class="c-title">Tỷ lệ huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(/ tổng đơn đặt)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtPct(s.huyHoanTra/(s.tongDon||1))}</span></div><div class="divider"></div>
@@ -826,7 +797,7 @@ function render(res, opts){
   </div>
 
   <!-- ZONE 5 -->
-  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
+  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.slove)}</span>${pill(n4.slove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
@@ -840,15 +811,10 @@ function render(res, opts){
     </div>
   </div>
 
-  <!-- ZONE 6 -->
-  <div class="zone"><span class="z-num">7</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
+  <!-- ZONE 6 (chủ shop bỏ 2 chart CTR / tỷ lệ chuyển đổi và bảng Chi tiết sản
+       phẩm của Shop Stats ngày 21/10/2026 — chỉ giữ doanh thu theo kênh) -->
+  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
   <div class="chart-card" style="margin-bottom:14px;"><div class="ct-title">Doanh thu theo kênh</div>${channelHtml}</div>
-  <div class="chart-grid">
-    <div class="chart-card"><div class="ct-title">CTR theo sản phẩm <span class="ct-note">(kênh Thẻ sản phẩm)</span></div>${ctrHtml}</div>
-    <div class="chart-card"><div class="ct-title">Tỷ lệ chuyển đổi theo sản phẩm <span class="ct-note">(kênh Thẻ sản phẩm)</span></div>${convHtml}</div>
-  </div>
-  <div class="sub-label">Chi tiết sản phẩm</div>
-  ${prodTableHtml}
 
   <div class="sub-label">Hiệu suất theo SKU/size <span style="text-transform:none;font-weight:400;">— gộp 2 sàn, chỉ tính đơn Hoàn thành</span></div>
   ${buildSkuPerformanceHtml(res)}
