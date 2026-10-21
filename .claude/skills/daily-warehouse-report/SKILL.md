@@ -5,6 +5,14 @@ description: Run the "3 báo cáo đối chiếu sàn" (+ bonus Báo cáo 4) dai
 
 # Báo cáo kho hàng ngày — 3 báo cáo đối chiếu sàn
 
+## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
+
+Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac
+"MacBook Air của nguyễn") → **DỪNG NGAY**: không mở trình duyệt, không đọc
+Sổ Kho, **không gửi Telegram**, chỉ trả lời 1 câu "Bỏ qua: báo cáo kho chỉ
+chạy trên máy Windows." Chủ shop chốt 2026-10-21 — Mac cũng chạy lịch này
+nên Telegram nhận 2 báo cáo (17:32/17:33 từ Mac + 17:39 từ Windows).
+
 ## What this is for
 
 **Giờ chạy cố định: 17:30 hằng ngày** (chốt 2026-10-13, thay cho "cuối
@@ -55,8 +63,9 @@ it and send the report, no need to ask first.
   `scan_date`, `created_at`. Full details: [reference_sokho_pyjama_tables](references/reference_sokho_pyjama_tables.md).
 - `warehouse_notices` ("📌 Việc cần làm"), case `category=eq.gui_don_bu`
   ("Gửi đơn bù" — xem [[resend-missing-item]]): `order_code` (mã vận đơn
-  SPX của lô hàng BÙ, không phải mã đơn gốc), `content` (text ngắn, có
-  ghi "- don goc #<mã gốc>"), `created_at`, `done`/`done_at`. Dùng cho
+  SPX của lô hàng BÙ, không phải mã đơn gốc), `content` (dạng
+  "<mã gốc> - 1 Quần ..."; dòng cũ trước 2026-10-20 có thể là
+  "Gui bu ... - don goc #<mã gốc>"), `created_at`, `done`/`done_at`. Dùng cho
   Báo cáo 4 (bổ sung 2026-10-09).
 - **"Tích đơn đi" ý nghĩa thật** (verified từ chính UI app, 2026-10-07):
   *"Lưu lại phòng khi đơn thất lạc trên đường tới kho vận chuyển — chỉ cần

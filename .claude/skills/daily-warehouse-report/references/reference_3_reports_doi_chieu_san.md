@@ -79,7 +79,7 @@ Nếu cả 3 mục đều "sạch" (shiper lấy hết, không đơn chưa đón
 
 **Cách check:**
 1. Lấy danh sách "đơn gửi bù" từ bảng `warehouse_notices` (`category=eq.gui_don_bu`), lọc `created_at` trong 48 giờ gần nhất.
-2. Với mỗi dòng, lấy `order_code` (đây là mã vận đơn SPX của lô hàng bù, KHÔNG phải mã đơn gốc — xem field `content` nếu cần đối chiếu ngược lại đơn gốc, thường ghi dạng "Gui bu ... - don goc #<mã gốc>").
+2. Với mỗi dòng, lấy `order_code` (đây là mã vận đơn SPX của lô hàng bù, KHÔNG phải mã đơn gốc — xem field `content` nếu cần đối chiếu ngược lại đơn gốc, dạng "<mã gốc> - <SL> Quần <phân loại> <size>"; dòng cũ có thể là "Gui bu ... - don goc #<mã gốc>").
 3. Tra từng `order_code` đó trong `warehouse_outbound_checks` (`?code=eq.<order_code>&select=*`, KHÔNG giới hạn `scan_date` — tra toàn bộ lịch sử).
 4. Mã nào **không có** trong `warehouse_outbound_checks` → đơn gửi bù này CHƯA được tích là đã gửi đi thật → cần báo cáo, vì khách đang chờ mà có thể kiện hàng còn nằm ở kho.
 5. Báo cáo: **CHỈ thêm mục này vào báo cáo khi có ít nhất 1 đơn gửi bù chưa tích đi** (lệch) — liệt kê số lượng + mã đơn (SPX code) + nội dung ngắn gọn (`content`) của từng đơn lệch đó, để biết hàng gì / đơn gốc nào — khác với Báo cáo 2/3 (chỉ số lượng), vì đây là case cần xử lý gấp (khách đã đợi 1 lần thiếu hàng rồi).
@@ -88,6 +88,6 @@ Nếu cả 3 mục đều "sạch" (shiper lấy hết, không đơn chưa đón
 **Thêm vào form tin nhắn** (sau mục 3, nếu có phát sinh):
 ```
 4. Đơn gửi bù chưa tích đi (48h gần nhất): [N] đơn
-   - [mã vận đơn SPX] — [content, vd "Gui bu 1 Chat Long-Shin, L - don goc #..."]
+   - [mã vận đơn SPX] — [content, vd "586635843530425651 - 1 Quần Chất Lông-Shin L"]
    ...
 ```
