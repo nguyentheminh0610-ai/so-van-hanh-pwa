@@ -261,7 +261,7 @@ function buildAffiliateKocSectionHtml(res){
   ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
   <!-- ZONE 7 -->
-  <div class="zone"><span class="z-num">7</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
+  <div class="zone"><span class="z-num">8</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — theo KOC</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
@@ -438,6 +438,99 @@ function buildPnlHtml(res, opts){
   ${spTableHtml}`;
 }
 
+// ---------- ZONE Tồn kho & cần nhập (mục tuần 4 doc Chuẩn hoá, 21/10/2026) ----------
+// Tồn = snapshot API Sapo (inventory-snapshot.json, chạy tools/sync_inventory.py
+// để cập nhật); tốc độ bán = SL/ngày của KỲ ĐANG XEM (combo đã tách về SKU con).
+// Ngày còn bán = tồn ÷ tốc độ → nhóm màu: HẾT HÀNG / <7 ngày (đỏ) / <14 (vàng)
+// / đủ (xanh) / tồn đọng (có tồn nhưng kỳ này không bán được cái nào).
+function buildInventoryHtml(res){
+  const invData = (typeof window !== 'undefined' ? window.INVENTORY : globalThis.INVENTORY);
+  const catalog = (typeof window !== 'undefined' ? window.SKU_CATALOG : globalThis.SKU_CATALOG);
+  const costData = (typeof window !== 'undefined' ? window.COST_CATALOG : globalThis.COST_CATALOG);
+  const zoneHead = `
+  <!-- ZONE 3: TỒN KHO -->
+  <div class="zone"><span class="z-num">3</span><span class="z-title">📦 Tồn kho &amp; cần nhập</span><span class="z-note">tồn Sapo · ngày còn bán theo tốc độ kỳ đang xem</span></div>`;
+  if (!invData || !invData.inventory || !catalog || !catalog.variants){
+    return zoneHead + '<div class="card"><p style="font-size:12.5px;color:var(--ink-faint);margin:0;">Chưa tải được tồn kho (inventory-snapshot.json) hoặc danh mục SKU — kiểm tra 2 file này có được deploy cùng web không.</p></div>';
+  }
+  const sp = res.skuPerformance;
+  const periodDays = (sp && sp.periodDays) ? sp.periodDays : null;
+  // tốc độ bán theo (tên mẫu | size) của kỳ đang xem
+  const rate = {};
+  if (sp && sp.items && periodDays){
+    for (const it of sp.items){
+      for (const s of (it.sizes || [])) rate[it.ten + '|' + s.size] = s.sl / periodDays;
+    }
+  }
+  const costOf = (baseSku) => {
+    if (!costData || !costData.cost) return null;
+    const key = Object.keys(costData.cost).find(k => k.toUpperCase().replace(/[^A-Z0-9]/g, '') === String(baseSku).toUpperCase().replace(/[^A-Z0-9]/g, ''));
+    return key !== undefined ? Number(costData.cost[key]) : null;
+  };
+  // gom tồn theo (tên mẫu | size) qua danh mục Sapo
+  const rows = [];
+  let tongTon = 0, tongGiaTri = 0, giaTriThieu = 0;
+  const normKey = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const variantsByNorm = {};
+  for (const [sku, v] of Object.entries(catalog.variants)) variantsByNorm[normKey(sku)] = Object.assign({ sku }, v);
+  const agg = {};
+  for (const [sku, ton] of Object.entries(invData.inventory)){
+    const v = variantsByNorm[normKey(sku)];
+    const name = v ? v.name : sku;
+    const size = (v && v.size) ? v.size : '(không rõ size)';
+    const baseSku = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
+    const key = name + '|' + size;
+    if (!agg[key]) agg[key] = { name, size, ton: 0, baseSku };
+    agg[key].ton += ton;
+  }
+  for (const a of Object.values(agg)){
+    const banNgay = rate[a.name + '|' + a.size] || 0;
+    const unitCost = costOf(a.baseSku);
+    // Sapo cho tồn ÂM khi bán vượt tồn — coi như 0 khi tính ngày còn/giá trị,
+    // nhưng vẫn hiện số âm ở cột Tồn để chủ shop biết đang bán quá số có.
+    const tonDuong = Math.max(0, a.ton);
+    const giaTri = (unitCost !== null) ? tonDuong * unitCost : null;
+    tongTon += tonDuong;
+    if (giaTri !== null) tongGiaTri += giaTri; else if (tonDuong > 0) giaTriThieu += tonDuong;
+    const ngayCon = banNgay > 0 ? tonDuong / banNgay : null;
+    let nhom, nhomOrder;
+    if (a.ton <= 0 && banNgay > 0){ nhom = 'HẾT HÀNG'; nhomOrder = 0; }
+    else if (a.ton <= 0){ nhom = null; nhomOrder = 9; } // hết + không bán → bỏ qua cho gọn
+    else if (banNgay <= 0){ nhom = 'TỒN ĐỌNG'; nhomOrder = 4; }
+    else if (ngayCon < 7){ nhom = 'CẦN NHẬP GẤP'; nhomOrder = 1; }
+    else if (ngayCon < 14){ nhom = 'SẮP PHẢI NHẬP'; nhomOrder = 2; }
+    else { nhom = 'ĐỦ HÀNG'; nhomOrder = 3; }
+    if (nhom) rows.push({ ...a, banNgay, ngayCon, giaTri, nhom, nhomOrder });
+  }
+  rows.sort((x, y) => (x.nhomOrder - y.nhomOrder) || ((x.ngayCon === null ? 1e9 : x.ngayCon) - (y.ngayCon === null ? 1e9 : y.ngayCon)) || (y.giaTri || 0) - (x.giaTri || 0));
+
+  const nhomMau = { 'HẾT HÀNG': 'inv-het', 'CẦN NHẬP GẤP': 'inv-do', 'SẮP PHẢI NHẬP': 'inv-vang', 'ĐỦ HÀNG': 'inv-xanh', 'TỒN ĐỌNG': 'inv-xam' };
+  const demNhom = {};
+  rows.forEach(r => { demNhom[r.nhom] = (demNhom[r.nhom] || 0) + 1; });
+  const rowHtml = (r) => `<tr class="${nhomMau[r.nhom]}"><td>${esc(r.name)}</td><td>${esc(r.size)}</td>
+    <td class="num">${fmtInt(r.ton)}</td>
+    <td class="num">${r.banNgay ? r.banNgay.toLocaleString('vi-VN', { maximumFractionDigits: 1 }) : '0'}</td>
+    <td class="num"><b>${r.ngayCon === null ? '—' : (r.ngayCon >= 365 ? '365+' : fmtInt(Math.floor(r.ngayCon)))}</b></td>
+    <td class="num">${r.giaTri === null ? '—' : fmtVND(r.giaTri)}</td>
+    <td><span class="inv-badge ${nhomMau[r.nhom]}">${r.nhom}</span></td></tr>`;
+  const canNhap = rows.filter(r => r.nhomOrder <= 2);
+  const duHang = rows.filter(r => r.nhomOrder === 3);
+  const tonDong = rows.filter(r => r.nhomOrder === 4);
+  const thead = '<thead><tr><th>Mẫu</th><th>Size</th><th style="text-align:right">Tồn</th><th style="text-align:right">Bán/ngày</th><th style="text-align:right">Ngày còn bán</th><th style="text-align:right">Giá trị tồn</th><th>Tình trạng</th></tr></thead>';
+  const tbl = (list) => `<table class="dtable">${thead}<tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+  return `${zoneHead}
+  <div class="kpi-row">
+    <div class="kpi-tile"><div class="k-label">Tổng tồn kho</div><div class="k-value">${fmtInt(tongTon)}</div><div class="k-sub">cái — theo Sapo lúc ${esc(invData.generatedAt || '?')}</div></div>
+    <div class="kpi-tile"><div class="k-label">Giá trị tồn (theo giá vốn)</div><div class="k-value">${fmtCompact(tongGiaTri)}</div><div class="k-sub">${giaTriThieu ? fmtInt(giaTriThieu) + ' cái chưa có giá vốn, chưa tính' : 'đủ giá vốn toàn bộ'}</div></div>
+    <div class="kpi-tile"><div class="k-label">Hết hàng (còn bán được)</div><div class="k-value">${fmtInt(demNhom['HẾT HÀNG'] || 0)}</div><div class="k-sub">mẫu-size đang có người mua mà tồn = 0</div></div>
+    <div class="kpi-tile"><div class="k-label">Cần nhập trong 7 ngày</div><div class="k-value">${fmtInt(demNhom['CẦN NHẬP GẤP'] || 0)}</div><div class="k-sub">+ ${fmtInt(demNhom['SẮP PHẢI NHẬP'] || 0)} mẫu-size sắp phải nhập (&lt;14 ngày)</div></div>
+  </div>
+  <p style="font-size:11.5px;color:var(--ink-faint);margin:4px 0 10px;">Tốc độ bán lấy theo kỳ đang xem${periodDays ? ' (' + fmtInt(periodDays) + ' ngày)' : ''} — xem tháng gần nhất để quyết định nhập hàng. Muốn cập nhật số tồn mới: nhắn Claude "cập nhật tồn kho".</p>
+  ${canNhap.length ? `<div class="sub-label">Hết hàng &amp; cần nhập <span style="text-transform:none;font-weight:400;">— sắp theo độ gấp</span></div>${tbl(canNhap)}` : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không có mẫu nào cần nhập gấp theo tốc độ kỳ này.</p></div>'}
+  ${duHang.length ? `<details class="inv-details"><summary>Đủ hàng (${duHang.length} mẫu-size)</summary>${tbl(duHang)}</details>` : ''}
+  ${tonDong.length ? `<details class="inv-details"><summary>Tồn đọng — có tồn nhưng kỳ này không bán được cái nào (${tonDong.length} mẫu-size, ${fmtVND(tonDong.reduce((s, r) => s + (r.giaTri || 0), 0))} vốn nằm im)</summary>${tbl(tonDong)}</details>` : ''}`;
+}
+
 // ---------- render ----------
 function render(res, opts){
   opts = opts || {};
@@ -565,12 +658,14 @@ function render(res, opts){
 
   ${buildPnlHtml(res, opts)}
 
-  <!-- ZONE 3 -->
-  <div class="zone"><span class="z-num">3</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
+  ${buildInventoryHtml(res)}
+
+  <!-- ZONE 4 -->
+  <div class="zone"><span class="z-num">4</span><span class="z-title">Khách hàng theo khu vực</span><span class="z-note">% số đơn theo tỉnh/thành — gộp Shopee + TikTok</span></div>
   <div class="chart-card" style="margin-bottom:14px;">${buildKhuVucHtml(res)}</div>
 
   <!-- ZONE 4 -->
-  <div class="zone"><span class="z-num">4</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
+  <div class="zone"><span class="z-num">5</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
   <div class="grid cols-2">
     <div class="card"><div class="c-title">Tỷ lệ huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(/ tổng đơn đặt)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtPct(s.huyHoanTra/(s.tongDon||1))}</span></div><div class="divider"></div>
@@ -590,7 +685,7 @@ function render(res, opts){
   </div>
 
   <!-- ZONE 5 -->
-  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
+  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.slove)}</span>${pill(n4.slove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
@@ -607,7 +702,7 @@ function render(res, opts){
   </div>
 
   <!-- ZONE 6 -->
-  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
+  <div class="zone"><span class="z-num">7</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
   <div class="chart-card" style="margin-bottom:14px;"><div class="ct-title">Doanh thu theo kênh</div>${channelHtml}</div>
   <div class="chart-grid">
     <div class="chart-card"><div class="ct-title">CTR theo sản phẩm <span class="ct-note">(kênh Thẻ sản phẩm)</span></div>${ctrHtml}</div>

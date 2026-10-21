@@ -397,3 +397,15 @@
     font-size:13.5px; font-weight:600; background:var(--surface); color:var(--ink);
     font-family:inherit; text-align:right; font-variant-numeric:tabular-nums; }
   .pnl-cost-field input:focus{ outline:2px solid var(--accent); outline-offset:-1px; }
+
+  /* ---------- Zone Tồn kho ---------- */
+  .inv-badge{ display:inline-block; font-size:10.5px; font-weight:700; padding:3px 8px; border-radius:999px; white-space:nowrap; }
+  .inv-badge.inv-het{ background:#7F1D1D; color:#fff; }
+  .inv-badge.inv-do{ background:var(--bad-soft, #FDE8E8); color:#B91C1C; }
+  .inv-badge.inv-vang{ background:#FEF3C7; color:#92400E; }
+  .inv-badge.inv-xanh{ background:var(--good-soft, #E8F7EC); color:#15803D; }
+  .inv-badge.inv-xam{ background:var(--line); color:var(--ink-soft); }
+  tr.inv-het td:first-child{ font-weight:700; }
+  .inv-details{ margin:10px 0; }
+  .inv-details summary{ cursor:pointer; font-size:12.5px; font-weight:600; color:var(--ink-soft); padding:8px 2px; }
+  .inv-details summary:hover{ color:var(--ink); }

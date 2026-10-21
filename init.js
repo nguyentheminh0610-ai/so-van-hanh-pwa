@@ -544,6 +544,19 @@ function ensureCostCatalog(){
   return __costCatalogPromise;
 }
 
+// Snapshot tồn kho từ Sapo (inventory-snapshot.json, tools/sync_inventory.py)
+// — cần cho Zone Tồn kho; thiếu thì zone tự hiện ghi chú.
+let __inventoryPromise = null;
+function ensureInventory(){
+  if (!__inventoryPromise){
+    __inventoryPromise = fetch('inventory-snapshot.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.inventory) window.INVENTORY = j; return j; })
+      .catch(() => null);
+  }
+  return __inventoryPromise;
+}
+
 // ---------- form "Chi phí vận hành tháng" trong Zone Lãi lỗ (21/10/2026) ----------
 // Chi phí nhập tay (lương kho/live, vật tư, QC khác, khác) lưu vào CHÍNH bản
 // ghi tháng (data.chiPhiVanHanh) — không có bảng riêng. Đang xem tháng ĐÃ LƯU
@@ -597,7 +610,7 @@ async function onCompute(){
     if (!xlsxOk || typeof XLSX === 'undefined'){
       throw new Error('Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo). Thử tắt VPN/ad-blocker, đổi sang wifi/4G khác rồi bấm lại "Tính toán".');
     }
-    await ensureSkuCatalog(); await ensureCostCatalog();
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
     currentResult = result;
@@ -1006,6 +1019,7 @@ async function onHistorySelectChange(){
   const noteEl = document.getElementById('history-note');
   noteEl.textContent = 'Đang tải…';
   try {
+    await Promise.all([ensureSkuCatalog(), ensureCostCatalog(), ensureInventory()]); // Zone Lãi lỗ + Tồn kho cần
     const rows = await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(v) + '&select=data,label,files');
     if (rows && rows[0]){
       // recordId để form Chi phí vận hành (Zone Lãi lỗ) lưu thẳng vào tháng này
@@ -1089,7 +1103,7 @@ async function onRefreshAllHistory(){
 
   let okCount = 0;
   const failed = [];
-  await ensureSkuCatalog(); await ensureCostCatalog(); // tính lại cũng cần danh mục SKU để tách combo
+  await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); // tính lại cũng cần danh mục SKU để tách combo
 
   for (let i = 0; i < records.length; i++){
     const record = records[i];
@@ -1165,7 +1179,7 @@ async function onChotLaiThang(){
   try {
     const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
     if (!xlsxOk || typeof XLSX === 'undefined') throw new Error('Không tải được thư viện đọc Excel.');
-    await ensureSkuCatalog(); await ensureCostCatalog();
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory();
     setNote('Đang tải dữ liệu 2 tháng…');
     const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
     const recCur = rows.find(r => r.id === entry.id), recNext = rows.find(r => r.id === next.id);
@@ -1229,6 +1243,7 @@ function init(){
   document.getElementById('btn-chot-thang').addEventListener('click', onChotLaiThang);
   ensureSkuCatalog();
   ensureCostCatalog();
+  ensureInventory();
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();
