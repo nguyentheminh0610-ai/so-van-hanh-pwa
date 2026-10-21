@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v19'; // v19: toc do ban 28 ngay tu Sapo, diem dat hang, lai dong gop/hoa von theo doc 4.1, card goi hoan phi VC, nut tu lay luong
+const CACHE_NAME = 'vanhanh-shop-v20'; // v20: luong live tu doc sheet, gia von tu doc sheet (khi mo chia se), nut tu lay luong kho
 const ASSETS = [
   './',
   './index.html',

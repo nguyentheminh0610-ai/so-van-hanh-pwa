@@ -20,6 +20,16 @@ CRED = os.path.expanduser('~/.config/sapo/credentials.json')
 UA = ('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 '
       '(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36')
 DAYS = 28
+# Sheet lương nhân viên live (chủ shop đã mở chia sẻ công khai 21/10/2026).
+LUONG_LIVE_CSV = ('https://docs.google.com/spreadsheets/d/'
+                  '1WWdKB3_LNFBR4V_emevCKAOYXunH25d11o9jkRmJSTI/export?format=csv')
+LUONG_LIVE_TABS = {'2026-10': 500001, '2026-11': 500002, '2026-12': 500003,
+                   '2027-01': 500004, '2027-02': 500005, '2027-03': 500006}
+# Sheet giá vốn "Chi phí & Lợi nhuận theo SKU", tab GiaCong cột H. Chỉ đọc được
+# khi chủ shop mở chia sẻ "bất kỳ ai có link" (hiện 21/10 còn riêng tư -> bỏ qua,
+# cost-catalog.json giữ nguyên bản chép tay).
+GIAVON_CSV = ('https://docs.google.com/spreadsheets/d/'
+              '1UNp0gw-zOlhtuV2e48UXFV5dWkjlItW3CqmhjvJWX9k/export?format=csv&gid=1590952086')
 
 def api(store, key, sec, path):
     r = subprocess.run(['curl', '-sf', '-u', f'{key}:{sec}',
@@ -99,16 +109,77 @@ def main():
     json.dump({'generatedAt': stamp, 'days': DAYS, 'orders': n_orders, 'sold': sold},
               open(os.path.join(REPO, 'sales-velocity.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, indent=0)
-    print(f'OK: tồn {sum(inv.values())} cái / {len(inv)} SKU · bán {DAYS} ngày: {sum(sold.values())} cái / {n_orders} đơn (đã trừ huỷ)')
+
+    # --- 3) lương nhân viên live từ Google Sheet (sheet đã chia sẻ công khai) ---
+    # Web tĩnh fetch thẳng Google Sheets sẽ dính CORS, nên script (chạy ngoài
+    # trình duyệt) tải hộ rồi ghi ra payroll-live.json cho web đọc.
+    luong = {}
+    for key, gid in LUONG_LIVE_TABS.items():
+        try:
+            r = subprocess.run(['curl', '-sfL', f'{LUONG_LIVE_CSV}&gid={gid}'],
+                               capture_output=True, text=True, timeout=60)
+            if r.returncode != 0:
+                continue
+            for dong in r.stdout.splitlines():
+                if 'TỔNG LƯƠNG THÁNG' in dong:
+                    nums = [x for x in dong.replace('"', '').replace('đ', '').split(',') if x.strip()]
+                    # số tiền bị tách bởi dấu phẩy hàng nghìn -> ghép lại các mảnh số
+                    digits = ''.join(c for c in dong if c.isdigit())
+                    # bỏ phần "(đ)" của nhãn: lấy cụm số dài nhất sau dấu phẩy cuối nhãn
+                    import re as _re
+                    m = _re.findall(r'"?([\d][\d,\.]{3,})\s*đ"?', dong)
+                    if m:
+                        luong[key] = int(''.join(c for c in m[-1] if c.isdigit()))
+                    break
+        except Exception:
+            continue
+    if luong:
+        json.dump({'generatedAt': stamp, 'byMonth': luong},
+                  open(os.path.join(REPO, 'payroll-live.json'), 'w', encoding='utf-8'),
+                  ensure_ascii=False, indent=0)
+
+    # --- 4) giá vốn từ sheet GiaCong (chỉ khi sheet đã mở chia sẻ công khai) ---
+    gv_msg = ''
+    try:
+        r = subprocess.run(['curl', '-sfL', GIAVON_CSV], capture_output=True, text=True, timeout=60)
+        if r.returncode == 0 and 'SKU' in r.stdout[:200]:
+            import csv, io
+            rows = list(csv.reader(io.StringIO(r.stdout)))
+            cost = {}
+            for row in rows[1:]:
+                if len(row) < 8:
+                    continue
+                ma = (row[0] or '').split(' - ')[0].strip()
+                raw = (row[7] or '').replace('.', '').replace(',', '').strip()
+                if ma and raw.isdigit() and int(raw) > 0:
+                    cost[ma] = int(raw)
+            if len(cost) >= 20:  # chốt chặn: sheet hỏng thì không ghi đè
+                cc_path = os.path.join(REPO, 'cost-catalog.json')
+                cc = json.load(open(cc_path, encoding='utf-8'))
+                old_cost = cc.get('cost') or {}
+                alias = {k: v for k, v in old_cost.items() if k not in cost and k == 'DO03BANCAOCAP'}
+                cost.update(alias)  # giữ alias mã cũ
+                if cost != old_cost:
+                    cc['cost'] = cost
+                    cc['generatedAt'] = stamp
+                    json.dump(cc, open(cc_path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+                    gv_msg = f' · giá vốn: cập nhật {len(cost)} mã từ sheet'
+                else:
+                    gv_msg = ' · giá vốn: không đổi'
+    except Exception:
+        pass
+
+    print(f'OK: tồn {sum(inv.values())} cái / {len(inv)} SKU · bán {DAYS} ngày: {sum(sold.values())} cái / {n_orders} đơn (đã trừ huỷ)'
+          + (f' · lương live: ' + ', '.join(f'{k}={v:,}đ' for k, v in sorted(luong.items())) if luong else '') + gv_msg)
 
     if push:
         os.chdir(REPO)
         diff = subprocess.run(['git', 'diff', '--quiet', '--', 'inventory-snapshot.json',
-                               'sales-velocity.json', 'inventory-history.json'])
+                               'sales-velocity.json', 'inventory-history.json', 'payroll-live.json', 'cost-catalog.json'])
         if diff.returncode == 0:
             print('Không có thay đổi — bỏ qua push.')
             return
-        subprocess.run(['git', 'add', 'inventory-snapshot.json', 'sales-velocity.json', 'inventory-history.json'], check=True)
+        subprocess.run(['git', 'add', 'inventory-snapshot.json', 'sales-velocity.json', 'inventory-history.json', 'payroll-live.json', 'cost-catalog.json'], check=True)
         subprocess.run(['git', '-c', 'user.name=sync-bot', '-c', 'user.email=nguyentheminh0610@gmail.com',
                         'commit', '-m', f'Dong bo ton kho + toc do ban {stamp} (tu dong)',
                         '--quiet'], check=True)

@@ -648,25 +648,23 @@ async function tinhLuongKhoThang(y, m){ // m: 1-12
   return { tong, chiTiet };
 }
 
-// ---------- lương nhân viên live — web tự đọc Google Sheet (chủ shop đã đồng ý
-// bật Publish to web; điền URL CSV đã publish vào hằng dưới đây là tự chạy;
-// còn trống thì nút tự điền sẽ báo và chủ shop nhập tay). ----------
-const LUONG_LIVE_PUB_URL = ''; // dạng https://docs.google.com/spreadsheets/d/e/<id>/pub?output=csv&gid=<gid của tab tháng>
-const LUONG_LIVE_GID_BY_MONTH = { '2026-10': 500001, '2026-11': 500002, '2026-12': 500003, '2027-01': 500004, '2027-02': 500005, '2027-03': 500006 };
-async function layLuongLiveThang(y, m){
-  if (!LUONG_LIVE_PUB_URL) return null;
-  const gid = LUONG_LIVE_GID_BY_MONTH[`${y}-${String(m).padStart(2, '0')}`];
-  if (!gid) return null;
-  const url = LUONG_LIVE_PUB_URL.replace(/gid=\d+/, 'gid=' + gid) + (LUONG_LIVE_PUB_URL.includes('gid=') ? '' : '&gid=' + gid);
-  const txt = await fetch(url).then(r => r.ok ? r.text() : null).catch(() => null);
-  if (!txt) return null;
-  for (const dong of txt.split('\n')){
-    if (dong.includes('TỔNG LƯƠNG THÁNG')){
-      const so = dong.replace(/"/g, '').match(/([\d.,]{4,})/g);
-      if (so && so.length) return num(so[so.length - 1]);
-    }
+// ---------- lương nhân viên live (21/10/2026) ----------
+// Web tĩnh KHÔNG fetch thẳng Google Sheets được (CORS), nên tools/sync_daily.py
+// tải hộ mỗi sáng và ghi ra payroll-live.json { byMonth: { "2026-10": 1953952 } }.
+let __payrollLivePromise = null;
+function ensurePayrollLive(){
+  if (!__payrollLivePromise){
+    __payrollLivePromise = fetch('payroll-live.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .catch(() => null);
   }
-  return null;
+  return __payrollLivePromise;
+}
+async function layLuongLiveThang(y, m){
+  const j = await ensurePayrollLive();
+  if (!j || !j.byMonth) return null;
+  const v = j.byMonth[`${y}-${String(m).padStart(2, '0')}`];
+  return (v === undefined || v === null) ? null : Number(v);
 }
 
 // ---------- form "Chi phí vận hành tháng" trong Zone Lãi lỗ (21/10/2026) ----------
@@ -697,7 +695,7 @@ function wirePnlCostForm(container, res, opts){
       } else if (key === 'luongLive'){
         const v = await layLuongLiveThang(y, m);
         if (v === null){
-          if (statusEl) statusEl.textContent = 'Chưa bật đọc tự động sheet lương live — nhập tay, hoặc nhờ Claude bật (cần Publish to web cho sheet đó).';
+          if (statusEl) statusEl.textContent = `Chưa có số lương live cho tháng ${m}/${y} trong sheet (hoặc tab tháng đó chưa được khai báo) — nhập tay cũng được.`;
         } else {
           input.value = fmtInt(v);
           if (statusEl) statusEl.textContent = `Lương live tháng ${m}/${y}: ${fmtVND(v)} (đọc từ sheet) — bấm "Lưu" để ghi.`;
