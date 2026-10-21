@@ -354,10 +354,10 @@ function buildPhiSanChiTietHtml(res){
 // NHẬP TAY (lương kho/lương live/vật tư/khác — lưu vào chính bản ghi tháng)
 // → LÃI RÒNG; kèm biên, điểm hoà vốn và bảng lãi gộp từng SP.
 const PNL_COST_FIELDS = [
-  { key: 'luongKho', label: 'Lương nhân viên kho', hint: 'số "Tổng lương tháng" ở tab 6. Lương của Sổ Kho' },
-  { key: 'luongLive', label: 'Lương nhân viên live', hint: 'số tổng trong sheet lương live' },
-  { key: 'vatTu', label: 'Vật tư đóng gói', hint: 'túi + tem + hộp… cả tháng' },
-  { key: 'adsKhac', label: 'Quảng cáo ngoài GMV Max', hint: 'QC GMV Max đã tự trừ ở trên — chỉ điền khoản khác' },
+  { key: 'luongKho', label: 'Lương nhân viên kho', hint: 'bấm ⟳ để web tự tính từ Sổ Kho', auto: true },
+  { key: 'luongLive', label: 'Lương nhân viên live', hint: 'bấm ⟳ để web tự đọc sheet lương live', auto: true },
+  { key: 'vatTu', label: 'Vật tư đóng gói', hint: 'túi + tem + hộp… cả tháng (chi phí biến đổi)' },
+  { key: 'adsKhac', label: 'Quảng cáo Shopee + QC khác', hint: 'tiền nạp ví QC Shopee tháng này; QC GMV Max của TikTok đã tự trừ ở trên' },
   { key: 'khac', label: 'Chi phí khác', hint: 'Sapo, điện nước, thuê kho… nếu có' },
 ];
 function buildPnlHtml(res, opts){
@@ -368,6 +368,12 @@ function buildPnlHtml(res, opts){
   const cp = res.chiPhiVanHanh || {};
   const cpTong = PNL_COST_FIELDS.reduce((s, f) => s + (Number(cp[f.key]) || 0), 0);
   const coChiPhi = PNL_COST_FIELDS.some(f => cp[f.key] !== undefined && cp[f.key] !== null);
+  // Theo bảng 4.1: vật tư đóng gói là chi phí BIẾN ĐỔI (trừ ra Lãi đóng góp);
+  // lương + QC + khác là chi phí CỐ ĐỊNH tháng (mẫu số điểm hoà vốn).
+  const cpVatTu = Number(cp.vatTu) || 0;
+  const cpCoDinh = cpTong - cpVatTu;
+  const laiDongGop = (p.laiSauPhiSan !== null) ? p.laiSauPhiSan - cpVatTu : null;
+  const bienDongGop = (laiDongGop !== null && p.doanhThu) ? laiDongGop / p.doanhThu : null;
   const laiRong = (p.laiSauPhiSan !== null && coChiPhi) ? p.laiSauPhiSan - cpTong : null;
   const vnd = (v) => (v === null || v === undefined) ? '—' : fmtVND(v);
   const pct = (v, base) => (v === null || v === undefined || !base) ? '' : ` <span class="pnl-pct">${fmtPct(v / base, 1)}</span>`;
@@ -381,31 +387,41 @@ function buildPnlHtml(res, opts){
   line('− Phí sàn (đủ khoản, từ file tài chính)', fmtVND(p.phiSan));
   if (p.quangCaoGmvMax) line('− Quảng cáo GMV Max (TikTok cấn vào ví)', fmtVND(p.quangCaoGmvMax));
   line('= Lãi sau phí sàn &amp; quảng cáo', vnd(p.laiSauPhiSan) + pct(p.laiSauPhiSan, p.doanhThu), 'total');
+  if (cpVatTu) line('− Vật tư đóng gói <span class="pnl-note">(chi phí biến đổi)</span>', fmtVND(cpVatTu));
+  line('= LÃI ĐÓNG GÓP', vnd(laiDongGop) + (bienDongGop !== null ? ' <span class="pnl-pct">biên ' + fmtPct(bienDongGop, 1) + '</span>' : ''), 'total');
   for (const f of PNL_COST_FIELDS){
+    if (f.key === 'vatTu') continue; // đã trừ ở trên
     const v = cp[f.key];
-    if (v !== undefined && v !== null && Number(v) !== 0) line('− ' + f.label, fmtVND(Number(v)));
+    if (v !== undefined && v !== null && Number(v) !== 0) line('− ' + f.label + ' <span class="pnl-note">(cố định)</span>', fmtVND(Number(v)));
   }
   line('= <b>LÃI RÒNG</b>', (laiRong === null ? '— <span class="pnl-note">nhập chi phí bên dưới</span>' : '<b>' + fmtVND(laiRong) + '</b>' + pct(laiRong, p.doanhThu)), 'total grand');
 
-  // hoà vốn: đóng góp bình quân/đơn hoàn thành × số đơn = lãi sau phí sàn
+  // Điểm hoà vốn theo đúng bảng 4.1: doanh thu hoà vốn = chi phí CỐ ĐỊNH tháng
+  // ÷ biên đóng góp; chia AOV ra số đơn; chia số ngày kỳ ra đơn/ngày.
   const donHT = res.tong ? res.tong.hoanThanh : 0;
-  const dongGopDon = (p.laiSauPhiSan !== null && donHT) ? p.laiSauPhiSan / donHT : null;
+  const aov = res.tong ? res.tong.aov : 0;
   const soNgay = res.skuPerformance && res.skuPerformance.periodDays ? res.skuPerformance.periodDays : 30;
-  let hoaVonHtml = '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Cần giá vốn + chi phí vận hành để tính điểm hoà vốn.</p>';
-  if (dongGopDon !== null && coChiPhi){
-    const donHoaVon = dongGopDon > 0 ? cpTong / dongGopDon : null;
-    hoaVonHtml = `<div class="c-row"><span>Đóng góp bình quân/đơn hoàn thành <span class="pnl-note">(lãi sau phí sàn ÷ ${fmtInt(donHT)} đơn)</span></span><span class="val">${fmtVND(dongGopDon)}</span></div>
+  let hoaVonHtml = '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Cần giá vốn + chi phí vận hành (nhập bên dưới) để tính điểm hoà vốn.</p>';
+  if (bienDongGop !== null && bienDongGop > 0 && coChiPhi){
+    const dtHoaVon = cpCoDinh / bienDongGop;
+    const donHoaVon = aov > 0 ? dtHoaVon / aov : null;
+    hoaVonHtml = `<div class="c-row"><span>Biên đóng góp <span class="pnl-note">(lãi đóng góp ÷ doanh thu)</span></span><span class="val">${fmtPct(bienDongGop, 1)}</span></div>
       <div class="divider"></div>
-      <div class="c-row"><span>Chi phí vận hành tháng</span><span class="val">${fmtVND(cpTong)}</span></div>
+      <div class="c-row"><span>Chi phí cố định tháng <span class="pnl-note">(lương + QC + khác, không gồm vật tư)</span></span><span class="val">${fmtVND(cpCoDinh)}</span></div>
       <div class="divider"></div>
-      <div class="c-row"><span><b>Điểm hoà vốn</b></span><span class="val">${donHoaVon === null ? '—' : '<b>' + fmtInt(Math.ceil(donHoaVon)) + ' đơn/tháng</b> ≈ ' + (donHoaVon / soNgay).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' đơn/ngày'}</span></div>
-      <p class="pnl-note" style="margin:8px 0 0;">Bán vượt mức này là tháng bắt đầu có lãi ròng; tháng này đạt ${fmtInt(donHT)} đơn hoàn thành${donHoaVon !== null ? (donHT >= donHoaVon ? ' — ĐÃ VƯỢT hoà vốn ✓' : ' — còn thiếu ' + fmtInt(Math.ceil(donHoaVon - donHT)) + ' đơn') : ''}.</p>`;
+      <div class="c-row"><span><b>Doanh thu hoà vốn</b></span><span class="val"><b>${fmtVND(dtHoaVon)}</b>/tháng</span></div>
+      <div class="divider"></div>
+      <div class="c-row"><span><b>Số đơn hoà vốn</b> <span class="pnl-note">(÷ AOV ${fmtVND(aov)})</span></span><span class="val">${donHoaVon === null ? '—' : '<b>' + fmtInt(Math.ceil(donHoaVon)) + ' đơn/tháng</b> ≈ ' + (donHoaVon / soNgay).toLocaleString('vi-VN', { maximumFractionDigits: 1 }) + ' đơn/ngày'}</span></div>
+      <p class="pnl-note" style="margin:8px 0 0;">Tháng này: ${fmtVND(p.doanhThu)} doanh thu · ${fmtInt(donHT)} đơn hoàn thành${donHoaVon !== null ? (donHT >= donHoaVon ? ' — ĐÃ VƯỢT hoà vốn ✓' : ' — còn thiếu ' + fmtInt(Math.ceil(donHoaVon - donHT)) + ' đơn') : ''}.</p>`;
   }
 
   // form chi phí — lưu vào bản ghi tháng đang xem (hoặc gắn vào số vừa tính)
   const inputs = PNL_COST_FIELDS.map(f => `
     <label class="pnl-cost-field"><span>${f.label} <span class="pnl-note">${f.hint}</span></span>
-      <input type="text" id="pnl-cost-${f.key}" inputmode="numeric" placeholder="0" value="${cp[f.key] !== undefined && cp[f.key] !== null ? fmtInt(Number(cp[f.key])) : ''}"></label>`).join('');
+      <span class="pnl-cost-input">
+        <input type="text" id="pnl-cost-${f.key}" inputmode="numeric" placeholder="0" value="${cp[f.key] !== undefined && cp[f.key] !== null ? fmtInt(Number(cp[f.key])) : ''}">
+        ${f.auto ? `<button type="button" class="pnl-auto" data-auto="${f.key}" title="Web tự lấy số cho tháng đang xem">⟳</button>` : ''}
+      </span></label>`).join('');
   const canSaveNow = !!(opts && opts.recordId);
   const formHtml = `
   <div class="card" id="pnl-cost-card">
@@ -421,10 +437,15 @@ function buildPnlHtml(res, opts){
   const items = (res.skuPerformance && res.skuPerformance.items ? res.skuPerformance.items : [])
     .filter(x => x.doanhThu !== undefined)
     .slice().sort((a, b) => (b.laiGop === null ? -1 : b.laiGop) - (a.laiGop === null ? -1 : a.laiGop));
+  const tongDtSp = items.reduce((s2, x) => s2 + (x.doanhThu || 0), 0);
   const spTableHtml = items.length ? `
-  <div class="sub-label">Lãi gộp theo sản phẩm <span style="text-transform:none;font-weight:400;">— doanh thu SP là số phân bổ theo dòng (Shopee chưa trừ voucher mức đơn) nên tổng hơi cao hơn Doanh thu hàng; combo đã tách về SKU con</span></div>
-  <table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">SL</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Lãi gộp</th><th style="text-align:right">Biên</th></tr></thead><tbody>
-    ${items.map(x => `<tr><td>${esc(x.ten)}</td><td class="num">${fmtInt(x.tongSL)}</td><td class="num">${fmtVND(x.doanhThu)}</td><td class="num">${x.thieuGiaVon ? '<span title="thiếu giá vốn ' + fmtInt(x.thieuGiaVon) + ' sp">thiếu</span>' : fmtVND(x.giaVon)}</td><td class="num">${x.laiGop === null ? '—' : fmtVND(x.laiGop)}</td><td class="num">${x.laiGop === null || !x.doanhThu ? '—' : fmtPct(x.laiGop / x.doanhThu, 0)}</td></tr>`).join('')}
+  <div class="sub-label">Lãi theo sản phẩm <span style="text-transform:none;font-weight:400;">— phí sàn PHÂN BỔ theo % doanh thu từng SP (xấp xỉ); doanh thu SP phân bổ theo dòng nên tổng hơi cao hơn Doanh thu hàng; combo đã tách về SKU con; chưa trừ chi phí hoàn và ads theo SP (chờ dữ liệu)</span></div>
+  <table class="dtable"><thead><tr><th>Sản phẩm</th><th style="text-align:right">SL</th><th style="text-align:right">Doanh thu</th><th style="text-align:right">Giá vốn</th><th style="text-align:right">Lãi gộp</th><th style="text-align:right">Biên gộp</th><th style="text-align:right">Phí sàn phân bổ</th><th style="text-align:right">Lãi sau phí sàn</th></tr></thead><tbody>
+    ${items.map(x => {
+      const phiPB = tongDtSp ? p.phiSan * ((x.doanhThu || 0) / tongDtSp) : 0;
+      const laiSauPhi = x.laiGop === null ? null : x.laiGop - phiPB;
+      return `<tr><td>${esc(x.ten)}</td><td class="num">${fmtInt(x.tongSL)}</td><td class="num">${fmtVND(x.doanhThu)}</td><td class="num">${x.thieuGiaVon ? '<span title="thiếu giá vốn ' + fmtInt(x.thieuGiaVon) + ' sp">thiếu</span>' : fmtVND(x.giaVon)}</td><td class="num">${x.laiGop === null ? '—' : fmtVND(x.laiGop)}</td><td class="num">${x.laiGop === null || !x.doanhThu ? '—' : fmtPct(x.laiGop / x.doanhThu, 0)}</td><td class="num">${fmtVND(phiPB)}</td><td class="num">${laiSauPhi === null ? '—' : '<b>' + fmtVND(laiSauPhi) + '</b>'}</td></tr>`;
+    }).join('')}
   </tbody></table>` : '';
 
   return `
@@ -449,86 +470,206 @@ function buildInventoryHtml(res){
   const costData = (typeof window !== 'undefined' ? window.COST_CATALOG : globalThis.COST_CATALOG);
   const zoneHead = `
   <!-- ZONE 3: TỒN KHO -->
-  <div class="zone"><span class="z-num">3</span><span class="z-title">📦 Tồn kho &amp; cần nhập</span><span class="z-note">tồn Sapo · ngày còn bán theo tốc độ kỳ đang xem</span></div>`;
+  <div class="zone"><span class="z-num">3</span><span class="z-title">📦 Tồn kho &amp; đặt hàng</span><span class="z-note">tồn Sapo · điểm đặt hàng theo thời gian nhập</span></div>`;
   if (!invData || !invData.inventory || !catalog || !catalog.variants){
     return zoneHead + '<div class="card"><p style="font-size:12.5px;color:var(--ink-faint);margin:0;">Chưa tải được tồn kho (inventory-snapshot.json) hoặc danh mục SKU — kiểm tra 2 file này có được deploy cùng web không.</p></div>';
   }
+  // Thời gian nhập hàng (đặt xưởng -> hàng về kho), chủ shop chỉnh được ngay
+  // trên zone này (lưu theo máy). Buffer an toàn + số ngày muốn phủ sau khi
+  // hàng về cũng vậy. Sheet DonHangSX hiện chỉ có ngày ĐẶT, chưa có ngày VỀ
+  // nên chưa tự đo lead time từ dữ liệu được — khi sheet có đủ 2 cột thì nâng cấp.
+  // Mặc định theo doc 4.1 + chốt với chủ shop 21/10: hàng về sau ~20 ngày,
+  // đệm an toàn 7 ngày, mỗi lần đặt phủ thêm 30 ngày bán.
+  let LEAD = 20, BUFFER = 7, COVER = 30;
+  try {
+    LEAD = Number(localStorage.getItem('svh_lead_time')) || 20;
+    BUFFER = Number(localStorage.getItem('svh_lead_buffer')) || 7;
+    COVER = Number(localStorage.getItem('svh_cover_days')) || 30;
+  } catch (e){}
+
   const sp = res.skuPerformance;
   const periodDays = (sp && sp.periodDays) ? sp.periodDays : null;
-  // tốc độ bán theo (tên mẫu | size) của kỳ đang xem
-  const rate = {};
-  if (sp && sp.items && periodDays){
-    for (const it of sp.items){
-      for (const s of (it.sizes || [])) rate[it.ten + '|' + s.size] = s.sl / periodDays;
-    }
-  }
+  const normKey = (x) => String(x || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   const costOf = (baseSku) => {
     if (!costData || !costData.cost) return null;
-    const key = Object.keys(costData.cost).find(k => k.toUpperCase().replace(/[^A-Z0-9]/g, '') === String(baseSku).toUpperCase().replace(/[^A-Z0-9]/g, ''));
-    return key !== undefined ? Number(costData.cost[key]) : null;
+    const k = normKey(baseSku);
+    for (const [kk, v] of Object.entries(costData.cost)) if (normKey(kk) === k) return Number(v);
+    return null;
   };
-  // gom tồn theo (tên mẫu | size) qua danh mục Sapo
-  const rows = [];
-  let tongTon = 0, tongGiaTri = 0, giaTriThieu = 0;
-  const normKey = (s) => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
   const variantsByNorm = {};
   for (const [sku, v] of Object.entries(catalog.variants)) variantsByNorm[normKey(sku)] = Object.assign({ sku }, v);
-  const agg = {};
-  for (const [sku, ton] of Object.entries(invData.inventory)){
+  // Tốc độ bán: ƯU TIÊN sales-velocity.json — SL bán 28 ngày gần nhất lấy thẳng
+  // từ đơn trên Sapo (tools/sync_daily.py chạy mỗi sáng, combo đã tách, đã trừ
+  // huỷ) — đúng công thức 4.1 và luôn mới; thiếu file thì rơi về tốc độ của kỳ
+  // đang xem. Giá bán TB mỗi mẫu vẫn lấy từ kỳ đang xem (velocity không có tiền).
+  const vel = (typeof window !== 'undefined' ? window.SALES_VELOCITY : globalThis.SALES_VELOCITY);
+  const rate = {};          // 'tên|size' -> sl/ngày
+  const giaTBMau = {};      // tên -> doanh thu TB / 1 cái
+  if (sp && sp.items && periodDays){
+    for (const it of sp.items){
+      if (it.doanhThu !== undefined && it.tongSL) giaTBMau[it.ten] = it.doanhThu / it.tongSL;
+    }
+  }
+  let rateSrc;
+  if (vel && vel.sold && vel.days){
+    for (const [sku, q] of Object.entries(vel.sold)){
+      const v = variantsByNorm[normKey(sku)];
+      const name = v ? v.name : sku;
+      const size = (v && v.size) ? v.size : '(1 size)';
+      const k = name + '|' + size;
+      rate[k] = (rate[k] || 0) + q / vel.days;
+    }
+    rateSrc = 'bán ' + fmtInt(vel.days) + ' ngày gần nhất từ Sapo (cập nhật ' + esc(vel.generatedAt || '?') + ', ' + fmtInt(vel.orders || 0) + ' đơn, đã trừ huỷ)';
+  } else if (sp && sp.items && periodDays){
+    for (const it of sp.items){
+      for (const s2 of (it.sizes || [])) rate[it.ten + '|' + s2.size] = s2.sl / periodDays;
+    }
+    rateSrc = 'kỳ đang xem (' + fmtInt(periodDays) + ' ngày) — chưa có sales-velocity.json';
+  } else {
+    rateSrc = 'chưa có dữ liệu tốc độ bán';
+  }
+
+  // Gom theo MẪU (đặt xưởng cắt may theo mẫu, không theo từng size lẻ)
+  const mau = {};
+  let tongTon = 0, tongGiaTri = 0, giaTriThieu = 0;
+  for (const [sku, tonRaw] of Object.entries(invData.inventory)){
     const v = variantsByNorm[normKey(sku)];
     const name = v ? v.name : sku;
-    const size = (v && v.size) ? v.size : '(không rõ size)';
+    const size = (v && v.size) ? v.size : '(1 size)';
     const baseSku = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
-    const key = name + '|' + size;
-    if (!agg[key]) agg[key] = { name, size, ton: 0, baseSku };
-    agg[key].ton += ton;
+    if (!mau[name]) mau[name] = { name, baseSku, sizes: {} };
+    if (!mau[name].sizes[size]) mau[name].sizes[size] = { ton: 0 };
+    mau[name].sizes[size].ton += tonRaw;
   }
-  for (const a of Object.values(agg)){
-    const banNgay = rate[a.name + '|' + a.size] || 0;
-    const unitCost = costOf(a.baseSku);
-    // Sapo cho tồn ÂM khi bán vượt tồn — coi như 0 khi tính ngày còn/giá trị,
-    // nhưng vẫn hiện số âm ở cột Tồn để chủ shop biết đang bán quá số có.
-    const tonDuong = Math.max(0, a.ton);
-    const giaTri = (unitCost !== null) ? tonDuong * unitCost : null;
-    tongTon += tonDuong;
-    if (giaTri !== null) tongGiaTri += giaTri; else if (tonDuong > 0) giaTriThieu += tonDuong;
-    const ngayCon = banNgay > 0 ? tonDuong / banNgay : null;
+  const rows = [];
+  for (const m of Object.values(mau)){
+    let ton = 0, banNgay = 0, matNgay = 0;
+    const goiY = [], thieuSize = [];
+    const giaTB = giaTBMau[m.name] || null;
+    for (const [size, d] of Object.entries(m.sizes)){
+      const tonD = Math.max(0, d.ton);
+      let r = rate[m.name + '|' + size] || 0;
+      if (!r && size === '(1 size)') r = rate[m.name + '|(không rõ size)'] || 0;
+      ton += tonD; banNgay += r;
+      if (tonD <= 0 && r > 0){
+        thieuSize.push(size);
+        if (giaTB) matNgay += r * giaTB;
+      }
+      // gợi ý SL đặt: đủ bán tới lúc hàng về + phủ thêm COVER ngày
+      const can = Math.ceil(r * (LEAD + BUFFER + COVER) - tonD);
+      if (can > 0 && r > 0) goiY.push({ size, can });
+    }
+    const unitCost = costOf(m.baseSku);
+    const giaTri = unitCost !== null ? ton * unitCost : null;
+    tongTon += ton;
+    if (giaTri !== null) tongGiaTri += giaTri; else if (ton > 0) giaTriThieu += ton;
+    const ngayCon = banNgay > 0 ? ton / banNgay : null;
     let nhom, nhomOrder;
-    if (a.ton <= 0 && banNgay > 0){ nhom = 'HẾT HÀNG'; nhomOrder = 0; }
-    else if (a.ton <= 0){ nhom = null; nhomOrder = 9; } // hết + không bán → bỏ qua cho gọn
-    else if (banNgay <= 0){ nhom = 'TỒN ĐỌNG'; nhomOrder = 4; }
-    else if (ngayCon < 7){ nhom = 'CẦN NHẬP GẤP'; nhomOrder = 1; }
-    else if (ngayCon < 14){ nhom = 'SẮP PHẢI NHẬP'; nhomOrder = 2; }
-    else { nhom = 'ĐỦ HÀNG'; nhomOrder = 3; }
-    if (nhom) rows.push({ ...a, banNgay, ngayCon, giaTri, nhom, nhomOrder });
+    if (banNgay <= 0 && ton > 0){ nhom = 'TỒN ĐỌNG'; nhomOrder = 4; }
+    else if (banNgay <= 0){ continue; } // không tồn, không bán — bỏ
+    else if (ngayCon <= LEAD){ nhom = 'ĐẶT NGAY'; nhomOrder = 1; }          // đặt hôm nay hàng về vẫn kịp sát nút/đã trễ
+    else if (ngayCon <= LEAD + BUFFER + 7){ nhom = 'ĐẶT TUẦN NÀY'; nhomOrder = 2; }
+    else { nhom = 'ỔN'; nhomOrder = 3; }
+    rows.push({ ...m, ton, banNgay, ngayCon, giaTri, matNgay, thieuSize, goiY, nhom, nhomOrder,
+      treNgay: ngayCon !== null ? Math.ceil(LEAD - ngayCon) : null });
   }
-  rows.sort((x, y) => (x.nhomOrder - y.nhomOrder) || ((x.ngayCon === null ? 1e9 : x.ngayCon) - (y.ngayCon === null ? 1e9 : y.ngayCon)) || (y.giaTri || 0) - (x.giaTri || 0));
+  rows.sort((a, b) => (a.nhomOrder - b.nhomOrder) || (b.matNgay - a.matNgay) || ((a.ngayCon ?? 1e9) - (b.ngayCon ?? 1e9)));
 
-  const nhomMau = { 'HẾT HÀNG': 'inv-het', 'CẦN NHẬP GẤP': 'inv-do', 'SẮP PHẢI NHẬP': 'inv-vang', 'ĐỦ HÀNG': 'inv-xanh', 'TỒN ĐỌNG': 'inv-xam' };
-  const demNhom = {};
-  rows.forEach(r => { demNhom[r.nhom] = (demNhom[r.nhom] || 0) + 1; });
-  const rowHtml = (r) => `<tr class="${nhomMau[r.nhom]}"><td>${esc(r.name)}</td><td>${esc(r.size)}</td>
-    <td class="num">${fmtInt(r.ton)}</td>
-    <td class="num">${r.banNgay ? r.banNgay.toLocaleString('vi-VN', { maximumFractionDigits: 1 }) : '0'}</td>
-    <td class="num"><b>${r.ngayCon === null ? '—' : (r.ngayCon >= 365 ? '365+' : fmtInt(Math.floor(r.ngayCon)))}</b></td>
-    <td class="num">${r.giaTri === null ? '—' : fmtVND(r.giaTri)}</td>
-    <td><span class="inv-badge ${nhomMau[r.nhom]}">${r.nhom}</span></td></tr>`;
-  const canNhap = rows.filter(r => r.nhomOrder <= 2);
-  const duHang = rows.filter(r => r.nhomOrder === 3);
+  const datNgay = rows.filter(r => r.nhomOrder === 1);
+  const datTuan = rows.filter(r => r.nhomOrder === 2);
+  const onDinh = rows.filter(r => r.nhomOrder === 3);
   const tonDong = rows.filter(r => r.nhomOrder === 4);
-  const thead = '<thead><tr><th>Mẫu</th><th>Size</th><th style="text-align:right">Tồn</th><th style="text-align:right">Bán/ngày</th><th style="text-align:right">Ngày còn bán</th><th style="text-align:right">Giá trị tồn</th><th>Tình trạng</th></tr></thead>';
+  const matNgayTong = rows.reduce((s, r) => s + r.matNgay, 0);
+  // Vòng quay kho (công thức ghi ngay trên UI): giá vốn hàng bán 1 ngày của kỳ
+  // đang xem = COGS kỳ / số ngày kỳ; số ngày quay hết kho = giá trị tồn / COGS-ngày.
+  // Giá vốn bán ra mỗi ngày: ưu tiên tính từ chính tốc độ bán 28 ngày (cùng kỳ
+  // với tồn hiện tại) — nếu so tồn HÔM NAY với COGS của tháng cũ thì lệch kỳ,
+  // vòng quay ra sai hẳn. Thiếu velocity mới rơi về COGS của kỳ đang xem.
+  let cogsNgay = null;
+  if (vel && vel.sold && vel.days){
+    let cogs28 = 0;
+    for (const [sku, q] of Object.entries(vel.sold)){
+      const u = costOf(String(sku).replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, ''));
+      if (u !== null) cogs28 += u * q;
+    }
+    if (cogs28) cogsNgay = cogs28 / vel.days;
+  }
+  if (cogsNgay === null){
+    const cogsKy = res.pnl && res.pnl.giaVonHangBan;
+    cogsNgay = (cogsKy && periodDays) ? cogsKy / periodDays : null;
+  }
+  const ngayQuayHet = (cogsNgay && tongGiaTri) ? tongGiaTri / cogsNgay : null;
+  const vongNam = ngayQuayHet ? 365 / ngayQuayHet : null;
+
+  const nhomMau = { 'ĐẶT NGAY': 'inv-do', 'ĐẶT TUẦN NÀY': 'inv-vang', 'ỔN': 'inv-xanh', 'TỒN ĐỌNG': 'inv-xam' };
+  const rowHtml = (r) => `<tr>
+    <td><b>${esc(r.name)}</b>${r.thieuSize.length ? '<br><span class="inv-thieu">hết size: ' + r.thieuSize.map(esc).join(', ') + '</span>' : ''}</td>
+    <td class="num">${fmtInt(r.ton)}</td>
+    <td class="num">${r.banNgay.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</td>
+    <td class="num"><b>${r.ngayCon === null ? '—' : (r.ngayCon >= 365 ? '365+' : fmtInt(Math.floor(r.ngayCon)))}</b></td>
+    <td class="num">${r.matNgay ? '<b class="inv-mat">' + fmtVND(Math.round(r.matNgay)) + '</b>' : '—'}</td>
+    <td>${r.goiY.length ? r.goiY.map(g => '<span class="inv-goiy">' + esc(g.size) + ' ×' + fmtInt(g.can) + '</span>').join(' ') : '—'}</td>
+    <td class="num">${r.giaTri === null ? '—' : fmtVND(r.giaTri)}</td>
+    <td><span class="inv-badge ${nhomMau[r.nhom]}">${r.nhom}${r.nhom === 'ĐẶT NGAY' && r.treNgay > 0 ? ' (trễ ' + fmtInt(r.treNgay) + ' ng)' : ''}</span></td></tr>`;
+  const thead = '<thead><tr><th>Mẫu</th><th style="text-align:right">Tồn</th><th style="text-align:right">Bán/ngày</th><th style="text-align:right">Còn bán được (ngày)</th><th style="text-align:right">Mất ~đ/ngày vì hết size</th><th>Gợi ý đặt (đủ tới khi hàng về + ' + fmtInt(COVER) + ' ngày nữa)</th><th style="text-align:right">Giá trị tồn</th><th>Tình trạng</th></tr></thead>';
   const tbl = (list) => `<table class="dtable">${thead}<tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+
   return `${zoneHead}
   <div class="kpi-row">
-    <div class="kpi-tile"><div class="k-label">Tổng tồn kho</div><div class="k-value">${fmtInt(tongTon)}</div><div class="k-sub">cái — theo Sapo lúc ${esc(invData.generatedAt || '?')}</div></div>
-    <div class="kpi-tile"><div class="k-label">Giá trị tồn (theo giá vốn)</div><div class="k-value">${fmtCompact(tongGiaTri)}</div><div class="k-sub">${giaTriThieu ? fmtInt(giaTriThieu) + ' cái chưa có giá vốn, chưa tính' : 'đủ giá vốn toàn bộ'}</div></div>
-    <div class="kpi-tile"><div class="k-label">Hết hàng (còn bán được)</div><div class="k-value">${fmtInt(demNhom['HẾT HÀNG'] || 0)}</div><div class="k-sub">mẫu-size đang có người mua mà tồn = 0</div></div>
-    <div class="kpi-tile"><div class="k-label">Cần nhập trong 7 ngày</div><div class="k-value">${fmtInt(demNhom['CẦN NHẬP GẤP'] || 0)}</div><div class="k-sub">+ ${fmtInt(demNhom['SẮP PHẢI NHẬP'] || 0)} mẫu-size sắp phải nhập (&lt;14 ngày)</div></div>
+    <div class="kpi-tile"><div class="k-label">Tồn kho hiện tại</div><div class="k-value">${fmtInt(tongTon)}</div><div class="k-sub">cái · ${fmtCompact(tongGiaTri)} giá vốn${giaTriThieu ? ' (+' + fmtInt(giaTriThieu) + ' cái chưa có giá vốn)' : ''} — Sapo lúc ${esc(invData.generatedAt || '?')}</div></div>
+    <div class="kpi-tile"><div class="k-label">Vòng quay tồn kho</div><div class="k-value">${ngayQuayHet === null ? '—' : (30 / ngayQuayHet).toLocaleString('vi-VN', { maximumFractionDigits: 2 }) + ' vòng/tháng'}</div><div class="k-sub">${ngayQuayHet === null ? 'cần giá vốn + kỳ có bán hàng' : 'quay hết 1 vòng ≈ ' + fmtInt(ngayQuayHet) + ' ngày (giá vốn bán ra mỗi ngày ÷ giá trị tồn; dùng tồn HIỆN TẠI thay tồn bình quân — nâng cấp khi có snapshot theo ngày)'}</div></div>
+    <div class="kpi-tile"><div class="k-label">Đang mất vì hết size</div><div class="k-value">${matNgayTong ? '~' + fmtCompact(matNgayTong * 30) : '0'}</div><div class="k-sub">${matNgayTong ? fmtVND(Math.round(matNgayTong)) + '/ngày nếu cứ để hết (×30 ngày)' : 'không mẫu nào đang hết size bán chạy'}</div></div>
+    <div class="kpi-tile"><div class="k-label">Phải đặt hàng NGAY</div><div class="k-value">${fmtInt(datNgay.length)}</div><div class="k-sub">mẫu (tồn không đủ bán tới lúc hàng mới về) · +${fmtInt(datTuan.length)} mẫu đặt trong tuần</div></div>
   </div>
-  <p style="font-size:11.5px;color:var(--ink-faint);margin:4px 0 10px;">Tốc độ bán lấy theo kỳ đang xem${periodDays ? ' (' + fmtInt(periodDays) + ' ngày)' : ''} — xem tháng gần nhất để quyết định nhập hàng. Muốn cập nhật số tồn mới: nhắn Claude "cập nhật tồn kho".</p>
-  ${canNhap.length ? `<div class="sub-label">Hết hàng &amp; cần nhập <span style="text-transform:none;font-weight:400;">— sắp theo độ gấp</span></div>${tbl(canNhap)}` : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không có mẫu nào cần nhập gấp theo tốc độ kỳ này.</p></div>'}
-  ${duHang.length ? `<details class="inv-details"><summary>Đủ hàng (${duHang.length} mẫu-size)</summary>${tbl(duHang)}</details>` : ''}
-  ${tonDong.length ? `<details class="inv-details"><summary>Tồn đọng — có tồn nhưng kỳ này không bán được cái nào (${tonDong.length} mẫu-size, ${fmtVND(tonDong.reduce((s, r) => s + (r.giaTri || 0), 0))} vốn nằm im)</summary>${tbl(tonDong)}</details>` : ''}`;
+  <div class="card" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+    <span style="font-size:12.5px; font-weight:600;">Thông số đặt hàng:</span>
+    <label class="inv-cfg">Hàng về sau khi đặt <input type="number" id="inv-lead" min="1" max="120" value="${LEAD}"> ngày</label>
+    <label class="inv-cfg">+ dự phòng <input type="number" id="inv-buffer" min="0" max="30" value="${BUFFER}"> ngày</label>
+    <label class="inv-cfg">đặt đủ bán thêm <input type="number" id="inv-cover" min="7" max="120" value="${COVER}"> ngày</label>
+    <button class="btn-primary" id="inv-apply" style="padding:7px 14px;">Áp dụng</button>
+    <span style="font-size:11.5px;color:var(--ink-faint);">"ĐẶT NGAY" = tồn không đủ bán trong ${fmtInt(LEAD)} ngày chờ hàng về. Tốc độ bán: ${rateSrc}. Gợi ý đặt CHƯA nhân hệ số mùa (chưa đủ 12 tháng dữ liệu) và CHƯA trừ hàng đang về (sheet SX chưa có cột ngày về). Cập nhật số tồn: nhắn Claude "cập nhật tồn kho".</span>
+  </div>
+  ${datNgay.length || datTuan.length
+    ? `<div class="sub-label">Cần đặt hàng <span style="text-transform:none;font-weight:400;">— xếp theo tiền đang mất mỗi ngày</span></div>${tbl([...datNgay, ...datTuan])}`
+    : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không mẫu nào tới điểm đặt hàng theo thông số hiện tại.</p></div>'}
+  ${onDinh.length ? `<details class="inv-details"><summary>Đủ hàng (${onDinh.length} mẫu)</summary>${tbl(onDinh)}</details>` : ''}
+  ${tonDong.length ? `<details class="inv-details"><summary>Tồn đọng — kỳ này không bán được cái nào (${tonDong.length} mẫu, ${fmtVND(tonDong.reduce((s2, r) => s2 + (r.giaTri || 0), 0))} vốn nằm im)</summary>${tbl(tonDong)}</details>` : ''}`;
+}
+
+// ---------- Card "Gói hoàn phí vận chuyển — nên đăng ký không?" (21/10/2026) ----------
+// Chủ shop hiện KHÔNG đăng ký PiShip (Shopee) / gói hoàn phí VC (TikTok).
+// Đúng 3 dòng theo yêu cầu: (1) ship hoàn/huỷ đã tự trả tháng này, (2) chi phí
+// ước tính nếu đăng ký gói = số đơn hoàn thành × đơn giá gói, (3) ĐỀ XUẤT.
+// Đơn giá gói chỉnh được (Shopee mặc định 2.700đ/đơn — đo từ chính tháng 7 còn
+// dùng gói: 534.600đ ÷ ~198 đơn; TikTok tạm 3.000đ/đơn — sửa khi có giá thật).
+function buildShipRefundPackHtml(res){
+  const s2 = res.shopee || {}, t2 = res.tiktok || {};
+  const shipSp = (s2.phiSanChiTiet && Number(s2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
+  const shipTt = (t2.phiSanChiTiet && Number(t2.phiSanChiTiet['Phí vận chuyển trả hàng'])) || 0;
+  const daTra = shipSp + shipTt;
+  let giaSp = 2700, giaTt = 3000;
+  try {
+    giaSp = Number(localStorage.getItem('svh_pack_sp')) || 2700;
+    giaTt = Number(localStorage.getItem('svh_pack_tt')) || 3000;
+  } catch (e){}
+  const donSp = s2.hoanThanh || 0, donTt = t2.hoanThanh || 0;
+  const uocTinh = donSp * giaSp + donTt * giaTt;
+  const coDuLieu = !!(s2.phiSanChiTiet || t2.phiSanChiTiet);
+  const chenh = daTra - uocTinh;
+  const nenDangKy = chenh > 0;
+  return `
+  <div class="card single"><div class="c-title">Gói hoàn phí vận chuyển (PiShip…) — nên đăng ký không?</div>
+    ${coDuLieu ? `
+    <div class="pnl-row"><span class="pnl-label">1. Ship hoàn/huỷ shop ĐÃ TỰ TRẢ tháng này <span class="pnl-note">(Shopee ${fmtVND(shipSp)} · TikTok ${fmtVND(shipTt)})</span></span><span class="pnl-value">${fmtVND(daTra)}</span></div>
+    <div class="pnl-row"><span class="pnl-label">2. Nếu đăng ký gói, phí ước tính <span class="pnl-note">(${fmtInt(donSp)} đơn Shopee × ${fmtInt(giaSp)}đ + ${fmtInt(donTt)} đơn TikTok × ${fmtInt(giaTt)}đ)</span></span><span class="pnl-value">${fmtVND(uocTinh)}</span></div>
+    <div class="pnl-row total"><span class="pnl-label">3. ĐỀ XUẤT</span><span class="pnl-value" style="color:${nenDangKy ? 'var(--good)' : 'var(--warn)'};">${nenDangKy ? 'NÊN ĐĂNG KÝ — tiết kiệm ~' + fmtVND(chenh) + '/tháng' : 'KHÔNG NÊN — tốn thêm ~' + fmtVND(-chenh) + '/tháng'}</span></div>
+    <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-top:8px;">
+      <label class="inv-cfg">Giá gói Shopee <input type="number" id="pack-gia-sp" min="0" value="${giaSp}"> đ/đơn</label>
+      <label class="inv-cfg">TikTok <input type="number" id="pack-gia-tt" min="0" value="${giaTt}"> đ/đơn</label>
+      <button class="btn-secondary" id="pack-apply" style="padding:5px 12px;">Áp dụng</button>
+    </div>`
+    : '<p style="font-size:12px;color:var(--ink-faint);margin:0;">Tháng này lưu bằng công thức cũ — bấm "Cập nhật lại lịch sử" để có số phí vận chuyển trả hàng.</p>'}
+  </div>`;
 }
 
 // ---------- render ----------
@@ -693,9 +834,7 @@ function render(res, opts){
     <div class="card single"><div class="c-title">Tlove — TikTok</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.tlove)}</span>${pill(n4.tlove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
       <div class="c-sub">Chi phí sàn đã hỗ trợ / Tổng chi phí sàn</div></div>
-    <div class="card single"><div class="c-title">Tỷ lệ PiShip — Shopee</div>
-      <div class="c-row"><span class="val">${fmtRatio(n4.piShipRatio)}</span>${pill(n4.piShipRatio>=1,'ổn','nên huỷ PiShip')}</div>
-      <div class="c-sub">Phí VC được hoàn bởi PiShip / Phí dịch vụ PiShip${n4.piShipRatio<1?` — cứ 1đ phí trả chỉ được hoàn lại ${fmtRatio(n4.piShipRatio)}đ`:''}</div></div>
+    ${buildShipRefundPackHtml(res)}
     <div class="card single"><div class="c-title">Voucher extra — Shopee</div>
       ${n4.voucherExtra===null ? '<div class="c-row"><span class="val">—</span></div><div class="c-sub">Cần file Shop Stats</div>' : `<div class="c-row"><span class="val">${fmtRatio(n4.voucherExtra)}</span>${pill(n4.voucherExtra>=1,'sàn đối ứng > chi thêm','shop đang chi nhiều hơn sàn đối ứng')}</div><div class="c-sub">Trợ giá Shopee (Shop Stats) / Phí Voucher Xtra</div>`}
     </div>

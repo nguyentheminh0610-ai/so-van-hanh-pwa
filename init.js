@@ -511,6 +511,7 @@ function renderResults(el, res, opts){
   el.classList.add('show');
   wireDailyRevenueChart(el, res);
   wirePnlCostForm(el, res, opts);
+  wireZoneControls(el, res, opts);
   refreshDashboardEmptyState();
   // Widget "Kỳ báo cáo" (gộp chung với "Xem kỳ") nằm ngoài #results, cập
   // nhật riêng khoảng ngày của kỳ đang xem tại đây.
@@ -557,6 +558,117 @@ function ensureInventory(){
   return __inventoryPromise;
 }
 
+// Tốc độ bán 28 ngày gần nhất (sales-velocity.json, tools/sync_daily.py chạy
+// mỗi sáng bằng launchd — script thuần, không tốn token AI).
+let __velocityPromise = null;
+function ensureVelocity(){
+  if (!__velocityPromise){
+    __velocityPromise = fetch('sales-velocity.json', { cache: 'no-cache' })
+      .then(r => r.ok ? r.json() : null)
+      .then(j => { if (j && j.sold) window.SALES_VELOCITY = j; return j; })
+      .catch(() => null);
+  }
+  return __velocityPromise;
+}
+
+// ---------- nút Áp dụng của Zone Tồn kho + card Gói hoàn phí VC (21/10/2026) ----------
+// Lưu thông số vào localStorage rồi vẽ lại — buildInventoryHtml/buildShipRefundPackHtml
+// tự đọc localStorage khi render.
+function wireZoneControls(container, res, opts){
+  const invBtn = container.querySelector('#inv-apply');
+  if (invBtn) invBtn.addEventListener('click', () => {
+    try {
+      localStorage.setItem('svh_lead_time', String(num(container.querySelector('#inv-lead').value) || 20));
+      localStorage.setItem('svh_lead_buffer', String(num(container.querySelector('#inv-buffer').value) || 7));
+      localStorage.setItem('svh_cover_days', String(num(container.querySelector('#inv-cover').value) || 30));
+    } catch (e){}
+    renderResults(container, res, opts);
+  });
+  const packBtn = container.querySelector('#pack-apply');
+  if (packBtn) packBtn.addEventListener('click', () => {
+    try {
+      localStorage.setItem('svh_pack_sp', String(num(container.querySelector('#pack-gia-sp').value) || 2700));
+      localStorage.setItem('svh_pack_tt', String(num(container.querySelector('#pack-gia-tt').value) || 3000));
+    } catch (e){}
+    renderResults(container, res, opts);
+  });
+}
+
+// ---------- lương nhân viên kho — web tự tính từ Supabase Sổ Kho (21/10/2026) ----------
+// Đúng quy chế tab 6 Sổ Kho: MAX(lương sàn theo mùa; đơn người đó quét × 500đ)
+// + kiện khách trả (doi_tra) × 2.000đ + thưởng chất lượng theo tỷ lệ lỗi chung
+// (chuyên cần/gắn bó chủ shop tự quyết nên không tự cộng). Quản lý không tính.
+const PAYROLL_MANAGERS = ['minh', 'minh nguyễn thế'];
+async function tinhLuongKhoThang(y, m){ // m: 1-12
+  const start = `${y}-${String(m).padStart(2, '0')}-01`;
+  const endDate = new Date(y, m, 0);
+  const end = `${y}-${String(m).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+  async function all(path){
+    let out = [], off = 0;
+    while (true){
+      const rows = await sbFetch(path + `&order=id.asc&limit=1000&offset=${off}`) || [];
+      out = out.concat(rows);
+      if (rows.length < 1000) break;
+      off += 1000;
+    }
+    return out;
+  }
+  const [outb, rets, errs] = await Promise.all([
+    all(`warehouse_outbound_checks?select=staff,scan_date&scan_date=gte.${start}&scan_date=lte.${end}`),
+    all(`warehouse_return_checks?select=staff,return_type&scan_date=gte.${start}&scan_date=lte.${end}`),
+    all(`warehouse_error_log?select=error_type&created_at=gte.${start}T00:00:00&created_at=lte.${end}T23:59:59`),
+  ]);
+  const isManager = (st) => PAYROLL_MANAGERS.includes(String(st || '').trim().toLowerCase());
+  const looksCode = (st) => /^(SPX|VTP|GHN|GHTK|JT|VNP)/i.test(String(st || '').replace(/\s+/g, '')) || /^[0-9]{8,}$/.test(String(st || ''));
+  const base = (m >= 9 || m <= 2) ? 3000000 : 1500000; // cao điểm 1/9–hết 2
+  const errKhoVan = errs.filter(e => e.error_type === 'kho_van').length;
+  const denom = outb.length + rets.length;
+  const rate = denom ? errKhoVan / denom : null;
+  const qualityBonus = rate === null ? 0 : (rate < 0.005 ? 500000 : (rate <= 0.01 ? 250000 : 0));
+  const per = {};
+  for (const r of outb){
+    const st = String(r.staff || '').trim();
+    if (!st || isManager(st) || looksCode(st)) continue;
+    per[st] = per[st] || { don: 0, hoan: 0 };
+    per[st].don++;
+  }
+  for (const r of rets){
+    const st = String(r.staff || '').trim();
+    if (!st || isManager(st) || looksCode(st)) continue;
+    per[st] = per[st] || { don: 0, hoan: 0 };
+    if (r.return_type !== 'boom') per[st].hoan++; // kiện huỷ = 0đ (chốt 20/10)
+  }
+  let tong = 0;
+  const chiTiet = [];
+  for (const [st, d] of Object.entries(per)){
+    const luong = Math.max(base, d.don * 500) + d.hoan * 2000 + qualityBonus;
+    tong += luong;
+    chiTiet.push(`${st}: ${luong.toLocaleString('vi-VN')}đ (${d.don} đơn, ${d.hoan} kiện hoàn, thưởng CL ${qualityBonus.toLocaleString('vi-VN')}đ)`);
+  }
+  return { tong, chiTiet };
+}
+
+// ---------- lương nhân viên live — web tự đọc Google Sheet (chủ shop đã đồng ý
+// bật Publish to web; điền URL CSV đã publish vào hằng dưới đây là tự chạy;
+// còn trống thì nút tự điền sẽ báo và chủ shop nhập tay). ----------
+const LUONG_LIVE_PUB_URL = ''; // dạng https://docs.google.com/spreadsheets/d/e/<id>/pub?output=csv&gid=<gid của tab tháng>
+const LUONG_LIVE_GID_BY_MONTH = { '2026-10': 500001, '2026-11': 500002, '2026-12': 500003, '2027-01': 500004, '2027-02': 500005, '2027-03': 500006 };
+async function layLuongLiveThang(y, m){
+  if (!LUONG_LIVE_PUB_URL) return null;
+  const gid = LUONG_LIVE_GID_BY_MONTH[`${y}-${String(m).padStart(2, '0')}`];
+  if (!gid) return null;
+  const url = LUONG_LIVE_PUB_URL.replace(/gid=\d+/, 'gid=' + gid) + (LUONG_LIVE_PUB_URL.includes('gid=') ? '' : '&gid=' + gid);
+  const txt = await fetch(url).then(r => r.ok ? r.text() : null).catch(() => null);
+  if (!txt) return null;
+  for (const dong of txt.split('\n')){
+    if (dong.includes('TỔNG LƯƠNG THÁNG')){
+      const so = dong.replace(/"/g, '').match(/([\d.,]{4,})/g);
+      if (so && so.length) return num(so[so.length - 1]);
+    }
+  }
+  return null;
+}
+
 // ---------- form "Chi phí vận hành tháng" trong Zone Lãi lỗ (21/10/2026) ----------
 // Chi phí nhập tay (lương kho/live, vật tư, QC khác, khác) lưu vào CHÍNH bản
 // ghi tháng (data.chiPhiVanHanh) — không có bảng riêng. Đang xem tháng ĐÃ LƯU
@@ -566,6 +678,36 @@ function wirePnlCostForm(container, res, opts){
   const btn = container.querySelector('#pnl-cost-save');
   if (!btn) return;
   const statusEl = container.querySelector('#pnl-cost-status');
+
+  // nút ⟳ tự lấy lương: xác định tháng đang xem từ minDate của kỳ
+  container.querySelectorAll('[data-auto]').forEach(b => b.addEventListener('click', async () => {
+    const key = b.getAttribute('data-auto');
+    const input = container.querySelector('#pnl-cost-' + key);
+    const d = res.minDate ? new Date(res.minDate) : null;
+    if (!d || isNaN(d)){ if (statusEl) statusEl.textContent = 'Không xác định được tháng của kỳ đang xem.'; return; }
+    const y = d.getFullYear(), m = d.getMonth() + 1;
+    const old = b.textContent; b.textContent = '…'; b.disabled = true;
+    try {
+      if (key === 'luongKho'){
+        const r = await tinhLuongKhoThang(y, m);
+        input.value = fmtInt(r.tong);
+        if (statusEl) statusEl.textContent = r.chiTiet.length
+          ? `Lương kho tháng ${m}/${y}: ${r.chiTiet.join(' · ')} — bấm "Lưu" để ghi vào tháng này.`
+          : `Tháng ${m}/${y} chưa có nhân viên kho nào quét đơn (ngoài quản lý) → 0đ.`;
+      } else if (key === 'luongLive'){
+        const v = await layLuongLiveThang(y, m);
+        if (v === null){
+          if (statusEl) statusEl.textContent = 'Chưa bật đọc tự động sheet lương live — nhập tay, hoặc nhờ Claude bật (cần Publish to web cho sheet đó).';
+        } else {
+          input.value = fmtInt(v);
+          if (statusEl) statusEl.textContent = `Lương live tháng ${m}/${y}: ${fmtVND(v)} (đọc từ sheet) — bấm "Lưu" để ghi.`;
+        }
+      }
+    } catch (err){
+      console.error(err);
+      if (statusEl) statusEl.textContent = 'Không lấy được: ' + err.message;
+    } finally { b.textContent = old; b.disabled = false; }
+  }));
   btn.addEventListener('click', async () => {
     const cp = {};
     for (const f of PNL_COST_FIELDS){
@@ -610,7 +752,7 @@ async function onCompute(){
     if (!xlsxOk || typeof XLSX === 'undefined'){
       throw new Error('Không tải được thư viện đọc file Excel (mạng chặn CDN, VPN, hoặc trình chặn quảng cáo). Thử tắt VPN/ad-blocker, đổi sang wifi/4G khác rồi bấm lại "Tính toán".');
     }
-    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory();
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
     currentResult = result;
@@ -1019,7 +1161,7 @@ async function onHistorySelectChange(){
   const noteEl = document.getElementById('history-note');
   noteEl.textContent = 'Đang tải…';
   try {
-    await Promise.all([ensureSkuCatalog(), ensureCostCatalog(), ensureInventory()]); // Zone Lãi lỗ + Tồn kho cần
+    await Promise.all([ensureSkuCatalog(), ensureCostCatalog(), ensureInventory(), ensureVelocity()]); // Zone Lãi lỗ + Tồn kho cần
     const rows = await sbFetch('monthly_reports?id=eq.' + encodeURIComponent(v) + '&select=data,label,files');
     if (rows && rows[0]){
       // recordId để form Chi phí vận hành (Zone Lãi lỗ) lưu thẳng vào tháng này
@@ -1103,7 +1245,7 @@ async function onRefreshAllHistory(){
 
   let okCount = 0;
   const failed = [];
-  await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); // tính lại cũng cần danh mục SKU để tách combo
+  await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity(); // tính lại cũng cần danh mục SKU để tách combo
 
   for (let i = 0; i < records.length; i++){
     const record = records[i];
@@ -1179,7 +1321,7 @@ async function onChotLaiThang(){
   try {
     const xlsxOk = window.__xlsxReady ? await window.__xlsxReady : (typeof XLSX !== 'undefined');
     if (!xlsxOk || typeof XLSX === 'undefined') throw new Error('Không tải được thư viện đọc Excel.');
-    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory();
+    await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity();
     setNote('Đang tải dữ liệu 2 tháng…');
     const rows = await sbFetch('monthly_reports?id=in.(' + encodeURIComponent(entry.id) + ',' + encodeURIComponent(next.id) + ')&select=id,label,files,chiPhi:data->chiPhiVanHanh') || [];
     const recCur = rows.find(r => r.id === entry.id), recNext = rows.find(r => r.id === next.id);
@@ -1244,6 +1386,7 @@ function init(){
   ensureSkuCatalog();
   ensureCostCatalog();
   ensureInventory();
+  ensureVelocity();
   document.getElementById('history-bar').style.display = 'flex';
   refreshDashboardEmptyState();
   refreshHistoryFromServer();
