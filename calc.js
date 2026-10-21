@@ -853,8 +853,15 @@ function computeAllFromAOA(aoa){
   const C_FIN_SHIP_TRA = findColKey(finHeaderKeys, [/^phí\s*vận\s*chuyển\s*trả\s*hàng\s*thực\s*tế$/i]);
   const C_FIN_THUE_GTGT = findColKey(finHeaderKeys, [/^thuế\s*gtgt\s*do\s*tiktok/i]);
   const C_FIN_THUE_TNCN = findColKey(finHeaderKeys, [/^thuế\s*tncn\s*do\s*tiktok/i]);
+  const C_FIN_TIEN_HOAN = findColKey(finHeaderKeys, [/^tiền\s*hoàn\s*của\s*khách$/i]);
+  const C_FIN_HOAN_SAU_GG = findColKey(finHeaderKeys, [/^tổng\s*phụ\s*của\s*khoản\s*hoàn\s*tiền\s*sau\s*giảm\s*giá/i]);
   let ttThucNhan = null, ttPhiSanFull = null, ttPhiSanChiTiet = null, ttQuangCaoGmvMax = 0;
+  // Ship hoàn/huỷ TikTok: chỉ cộng phần ship của ĐÚNG các đơn có hoàn tiền —
+  // khoản "Phí vận chuyển shop chịu" tổng gồm cả đơn bán bình thường (freeship),
+  // không phải chi phí do hoàn/bom nên không được đem so với gói hoàn phí VC.
+  let ttShipHoan = null;
   if (C_FIN_QT && finRows.length){
+    ttShipHoan = { traHang: 0, shipShopChiu: 0, soDon: 0 };
     ttThucNhan = 0;
     const bd = { 'Phí giao dịch': 0, 'Hoa hồng TikTok Shop': 0, 'Phí xử lý đơn hàng': 0,
       'Hoa hồng affiliate (liên kết)': 0, 'Phí vận chuyển shop chịu': 0, 'Phí vận chuyển trả hàng': 0, 'Phí khác': 0 };
@@ -881,6 +888,13 @@ function computeAllFromAOA(aoa){
       bd['Phí giao dịch'] += phiGD; bd['Hoa hồng TikTok Shop'] += hhTT; bd['Phí xử lý đơn hàng'] += phiXL;
       bd['Hoa hồng affiliate (liên kết)'] += aff; bd['Phí vận chuyển shop chịu'] += ship; bd['Phí vận chuyển trả hàng'] += shipTra;
       tongPhiAbs += tongPhi; thueAbs += thue;
+      const tienHoan = Math.abs(num(C_FIN_TIEN_HOAN ? r[C_FIN_TIEN_HOAN] : 0))
+        + Math.abs(num(C_FIN_HOAN_SAU_GG ? r[C_FIN_HOAN_SAU_GG] : 0));
+      if (tienHoan > 0){
+        ttShipHoan.soDon += 1;
+        ttShipHoan.traHang += shipTra;
+        ttShipHoan.shipShopChiu += ship;
+      }
     }
     ttPhiSanFull = C_FIN_TONG_PHI
       ? Math.max(0, tongPhiAbs - thueAbs)
@@ -987,6 +1001,10 @@ function computeAllFromAOA(aoa){
   const C_INC_THUE_GTGT = findColKey(incHdrKeys, [/^thuế\s*gtgt$/i]);
   const C_INC_THUE_TNCN = findColKey(incHdrKeys, [/^thuế\s*tncn$/i]);
   let spThucNhan = null, spPhiSanFull = null, spPhiSanChiTiet = null, spDieuChinh = 0;
+  // Ship hoàn/huỷ Shopee tách 2 loại + số gói PiShip (phục vụ câu "nên đăng ký
+  // gói hoàn phí vận chuyển không?"). Tách riêng vì PiShip chỉ hoàn phần đơn
+  // Trả hàng/hoàn tiền, KHÔNG hoàn đơn giao không thành công.
+  let spShipHoan = null;
   if (C_INC_PAID && incOrderRows.length){
     if (aoa.income_Adjustment){
       const adjRaw = findLabeledValue(aoa.income_Adjustment, 'Tổng số tiền điều chỉnh');
@@ -1007,6 +1025,11 @@ function computeAllFromAOA(aoa){
       bd['Phí vận chuyển trả hàng'] += Math.abs(num(C_INC_VC_TRA_1 ? r[C_INC_VC_TRA_1] : 0)) + Math.abs(num(C_INC_VC_TRA_2 ? r[C_INC_VC_TRA_2] : 0));
       thueAbs += Math.abs(num(C_INC_THUE_GTGT ? r[C_INC_THUE_GTGT] : 0)) + Math.abs(num(C_INC_THUE_TNCN ? r[C_INC_THUE_TNCN] : 0));
     }
+    spShipHoan = {
+      traHang: incOrderRows.reduce((s, r) => s + Math.abs(num(C_INC_VC_TRA_1 ? r[C_INC_VC_TRA_1] : 0)), 0),
+      giaoKhongTC: incOrderRows.reduce((s, r) => s + Math.abs(num(C_INC_VC_TRA_2 ? r[C_INC_VC_TRA_2] : 0)), 0),
+      goiPhi: piShipPhi, goiHoan: piShipHoan,
+    };
     bd['Voucher Xtra (Freeship Xtra)'] = voucherXtraTotal;
     bd['Phí hạ tầng'] = phiHaTangTotal;
     spPhiSanFull = Object.values(bd).reduce((s, v) => s + v, 0);
@@ -1401,7 +1424,7 @@ function computeAllFromAOA(aoa){
     })
     .filter(Boolean)
     .sort((a, b) => b.gmv - a.gmv)
-    .slice(0, 20) : null;
+    .slice(0, 10) : null;
 
   const kocTable1 = affRowsRaw ? Object.entries(kocOrders)
     .map(([koc, v]) => ({
@@ -1409,7 +1432,7 @@ function computeAllFromAOA(aoa){
       ctor: creatorCtorMap[koc] !== undefined ? creatorCtorMap[koc] : null,
     }))
     .sort((a, b) => b.doanhThu - a.doanhThu)
-    .slice(0, 20) : null;
+    .slice(0, 10) : null;
 
   // Bảng 2 (Chất lượng nội dung theo KOC) — nền tảng là videoAnalysis (đo hiệu
   // quả nội dung); cột "doanh thu đến từ đâu" nối chéo sang kocContentRevenue ở
@@ -1457,7 +1480,7 @@ function computeAllFromAOA(aoa){
     if (b.gpm !== a.gpm) return b.gpm - a.gpm;
     if (b.completionAvg !== a.completionAvg) return b.completionAvg - a.completionAvg;
     return b.ctrAvg - a.ctrAvg;
-  }).slice(0, 20) : null;
+  }).slice(0, 10) : null;
 
   // Bảng 3 "Hiệu quả LIVE theo KOC" (Live List — Transaction Analysis) — file
   // tuỳ chọn riêng, độc lập với table1/table2; liveTable = null khi chưa tải
@@ -1533,6 +1556,7 @@ function computeAllFromAOA(aoa){
       doanhThu: spRevenue, doanhThuCu: spRevenueCu, gmvDat: spGmvDat,
       thucNhan: spThucNhan, dieuChinh: spDieuChinh,
       phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
+      shipHoan: spShipHoan,
       troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
       huyHoanTra: spHuyHoanTra, loiShop: spErrTotal, hoanVeKho: spHoanVeKho,
@@ -1543,6 +1567,7 @@ function computeAllFromAOA(aoa){
       doanhThu: ttRevenue, doanhThuCu: ttRevenueCu, gmvDat: ttGmvDat,
       thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
       phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
+      shipHoan: ttShipHoan,
       troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
       huyHoanTra: ttHuyHoanTra, loiShop: ttErrTotal, hoanVeKho: ttHoanVeKho,
@@ -1633,6 +1658,7 @@ function combineMonthlyResults(entries){
     thucNhan: sumOptional(d => d.shopee.thucNhan),
     phiSanUocTinh: sumField(d => (d.shopee.phiSanUocTinh !== undefined && d.shopee.phiSanUocTinh !== null) ? d.shopee.phiSanUocTinh : d.shopee.phiSan),
     phiSanChiTiet: mergeChiTiet(d => d.shopee.phiSanChiTiet),
+    shipHoan: mergeChiTiet(d => d.shopee.shipHoan),
     troGia: sumField(d => d.shopee.troGia),
     huy: sumField(d => d.shopee.huy), tra: sumField(d => d.shopee.tra), hoan: sumField(d => d.shopee.hoan),
     huyHoanTra: sumField(d => d.shopee.huyHoanTra), loiShop: sumField(d => d.shopee.loiShop),
@@ -1648,6 +1674,7 @@ function combineMonthlyResults(entries){
     thucNhan: sumOptional(d => d.tiktok.thucNhan), quangCaoGmvMax: sumOptional(d => d.tiktok.quangCaoGmvMax),
     phiSanUocTinh: sumField(d => (d.tiktok.phiSanUocTinh !== undefined && d.tiktok.phiSanUocTinh !== null) ? d.tiktok.phiSanUocTinh : d.tiktok.phiSan),
     phiSanChiTiet: mergeChiTiet(d => d.tiktok.phiSanChiTiet),
+    shipHoan: mergeChiTiet(d => d.tiktok.shipHoan),
     troGia: sumField(d => d.tiktok.troGia),
     huy: sumField(d => d.tiktok.huy), tra: sumField(d => d.tiktok.tra), hoan: sumField(d => d.tiktok.hoan),
     huyHoanTra: sumField(d => d.tiktok.huyHoanTra), loiShop: sumField(d => d.tiktok.loiShop),
@@ -1781,9 +1808,9 @@ function combineMonthlyResults(entries){
   const khuVucRows = khuVucNamed.slice();
   if (khuVucKhacSum > 0) khuVucRows.push({ ten: 'Khác', soDon: khuVucKhacSum, isKhac: true });
   const khuVuc = list.some(d => d.khuVuc) ? { total: khuVucTotalSum, rows: khuVucRows } : null;
-  if (khuVuc){
-    warnings.push('Gộp kỳ: "Khách hàng theo khu vực" là số gần đúng — các tỉnh nhỏ lẻ nằm trong nhóm "Khác" ở 1 tháng nào đó sẽ không tách lại được dù lên top ở tháng khác.');
-  }
+  // (21/10/2026) Zone "Khách hàng theo khu vực" đã bỏ khỏi dashboard theo yêu
+  // cầu chủ shop — vẫn tính và lưu số để sau cần thì bật lại, nhưng không còn
+  // cảnh báo "gộp kỳ là số gần đúng" vì chẳng còn chỗ nào hiển thị nó.
 
   // skuPerformance — gộp theo tên SKU, cộng SL + cộng SL theo size, tính lại % và SL/ngày
   // (chỉ gồm các mã đã có tên trong bảng tra cứu — computeAllFromAOA đã lọc bỏ

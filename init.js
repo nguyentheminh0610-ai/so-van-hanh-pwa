@@ -584,14 +584,17 @@ function wireZoneControls(container, res, opts){
     } catch (e){}
     renderResults(container, res, opts);
   });
-  const packBtn = container.querySelector('#pack-apply');
-  if (packBtn) packBtn.addEventListener('click', () => {
+  // 2 thẻ gói ship (Shopee / TikTok) mỗi thẻ 1 nút Áp dụng riêng — nút nào cũng
+  // lưu cả 2 ô (ô nào thiếu thì giữ mặc định) rồi vẽ lại zone.
+  container.querySelectorAll('.pack-apply').forEach(btn => btn.addEventListener('click', () => {
+    const giaSp = container.querySelector('#pack-gia-sp');
+    const giaTt = container.querySelector('#pack-gia-tt');
     try {
-      localStorage.setItem('svh_pack_sp', String(num(container.querySelector('#pack-gia-sp').value) || 2700));
-      localStorage.setItem('svh_pack_tt', String(num(container.querySelector('#pack-gia-tt').value) || 3000));
+      if (giaSp) localStorage.setItem('svh_pack_sp', String(num(giaSp.value) || 2700));
+      if (giaTt) localStorage.setItem('svh_pack_tt', String(num(giaTt.value) || 3000));
     } catch (e){}
     renderResults(container, res, opts);
-  });
+  }));
 }
 
 // ---------- lương nhân viên kho — web tự tính từ Supabase Sổ Kho (21/10/2026) ----------

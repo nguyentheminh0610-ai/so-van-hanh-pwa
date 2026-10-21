@@ -241,6 +241,11 @@
   .sku-size-bar{ display:flex; width:100%; height:26px; border-radius:7px; overflow:hidden; gap:2px; background:var(--bg); }
   .sku-size-seg{ display:flex; align-items:center; justify-content:center; min-width:2px; overflow:hidden; }
   .sku-size-seg span{ font-size:11px; font-weight:700; color:#fff; white-space:nowrap; padding:0 4px; }
+  /* bảng "Hiệu suất theo SKU/size" gọn lại 1 dòng/mẫu (21/10/2026): thanh tỷ
+     trọng size nằm trong ô bảng nên thấp hơn bản khối cũ */
+  .dtable .sku-size-bar{ height:20px; border-radius:5px; }
+  .dtable .sku-size-seg span{ font-size:10.5px; }
+  .sku-size-cell{ min-width:200px; }
   .sku-size-legend{ display:flex; flex-wrap:wrap; gap:10px; }
   .sku-size-legend-item{ display:flex; align-items:center; gap:5px; font-size:11.5px; font-weight:600; color:var(--ink-soft); }
   .sku-size-legend-item i{ width:9px; height:9px; border-radius:3px; display:inline-block; flex:none; }
@@ -278,6 +283,9 @@
     .kpi-row{ grid-template-columns:1fr; }
     .grid, .grid.cols-3, .grid.cols-2{ grid-template-columns:1fr; }
     .r-bar-row{ grid-template-columns:130px 1fr 38px; gap:8px; }
+    .sku-size-cell{ min-width:90px; }
+    .dtable{ font-size:11.5px; }
+    .dtable th, .dtable td{ padding-left:6px; padding-right:6px; }
     .colchart-wrap{ gap:8px; }
     .col-labels{ gap:8px; }
   }
