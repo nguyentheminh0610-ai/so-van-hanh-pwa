@@ -32,6 +32,19 @@ Luôn `select_browser` TRƯỚC khi mở trang. Không chọn thì rơi về bro
 (thường là Chrome trên Mac) → vào TikTok sẽ thất bại và dễ kết luận nhầm là "mất
 quyền / bị chặn".
 
+## ⚠️ Tên "Browser N" KHÔNG ổn định — chỉ tin deviceId
+
+Gặp thật **2026-10-22 15:08**: chỉ còn 2 Chrome kết nối (Chrome trên Mac đã
+ngắt), nên danh sách đánh số lại — `select_browser` với deviceId Shopee
+(`81a996d1-…`) lại báo **"Selected browser 'Browser 2'"**, đúng cái tên mà
+bảng trên gán cho Chrome TikTok. Dễ tưởng chọn nhầm rồi đi chọn lại cho
+"đúng tên" → mới thật sự vào nhầm Chrome.
+
+**Quy tắc: deviceId là thật, tên hiển thị chỉ là số thứ tự theo danh sách
+đang kết nối.** Chọn đúng deviceId là xong, kệ tên trả về. Muốn chắc thì
+`list_connected_browsers` xem deviceId nào đang `inUse`, hoặc mở trang seller
+rồi đọc nội dung (xem mục dưới).
+
 ## Khi deviceId không còn khớp
 
 deviceId đổi nếu extension cài lại hoặc Chrome đổi profile. Lúc đó:
