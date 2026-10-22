@@ -102,6 +102,23 @@ lại cả size-spec.md lẫn size-rules.json.
 - **Mốc dài quần**: chạm gót = gấu quần chạm gót chân (che qua mắt cá);
   mắt cá = ngắn hơn, ngang mắt cá chân; quét đất = dài chạm sàn.
 
+## Đóng hội thoại đã xong — PHẢI đọc kỹ ngữ cảnh trước (CHỐT 2026-10-22)
+
+Khi rà hộp thư "Chưa trả lời" thấy tin cuối của khách chỉ là xác nhận ngắn
+("Dạ", "ok shop", emoji...) — **không được kết luận ngay là xong** chỉ dựa
+vào preview/thẻ (vd "Trước khi mua") hiển thị ngoài danh sách. Luôn **mở
+đúng hội thoại đó, đọc lại toàn bộ nội dung trước đó** để hiểu khách đã
+hỏi gì/được tư vấn gì, xác nhận thật sự không còn câu hỏi/vấn đề nào treo
+lại, rồi mới quyết định cách đóng:
+- Hội thoại **tư vấn trước khi mua** (size, sản phẩm...) đã xong, khách
+  chỉ xác nhận ngắn → trả lời bằng chữ **"Dạ vâng ạ"** để khép lại, giữ
+  không khí tư vấn bán hàng.
+- Hội thoại **CSKH/khiếu nại sau khi mua** đã xử lý xong, khách chỉ xác
+  nhận ("ok shop"/"dạ") → gửi **sticker** mèo/chó ôm tim (không gõ chữ) —
+  xem [[feedback_close_resolved_chats_with_emoji]].
+Nếu đọc lại mà thấy còn câu hỏi/vấn đề chưa xử lý (dù tin cuối trông như
+xác nhận), xử lý đúng câu hỏi đó trước, không đóng hội thoại vội.
+
 ## Mở rộng phạm vi (ngoài size thuần, nhưng cùng chạy trong task lịch trả lời khách — CHỐT 2026-10-22)
 
 Task tự động "trả lời khách" theo lịch cũng xử lý luôn 2 case dưới đây
