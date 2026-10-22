@@ -588,6 +588,26 @@ function computeAllFromAOA(aoa){
   }
   spPhiSan = Math.abs(spPhiSan);
 
+  // (rà soát 22/10/2026) KIỂM TRA CỘT SỐNG CÒN — trước đây phía Shopee đọc cột
+  // bằng tên CỨNG: Shopee đổi một chữ trong tiêu đề là giá trị thành undefined
+  // → num() trả 0 → Slove/PiShip/trợ giá âm thầm sai mà không có cảnh báo nào
+  // (phía TikTok đã có cơ chế này từ trước). Giờ thiếu cột nào là báo ngay.
+  const spColCheck = [
+    ['Mã đơn hàng', spHdrKeys, 'không gom được đơn — mọi số Shopee sẽ sai'],
+    ['Trạng Thái Đơn Hàng', spHdrKeys, 'không phân biệt được hoàn thành/huỷ'],
+    ['Ngày đặt hàng', spHdrKeys, 'mất biểu đồ theo ngày và khoảng ngày của kỳ'],
+    ['Phí cố định', spHdrKeys, 'Slove sai (mẫu số thiếu)'],
+    ['Phí Dịch Vụ', spHdrKeys, 'Slove sai (mẫu số thiếu)'],
+    ['Phí xử lý giao dịch', spHdrKeys, 'Slove sai (mẫu số thiếu)'],
+    ['Được Shopee trợ giá', spHdrKeys, 'Slove sai (tử số thiếu)'],
+    ['Mã giảm giá của Shopee', spHdrKeys, 'Slove sai (tử số thiếu)'],
+  ];
+  const spColMissing = spColCheck.filter(([name, keys]) => !keys.includes(name));
+  if (spHdrKeys.length && spColMissing.length){
+    warnings.push('Shopee "tất cả đơn hàng": THIẾU CỘT ' + spColMissing.map(([n, , hq]) => `"${n}" (${hq})`).join('; ')
+      + '. Sàn có thể đã đổi tên cột — số liệu liên quan đang bị tính bằng 0. Cột thực đọc được: ' + spHdrKeys.join(' | '));
+  }
+
   const KNOWN_SHOP_ERR_REASONS_SP = [];
   function spIsShopErrorCancel(reason){
     if (!reason) return false;
@@ -974,6 +994,16 @@ function computeAllFromAOA(aoa){
     piShipPhi += Math.abs(num(r['Phí dịch vụ PiShip']));
     piShipHoan += Math.abs(num(r['Phí vận chuyển được hoàn bởi PiShip']));
   }
+  // (rà soát 22/10) 2 cột PiShip cũng đọc bằng tên cứng — thiếu thì thẻ "nên
+  // đăng ký gói ship" sẽ kết luận sai mà không ai biết, nên cảnh báo rõ.
+  {
+    const incKeysSom = incRows.length ? Object.keys(incRows[0]) : [];
+    const thieu = ['Phí dịch vụ PiShip', 'Phí vận chuyển được hoàn bởi PiShip'].filter(c => !incKeysSom.includes(c));
+    if (incKeysSom.length && thieu.length){
+      warnings.push('File Income Shopee: thiếu cột ' + thieu.map(c => `"${c}"`).join(', ')
+        + ' — thẻ "Gói PiShip nên giữ hay huỷ" đang tính các khoản đó = 0 nên ĐỀ XUẤT có thể sai.');
+    }
+  }
   const piShipRatio = piShipPhi ? piShipHoan / piShipPhi : 0;
 
   // ---------- 7) Income — Service Fee Details (Voucher Xtra + Phí Hạ Tầng) ----------
@@ -1113,12 +1143,19 @@ function computeAllFromAOA(aoa){
 
   // ---------- date range detected (for display only) ----------
   // (toDate() đã tách lên top-level phía trên, dùng chung với detectFile())
+  // (rà soát 22/10/2026) TRƯỚC ĐÂY chỉ lấy từ đơn Shopee → tháng nào Shopee
+  // không bán ngày đầu/cuối là periodDays ngắn lại, SL bán/ngày và đơn/ngày hoà
+  // vốn bị thổi lên; Shopee trống hẳn thì periodDays = null, mất luôn cột
+  // sp/ngày. Giờ lấy khoảng ngày của CẢ 2 SÀN.
   let minDate = null, maxDate = null;
-  for (const r of Object.values(spOrders)){
-    const d = toDate(r['Ngày đặt hàng']);
-    if (d && (!minDate || d < minDate)) minDate = d;
-    if (d && (!maxDate || d > maxDate)) maxDate = d;
+  function trackDate(v){
+    const d = toDate(v);
+    if (!d) return;
+    if (!minDate || d < minDate) minDate = d;
+    if (!maxDate || d > maxDate) maxDate = d;
   }
+  for (const r of Object.values(spOrders)) trackDate(r['Ngày đặt hàng']);
+  for (const r of Object.values(ttOrders)) trackDate(r['Created Time']);
 
   // ---------- doanh thu theo ngày (Shopee/TikTok) — để xem xu hướng trong kỳ,
   // khác với các chỉ số khác (vd. hoàn về kho) vốn chỉ cần xem theo tháng/kỳ.
@@ -1537,6 +1574,36 @@ function computeAllFromAOA(aoa){
   const pnlCogs = Object.values(skuAgg).reduce((s, x) => s + x.giaVon, 0);
   const pnlThieuGiaVonSL = Object.values(skuAgg).reduce((s, x) => s + x.thieuGiaVon, 0);
   const pnlPhiSan = spPhiSanHienThi + ttPhiSanHienThi;
+
+  // ===== (rà soát 22/10/2026) 2 lỗi làm LÃI SAI mà trước đây không ai biết =====
+  //
+  // LỖI A — LỆCH KỲ giữa doanh thu và phí sàn. Doanh thu chỉ tính đơn ĐÃ HOÀN
+  // THÀNH (đặt trong kỳ), còn phí sàn lấy từ file tài chính = mọi đơn QUYẾT
+  // TOÁN trong kỳ. Xuất file quá sớm sau khi hết tháng → một đống đơn còn "đang
+  // giao" chưa kịp thành "hoàn thành" → doanh thu hụt nhưng phí sàn vẫn đủ →
+  // lãi tụt giả tạo. Đo thật: T8/2026 xuất file ngày 13-14/09 có 25,5% GMV chưa
+  // hoàn thành (các tháng khác chỉ 2-4,6%) → biên lãi báo 10,5% thay vì ~22%.
+  const gmvDatTong = (spGmvDat !== null && ttGmvDat !== null) ? spGmvDat + ttGmvDat : null;
+  const tyLeChuaHoanThanh = (gmvDatTong && gmvDatTong > 0) ? (gmvDatTong - pnlDoanhThu) / gmvDatTong : null;
+  if (tyLeChuaHoanThanh !== null && tyLeChuaHoanThanh > 0.10){
+    warnings.push('LỆCH KỲ — số lãi tháng này đang THẤP GIẢ TẠO: '
+      + (tyLeChuaHoanThanh * 100).toFixed(1) + '% giá trị đơn (≈ '
+      + Math.round(gmvDatTong - pnlDoanhThu).toLocaleString('vi-VN') + 'đ) nằm ở đơn CHƯA hoàn thành nên chưa được tính vào doanh thu, trong khi phí sàn thì đã tính đủ. '
+      + 'Nguyên nhân thường gặp: tải file quá sớm sau khi hết tháng. Nên tải lại file 2 sàn sau ngày 15 của tháng kế tiếp rồi bấm "Cập nhật lại lịch sử" (các tháng bình thường chỉ số này là 2-5%).');
+  }
+  //
+  // LỖI B — COGS HỤT khi thiếu giá vốn. Trước đây chỉ cộng giá vốn của mã ĐÃ
+  // CÓ trong bảng giá, mã thiếu thì bỏ qua → giá vốn nhỏ hơn thật → lãi gộp và
+  // lãi ròng CAO hơn thật, chỉ có 1 dòng cảnh báo đếm số sp chứ không nói mất
+  // bao nhiêu tiền. Đo thật: T9/2025 lãi báo 14,3tr nhưng ước tính thật ~9,5tr.
+  const pnlSlCoGiaVon = Object.values(skuAgg).reduce((s, x) => s + (x.tongSL - (x.thieuGiaVon || 0)), 0);
+  const pnlGiaVonTbCai = pnlSlCoGiaVon ? pnlCogs / pnlSlCoGiaVon : 0;
+  const pnlGiaVonThieuUocTinh = Math.round(pnlThieuGiaVonSL * pnlGiaVonTbCai);
+  if (pnlGiaVonThieuUocTinh > 0){
+    warnings.push('Lãi đang CAO hơn thật khoảng ' + pnlGiaVonThieuUocTinh.toLocaleString('vi-VN') + 'đ: '
+      + pnlThieuGiaVonSL + ' sp chưa có giá vốn nên không được trừ vào giá vốn hàng bán '
+      + '(ước tính theo giá vốn trung bình ' + Math.round(pnlGiaVonTbCai).toLocaleString('vi-VN') + 'đ/cái). Bổ sung các mã thiếu vào sheet GiaCong để hết sai lệch này.');
+  }
   const pnl = {
     coGiaVon: !!costCatalog,
     doanhThu: pnlDoanhThu,
@@ -1545,6 +1612,10 @@ function computeAllFromAOA(aoa){
     laiGop: costCatalog ? pnlDoanhThu - pnlCogs : null,
     phiSan: pnlPhiSan,
     quangCaoGmvMax: ttQuangCaoGmvMax || 0,
+    // 2 trường chẩn đoán (rà soát 22/10) để app hiện cảnh báo ngay cạnh số lãi
+    giaVonThieuUocTinh: pnlGiaVonThieuUocTinh,
+    tyLeChuaHoanThanh,
+    doanhThuChuaHoanThanh: (gmvDatTong !== null) ? gmvDatTong - pnlDoanhThu : null,
     // lãi sau phí sàn & quảng cáo — TRƯỚC chi phí vận hành nhập tay
     laiSauPhiSan: costCatalog ? pnlDoanhThu - pnlCogs - pnlPhiSan - (ttQuangCaoGmvMax || 0) : null,
   };

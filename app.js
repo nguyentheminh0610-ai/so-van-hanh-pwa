@@ -339,7 +339,12 @@ function buildPnlHtml(res, opts){
   const line = (label, value, cls, note) => rows.push(
     `<div class="pnl-row ${cls || ''}"><span class="pnl-label">${label}${note ? ` <span class="pnl-note">${note}</span>` : ''}</span><span class="pnl-value">${value}</span></div>`);
   line('Doanh thu hàng', fmtVND(p.doanhThu), 'head');
-  line('− Giá vốn hàng bán', vnd(p.giaVonHangBan), '', p.thieuGiaVonSL ? `(${fmtInt(p.thieuGiaVonSL)} sp chưa có giá vốn — xem cảnh báo)` : '');
+  // Rà soát 22/10: nói thẳng THIẾU BAO NHIÊU TIỀN, không chỉ đếm số sp — vì
+  // phần giá vốn thiếu làm lãi hiện ra CAO hơn thật (T9/2025 lệch tới 4,8tr).
+  line('− Giá vốn hàng bán', vnd(p.giaVonHangBan), '',
+    p.thieuGiaVonSL
+      ? `(thiếu giá vốn ${fmtInt(p.thieuGiaVonSL)} sp${p.giaVonThieuUocTinh ? ' ≈ ' + fmtVND(p.giaVonThieuUocTinh) + ' → lãi dưới đây đang CAO hơn thật chừng đó' : ''})`
+      : '');
   line('= LÃI GỘP', vnd(p.laiGop) + pct(p.laiGop, p.doanhThu), 'total');
   line('− Phí sàn (đủ khoản, từ file tài chính)', fmtVND(p.phiSan));
   if (p.quangCaoGmvMax) line('− Quảng cáo GMV Max (TikTok cấn vào ví)', fmtVND(p.quangCaoGmvMax));
@@ -409,11 +414,20 @@ function buildPnlHtml(res, opts){
     }).join('')}
   </tbody></table>` : '';
 
+  // Rà soát 22/10 — cảnh báo LỆCH KỲ đặt ngay trong thẻ P&L, vì nếu chỉ để ở
+  // khối cảnh báo đầu trang thì chủ shop nhìn số lãi trước rồi tin luôn.
+  const lechKyHtml = (p.tyLeChuaHoanThanh !== null && p.tyLeChuaHoanThanh !== undefined && p.tyLeChuaHoanThanh > 0.10)
+    ? `<div class="pnl-row" style="background:var(--warn-soft); border-radius:7px; padding:8px 10px; margin-top:8px;">
+         <span class="pnl-label" style="color:var(--warn);"><b>⚠ Lãi tháng này đang THẤP GIẢ TẠO</b>
+           <span class="pnl-note">${fmtPct(p.tyLeChuaHoanThanh, 1)} giá trị đơn (${fmtVND(p.doanhThuChuaHoanThanh)}) còn ở đơn CHƯA hoàn thành nên chưa tính vào doanh thu, trong khi phí sàn đã tính đủ. Tải lại file 2 sàn sau ngày 15 tháng kế tiếp rồi bấm "Cập nhật lại lịch sử".</span>
+         </span></div>`
+    : '';
+
   return `
   <!-- ZONE 2: LÃI LỖ -->
   <div class="zone"><span class="z-num">2</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · hoà vốn · lãi gộp theo SP</span></div>
   <div class="grid cols-2">
-    <div class="card"><div class="c-title">P&amp;L tháng</div><div class="pnl-table">${rows.join('')}</div></div>
+    <div class="card"><div class="c-title">P&amp;L tháng</div><div class="pnl-table">${rows.join('')}</div>${lechKyHtml}</div>
     <div class="card"><div class="c-title">Điểm hoà vốn</div>${hoaVonHtml}</div>
   </div>
   ${formHtml}
