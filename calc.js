@@ -62,8 +62,14 @@ function rowsAsDicts(aoa, headerRowIdx, startRowIdx){
     if (!row || row.every(v => v === null || v === undefined)) continue;
     const d = {};
     for (let i = 0; i < hdr.length; i++){
-      if (hdr[i] !== null && hdr[i] !== undefined && i < row.length){
-        d[hdr[i]] = nfc(row[i]);
+      // (rà soát 22/10/2026) TRƯỚC ĐÂY còn điều kiện `i < row.length`: dòng dữ
+      // liệu nào bị cắt ngắn (SheetJS bỏ các ô rỗng ở đuôi) thì những cột phía
+      // sau KHÔNG có mặt trong object → chỗ nào dò cột bằng Object.keys(dòng
+      // đầu) sẽ tưởng sàn đã bỏ cột. Đã dính thật với file tài chính TikTok
+      // tháng 9/2026: dòng đầu chỉ 21 ô nên 45 cột cuối "biến mất", phí sàn và
+      // thực nhận TikTok ra 0. Giờ luôn tạo đủ khoá theo DÒNG TIÊU ĐỀ.
+      if (hdr[i] !== null && hdr[i] !== undefined){
+        d[hdr[i]] = (i < row.length) ? nfc(row[i]) : null;
       }
     }
     out.push(d);
@@ -819,7 +825,12 @@ function computeAllFromAOA(aoa){
   // header thật, thay vì âm thầm trả về 0.
   const finAOA = aoa.tiktokFinance;
   const finRows = rowsAsDicts(finAOA, 0);
-  const finHeaderKeys = finRows.length ? Object.keys(finRows[0]) : ((finAOA[0] || []).map(nfc).filter(v => v !== null && v !== undefined && v !== ''));
+  // Danh sách cột LUÔN lấy từ dòng tiêu đề của file, không lấy từ dòng dữ liệu
+  // đầu tiên (xem ghi chú trong rowsAsDicts) — gộp thêm khoá của dòng đầu cho chắc.
+  const finHeaderFromAOA = (finAOA && finAOA[0] ? finAOA[0] : []).map(nfc).filter(v => v !== null && v !== undefined && v !== '');
+  const finHeaderKeys = finHeaderFromAOA.length
+    ? Array.from(new Set(finHeaderFromAOA.concat(finRows.length ? Object.keys(finRows[0]) : [])))
+    : (finRows.length ? Object.keys(finRows[0]) : []);
 
   const COL_LOAI_GD = findColKey(finHeaderKeys, [/^loại\s*giao\s*dịch$/i, /loại.*giao.*dịch/i]);
   const COL_PHI_XU_LY = findColKey(finHeaderKeys, [/phí.*xử\s*lý.*đơn/i]);
