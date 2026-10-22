@@ -29,32 +29,33 @@
       "measure_table": "B",
       "default_available_sizes": ["M", "L", "XL", "XXL"],
       "cotton_thuong_skus": ["Đỏ 03", "Đỏ 04", "Đen 02"],
-      "cotton_thuong_size_bonus": 1
+      "cotton_thuong_size_bonus": 0,
+      "_note": "CHỐT 2026-10-22: bỏ hẳn +1 size cho cotton thường, tư vấn như Caro thường"
     },
     "CT": {
       "name": "Quần thun",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
     },
     "PJD": {
       "name": "Bộ dài",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
     },
     "PJC": {
       "name": "Bộ ngắn",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_unconfirmed": "mục 8.1 — dùng tạm bảng A, cần chủ shop xác nhận"
+      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
     },
     "QS": {
       "name": "Quần short",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
       "length_cm_applicable": false,
-      "_unconfirmed": "mục 8.1 — dùng tạm bảng A (bỏ qua dài quần), cần chủ shop xác nhận"
+      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A (bỏ qua dài quần), không còn là tạm/chưa xác nhận"
     },
     "CB": {
       "name": "Combo",
@@ -125,7 +126,7 @@
     "underweight_loose": "Dạ bạn lấy size {size} để quần đủ dài tới chạm gót ạ, dài quần {length}cm, form sẽ hơi rộng một chút.",
     "clamped_min": "Dạ size nhỏ nhất của mẫu này là {size} ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé.",
     "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
-    "caro_cotton_thuong_suffix": "Mẫu {ten} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ.",
+    "fear_tight_or_loose_waist_suffix": "Dạ bên mình cạp quần là cạp chun co giãn nên bạn không cần lo rộng/chật eo quá đâu ạ.",
     "missing_height": "Dạ bạn cho mình xin chiều cao và cân nặng để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ.",
     "missing_weight": "Dạ {height} bạn mặc size {size} ({length}cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ."
   },
@@ -161,11 +162,13 @@
     { "id": 20, "input": "chỉ có 60kg", "expected_size": "M", "note": "tạm M vì <65kg, bắt buộc xin chiều cao" }
   ],
 
+  "confirmed_2026_10_22": [
+    "CT/PJD/PJC/QS dùng thẳng bảng A, không còn tạm",
+    "Caro cotton thường: bỏ hẳn +1 size",
+    "Bảng cân nặng caro dùng ngưỡng riêng mục 3.3 (M<60,L<70,XL<77,XXL<85)",
+    "Giới tính không rõ: mặc định ngưỡng nam (10kg)"
+  ],
   "unconfirmed_items": [
-    "CT/PJD/PJC/QS dùng tạm bảng A — chưa có bảng đo riêng, cần chủ shop gửi/xác nhận",
-    "Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02) +1 size — áp dụng ở bước B1 trước mốc dài, cần chủ shop chốt có dùng không",
-    "Bảng cân nặng caro dùng ngưỡng riêng (mục 3.3) thay vì y hệt quần lông — cần xác nhận",
-    "Giới tính không rõ dùng ngưỡng nam (10kg) — cần xác nhận",
-    "Combo thiếu cặp size phù hợp → tư vấn mua lẻ 2 quần — cần xác nhận"
+    "Combo thiếu cặp size phù hợp: PHẢI tra thật trên Sapo/sàn trước (combo đã làm ~95%, gần như luôn có sẵn) — chỉ khi xác nhận thật sự không có cặp đó mới tư vấn mua lẻ 2 quần (giá lẻ), chủ shop có thể đổi hướng xử lý sau"
   ]
 }
