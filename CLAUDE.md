@@ -52,10 +52,25 @@ Script này tự: commit mọi thay đổi trong `.claude/` còn sót lại → 
 --rebase` → `git push`. Chạy được ở cả 2 chiều, nên train ở máy nào cũng đồng bộ
 sang máy kia.
 
-**Trên PC:** các Task Scheduler đang chạy sẵn nên gọi `sync-knowledge.ps1`
-TRƯỚC khi gọi `claude -p` (thêm vào đầu script hiện có, hoặc tạo 1 task riêng
-chạy script này mỗi 10-15 phút). Không tạo thêm task gọi thẳng skill — dễ chạy
-trùng với task đã có, khách sẽ bị nhắn 2 lần.
+**Trên PC đã có task tự đồng bộ mỗi 15 phút** (cài 2026-10-22 bằng
+`scripts/setup-sync-task.ps1`, tên task: `Claude - Dong bo kien thuc`). Nhờ đó
+kiến thức train ở máy nào cũng tự sang máy kia trong vòng 15 phút, không cần ai
+nhớ chạy tay. Không tạo thêm task gọi thẳng skill trả lời khách — dễ chạy trùng
+với task đã có, khách sẽ bị nhắn 2 lần.
+
+### Kiến thức mới thì ghi vào ĐÂU
+
+| Chủ shop train về... | Ghi vào file |
+|---|---|
+| **Trả lời tin nhắn khách** (tư vấn size, chào chung, hỏi tồn kho, đóng hội thoại, mẫu câu, văn phong) | `.claude/skills/size-consultation/SKILL.md`; nếu là số liệu/bảng/mẫu câu thì sửa thêm `references/size-spec.md` + `references/size-rules.json` cho khớp nhau |
+| Báo cáo kho, đối chiếu sàn | `.claude/skills/daily-warehouse-report/` |
+| Gửi bù hàng thiếu | `.claude/skills/resend-missing-item/` |
+| KOC, flash sale | `.claude/skills/check-koc/`, `tiktok-koc-flashsale/`, `tiktok-live-flashsale/` |
+| Quy tắc chung nhiều skill dùng | `.claude/shared/` |
+
+Luôn ghi kèm **ngày chốt** + **lý do**, và nếu quy tắc mới ghi đè quy tắc cũ thì
+nói rõ "chốt ngày X, thay cho quy tắc cũ Y" thay vì xoá lịch sử — để phiên sau
+hiểu vì sao đổi.
 
 ### Nguồn chuẩn khi có mâu thuẫn
 
