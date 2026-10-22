@@ -30,37 +30,37 @@
       "default_available_sizes": ["M", "L", "XL", "XXL"],
       "cotton_thuong_skus": ["Đỏ 03", "Đỏ 04", "Đen 02"],
       "cotton_thuong_size_bonus": 0,
-      "_note": "CHỐT 2026-10-22: bỏ hẳn +1 size cho cotton thường, tư vấn như Caro thường"
+      "_cotton_thuong_note": "Chốt 15/10/2026: KHÔNG lên size cho cotton thường"
     },
     "CT": {
       "name": "Quần thun",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
+      "_confirmed": "Chốt 22/10/2026: dùng thẳng bảng A, đã xác nhận (không còn tạm)"
     },
     "PJD": {
       "name": "Bộ dài",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
+      "_confirmed": "Chốt 22/10/2026: dùng thẳng bảng A, đã xác nhận (không còn tạm)"
     },
     "PJC": {
       "name": "Bộ ngắn",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
-      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A, không còn là tạm/chưa xác nhận"
+      "_confirmed": "Chốt 22/10/2026: dùng thẳng bảng A, đã xác nhận (không còn tạm)"
     },
     "QS": {
       "name": "Quần short",
       "measure_table": "A",
       "default_available_sizes": ["M", "L", "XL"],
       "length_cm_applicable": false,
-      "_note": "CHỐT 2026-10-22: dùng thẳng bảng A (bỏ qua dài quần), không còn là tạm/chưa xác nhận"
+      "_confirmed": "Chốt 22/10/2026: dùng thẳng bảng A, đã xác nhận (không còn tạm) — bỏ qua dài quần"
     },
     "CB": {
       "name": "Combo",
       "measure_table": null,
-      "note": "Size cố định theo tên combo — tư vấn từng SKU con rồi chọn combo đúng cặp size. Nếu không có cặp phù hợp, tư vấn mua lẻ 2 quần (mục 8.5 — cần xác nhận)."
+      "note": "Size cố định theo tên combo — tư vấn từng SKU con rồi chọn combo đúng cặp size. CHỐT 22/10/2026: combo đã làm ~95%, PHẢI tra biến thể combo thật trên Sapo/sàn trước, không vội kết luận thiếu cặp size; chỉ khi tra thật không có mới tư vấn mua lẻ 2 quần (giá lẻ)."
     }
   },
 
@@ -126,7 +126,8 @@
     "underweight_loose": "Dạ bạn lấy size {size} để quần đủ dài tới chạm gót ạ, dài quần {length}cm, form sẽ hơi rộng một chút.",
     "clamped_min": "Dạ size nhỏ nhất của mẫu này là {size} ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé.",
     "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
-    "fear_tight_or_loose_waist_suffix": "Dạ bên mình cạp quần là cạp chun co giãn nên bạn không cần lo rộng/chật eo quá đâu ạ.",
+    "waist_worry": "Dạ hiện các quần bên mình đều là cạp chun cả, nên không sợ bị rộng/chật eo đâu ạ, bạn cứ yên tâm nha.",
+    "send_size_chart": "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình nha.",
     "missing_height": "Dạ bạn cho mình xin chiều cao và cân nặng để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ.",
     "missing_weight": "Dạ {height} bạn mặc size {size} ({length}cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ."
   },
@@ -163,12 +164,11 @@
   ],
 
   "confirmed_2026_10_22": [
-    "CT/PJD/PJC/QS dùng thẳng bảng A, không còn tạm",
-    "Caro cotton thường: bỏ hẳn +1 size",
-    "Bảng cân nặng caro dùng ngưỡng riêng mục 3.3 (M<60,L<70,XL<77,XXL<85)",
+    "CT/PJD/PJC/QS: dùng thẳng bảng A, không còn tạm",
+    "Bảng cân nặng caro: dùng ngưỡng riêng mục 3.3 (M<60, L<70, XL<77, XXL<85)",
     "Giới tính không rõ: mặc định ngưỡng nam (10kg)"
   ],
   "unconfirmed_items": [
-    "Combo thiếu cặp size phù hợp: PHẢI tra thật trên Sapo/sàn trước (combo đã làm ~95%, gần như luôn có sẵn) — chỉ khi xác nhận thật sự không có cặp đó mới tư vấn mua lẻ 2 quần (giá lẻ), chủ shop có thể đổi hướng xử lý sau"
+    "Combo thiếu cặp size: phải tra thật trên Sapo/sàn trước (combo đã làm ~95%); chỉ khi xác nhận thật không có mới tư vấn mua lẻ 2 quần — cách xử lý này chủ shop có thể đổi sau"
   ]
 }

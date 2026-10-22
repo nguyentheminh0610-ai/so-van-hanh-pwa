@@ -90,10 +90,9 @@ Mốc mặc định: **chạm gót**.
 | XL | 1m65–1m77 | dưới 77kg | 100 | 103 | 68 | 118 | 24 |
 | XXL (2XL) | 1m70–1m85 | dưới 85kg | 104 | 110 | 71 | 122 | 26 |
 
-**CHỐT 2026-10-22 (sửa lại quyết định 13/10):** KHÔNG áp dụng "+1 size cho Cotton
-thường" — chủ shop đã sửa việc này trước đó rồi, tư vấn Caro cotton thường
-**như bình thường**, không cộng size. Bỏ cờ/câu mẫu `caro_cotton_thuong_suffix`
-trong size-rules.json, không dùng nữa.
+Lưu ý in trên bảng công khai:
+- Độ co giãn tăng dần theo chất: **Cotton thường < Cotton mềm < Chất dạ cao cấp**.
+- Shop khuyến khích **tăng 1 size với phân loại Cotton thường (Đỏ 03, Đỏ 04, Đen 02)**.
 
 ### 3.2 Bảng quyết định theo chiều cao (dùng trong code)
 
@@ -188,7 +187,7 @@ Cấu trúc bắt buộc: **1 size + dài quần + mốc**, rồi hỏi/chốt m
 | Gầy (`underweight_loose`) | "Dạ bạn lấy **size {size}** để quần đủ dài tới chạm gót ạ, dài quần {length}cm, form sẽ hơi rộng một chút." |
 | Kẹp size nhỏ nhất (`clamped_min`) | "Dạ size nhỏ nhất của mẫu này là **{size}** ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé." |
 | Kẹp size lớn nhất (`clamped_max`) | "Dạ mẫu này lớn nhất là **size {size}** ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé." |
-| Sợ rộng/chật eo (CHỐT 2026-10-22) | "Dạ bên mình cạp quần là cạp chun co giãn nên bạn không cần lo rộng/chật eo quá đâu ạ." — ghép thêm vào SAU câu tư vấn size bình thường (không phải câu trả lời một mình). |
+| Caro – Cotton thường | thêm: "Mẫu {tên} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ." (xem mục 8) |
 | Thiếu chiều cao | "Dạ bạn cho mình xin **chiều cao và cân nặng** để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ." |
 | Thiếu cân nặng | Tư vấn theo chiều cao ngay + xin thêm cân nặng trong cùng tin: "Dạ 1m70 bạn mặc **size L** (97cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ." |
 
@@ -241,29 +240,13 @@ Bổ sung nên test:
 
 ---
 
-## 8. Điểm đã chốt / đang chờ (cập nhật 2026-10-22)
+## 8. Điểm chưa chốt — cần chủ shop xác nhận trước khi code cứng
 
-**Đã chốt với chủ shop (2026-10-22):**
-1. **Quần thun (CT), Bộ dài/ngắn (PJD/PJC), Quần short (QS)**: CHỐT dùng **Bảng A
-   (Hoạt Hình)** y như Quần Hoạt Hình — không phải "tạm" nữa, dùng thẳng, kẹp
-   M–XL, dài quần theo Bảng A (short bỏ qua dài quần).
-2. **Caro – Cotton thường "+1 size"**: CHỐT **bỏ hẳn**, không áp dụng. Tư vấn
-   Caro cotton thường như các mẫu Caro khác, không cộng size (xem mục 3.1).
-3. **Bảng cân nặng caro riêng** (mục 3.3: M<60, L<70, XL<77, XXL<85): CHỐT dùng
-   đúng bảng này cho Caro, không dùng chung bảng quần lông.
-4. **Giới tính không rõ**: CHỐT mặc định dùng ngưỡng **nam (10kg)** làm
-   mặc định khi khách không nói rõ giới tính.
-
-**Đang chờ xác nhận thêm (2026-10-22):**
-5. **Combo thiếu cặp size phù hợp**: chủ shop lưu ý combo đã làm **gần đủ
-   95%** rồi, nên **KHÔNG được vội kết luận "không có combo đúng cặp"**.
-   Thứ tự xử lý bắt buộc:
-   a. Tra trực tiếp trên Sapo/sàn (biến thể combo thật, không suy đoán từ
-      danh sách combo biết trước) xem có đúng cặp size khách cần không —
-      vì gần như luôn có sẵn.
-   b. Chỉ khi tra thật và xác nhận KHÔNG có cặp đó, mới tư vấn khách
-      **mua lẻ 2 quần** (giá lẻ, không theo giá combo) để đúng size mỗi
-      món. Đây vẫn là hướng tạm, chủ shop có thể đổi cách xử lý sau.
+1. ✅ **ĐÃ CHỐT 22/10/2026: dùng thẳng Bảng A** (Hoạt Hình) cho Quần thun (CT), Bộ dài/ngắn (PJD/PJC), Quần short (QS) — không còn là "tạm". Kẹp M–XL, dài quần lấy theo Bảng A (short bỏ qua dài quần).
+2. ✅ **ĐÃ CHỐT 15/10/2026: KHÔNG lên size** cho cotton thường, tư vấn như caro thường. (Nội dung cũ: **Caro – Cotton thường (Đỏ 03, Đỏ 04, Đen 02) "+1 size"**: bảng công khai khuyên vậy, nhưng tài liệu CSKH nội bộ chưa quy định. Đề xuất: cộng 1 bậc ở **B1** (trước khi xét mốc dài), kẹp tối đa XXL, và nói rõ lý do với khách. *Cần anh chốt có áp dụng không và áp dụng trước hay sau mốc dài.*
+3. ✅ **ĐÃ CHỐT 22/10/2026: dùng ngưỡng cân nặng caro riêng** (mục 3.3: M<60, L<70, XL<77, XXL<85), KHÔNG dùng chung bảng cân nặng quần lông.
+4. ✅ **ĐÃ CHỐT 22/10/2026: giới tính không rõ → dùng ngưỡng nam (10kg)** làm mặc định.
+5. ⚠️ **Combo — PHẢI TRA THẬT TRƯỚC (chốt 22/10/2026):** chủ shop đã làm combo **gần đủ 95%**, nên **không được vội kết luận "không có combo đúng cặp size"**. Thứ tự bắt buộc: (a) tra trực tiếp biến thể combo thật trên Sapo/sàn xem có đúng cặp size khách cần không — gần như luôn có; (b) chỉ khi tra thật và xác nhận KHÔNG có mới tư vấn khách mua lẻ 2 quần (giá lẻ). Cách xử lý ở bước (b) vẫn có thể đổi nếu chủ shop muốn khác.
 
 ---
 

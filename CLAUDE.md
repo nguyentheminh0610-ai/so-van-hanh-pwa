@@ -2,7 +2,14 @@
 
 Shop SOME.TIME (đồ ngủ, bán TikTok Shop + Shopee). Chủ shop: Nguyễn Thế Minh.
 Dự án này chạy trên **2 máy**: máy Mac của chủ shop, và **PC Windows trực 24/7**
-(`C:\sokho\so-van-hanh-pwa`) chạy các task tự động theo lịch.
+(`C:\sokho\so-van-hanh-pwa`, hostname `DESKTOP-N7T8LNP`) chạy các task tự động
+theo lịch.
+
+**Máy nào làm gì (chốt 21/10/2026):** mọi việc chạy thật (mở trình duyệt, nhắn
+khách, gửi Telegram) **chỉ chạy trên PC Windows** — nhiều skill có sẵn bước
+kiểm `hostname` và tự dừng nếu không phải PC, để tránh 2 máy làm trùng (khách
+bị nhắn 2 lần, Telegram nhận 2 báo cáo). Máy Mac dùng để trao đổi, sửa kiến
+thức, sửa code.
 
 ---
 
@@ -10,8 +17,13 @@ Dự án này chạy trên **2 máy**: máy Mac của chủ shop, và **PC Windo
 
 Chủ shop thường xuyên "train" kiến thức nghiệp vụ mới qua chat (quy tắc tư vấn
 size, cách trả lời khách, quy trình kho, chính sách...). **Vấn đề đã từng xảy
-ra nhiều lần: train xong rồi phiên sau quên sạch**, vì kiến thức chỉ nằm trong
-hội thoại hoặc trong memory cục bộ của 1 máy.
+ra nhiều lần: train xong rồi phiên sau quên sạch.**
+
+**Sự cố thật 22/10/2026 (lý do có mục này):** máy Mac làm việc suốt nhiều ngày
+trên bản kiến thức cũ vì **không bao giờ `git pull`**, trong khi PC vẫn đang
+đẩy kiến thức mới lên GitHub. Kết quả: chủ shop phải train lại những thứ PC đã
+chốt từ 15/10 (cotton thường không lên size, câu trả lời eo cạp chun...), và
+2 nhánh git lệch nhau phải gộp tay. **Vì vậy: BẮT BUỘC pull trước khi làm.**
 
 ### Khi chủ shop train/chốt bất kỳ kiến thức nghiệp vụ mới nào → làm ĐỦ 3 bước:
 
@@ -40,8 +52,10 @@ Script này tự: commit mọi thay đổi trong `.claude/` còn sót lại → 
 --rebase` → `git push`. Chạy được ở cả 2 chiều, nên train ở máy nào cũng đồng bộ
 sang máy kia.
 
-**Task theo lịch trên PC bắt buộc phải chạy `sync-knowledge.ps1` TRƯỚC khi gọi
-`claude -p`**, nếu không PC sẽ chạy bằng kiến thức cũ.
+**Trên PC:** các Task Scheduler đang chạy sẵn nên gọi `sync-knowledge.ps1`
+TRƯỚC khi gọi `claude -p` (thêm vào đầu script hiện có, hoặc tạo 1 task riêng
+chạy script này mỗi 10-15 phút). Không tạo thêm task gọi thẳng skill — dễ chạy
+trùng với task đã có, khách sẽ bị nhắn 2 lần.
 
 ### Nguồn chuẩn khi có mâu thuẫn
 

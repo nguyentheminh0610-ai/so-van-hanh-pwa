@@ -20,7 +20,7 @@ in `so-van-hanh-pwa/init.js`.
 |---|---|
 | `category` | `gui_don_bu` |
 | `order_code` | the **new** SPX mã vận đơn (not the original order code) |
-| `content` | keep short: `"Gui bu <SKU> - don goc #<ma don goc>"` — no shipping-fee detail, shop owner finds that clutter |
+| `content` | `"<mã đơn gốc> - <SL> Quần <tên phân loại> <size>"` — không lặp chữ "Gửi bù" (app đã hiện nhãn), có số lượng, không ghi phí ship. Chuẩn đầy đủ: `.claude/shared/notice_naming.md` |
 | `pdf_path` | exact filename of the label PDF — **must match an object actually uploaded to the `notices-pdf` storage bucket**, see below |
 | `done` | `false` until staff physically packs/ships it |
 

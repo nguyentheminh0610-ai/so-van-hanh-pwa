@@ -54,7 +54,9 @@ def _open_wb(path):
     if head != b'PK':
         raise ValueError('không phải file Excel dạng xlsx (zip)')
     with open(path, 'rb') as f:
-        return openpyxl.load_workbook(io.BytesIO(f.read()), read_only=True, data_only=True)
+        # KHÔNG dùng read_only: file sàn khai sai <dimension> nên ở chế độ đó
+        # openpyxl chỉ đọc được 1 cột của dòng tiêu đề (đã dính thật 22/10).
+        return openpyxl.load_workbook(io.BytesIO(f.read()), read_only=False, data_only=True)
 
 
 def header_and_rows(path, sheet=None, header_row=1, max_rows=5000):
@@ -95,11 +97,13 @@ def classify(path):
         return 'shopStats', sheets[0], 1
     hdr, _ = header_and_rows(path, None, 1, 1)
     hs = ' | '.join(hdr).lower()
-    if 'trạng thái trả hàng/hoàn tiền' in hs:
+    # THỨ TỰ QUAN TRỌNG: file Order.all của Shopee CŨNG có cột "Trạng thái Trả
+    # hàng/Hoàn tiền" nên phải nhận file trả/hoàn bằng cột riêng của nó trước.
+    if 'mã số khiếu nại' in hs:
         return 'shopeeReturnRefund', None, 1
     if 'return status' in hs or 'return order id' in hs:
         return 'tiktokReturns', None, 1
-    if 'trạng thái đơn hàng' in hs and 'mã vận đơn' in hs and 'lý do hủy' in hs:
+    if 'lý do hủy' in hs or 'lý do huỷ' in hs:
         return 'shopeeOrders', None, 1
     if 'trạng thái đơn hàng' in hs and 'mã vận đơn' in hs:
         return 'shopeeFailedDelivery', None, 1
