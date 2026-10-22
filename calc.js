@@ -47,9 +47,32 @@ function normalizeTinhThanh(raw){
   return raw.replace(/^Thành phố\s+/, '').replace(/^Tỉnh\s+/, '').trim() || 'Không rõ';
 }
 
+/** Tính lại phạm vi thật của sheet từ các ô có thật.
+ *
+ *  BẪY NẶNG (phát hiện 22/10/2026, file tài chính TikTok tháng 9): file xuất từ
+ *  sàn khai sai thẻ <dimension> — ghi "A1:U2" trong khi dữ liệu thật tới
+ *  "A1:BN880". SheetJS TIN con số đó nên chỉ đọc 21 cột × 2 dòng → phí sàn,
+ *  thực nhận, quảng cáo GMV Max của TikTok đều ra 0 mà nhìn qua vẫn thấy
+ *  "có đọc được file". (Thư viện openpyxl bên Python dính y hệt, phải gọi
+ *  reset_dimensions.) Vì vậy LUÔN quét khoá ô thật để dựng lại !ref. */
+function fixSheetRange(ws){
+  if (!ws) return ws;
+  let maxR = 0, maxC = 0, any = false;
+  for (const k in ws){
+    if (!Object.prototype.hasOwnProperty.call(ws, k) || k.charAt(0) === '!') continue;
+    const cell = XLSX.utils.decode_cell(k);
+    if (!cell || isNaN(cell.r) || isNaN(cell.c)) continue;
+    if (cell.r > maxR) maxR = cell.r;
+    if (cell.c > maxC) maxC = cell.c;
+    any = true;
+  }
+  if (any) ws['!ref'] = XLSX.utils.encode_range({ s: { r: 0, c: 0 }, e: { r: maxR, c: maxC } });
+  return ws;
+}
+
 /** sheet -> array of arrays (raw), via SheetJS */
 function sheetToAOA(ws){
-  return XLSX.utils.sheet_to_json(ws, { header: 1, raw: true, defval: null, blankrows: true });
+  return XLSX.utils.sheet_to_json(fixSheetRange(ws), { header: 1, raw: true, defval: null, blankrows: true });
 }
 
 /** Build array of row-objects keyed by header row (0-based header index). */
