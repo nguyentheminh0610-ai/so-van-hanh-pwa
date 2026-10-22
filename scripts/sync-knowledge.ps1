@@ -32,7 +32,9 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "[2/3] Keo ban moi nhat tu GitHub..."
-git pull --rebase origin main
+# --autostash: tu cat cac thay doi dang lam do roi tra lai nguyen ven, neu khong
+# rebase se bao "cannot pull with rebase: You have unstaged changes".
+git pull --rebase --autostash origin main
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[LOI] Pull that bai (co the dang xung dot). Xu ly thu cong roi chay lai."
     exit 1
@@ -42,6 +44,18 @@ Write-Host "[3/3] Day len GitHub..."
 git push origin main
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[CANH BAO] Push that bai - kiem tra mang/quyen (repo public thi pull van chay duoc)."
+}
+
+Write-Host "[4/4] Kiem tra tham chieu trong .claude/ co tro dung file that khong..."
+$py = Get-Command python -ErrorAction SilentlyContinue
+if (-not $py) { $py = Get-Command python3 -ErrorAction SilentlyContinue }
+if ($py) {
+    & $py.Source scripts\check-skill-links.py
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "[CANH BAO] Co link hong o tren - sua roi commit lai."
+    }
+} else {
+    Write-Host "      (bo qua: khong tim thay python tren may nay)"
 }
 
 Write-Host "[XONG] Kien thuc da dong bo. Commit moi nhat:"

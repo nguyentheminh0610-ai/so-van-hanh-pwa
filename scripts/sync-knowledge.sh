@@ -29,13 +29,22 @@ else
 fi
 
 echo "[2/3] Keo ban moi nhat tu GitHub..."
-if ! git pull --rebase origin main; then
+# --autostash: tu cat cac thay doi dang lam do (vd app.js) roi tra lai nguyen ven,
+# neu khong rebase se bao "cannot pull with rebase: You have unstaged changes".
+if ! git pull --rebase --autostash origin main; then
   echo "[LOI] Pull that bai (co the dang xung dot). Xu ly thu cong roi chay lai."
   exit 1
 fi
 
 echo "[3/3] Day len GitHub..."
 git push origin main || echo "[CANH BAO] Push that bai - kiem tra mang/quyen."
+
+echo "[4/4] Kiem tra tham chieu trong .claude/ co tro dung file that khong..."
+if command -v python3 >/dev/null 2>&1; then
+  python3 scripts/check-skill-links.py || echo "[CANH BAO] Co link hong o tren - sua roi commit lai."
+else
+  echo "      (bo qua: khong co python3)"
+fi
 
 echo "[XONG] Kien thuc da dong bo. Commit moi nhat:"
 git log --oneline -1
