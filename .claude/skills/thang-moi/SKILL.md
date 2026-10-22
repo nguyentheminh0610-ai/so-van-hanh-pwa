@@ -21,7 +21,7 @@ Nếu buộc phải chạy sớm: vẫn làm được, nhưng **phải nói rõ 
 
 ## Trình duyệt nào dùng được
 
-Đọc [[reference_browser_surfaces_permissions]] trước. Tóm tắt tính tới 22/10/2026:
+Đọc [reference_browser_surfaces_permissions](../../shared/reference_chrome_browsers.md) trước. Tóm tắt tính tới 22/10/2026:
 
 - **Browser pane trong app Claude** (`mcp__Claude_Browser__*`) — CÓ quyền vào cả `seller-vn.tiktok.com` lẫn `banhang.shopee.vn`. **Dùng cái này.** Nhược điểm: dùng hồ sơ riêng, lần đầu phải để chủ shop tự đăng nhập (Claude không được nhập mật khẩu hộ — TikTok có đăng nhập bằng mã SMS, Shopee có quét QR).
 - **Claude in Chrome** (`mcp__claude-in-chrome__*`) — mới chỉ được phép `banhang.shopee.vn`, mọi tên miền TikTok đều bị chặn. Đừng mất thời gian ở đây cho tới khi chủ shop sửa Site access trong `chrome://extensions`.
@@ -104,7 +104,7 @@ Lệch quá 1% thì **dừng lại, báo chủ shop**, đừng tự kết luận
 
 ## Bước 7 — Báo cáo Telegram
 
-Gửi qua bot (xem [[reference_telegram_bot]]), gồm: kỳ vừa chốt; doanh thu hàng và thực nhận 2 sàn; lãi ròng và biên; số đơn và tỷ lệ huỷ/hoàn; các cảnh báo còn treo; và việc cần chủ shop làm (mã thiếu giá vốn, chi phí chưa điền).
+Gửi qua bot (xem [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md)), gồm: kỳ vừa chốt; doanh thu hàng và thực nhận 2 sàn; lãi ròng và biên; số đơn và tỷ lệ huỷ/hoàn; các cảnh báo còn treo; và việc cần chủ shop làm (mã thiếu giá vốn, chi phí chưa điền).
 
 ## Không được làm
 

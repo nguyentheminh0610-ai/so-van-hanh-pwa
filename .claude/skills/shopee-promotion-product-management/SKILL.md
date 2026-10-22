@@ -26,7 +26,7 @@ Removing a product from a campaign and re-adding it both end with a real
 "Xác nhận" click that rewrites live promotion data -- that's an edit to
 something that already exists, which this shop's owner has set as a hard
 rule: any delete/decluster or edit of existing data needs their
-confirmation first, no exceptions (see `[[confirm-before-delete-or-edit-existing]]`
+confirmation first, no exceptions (see `[confirm-before-delete-or-edit-existing](../../shared/feedback_confirm_before_delete_or_edit_existing.md)`
 memory if you have access to it). Adding something brand new doesn't need
 to be asked first, but putting a product back into an existing campaign
 counts as editing that campaign's product list, so still check in. Walk

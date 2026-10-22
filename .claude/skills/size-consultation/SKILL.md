@@ -131,7 +131,7 @@ thật sự không còn câu hỏi nào treo lại, rồi mới chọn cách đ�
 - Hội thoại **tư vấn trước khi mua** (size, sản phẩm...) đã xong → trả lời
   bằng chữ **"Dạ vâng ạ"**, giữ không khí tư vấn bán hàng.
 - Hội thoại **CSKH / sau khi mua** đã xử lý xong → gửi **sticker** mèo/chó
-  ôm tim, không gõ chữ (xem [[feedback_close_resolved_chats_with_emoji]]).
+  ôm tim, không gõ chữ (xem [feedback_close_resolved_chats_with_emoji](../../shared/feedback_close_resolved_chats_with_emoji.md)).
 
 Đọc lại mà thấy còn câu hỏi/vấn đề chưa xử lý (dù tin cuối trông như xác
 nhận) → xử lý đúng câu hỏi đó trước, không đóng vội.

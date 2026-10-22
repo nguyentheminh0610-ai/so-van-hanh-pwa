@@ -22,7 +22,7 @@ Daily recurring task (shop owner can trigger it any time, e.g. "check 3 báo
 cáo hôm nay") that answers 3 questions about today's TikTok Shop + Shopee
 orders and reports them over Telegram — never just answered in chat, see
 [reference_telegram_bot](references/reference_telegram_bot.md). Priority #1 in the daily ops mandate
-([[project_ops_assistant_mandate]] nhóm 6) — **run it every day without
+([project_ops_assistant_mandate](../../shared/project_ops_assistant_mandate.md) nhóm 6) — **run it every day without
 being asked**, the shop owner explicitly does not want to have to remember
 to request it.
 
@@ -41,13 +41,14 @@ way around.
 2-mục/3-mục definitions from scratch across several rounds of
 back-and-forth on 2026-10-07 evening — wrong, and corrected once the shop
 owner pointed at the real source. Full story in
-[[project_5pm_check_procedure]], kept for context only, not for execution.)
+the memory note `project_5pm_check_procedure` on the Mac — superseded, kept
+for context only, not for execution.)
 
 ## Hard rule: internal reporting, no confirmation needed
 
 Read-only reporting + internal Sổ Kho bookkeeping (no pricing, no product
 changes, no messages to customers) — per
-[[feedback_confirm_before_pricing]] this is the "việc khác" category: run
+[feedback_confirm_before_pricing](../../shared/feedback_confirm_before_pricing.md) this is the "việc khác" category: run
 it and send the report, no need to ask first.
 
 ## Quick reference
@@ -62,7 +63,7 @@ it and send the report, no need to ask first.
   `platform`, `reason` (`thieu_hang`|`loi_hang`|`khac`), `note`, `staff`,
   `scan_date`, `created_at`. Full details: [reference_sokho_pyjama_tables](references/reference_sokho_pyjama_tables.md).
 - `warehouse_notices` ("📌 Việc cần làm"), case `category=eq.gui_don_bu`
-  ("Gửi đơn bù" — xem [[resend-missing-item]]): `order_code` (mã vận đơn
+  ("Gửi đơn bù" — xem [resend-missing-item](../resend-missing-item/SKILL.md)): `order_code` (mã vận đơn
   SPX của lô hàng BÙ, không phải mã đơn gốc), `content` (dạng
   "<mã gốc> - 1 Quần ..."; dòng cũ trước 2026-10-20 có thể là
   "Gui bu ... - don goc #<mã gốc>"), `created_at`, `done`/`done_at`. Dùng cho

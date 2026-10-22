@@ -39,7 +39,7 @@ y/n, who pays shipping) and wait for an explicit "ok" before clicking
 (cách chính, chốt 2026-10-13): gửi `PushNotification` ngắn về điện thoại
 ("Duyệt gửi bù đơn <mã gốc>: <SKU>, <tên khách>"), viết bản tóm tắt đầy đủ
 ngay trong phiên, rồi chờ chủ shop gõ "ok" trong phiên đó. Dự phòng (phiên
-chạy headless, không ai trả lời được): gửi bản tóm tắt đó + ảnh form qua Telegram ([[reference_telegram_bot]]), kèm mã đơn gốc
+chạy headless, không ai trả lời được): gửi bản tóm tắt đó + ảnh form qua Telegram ([reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md)), kèm mã đơn gốc
 và dòng "Trả lời: ok <mã đơn gốc> để tạo đơn". Các lượt quét 15 phút sau
 đọc tin trả lời Telegram (`getUpdates`); thấy "ok <mã đơn gốc>" thì điền lại
 form và bấm "Tạo đơn". Chưa có "ok" thì không làm gì với case đó.
@@ -49,7 +49,7 @@ form và bấm "Tạo đơn". Chưa có "ok" thì không làm gì với case đ�
   thì không tạo đơn, nhắn lại hỏi mã nào.
 - Telegram chỉ giữ tin chưa đọc khoảng 24 tiếng, và `getUpdates` không
   dùng được nếu bot đang gắn webhook — lần đầu cài phải chạy thử. This matches the general policy in
-[[feedback_confirm_before_pricing]] — order-creation counts as the kind of
+[feedback_confirm_before_pricing](../../shared/feedback_confirm_before_pricing.md) — order-creation counts as the kind of
 thing to confirm first; the Sổ Kho logging afterward does not (internal
 bookkeeping, just do it and report).
 
@@ -86,7 +86,7 @@ id `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`, tab "Mau tin nhan"):**
 row 33 = post-resend confirmation message ("Đưa ra hướng xử lý" / "Sau
 khi gửi bù hàng") — asks the customer to double-check delivery info, with
 the `spx.vn/track` tracking link. Use this tab the same way
-[[project_koc_inbox_messaging_rules]] uses the KOC "inbox" tab — read the
+[project_koc_inbox_messaging_rules](../../shared/project_koc_inbox_messaging_rules.md) uses the KOC "inbox" tab — read the
 live row, don't paraphrase from memory, the shop owner edits these over
 time.
 

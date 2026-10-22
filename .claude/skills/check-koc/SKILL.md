@@ -105,7 +105,7 @@ tab) *and* the age/gender breakdown (under "Người theo dõi", which is
 apparently pre-rendered on the same page even though it's a separate
 tab). If the age breakdown is missing from that dump, click the "Người
 theo dõi" tab and re-run `get_page_text`.
-[[feedback_tiktok_creator_search_unreliable]] — roughly 30-35% of
+[feedback_tiktok_creator_search_unreliable](../../shared/feedback_tiktok_creator_search_unreliable.md) — roughly 30-35% of
 searches don't find the creator at all; retry the search once, and if it
 still fails just leave GPM/age blank rather than blocking on it.
 
@@ -135,7 +135,7 @@ don't fill them in.
 
 **Always verify the next empty row with a fresh `get_values` read first**
 (e.g. the last 5 rows of column A/C) — don't compute it from memory or a
-stale row count. [[feedback_gsheet_row_verification]] A header row means
+stale row count. [feedback_gsheet_row_verification](../../shared/feedback_gsheet_row_verification.md) A header row means
 `STT N` sits at spreadsheet row `N+1`.
 
 Write A–I as plain values (dates as `DD/MM/YYYY`, today's date), then
@@ -245,7 +245,7 @@ whoever's topical).
    clicking OK — the first character of the note has dropped silently
    more than once.
 5. **Log the same note to Sổ Kho** — insert into Supabase
-   `warehouse_notices` (see [[sokho-pyjama-supabase-tables]] for the
+   `warehouse_notices` (see [sokho-pyjama-supabase-tables](../daily-warehouse-report/references/reference_sokho_pyjama_tables.md) for the
    URL/key): `category: "thong_bao_chung"`, `order_code` = the TikTok
    order ID, `content`: prefix with the KOC's name for easy search, e.g.
    `"KOC {username} thêm mẫu: {same note text}"` (xem `.claude/shared/notice_naming.md`).

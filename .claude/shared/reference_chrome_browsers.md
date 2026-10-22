@@ -4,7 +4,8 @@ Xác minh thật ngày **2026-10-22** bằng cách mở trang seller của từn
 từng browser và đọc nội dung trang.
 
 **Trước đó file này KHÔNG tồn tại**, dù 7 skill đều viết "dùng `select_browser`
-deviceId TikTok / deviceId Shopee" và link tới `[[reference_chrome_browsers]]`.
+deviceId TikTok / deviceId Shopee" và link tới một tài liệu tên
+`reference_chrome_browsers` bằng kiểu wiki-link.
 Hậu quả: mỗi phiên phải tự đoán, đoán trượt thì tưởng là "bị chặn không vào được
 TikTok" (gặp thật 22/10).
 

@@ -62,6 +62,29 @@ trùng với task đã có, khách sẽ bị nhắn 2 lần.
 File skill trong git **luôn thắng** memory cục bộ. Nếu memory nói khác file
 skill, tin file skill và sửa/đánh dấu lại memory cho khớp.
 
+### ⚠️ CẤM dùng wiki-link `[[tên]]` trong `.claude/`
+
+Skill **chỉ được tham chiếu file NẰM TRONG REPO**, bằng đường dẫn tương đối
+thật: `[tên](../../shared/ten-file.md)`.
+
+**Tuyệt đối không viết `[[tên-memory]]`** — memory chỉ nằm trên máy Mac, không
+đi theo git, nên skill chạy trên PC gặp link đó thì **không có gì để đọc**.
+
+**Sự cố thật 2026-10-22:** 7 skill ghi "xem `[[reference_chrome_browsers]]`"
+nhưng file đó chưa bao giờ tồn tại → không phiên nào biết Chrome nào vào TikTok,
+Chrome nào vào Shopee; đoán trượt thì tưởng "bị chặn không vào được TikTok".
+Rà thêm thì còn 27 link treo nữa cùng kiểu. Đã dọn sạch và chép kiến thức cần
+thiết vào `.claude/shared/`.
+
+Kiến thức dùng chung nhiều skill → để ở **`.claude/shared/`**. Kiến thức riêng
+1 skill → để ở `references/` của skill đó.
+
+**Kiểm trước khi commit** (script tự chạy trong `sync-knowledge`, chạy tay được):
+```bash
+python3 scripts/check-skill-links.py
+```
+Nó báo mọi wiki-link và mọi link trỏ tới file không tồn tại. Phải sạch mới commit.
+
 ---
 
 ## Bảo mật

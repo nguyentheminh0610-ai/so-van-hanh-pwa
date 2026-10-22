@@ -23,7 +23,7 @@ back to the shop owner. Full rationale and the back-and-forth that pinned
 these rules down lives in the Claude Doc
 **"Workflow CSKH: Phàn nàn · Đánh giá · Trả hàng hoàn tiền"**
 (`https://claude.ai/code/artifact/178382aa-6df8-4fdd-af48-886b6c18a3fa`) and
-[[project_cskh_task_not_started]] — if this skill ever seems to contradict
+[project_cskh_task_not_started](../../shared/project_cskh_task_not_started.md) — if this skill ever seems to contradict
 either, trust this file for the mechanics (it's the ready-to-execute
 version) but go reconcile the doc, the shop owner corrects this often.
 
@@ -37,10 +37,10 @@ version) but go reconcile the doc, the shop owner corrects this often.
 - **Lịch chạy: 2 lần/ngày, cách nhau 12 tiếng — 08:00 và 20:00** (chốt
   2026-10-13, thay cho quy tắc "chỉ chạy khi được gọi" trước đây). Shop
   owner vẫn có thể gọi tay thêm bất kỳ lúc nào. Khi chạy theo lịch (không
-  có ai đang chat), gửi báo cáo qua Telegram (xem [[reference_telegram_bot]],
-  cùng bot với [[daily-warehouse-report]]).
+  có ai đang chat), gửi báo cáo qua Telegram (xem [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md),
+  cùng bot với [daily-warehouse-report](../daily-warehouse-report/SKILL.md)).
 - Inbox: ngoài phạm vi skill này. Riêng case khách báo **giao thiếu hàng**
-  trong inbox do [[resend-missing-item]] quét 15 phút/lần, không phải skill
+  trong inbox do [resend-missing-item](../resend-missing-item/SKILL.md) quét 15 phút/lần, không phải skill
   này.
 - **Date window:** unless the shop owner says otherwise, only act on
   cases from the last 2 days (chốt 2026-10-07) — older backlog exists (can be
@@ -176,7 +176,7 @@ Nếu lỗi không check được gì: chỉ gửi 1 dòng
 
 ## Reference
 
-- [[project_cskh_task_not_started]] — narrative history of how this scope
+- [project_cskh_task_not_started](../../shared/project_cskh_task_not_started.md) — narrative history of how this scope
   got negotiated down (started as "Claude does everything", ended here);
   read it if the shop owner seems to be renegotiating scope again.
 - Claude Doc "Workflow CSKH: Phàn nàn · Đánh giá · Trả hàng hoàn tiền"
@@ -184,5 +184,5 @@ Nếu lỗi không check được gì: chỉ gửi 1 dòng
   the full policy tables (Nhẹ/Vừa/Nặng per lỗi sản phẩm/dịch vụ), channel
   comparison table, and permission breakdown this skill is the execution
   layer for.
-- [[shop-knowledge-base-artifacts]] — other live Artifacts/Sheets for this
+- [shop-knowledge-base-artifacts](../../shared/reference_shop_knowledge_base_artifacts.md) — other live Artifacts/Sheets for this
   shop (product guide, size-consultation rules, quick policy lookup).
