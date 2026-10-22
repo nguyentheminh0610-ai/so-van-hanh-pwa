@@ -138,6 +138,10 @@ def parse_date(v):
     m = re.match(r'^(\d{2})/(\d{2})/(\d{4})', s)
     if m:
         return datetime.date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+    # file tài chính TikTok ghi ngày kiểu 2026/09/30 (gạch chéo, năm trước)
+    m = re.match(r'^(\d{4})/(\d{2})/(\d{2})', s)
+    if m:
+        return datetime.date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
     return None
 
 

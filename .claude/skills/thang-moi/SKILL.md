@@ -19,14 +19,17 @@ Số thật tháng 8/2026: tải ngày 13-14/09 (tưởng là đủ 2 tuần) th
 
 Nếu buộc phải chạy sớm: vẫn làm được, nhưng **phải nói rõ với chủ shop là số lãi chưa chốt** và hẹn chạy lại sau ngày 20.
 
-## Trình duyệt nào dùng được
+## Trình duyệt nào dùng được — ĐÃ KIỂM THẬT 22/10/2026
 
-Đọc [reference_browser_surfaces_permissions](../../shared/reference_chrome_browsers.md) trước. Tóm tắt tính tới 22/10/2026:
+**Dùng Browser 1 (Chrome trên máy Mac, deviceId `af1ae8fc-...`).** Lý do quyết định: file tải về nằm **ngay trên máy Mac** nên mới chạy được script kiểm và `file_upload` lên Sổ Vận Hành. Chrome trên máy Windows tải về máy Windows → phiên chạy ở Mac KHÔNG đọc được file, coi như tải xong cũng vô dụng.
 
-- **Browser pane trong app Claude** (`mcp__Claude_Browser__*`) — CÓ quyền vào cả `seller-vn.tiktok.com` lẫn `banhang.shopee.vn`. **Dùng cái này.** Nhược điểm: dùng hồ sơ riêng, lần đầu phải để chủ shop tự đăng nhập (Claude không được nhập mật khẩu hộ — TikTok có đăng nhập bằng mã SMS, Shopee có quét QR).
-- **Claude in Chrome** (`mcp__claude-in-chrome__*`) — mới chỉ được phép `banhang.shopee.vn`, mọi tên miền TikTok đều bị chặn. Đừng mất thời gian ở đây cho tới khi chủ shop sửa Site access trong `chrome://extensions`.
+Mac Chrome đã đăng nhập sẵn **cả TikTok Seller lẫn Shopee** (sometime_official) — đã xác minh.
 
-Nếu trang hiện màn đăng nhập: **dừng lại, nhắn chủ shop đăng nhập giúp**, đừng thử nhập gì.
+Luôn `select_browser` trước khi mở trang. Nếu nhóm tab cũ bị treo (navigate xong vẫn ra màn đăng nhập), gọi `tabs_context_mcp` với `createIfEmpty: true` để mở nhóm tab mới rồi thử lại — đừng vội kết luận "chưa đăng nhập".
+
+**Chế độ quyền của cuộc chat:** nếu `navigate` báo `Navigation to this domain is not allowed` cho MỌI tên miền lạ (kể cả google.com) thì cuộc chat đang kẹt ở chế độ quyền hạn chế (`chromePermissionMode: follow_a_plan`, thường do trước đó vào chế độ Plan). Nhờ chủ shop mở menu Mode → chọn lại **Auto**. Không phải lỗi quyền trong Chrome, chỉnh `chrome://extensions` vô ích.
+
+**Shopee chặn bằng mật khẩu:** vào mục Tài Chính → Doanh Thu, Shopee bật hộp "nhập mật khẩu Shopee của bạn". **Claude KHÔNG được nhập mật khẩu** — dừng lại, nhờ chủ shop tự nhập rồi báo xong, sau đó mới tải tiếp file Income.
 
 ## Bước 1 — Tải file
 
@@ -63,9 +66,17 @@ python3 .claude/skills/thang-moi/scripts/check_month_files.py ~/Downloads/so-van
 
 Script nhận diện file theo **nội dung** (tên sheet + tiêu đề cột) nên đổi tên file thoải mái. Nó báo: đủ/thiếu từng vai trò, khoảng ngày thật trong file (bắt lỗi tải nhầm tháng), 2 sàn có cùng tháng không, và **tỷ lệ đơn chưa hoàn thành** của từng sàn.
 
+**TUYỆT ĐỐI không nhận diện file bằng "file mới nhất trong Downloads"** — đúng tinh thần mục 5 của `.claude/shared/notice_naming.md`. Đã dính thật 22/10: bấm nhầm dòng trong danh sách báo cáo Shopee nên tải về file tháng 10 trong khi tưởng là tháng 9. Mỗi file tải xong phải mở ra kiểm **role + khoảng ngày thật bên trong**, rồi mới xếp vào thư mục tháng.
+
 Thoát mã 0 = dùng được. Mã 1 = còn vấn đề, đọc phần "CẦN XỬ LÝ" rồi sửa trước khi đi tiếp. **Nếu nó báo "TẢI QUÁ SỚM" thì đừng upload** — đợi qua ngày 20 rồi tải lại, nếu không sẽ phải làm lại từ đầu.
 
 2 bẫy kỹ thuật script đã xử sẵn (đừng viết lại cho mệt): file `.xls` của Shopee thực ra là xlsx đặt sai đuôi; file sàn khai sai `<dimension>` nên không được mở bằng `read_only=True` kẻo chỉ đọc ra 1 cột.
+
+## Quy ước lưu file (chốt 22/10/2026)
+
+- Mỗi kỳ một thư mục riêng: `~/Downloads/svh-YYYY-MM/` (vd `svh-2026-09`).
+- **Giữ nguyên tên file gốc do sàn đặt** — không đổi tên. Web nhận diện bằng nội dung, còn tên gốc giữ được dấu vết kỳ/giờ xuất để đối chiếu về sau. Trùng tên thì bỏ hậu tố ` (1)` do trình duyệt thêm.
+- Không để lẫn 2 tháng trong cùng thư mục; file tải nhầm thì xoá ngay, đừng để lại.
 
 ## Bước 3 — Upload và tính
 
