@@ -62,7 +62,7 @@ Sapo/sàn trước**, xem bước 2 dưới.
 
 ## Quy trình
 
-1. **Dùng Claude in Chrome** ([[reference_chrome_browsers]]) — KHÔNG dùng
+1. **Dùng Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)) — KHÔNG dùng
    built-in browser (không có session đã đăng nhập):
    - **TikTok Shop**: `select_browser` deviceId TikTok, mở
      `https://seller-vn.tiktok.com/chat/inbox/current?shop_region=VN`.

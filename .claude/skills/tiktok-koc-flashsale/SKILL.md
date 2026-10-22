@@ -51,7 +51,7 @@ only see this by opening the campaign's own detail page; the management
 list's "Loại" column just shows "Flash Sale của shop" for it like any
 other flash sale.
 
-Dùng **Claude in Chrome** ([[reference_chrome_browsers]]) deviceId TikTok —
+Dùng **Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)) deviceId TikTok —
 KHÔNG dùng built-in browser. Go to
 `https://seller-vn.tiktok.com/promotion/marketing-tools/management?tab=1&shop_region=VN`
 ("Đang diễn ra" tab), and look through the ongoing "Flash Sale của shop"

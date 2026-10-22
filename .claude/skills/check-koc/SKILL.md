@@ -264,7 +264,7 @@ the warehouse's real stock count drops. Chốt 2026-10-20.
 **Login**: `https://sometime-official.mysapo.net/admin/dashboard` — on
 this machine, already signed in on the Windows Chrome profile named
 **"Minh"** (not the two Chrome profiles used for TikTok/Shopee — see
-[[reference_chrome_browsers]], which needs updating to add this as a
+[reference_chrome_browsers](../../shared/reference_chrome_browsers.md), which needs updating to add this as a
 third mapped profile next time it's touched). If that profile isn't
 connected to Claude in Chrome, ask the shop owner to log in there rather
 than entering credentials yourself.

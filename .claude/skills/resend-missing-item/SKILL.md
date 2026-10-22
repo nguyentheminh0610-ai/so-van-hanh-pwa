@@ -97,9 +97,9 @@ time.
 
 1. **Dùng Claude in Chrome** cho cả 2 sàn — KHÔNG dùng built-in browser
    (built-in browser không có session đã đăng nhập):
-   - **TikTok Shop**: `select_browser` deviceId TikTok ([[reference_chrome_browsers]]),
+   - **TikTok Shop**: `select_browser` deviceId TikTok ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)),
      rồi mở link inbox ở Quick reference.
-   - **Shopee**: `select_browser` deviceId Shopee ([[reference_chrome_browsers]]),
+   - **Shopee**: `select_browser` deviceId Shopee ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)),
      rồi mở `https://banhang.shopee.vn/webchat/conversations`.
    Xem các hội thoại có tin mới từ khách kể từ lượt quét trước (~15 phút).
    Danh sách Shopee hiện bên trái kèm giờ + preview tin cuối + chấm chưa

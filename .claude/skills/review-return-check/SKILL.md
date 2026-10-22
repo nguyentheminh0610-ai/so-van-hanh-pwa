@@ -80,7 +80,7 @@ owner edits these. As of 2026-10-07:
   return/refund request, regardless of the reason the platform shows —
   always use this generic opener, don't pick a reason-specific template.
 
-**TikTok Shop Seller Center** — dùng **Claude in Chrome** ([[reference_chrome_browsers]])
+**TikTok Shop Seller Center** — dùng **Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md))
 deviceId TikTok, KHÔNG dùng built-in browser:
 - Reviews: `https://seller-vn.tiktok.com/product/rating?shop_region=VN`
   → "Trả lời bài đánh giá" panel → "Đánh giá tiêu cực" (1-2★) / "Đánh giá

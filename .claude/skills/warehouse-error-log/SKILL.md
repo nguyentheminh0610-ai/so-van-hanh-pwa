@@ -25,7 +25,7 @@ gửi lại), hoặc chủ shop chỉ muốn ghi nhận lỗi để theo dõi KP
 Chủ shop thường chỉ nhắn tên khách (không phải mã đơn), ví dụ "tonehonggirl
 giao nhầm hàng". Cần tự tra ra:
 
-1. Dùng **Claude in Chrome** ([[reference_chrome_browsers]]) deviceId TikTok
+1. Dùng **Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)) deviceId TikTok
    — KHÔNG dùng built-in browser. Vào TikTok Shop Seller Center → icon
    "Tin nhắn từ khách hàng" (mở tab `seller-vn.tiktok.com/chat/inbox/current`)
    → tìm đúng tên khách trong danh sách hội thoại bên trái, click vào.

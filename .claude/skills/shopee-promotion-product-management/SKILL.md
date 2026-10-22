@@ -37,7 +37,7 @@ re-adds the product.
 
 ## Step 1-4: get into the campaign's edit mode (shared by both directions)
 
-1. Dùng **Claude in Chrome** ([[reference_chrome_browsers]]) deviceId Shopee
+1. Dùng **Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md)) deviceId Shopee
    — KHÔNG dùng built-in browser. Go to Kênh Marketing
    (`banhang.shopee.vn/portal/marketing`) and click
    **"Khuyến Mãi của Shop"**. This opens the "Giảm giá" list page.
