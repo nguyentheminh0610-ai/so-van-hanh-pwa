@@ -89,6 +89,13 @@ Sapo/sàn trước**, xem bước 2 dưới.
      đó, không thêm câu note quần lông.
    - Khách đã xác nhận là quần lông trong hội thoại → chỉ gửi câu size,
      không thêm câu note.
+   **Mẫu khách chọn không có size nhỏ cần thiết (chốt 23/10/2026):** nếu
+   size tính ra nhỏ hơn size nhỏ nhất của mẫu khách chọn (vd muốn mắt cá →
+   cần S, nhưng Chất Lông-Hello Kitty chỉ từ M) mà có mẫu khác cùng dòng có
+   size đó (vd Chất Lông-Shin có S) → dùng mẫu câu
+   `reply_templates.clamped_min_suggest_other` (báo size nhỏ nhất + dài
+   quần thực tế, mời khách tự đo, gợi ý đổi mẫu). Không có mẫu thay thế →
+   dùng `clamped_min` như cũ.
    **Combo (chốt 22/10/2026):** combo đã làm gần đủ 95%, nên **không được
    vội kết luận "không có combo đúng cặp size"**. Phải tra biến thể combo
    thật trên Sapo/sàn trước; chỉ khi tra thật và xác nhận không có mới tư

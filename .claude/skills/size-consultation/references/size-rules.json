@@ -128,6 +128,8 @@
     "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
     "waist_worry": "Dạ hiện các quần bên mình đều là cạp chun cả, nên không sợ bị rộng/chật eo đâu ạ, bạn cứ yên tâm nha.",
     "send_size_chart": "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình nha.",
+    "clamped_min_suggest_other": "Dạ mẫu {model} nhỏ nhất chỉ có size {size} thôi ạ, dài quần {length}cm, với chiều cao của bạn quần sẽ dài tầm {actual_landmark} á. Bạn có thể đo thử từ eo xuống {length}cm xem tới đâu nha. Nếu bạn muốn quần ngắn tới {wanted_landmark} thì chọn sang mẫu {alt_model}, mẫu này có size {alt_size} ({alt_length}cm) ạ.",
+    "_clamped_min_suggest_other_usage": "Chốt 23/10/2026 (chủ shop soạn, case user23042014_: 1m60 muốn mắt cá -> cần S nhưng Chất Lông-Hello Kitty nhỏ nhất M). Dùng khi size tính ra nhỏ hơn size nhỏ nhất của mẫu khách chọn VÀ có mẫu khác cùng dòng có size đó (vd Chất Lông-Shin có S). Không có mẫu thay thế thì dùng clamped_min. {actual_landmark} = mốc quần thực tế sẽ tới khi mặc size nhỏ nhất (thường dài hơn 1 mốc so với {wanted_landmark}, vd muốn mắt cá -> thực tế chạm gót).",
     "default_quan_long_note": "Mình đang tư vấn theo quần lông ạ, nếu bạn cần tư vấn mẫu quần khác thì báo mình nha.",
     "_default_quan_long_note_usage": "Chốt 23/10/2026: khách hỏi size KHÔNG kèm card sản phẩm và không nói rõ mẫu -> tư vấn theo quần lông (bảng A), gửi câu size bình thường rồi nối thêm câu này. Thay cho quy tắc 22/10 (hỏi lại 'Dạ bạn đang hỏi về size quần lông đúng không ạ?').",
     "unisex_faq": "Dạ quần bên mình nam nữ đều mặc được bạn nha.",
