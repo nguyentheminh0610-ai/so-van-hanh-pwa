@@ -136,6 +136,17 @@ thật sự không còn câu hỏi nào treo lại, rồi mới chọn cách đ�
 Đọc lại mà thấy còn câu hỏi/vấn đề chưa xử lý (dù tin cuối trông như xác
 nhận) → xử lý đúng câu hỏi đó trước, không đóng vội.
 
+⚠️ **Trước khi gửi "Dạ vâng ạ"/sticker — kiểm tra xem đã đóng rồi chưa, tránh
+gửi lặp** (chốt 2026-10-23, sau case `missed.luv251` bị gửi "Dạ vâng ạ" lặp
+3 lần liền 00:07/07:07/07:14): tin nhắn CUỐI CÙNG trong hội thoại đã là tin
+của SHOP (không phải của khách) VÀ nội dung đã đúng là "Dạ vâng ạ"/sticker
+rồi → **không gửi lại**, coi như đã đóng, bỏ qua case này. Chỉ gửi khi tin
+cuối cùng là của khách (chưa có ai đóng). Trên TikTok, đọc nội dung tin cuối
+bằng `get_page_text` (không dùng preview sidebar hay chỉ nhìn screenshot) vì
+trang bị Chrome dịch tự động làm méo chữ, dễ đọc nhầm tin đã đóng thành tin
+lạ rồi tưởng chưa xử lý — xem
+[reference_tiktok_tab_auto_translate](../../shared/reference_tiktok_tab_auto_translate.md).
+
 Chủ shop nhấn mạnh 22/10/2026: **hiểu đúng ngữ cảnh đoạn chat là quan trọng
 nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
 
