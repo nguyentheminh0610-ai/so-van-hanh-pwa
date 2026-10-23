@@ -76,9 +76,19 @@ Sapo/sàn trước**, xem bước 2 dưới.
    bảng mặc định của cả nhóm (B4 trong size-spec.md mục 4) — tra
    `size_rules.json.product_groups.<nhóm>.sku_overrides` hoặc hỏi lại/kiểm
    tra variant trên trang sản phẩm nếu không chắc.
-   **Không có card sản phẩm / không rõ mẫu (chốt 22/10/2026):** hỏi lại
-   khách xác nhận trước, đúng câu: *"Dạ bạn đang hỏi về size quần lông đúng
-   không ạ?"* — không tự đoán mẫu rồi báo size.
+   **Không có card sản phẩm / không rõ mẫu (chốt 23/10/2026, thay cho quy
+   tắc 22/10 "hỏi lại *Dạ bạn đang hỏi về size quần lông đúng không ạ?*"):**
+   KHÔNG hỏi lại. Mặc định tư vấn theo **quần lông** (bảng A): gửi câu size
+   như bình thường (đúng mẫu theo tình huống), rồi nối thêm đúng câu mẫu
+   `reply_templates.default_quan_long_note`: *"Mình đang tư vấn theo quần
+   lông ạ, nếu bạn cần tư vấn mẫu quần khác thì báo mình nha."*
+   Lý do: shop chủ yếu bán quần lông, khách đưa chiều cao/cân nặng thì gần
+   như chắc chắn hỏi quần lông; hỏi lại bị khách mắng ("hỏi quần lông chứ
+   không lẽ quần sịp lọt khe" — user23042014_, 23/10/2026).
+   - Khách nhắc rõ dòng khác (caro, thun, bộ, short...) → tư vấn theo dòng
+     đó, không thêm câu note quần lông.
+   - Khách đã xác nhận là quần lông trong hội thoại → chỉ gửi câu size,
+     không thêm câu note.
    **Combo (chốt 22/10/2026):** combo đã làm gần đủ 95%, nên **không được
    vội kết luận "không có combo đúng cặp size"**. Phải tra biến thể combo
    thật trên Sapo/sàn trước; chỉ khi tra thật và xác nhận không có mới tư

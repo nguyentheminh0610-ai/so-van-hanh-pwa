@@ -188,6 +188,7 @@ Cấu trúc bắt buộc: **1 size + dài quần + mốc**, rồi hỏi/chốt m
 | Kẹp size nhỏ nhất (`clamped_min`) | "Dạ size nhỏ nhất của mẫu này là **{size}** ({length}cm) ạ, quần sẽ dài hơn mốc {landmark} một chút, bạn xắn gấu nhẹ là xinh nhé." |
 | Kẹp size lớn nhất (`clamped_max`) | "Dạ mẫu này lớn nhất là **size {size}** ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé." |
 | Caro – Cotton thường | thêm: "Mẫu {tên} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ." (xem mục 8) |
+| Không có card sản phẩm, khách không nói rõ mẫu (chốt 23/10/2026) | Tư vấn theo **quần lông** (Bảng A), gửi câu size theo đúng tình huống rồi nối thêm: "Mình đang tư vấn theo quần lông ạ, nếu bạn cần tư vấn mẫu quần khác thì báo mình nha." — KHÔNG hỏi lại "có phải quần lông không" (quy tắc 22/10 đã bỏ). |
 | Thiếu chiều cao | "Dạ bạn cho mình xin **chiều cao và cân nặng** để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ." |
 | Thiếu cân nặng | Tư vấn theo chiều cao ngay + xin thêm cân nặng trong cùng tin: "Dạ 1m70 bạn mặc **size L** (97cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ." |
 
