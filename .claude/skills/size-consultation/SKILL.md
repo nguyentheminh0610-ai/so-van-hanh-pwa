@@ -127,6 +127,26 @@ Sapo/sàn trước**, xem bước 2 dưới.
   rút** — tất cả đều là cạp chun co giãn nhiều (khớp câu trả lời "sợ
   rộng/chật eo" ở trên). Trả lời theo đúng dòng khách hỏi, đừng mặc định.
 
+## Đọc tin nhắn viết tắt — đừng đoán nhầm "mét" thành "cân" (chốt 23/10/2026)
+
+Khách hay gõ tắt chiều cao kiểu "m" + số thay vì "1m" + số, dễ đọc nhầm
+thành cân nặng. Case thật: `yabaooo.10` gõ `"m50sz j ạ"` — nghĩa thật là
+**"1m50, size gì ạ"** (chiều cao 1m50, hỏi size), nhưng bị đọc nhầm thành
+"50kg" nên hỏi lại cả chiều cao lẫn cân nặng — dư vì khách đã cho chiều cao
+rồi, trông như không đọc tin khách. Chủ shop sửa lại 23/10/2026, câu đúng ra
+phải là "Dạ 1m50 bạn mặc size S (92cm, chạm gót) nhé ạ. Bạn cho mình xin
+thêm cân nặng để mình chắc chắn hơn ạ." (áp mẫu `missing_weight`).
+
+**Cách đọc:** "m" + số 2 chữ số đứng đầu câu, không kèm "kg"/"ký" ngay sau
+→ hiểu là viết tắt "Xm Y0" (chiều cao mét), KHÔNG phải cân nặng — vd "m50"
+= 1m50 = 150cm, "m55" = 1m55 = 155cm, "m6"/"m60" = 1m60. Chỉ hiểu là cân
+nặng khi có "kg"/"ký" đi kèm (vd "50kg", "50 ký"). Viết tắt thường gặp
+khác: "sz" = "size", "j" = "gì" (giọng miền Nam gõ tắt, không phải lỗi gõ).
+
+Gặp tin dạng số+chữ viết tắt mà không chắc đọc đúng nghĩa → vẫn hỏi lại cho
+chắc (an toàn hơn đoán sai), nhưng ưu tiên cách đọc "m" = mét theo quy tắc
+trên trước khi kết luận "không rõ nghĩa".
+
 ## Đóng hội thoại đã xong — PHẢI đọc kỹ ngữ cảnh trước (chốt 22/10/2026)
 
 Thấy tin cuối của khách chỉ là xác nhận ngắn ("Dạ", "ok shop", emoji 😁...)
