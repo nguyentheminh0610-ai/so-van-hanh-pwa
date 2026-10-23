@@ -451,7 +451,9 @@ function buildChiPhiHtml(res, opts){
   const adsTt = t2.ads ? n(t2.ads.chiPhi) : n(res.pnl && res.pnl.quangCaoGmvMax);
   const luong = n(cp.luongKho) + n(cp.luongLive);
   const vatTu = n(cp.vatTu);
-  const khac = n(cp.khac) + ((adsSpFile !== null) ? n(cp.adsKhac) : 0);
+  // cp.adsKhac CHÍNH LÀ quảng cáo Shopee (tự điền từ file hoặc gõ tay) nên
+  // KHÔNG được cộng lại vào "chi phí khác" — cộng là đếm trùng (đã dính 23/10).
+  const khac = n(cp.khac);
 
   const tongPhiSan = phiSp + phiTt;
   const tongAds = adsSp + adsTt;
@@ -490,7 +492,7 @@ function buildChiPhiHtml(res, opts){
     ${row('TỔNG', tong, '', true)}
   </tbody></table>
   ${(roasSp || adsTt) ? `<p style="font-size:12px;color:var(--ink-faint);margin:8px 0 0;">
-    Hiệu quả quảng cáo: ${roasSp ? `<b>Shopee ROAS ${roasSp.toFixed(2)}</b> — tiêu ${fmtVND(adsSp)} thu về ${fmtVND(dsAdsSp)} doanh số` : 'Shopee chưa có file quảng cáo nên chưa tính được ROAS'}.
+    Hiệu quả quảng cáo: ${roasSp ? `<b>Shopee ROAS ${roasSp.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> — tiêu ${fmtVND(adsSp)} thu về ${fmtVND(dsAdsSp)} doanh số` : 'Shopee chưa có file quảng cáo nên chưa tính được ROAS'}.
     TikTok GMV Max ${adsTt ? fmtVND(adsTt) : '0đ'} — file tài chính không kèm doanh số từ quảng cáo nên chưa tính được ROAS.</p>` : ''}`;
 }
 
