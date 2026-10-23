@@ -128,6 +128,8 @@
     "clamped_max": "Dạ mẫu này lớn nhất là size {size} ({length}cm) ạ, với chiều cao của bạn quần sẽ ngắn hơn {landmark} một chút, mình báo trước để bạn cân nhắc nhé.",
     "waist_worry": "Dạ hiện các quần bên mình đều là cạp chun cả, nên không sợ bị rộng/chật eo đâu ạ, bạn cứ yên tâm nha.",
     "send_size_chart": "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình nha.",
+    "unisex_faq": "Dạ quần bên mình nam nữ đều mặc được bạn nha.",
+    "drawstring_faq_caro_only": "Chỉ Quần Caro có dây rút, các dòng quần khác (Hoạt Hình, Thun, Bộ Dài/Ngắn, Short) không có dây rút, đều là cạp chun co giãn nhiều.",
     "missing_height": "Dạ bạn cho mình xin chiều cao và cân nặng để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ.",
     "missing_weight": "Dạ {height} bạn mặc size {size} ({length}cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ."
   },

@@ -1,6 +1,6 @@
 ---
 name: size-consultation
-description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không"), and closing out finished conversations. Do NOT use this for khiếu nại, giao thiếu hàng, logistics, KOC/affiliate, or a customer's post-purchase worry/complaint even if it mentions "size"/"dài"/"rộng" -- those stay unanswered for the shop owner or another skill.
+description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22/23) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không" -- must confirm which phân loại first), closing out finished conversations, and short product-FAQ questions (unisex? có dây rút không?). Do NOT use this for khiếu nại, giao thiếu hàng, logistics, KOC/affiliate, or a customer's post-purchase worry/complaint even if it mentions "size"/"dài"/"rộng" -- those stay unanswered for the shop owner or another skill.
 ---
 
 # Tư vấn size cho khách (chat TikTok Shop & Shopee)
@@ -119,6 +119,13 @@ Sapo/sàn trước**, xem bước 2 dưới.
   15/10/2026) — tư vấn như caro thường.
 - **Mốc dài quần**: chạm gót = gấu quần chạm gót chân (che qua mắt cá);
   mắt cá = ngắn hơn, ngang mắt cá chân; quét đất = dài chạm sàn.
+- **Nam nữ mặc chung được không** (chốt 23/10/2026): được, **tất cả các dòng
+  quần đều unisex**. Trả lời đúng câu: *"Dạ quần bên mình nam nữ đều mặc
+  được bạn nha."*
+- **Quần có dây rút không** (chốt 23/10/2026): **CHỈ Quần Caro có dây
+  rút.** Mọi dòng khác (Hoạt Hình, Thun, Bộ Dài/Ngắn, Short) **KHÔNG có dây
+  rút** — tất cả đều là cạp chun co giãn nhiều (khớp câu trả lời "sợ
+  rộng/chật eo" ở trên). Trả lời theo đúng dòng khách hỏi, đừng mặc định.
 
 ## Đóng hội thoại đã xong — PHẢI đọc kỹ ngữ cảnh trước (chốt 22/10/2026)
 
@@ -155,8 +162,12 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
 - **Khách chào chung, không hỏi gì cụ thể** (chỉ "Hi", "Shop ơi", "Alo"):
   trả lời đúng câu **"Dạ, bạn cần shop tư vấn gì ạ?"** — không đoán khách
   định hỏi gì.
-- **Khách hỏi còn hàng / còn size nào**: vào kiểm tra tồn kho thật
-  (Sapo/trang sản phẩm) rồi báo đúng các size hiện còn.
+- **Khách hỏi còn hàng / còn size nào** (chốt 23/10/2026, bổ sung bước hỏi
+  phân loại): **PHẢI xác định đúng phân loại/mẫu khách hỏi TRƯỚC** (màu,
+  hoạ tiết, chất liệu — hỏi lại khách nếu chưa rõ, giống bước xác nhận mẫu
+  ở trên), rồi mới vào kiểm tra tồn kho thật (Sapo/trang sản phẩm) đúng
+  phân loại đó, rồi mới báo đúng các size hiện còn. Không kiểm tra/trả lời
+  khi chưa biết chắc đúng phân loại nào.
 - **Khách hỏi ngày dự kiến hàng về** (hàng đang hết): KHÔNG tự đoán ngày.
   Trả lời khách **"bạn chờ xíu mình kiểm tra rồi báo ngay ạ"**, đồng thời
   gửi Telegram báo chủ shop (token + chat ID + lệnh curl:
