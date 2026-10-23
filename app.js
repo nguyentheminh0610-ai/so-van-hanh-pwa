@@ -836,10 +836,12 @@ function render(res, opts){
   <div class="kpi-row">
     <div class="kpi-tile"><div class="k-label">${g.doanhThuCu === undefined ? 'Tổng doanh thu 2 sàn (công thức cũ)' : 'Doanh thu hàng 2 sàn'}</div><div class="k-value">${fmtCompact(g.doanhThu)}</div><div class="k-sub">Shopee ${fmtCompact(s.doanhThu)} · TikTok ${fmtCompact(t.doanhThu)}</div></div>
     <div class="kpi-tile"><div class="k-label">Thực nhận 2 sàn</div><div class="k-value">${g.thucNhan === null || g.thucNhan === undefined ? '—' : fmtCompact(g.thucNhan)}</div><div class="k-sub">${g.thucNhan === null || g.thucNhan === undefined ? 'cần tính lại bằng công thức mới' : 'Shopee ' + fmtCompact(s.thucNhan) + ' · TikTok ' + fmtCompact(t.thucNhan)}</div></div>
-    <div class="kpi-tile"><div class="k-label">Tổng chi phí sàn</div><div class="k-value">${fmtCompact(g.phiSan)}</div><div class="k-sub">Shopee ${fmtCompact(s.phiSan)} · TikTok ${fmtCompact(t.phiSan)}</div></div>
-    <div class="kpi-tile"><div class="k-label">Tổng đơn đặt trong kỳ</div><div class="k-value">${fmtInt(g.tongDon)}</div><div class="k-sub">Shopee ${fmtInt(s.tongDon)} · TikTok ${fmtInt(t.tongDon)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Đơn ĐÃ GỬI</div><div class="k-value">${g.daGui === null || g.daGui === undefined ? '—' : fmtInt(g.daGui)}</div><div class="k-sub">${g.daGui === null || g.daGui === undefined ? 'cần tính lại để có số này' : 'Shopee ' + fmtInt(s.daGui || 0) + ' · TikTok ' + fmtInt(t.daGui || 0)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Đơn HOÀN THÀNH</div><div class="k-value">${fmtInt(g.hoanThanh)}</div><div class="k-sub">Shopee ${fmtInt(s.hoanThanh)} · TikTok ${fmtInt(t.hoanThanh)} · đặt ${fmtInt(g.tongDon)}</div></div>
   </div>
   <p style="font-size:11.5px;color:var(--ink-faint);margin:4px 0 10px;">
+    <b>Đơn ĐÃ GỬI</b> = đơn thực sự rời kho (có thời gian giao hàng), TÍNH CẢ đơn sau đó khách không nhận hoặc trả lại — vì hàng đã đi là đã tốn công đóng và tiền ship.
+    <b>Đơn HOÀN THÀNH</b> = đơn đã xong hẳn, khách KHÔNG trả, KHÔNG huỷ, KHÔNG bom — đây là tập đơn dùng để tính doanh thu và giá vốn.
     <b>Doanh thu hàng</b> = tiền hàng sau giảm giá của shop, TRƯỚC trợ giá sàn, không gồm ship (đơn hoàn thành, theo ngày đặt).
     <b>Thực nhận</b> = tiền sàn thật sự chuyển về trong kỳ theo file tài chính (đã trừ phí, thuế, điều chỉnh) — 2 số đo 2 việc khác nhau, không trừ chéo.
     ${t.quangCaoGmvMax ? ' TikTok: quyết toán đơn ' + fmtCompact((t.thucNhan || 0) + t.quangCaoGmvMax) + ' − quảng cáo GMV Max ' + fmtCompact(t.quangCaoGmvMax) + ' bị cấn thẳng vào ví = thực nhận ' + fmtCompact(t.thucNhan || 0) + '.' : ''}

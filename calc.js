@@ -566,6 +566,22 @@ function computeAllFromAOA(aoa){
   for (const [oid, r] of Object.entries(spOrders)) if (spNorm(r) === 'huy') spCancelledNative[oid] = r;
   const spCancelAllIds = new Set([...Object.keys(spCancelledNative), ...Object.keys(spReclassToCancel)]);
 
+  // (23/10/2026, chủ shop chốt) ĐƠN ĐÃ GỬI = đơn thực sự rời kho, tính cả đơn
+  // sau đó khách không nhận hoặc trả lại — vì hàng đã đi là đã tốn công đóng,
+  // tốn ship. Dấu hiệu: Shopee có "Thời gian giao hàng", TikTok có "Shipped Time".
+  // KHÔNG dùng "có mã vận đơn" vì đơn huỷ trước khi gửi vẫn có thể đã tạo vận đơn
+  // (T9/2026: 9 đơn Shopee như vậy).
+  const spHdrKeys0 = spRows.length ? Object.keys(spRows[0]) : [];
+  const C_SP_TG_GIAO = findColKey(spHdrKeys0, [/^thời\s*gian\s*giao\s*hàng$/i]);
+  const spDaGuiIds = new Set();
+  if (C_SP_TG_GIAO){
+    for (const [oid, r] of Object.entries(spOrders)){
+      if (String(r[C_SP_TG_GIAO] || '').trim()) spDaGuiIds.add(oid);
+    }
+  } else {
+    warnings.push('Shopee: không thấy cột "Thời gian giao hàng" — chưa đếm được "đơn đã gửi".');
+  }
+
   const spRefundedIds = new Set([...Object.keys(spDonTra), ...Object.keys(spDonHoan), ...Object.keys(spReclassToCancel)]);
   const spCompleted = {};
   for (const [oid, r] of Object.entries(spOrders)){
@@ -807,6 +823,17 @@ function computeAllFromAOA(aoa){
   }
   const ttCancelledNative = {};
   for (const [oid, r] of Object.entries(ttOrders)) if (ttNorm(r) === 'huy') ttCancelledNative[oid] = r;
+  const ttHdrKeys0 = ttRows.length ? Object.keys(ttRows[0]) : [];
+
+  const C_TT_SHIPPED = findColKey(ttHdrKeys0, [/^shipped\s*time$/i]);
+  const ttDaGuiIds = new Set();
+  if (C_TT_SHIPPED){
+    for (const [oid, r] of Object.entries(ttOrders)){
+      if (String(r[C_TT_SHIPPED] || '').trim()) ttDaGuiIds.add(oid);
+    }
+  } else {
+    warnings.push('TikTok: không thấy cột "Shipped Time" — chưa đếm được "đơn đã gửi".');
+  }
 
   const ttRefundedIds = new Set([...Object.keys(ttDonTra), ...Object.keys(ttDonHoan)]);
   const ttCompleted = {};
@@ -944,9 +971,14 @@ function computeAllFromAOA(aoa){
       const phiXL = Math.abs(num(COL_PHI_XU_LY ? r[COL_PHI_XU_LY] : 0));
       const aff = Math.abs(num(C_FIN_AFF ? r[C_FIN_AFF] : 0)) + Math.abs(num(C_FIN_AFF_QC ? r[C_FIN_AFF_QC] : 0))
         + Math.abs(num(C_FIN_AFF_DT ? r[C_FIN_AFF_DT] : 0)) + Math.abs(num(C_FIN_AFF_DT_QC ? r[C_FIN_AFF_DT_QC] : 0));
-      // ship shop chịu = −(phí VC người bán + phí VC thực tế + chiết khấu nền
-      // tảng) — phí là số âm, chiết khấu là số dương; khớp nhau thì = 0.
-      const ship = -(num(C_FIN_SHIP_NB ? r[C_FIN_SHIP_NB] : 0) + num(C_FIN_SHIP_TT ? r[C_FIN_SHIP_TT] : 0) + num(C_FIN_SHIP_CK ? r[C_FIN_SHIP_CK] : 0));
+      // SỬA 23/10/2026 — ship shop chịu = ĐÚNG cột "Phí vận chuyển của người bán".
+      // Sheet "Giải thích về phí" của chính TikTok ghi: "Phí vận chuyển của người
+      // bán = phí vận chuyển thực tế − giảm phí vận chuyển của nền tảng − phí vận
+      // chuyển của khách hàng" (đã kiểm 390/400 dòng khớp), tức cột này ĐÃ LÀ số
+      // ròng shop phải chịu. Công thức cũ cộng thêm "thực tế" và "chiết khấu nền
+      // tảng" vào nữa nên ĐẾM TRÙNG: T9/2026 ra 3.354.276đ thay vì 1.328.883đ
+      // (gấp 2,5 lần), kéo theo bảng phí sàn chi tiết lệch 2,08tr so với tổng.
+      const ship = Math.abs(num(C_FIN_SHIP_NB ? r[C_FIN_SHIP_NB] : 0));
       const shipTra = Math.abs(num(C_FIN_SHIP_TRA ? r[C_FIN_SHIP_TRA] : 0));
       const thue = Math.abs(num(C_FIN_THUE_GTGT ? r[C_FIN_THUE_GTGT] : 0)) + Math.abs(num(C_FIN_THUE_TNCN ? r[C_FIN_THUE_TNCN] : 0));
       const tongPhi = Math.abs(num(C_FIN_TONG_PHI ? r[C_FIN_TONG_PHI] : 0));
@@ -1291,6 +1323,7 @@ function computeAllFromAOA(aoa){
   const hoanVeKhoNgoaiKyCount = hoanVeKhoDetailAll.filter(x => x.ngoaiKy).length;
 
   const tongDon = Object.keys(spOrders).length + Object.keys(ttOrders).length;
+  const tongDaGui = spDaGuiIds.size + ttDaGuiIds.size;
   const spHuyHoanTra = spCancelAllIds.size + Object.keys(spDonTra).length + Object.keys(spDonHoan).length;
   const ttHuyHoanTra = Object.keys(ttCancelledNative).length + Object.keys(ttDonTra).length + Object.keys(ttDonHoan).length;
 
@@ -1726,6 +1759,7 @@ function computeAllFromAOA(aoa){
     warnings, ssWarning, minDate, maxDate,
     shopee: {
       tongDon: Object.keys(spOrders).length, hoanThanh: Object.keys(spCompleted).length,
+      daGui: C_SP_TG_GIAO ? spDaGuiIds.size : null,
       doanhThu: spRevenue, doanhThuCu: spRevenueCu, gmvDat: spGmvDat,
       thucNhan: spThucNhan, dieuChinh: spDieuChinh,
       phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
@@ -1737,6 +1771,7 @@ function computeAllFromAOA(aoa){
     },
     tiktok: {
       tongDon: Object.keys(ttOrders).length, hoanThanh: Object.keys(ttCompleted).length,
+      daGui: C_TT_SHIPPED ? ttDaGuiIds.size : null,
       doanhThu: ttRevenue, doanhThuCu: ttRevenueCu, gmvDat: ttGmvDat,
       thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
       phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
@@ -1748,6 +1783,7 @@ function computeAllFromAOA(aoa){
     },
     tong: {
       doanhThu: spRevenue + ttRevenue, tongDon, hoanThanh: Object.keys(spCompleted).length + Object.keys(ttCompleted).length,
+      daGui: (C_SP_TG_GIAO || C_TT_SHIPPED) ? (spDaGuiIds.size + ttDaGuiIds.size) : null,
       doanhThuCu: spRevenueCu + ttRevenueCu,
       gmvDat: (spGmvDat !== null && ttGmvDat !== null) ? spGmvDat + ttGmvDat : null,
       thucNhan: (spThucNhan !== null && ttThucNhan !== null) ? spThucNhan + ttThucNhan : null,
@@ -1826,6 +1862,7 @@ function combineMonthlyResults(entries){
 
   const shopee = {
     tongDon: sumField(d => d.shopee.tongDon), hoanThanh: sumField(d => d.shopee.hoanThanh),
+    daGui: sumOptional(d => d.shopee.daGui),
     doanhThu: sumField(d => d.shopee.doanhThu), phiSan: sumField(d => d.shopee.phiSan),
     doanhThuCu: sumOptional(d => d.shopee.doanhThuCu), gmvDat: sumOptional(d => d.shopee.gmvDat),
     thucNhan: sumOptional(d => d.shopee.thucNhan),
@@ -1842,6 +1879,7 @@ function combineMonthlyResults(entries){
 
   const tiktok = {
     tongDon: sumField(d => d.tiktok.tongDon), hoanThanh: sumField(d => d.tiktok.hoanThanh),
+    daGui: sumOptional(d => d.tiktok.daGui),
     doanhThu: sumField(d => d.tiktok.doanhThu), phiSan: sumField(d => d.tiktok.phiSan),
     doanhThuCu: sumOptional(d => d.tiktok.doanhThuCu), gmvDat: sumOptional(d => d.tiktok.gmvDat),
     thucNhan: sumOptional(d => d.tiktok.thucNhan), quangCaoGmvMax: sumOptional(d => d.tiktok.quangCaoGmvMax),
@@ -1868,6 +1906,7 @@ function combineMonthlyResults(entries){
     thucNhan: (shopee.thucNhan !== null && tiktok.thucNhan !== null) ? shopee.thucNhan + tiktok.thucNhan : null,
     phiSan: shopee.phiSan + tiktok.phiSan, doanhThuRong: shopee.doanhThuRong + tiktok.doanhThuRong,
     aov: safeDiv(tongDoanhThu, tongHoanThanh),
+    daGui: (shopee.daGui !== null || tiktok.daGui !== null) ? (shopee.daGui || 0) + (tiktok.daGui || 0) : null,
     huyHoanTra: tongHuyHoanTra, tyLeHuyHoanTra: safeDiv(tongHuyHoanTra, tongDon),
     loiShop: tongLoiShop, tyLeLoiShop: safeDiv(tongLoiShop, tongDon),
     hoanVeKho: shopee.hoanVeKho + tiktok.hoanVeKho,
