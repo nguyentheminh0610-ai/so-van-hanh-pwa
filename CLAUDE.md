@@ -37,7 +37,14 @@ chốt từ 15/10 (cotton thường không lên size, câu trả lời eo cạp 
 Ghi kèm **ngày chốt** và **lý do/ngữ cảnh** vào file, để phiên sau hiểu được vì
 sao có quy tắc đó, không chỉ biết quy tắc.
 
-### Đầu mỗi phiên làm việc / trước mỗi lần chạy task theo lịch → lấy bản mới nhất:
+### Đầu mỗi phiên làm việc (do người mở) → lấy bản mới nhất:
+
+**Ngoại lệ — task theo lịch trên PC (chốt 23/10/2026, thay cho quy tắc cũ
+"chạy sync trước mỗi task theo lịch"):** task CSKH chạy 15 phút/lần, mỗi lần tự
+kiểm hostname + chạy sync tốn token vô ích, trong khi Windows Task Scheduler
+`Claude - Dong bo kien thuc` đã tự đồng bộ 15 phút/lần (không tốn token nào).
+Vì vậy task theo lịch **KHÔNG chạy sync-knowledge, KHÔNG kiểm hostname** (task
+theo lịch chỉ được cài trên PC), cứ dùng file skill đang có trên đĩa.
 
 ```bash
 # Mac
