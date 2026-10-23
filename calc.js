@@ -220,6 +220,7 @@ const ROLE_META = {
   tiktokFinance: { platform: 'TikTok', label: 'Tài chính', required: true },
   shopStats: { platform: 'Shopee', label: 'Shop Stats', required: false },
   shopeeFailedDelivery: { platform: 'Shopee', label: 'Giao hàng thất bại (khách không nhận)', required: false },
+  shopeeAds: { platform: 'Shopee', label: 'Quảng cáo (Dịch vụ Hiển thị)', required: false },
   tiktokAffiliateOrders: { platform: 'TikTok', label: 'Affiliate Orders', required: false },
   tiktokVideoAnalysis: { platform: 'TikTok', label: 'Video Analysis', required: false },
   tiktokCreatorList: { platform: 'TikTok', label: 'Creator List (Transaction Analysis)', required: false },
@@ -265,6 +266,14 @@ function detectRoleFromContent(wb){
 
   if (sheetNames.includes('orders')) return 'shopeeOrders';
   if (header.has('Trạng Thái Đơn Hàng') && header.has('Mã đơn hàng')) return 'shopeeOrders';
+
+  // Báo cáo quảng cáo Shopee (CSV) — dòng 1 là tiêu đề báo cáo, không phải header.
+  // CÓ 2 LOẠI, phải phân biệt kẻo thiếu tiền (đã dính thật 10/2026):
+  //  - "Báo cáo Dịch vụ Hiển thị trả theo CPC"  → ĐỦ mọi chiến dịch (dùng cái này)
+  //  - "Chiến dịch nhóm - Shopee"               → CHỈ chiến dịch nhóm, THIẾU chiến dịch lẻ
+  const dong1 = String((firstAOA[0] || [])[0] || '');
+  if (/Dịch vụ Hiển thị trả theo CPC/i.test(dong1)) return 'shopeeAds';
+  if (/^Chiến dịch nhóm\s*-\s*Shopee/i.test(dong1)) return 'shopeeAds';
 
   return null;
 }
@@ -456,6 +465,7 @@ async function computeAll(files){
   const wbFin = await readWorkbook(files.tiktokFinance);
   const wbSs = files.shopStats ? await readWorkbook(files.shopStats) : null;
   const wbFd = files.shopeeFailedDelivery ? await readWorkbook(files.shopeeFailedDelivery) : null;
+  const wbAds = files.shopeeAds ? await readWorkbook(files.shopeeAds) : null;
   const wbAff = files.tiktokAffiliateOrders ? await readWorkbook(files.tiktokAffiliateOrders) : null;
   const wbVid = files.tiktokVideoAnalysis ? await readWorkbook(files.tiktokVideoAnalysis) : null;
   const wbCreatorList = files.tiktokCreatorList ? await readWorkbook(files.tiktokCreatorList) : null;
@@ -482,6 +492,7 @@ async function computeAll(files){
     ss_NguonTruyCap: wbSs ? sheetToAOA(getSheet(wbSs, 'Nguồn truy cập cho Đơn hàng...')) : null,
     ss_TheoSanPham: wbSs ? sheetToAOA(getSheet(wbSs, 'Theo sản phẩm (đơn đã đặt)')) : null,
     shopeeFailedDelivery: wbFd ? sheetToAOA(getSheet(wbFd)) : null,
+    shopeeAds: wbAds ? sheetToAOA(getSheet(wbAds)) : null,
     tiktokAffiliateOrders: wbAff ? sheetToAOA(getSheet(wbAff)) : null,
     tiktokVideoAnalysis: wbVid ? sheetToAOA(getSheet(wbVid)) : null,
     tiktokCreatorList: wbCreatorList ? sheetToAOA(getSheet(wbCreatorList)) : null,
@@ -1039,6 +1050,62 @@ function computeAllFromAOA(aoa){
     }
   }
   const piShipRatio = piShipPhi ? piShipHoan / piShipPhi : 0;
+
+  // ---------- 6b) Quảng cáo Shopee (Dịch vụ Hiển thị) — file CSV tuỳ chọn ----------
+  // Shopee KHÔNG đưa tiền quảng cáo vào file Income (đã kiểm: 0 đồng), nên đây
+  // là nguồn DUY NHẤT để sổ biết chi phí quảng cáo Shopee thay vì nhập tay.
+  // Mỗi dòng là 1 chiến dịch (chiến dịch nhóm hoặc chiến dịch cho 1 listing);
+  // cộng hết các dòng ra đúng con số trên dashboard Shopee (đã đối chiếu T8+T9).
+  let spAds = null;
+  if (aoa.shopeeAds && aoa.shopeeAds.length){
+    const adsAOA = aoa.shopeeAds;
+    const tieuDe = String((adsAOA[0] || [])[0] || '');
+    // dòng tiêu đề cột là dòng bắt đầu bằng "Thứ tự"
+    let hIdx = -1;
+    for (let i = 0; i < Math.min(adsAOA.length, 20); i++){
+      if (String((adsAOA[i] || [])[0] || '').trim() === 'Thứ tự'){ hIdx = i; break; }
+    }
+    if (hIdx === -1){
+      warnings.push('File quảng cáo Shopee: không tìm thấy dòng tiêu đề (ô đầu tiên = "Thứ tự") — bỏ qua file này.');
+    } else {
+      const adsRows = rowsAsDicts(adsAOA, hIdx);
+      const adsKeys = adsRows.length ? Object.keys(adsRows[0]) : [];
+      const C_ADS_CHIPHI = findColKey(adsKeys, [/^chi\s*phí$/i]);
+      const C_ADS_DOANHSO = findColKey(adsKeys, [/^doanh\s*số$/i]);
+      const C_ADS_TEN = findColKey(adsKeys, [/^tên\s*dịch\s*vụ\s*hiển\s*thị$/i, /^chiến\s*dịch\s*\/\s*tên\s*sản\s*phẩm$/i]);
+      const C_ADS_TT = findColKey(adsKeys, [/^trạng\s*thái$/i]);
+      if (!C_ADS_CHIPHI){
+        warnings.push('File quảng cáo Shopee: không thấy cột "Chi phí" — cột đọc được: ' + adsKeys.join(' | '));
+      } else {
+        // File "Chiến dịch nhóm" có dòng CON (từng sản phẩm trong nhóm, cột
+        // "Trạng thái" = "-") — cộng cả dòng con là NHÂN ĐÔI. Chỉ lấy dòng cấp
+        // chiến dịch. File CPC đầy đủ thì mọi dòng đều là cấp chiến dịch.
+        const laFileNhom = /^Chiến dịch nhóm\s*-\s*Shopee/i.test(tieuDe);
+        const dong = adsRows.filter(r => {
+          const stt = String(r['Thứ tự'] !== undefined ? r['Thứ tự'] : '').trim();
+          if (!/^\d+$/.test(stt)) return false;
+          if (laFileNhom && C_ADS_TT) return !['-', ''].includes(String(r[C_ADS_TT] || '').trim());
+          return true;
+        });
+        const chiPhi = dong.reduce((t, r) => t + Math.abs(num(r[C_ADS_CHIPHI])), 0);
+        const doanhSo = C_ADS_DOANHSO ? dong.reduce((t, r) => t + num(r[C_ADS_DOANHSO]), 0) : null;
+        spAds = {
+          chiPhi, doanhSo,
+          roas: (doanhSo && chiPhi) ? doanhSo / chiPhi : null,
+          soChienDich: dong.length,
+          thieuChienDichLe: laFileNhom,
+          chiTiet: dong.map(r => ({
+            ten: C_ADS_TEN ? String(r[C_ADS_TEN] || '') : '',
+            chiPhi: Math.abs(num(r[C_ADS_CHIPHI])),
+            doanhSo: C_ADS_DOANHSO ? num(r[C_ADS_DOANHSO]) : null,
+          })).sort((a, b) => b.chiPhi - a.chiPhi),
+        };
+        if (laFileNhom){
+          warnings.push('Quảng cáo Shopee: file đang dùng là loại "Chiến dịch nhóm" — loại này CHỈ gồm chiến dịch nhóm, THIẾU các chiến dịch chạy riêng cho từng sản phẩm (tháng 8/2026 thiếu 2.137.858đ). Tải lại bằng "Tải dữ liệu → Số liệu thống kê chung" (file có tiêu đề "Báo cáo Dịch vụ Hiển thị trả theo CPC").');
+        }
+      }
+    }
+  }
 
   // ---------- 7) Income — Service Fee Details (Voucher Xtra + Phí Hạ Tầng) ----------
   const sfdAOA = aoa.income_ServiceFee;
@@ -1646,6 +1713,7 @@ function computeAllFromAOA(aoa){
     laiGop: costCatalog ? pnlDoanhThu - pnlCogs : null,
     phiSan: pnlPhiSan,
     quangCaoGmvMax: ttQuangCaoGmvMax || 0,
+    quangCaoShopee: spAds ? spAds.chiPhi : null,
     // 2 trường chẩn đoán (rà soát 22/10) để app hiện cảnh báo ngay cạnh số lãi
     giaVonThieuUocTinh: pnlGiaVonThieuUocTinh,
     tyLeChuaHoanThanh,
@@ -1661,7 +1729,7 @@ function computeAllFromAOA(aoa){
       doanhThu: spRevenue, doanhThuCu: spRevenueCu, gmvDat: spGmvDat,
       thucNhan: spThucNhan, dieuChinh: spDieuChinh,
       phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
-      shipHoan: spShipHoan,
+      shipHoan: spShipHoan, ads: spAds,
       troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
       huyHoanTra: spHuyHoanTra, loiShop: spErrTotal, hoanVeKho: spHoanVeKho,
@@ -1672,7 +1740,7 @@ function computeAllFromAOA(aoa){
       doanhThu: ttRevenue, doanhThuCu: ttRevenueCu, gmvDat: ttGmvDat,
       thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
       phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
-      shipHoan: ttShipHoan,
+      shipHoan: ttShipHoan, ads: { chiPhi: ttQuangCaoGmvMax || 0, doanhSo: null, roas: null },
       troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
       huyHoanTra: ttHuyHoanTra, loiShop: ttErrTotal, hoanVeKho: ttHoanVeKho,

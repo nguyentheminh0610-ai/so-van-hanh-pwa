@@ -272,7 +272,7 @@ function buildAffiliateKocSectionHtml(res){
   ${buildAffiliateCtorCtrTableHtml(aff.ctorCtrTable)}` : '';
   return `
   <!-- ZONE 7 -->
-  <div class="zone"><span class="z-num">7</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — 10 KOC hàng đầu mỗi bảng</span></div>
+  <div class="zone"><span class="z-num">8</span><span class="z-title">📣 Affiliate / KOL</span><span class="z-note">TikTok Shop Affiliate — 10 KOC hàng đầu mỗi bảng</span></div>
   <div class="sub-label">Tổng hợp KOC theo đơn &amp; doanh thu</div>
   ${buildAffiliateTable1Html(aff.table1)}
   <div class="sub-label">Chất lượng nội dung theo KOC <span style="text-transform:none;font-weight:400;">— GPM = doanh thu video liên kết / 1.000 lượt xem</span></div>
@@ -314,13 +314,13 @@ const PNL_COST_FIELDS = [
   { key: 'luongKho', label: 'Lương nhân viên kho', hint: 'bấm ⟳ để web tự tính từ Sổ Kho', auto: true },
   { key: 'luongLive', label: 'Lương nhân viên live', hint: 'bấm ⟳ để web tự đọc sheet lương live', auto: true },
   { key: 'vatTu', label: 'Vật tư đóng gói', hint: 'túi + tem + hộp… cả tháng (chi phí biến đổi)' },
-  { key: 'adsKhac', label: 'Quảng cáo Shopee + QC khác', hint: 'tiền nạp ví QC Shopee tháng này; QC GMV Max của TikTok đã tự trừ ở trên' },
+  { key: 'adsKhac', label: 'Quảng cáo Shopee', hint: 'tự điền khi có file "Dịch vụ Hiển thị"; QC GMV Max của TikTok đã tự trừ ở trên' },
   { key: 'khac', label: 'Chi phí khác', hint: 'Sapo, điện nước, thuê kho… nếu có' },
 ];
 function buildPnlHtml(res, opts){
   const p = res.pnl;
   if (!p) return `
-  <div class="zone"><span class="z-num">2</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · lãi gộp theo SP · hoà vốn</span></div>
+  <div class="zone"><span class="z-num">3</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · lãi gộp theo SP · hoà vốn</span></div>
   <div class="card"><p style="font-size:12.5px;color:var(--ink-faint);margin:0;">Tháng này được lưu bằng công thức cũ nên chưa có số Lãi lỗ — bấm "🔄 Cập nhật lại lịch sử" để tính lại.</p></div>`;
   const cp = res.chiPhiVanHanh || {};
   const cpTong = PNL_COST_FIELDS.reduce((s, f) => s + (Number(cp[f.key]) || 0), 0);
@@ -425,13 +425,73 @@ function buildPnlHtml(res, opts){
 
   return `
   <!-- ZONE 2: LÃI LỖ -->
-  <div class="zone"><span class="z-num">2</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · hoà vốn · lãi gộp theo SP</span></div>
+  <div class="zone"><span class="z-num">3</span><span class="z-title">💰 Lãi lỗ</span><span class="z-note">P&amp;L tháng · hoà vốn · lãi gộp theo SP</span></div>
   <div class="grid cols-2">
     <div class="card"><div class="c-title">P&amp;L tháng</div><div class="pnl-table">${rows.join('')}</div>${lechKyHtml}</div>
     <div class="card"><div class="c-title">Điểm hoà vốn</div>${hoaVonHtml}</div>
   </div>
   ${formHtml}
   ${spTableHtml}`;
+}
+
+// ---------- ZONE Chi phí (chủ shop yêu cầu 23/10/2026) ----------
+// Gom MỌI khoản tiền ra trong tháng về một chỗ, tách rõ từng sàn — trước đây
+// phí sàn nằm ở Tổng quan, quảng cáo TikTok nằm lẫn trong P&L, quảng cáo Shopee
+// thì bị nhét chung vào ô "chi phí khác" nên không ai biết thực sự tốn bao nhiêu.
+function buildChiPhiHtml(res, opts){
+  const s2 = res.shopee || {}, t2 = res.tiktok || {};
+  const cp = res.chiPhiVanHanh || {};
+  const dt = (res.tong && res.tong.doanhThu) || 0;
+  const n = (v) => Number(v) || 0;
+
+  const phiSp = n(s2.phiSan), phiTt = n(t2.phiSan);
+  // Quảng cáo Shopee: ưu tiên số ĐỌC TỪ FILE, không có file thì lấy số nhập tay.
+  const adsSpFile = s2.ads ? n(s2.ads.chiPhi) : null;
+  const adsSp = (adsSpFile !== null) ? adsSpFile : n(cp.adsKhac);
+  const adsTt = t2.ads ? n(t2.ads.chiPhi) : n(res.pnl && res.pnl.quangCaoGmvMax);
+  const luong = n(cp.luongKho) + n(cp.luongLive);
+  const vatTu = n(cp.vatTu);
+  const khac = n(cp.khac) + ((adsSpFile !== null) ? n(cp.adsKhac) : 0);
+
+  const tongPhiSan = phiSp + phiTt;
+  const tongAds = adsSp + adsTt;
+  const tong = tongPhiSan + tongAds + luong + vatTu + khac;
+  const pct = (v) => dt ? fmtPct(v / dt, 1) : '—';
+
+  const roasSp = (s2.ads && s2.ads.roas) ? s2.ads.roas : null;
+  const dsAdsSp = (s2.ads && s2.ads.doanhSo) ? n(s2.ads.doanhSo) : null;
+
+  const row = (ten, giaTri, ghiChu, dam) => `<tr${dam ? ' style="font-weight:700;"' : ''}>
+    <td>${ten}${ghiChu ? ` <span class="pnl-note">${ghiChu}</span>` : ''}</td>
+    <td class="num">${fmtVND(giaTri)}</td>
+    <td class="num">${pct(giaTri)}</td></tr>`;
+
+  const nguonAds = (adsSpFile !== null)
+    ? 'tự đọc từ file Dịch vụ Hiển thị'
+    : (n(cp.adsKhac) ? 'nhập tay — tải file quảng cáo Shopee để tự có' : 'CHƯA CÓ — tải file quảng cáo Shopee hoặc nhập tay bên dưới');
+
+  return `
+  <!-- ZONE 2: CHI PHÍ -->
+  <div class="zone"><span class="z-num">2</span><span class="z-title">💸 Chi phí</span><span class="z-note">mọi khoản tiền ra trong kỳ · tách theo sàn</span></div>
+  <div class="kpi-row">
+    <div class="kpi-tile"><div class="k-label">Phí sàn</div><div class="k-value">${fmtCompact(tongPhiSan)}</div><div class="k-sub">Shopee ${fmtCompact(phiSp)} · TikTok ${fmtCompact(phiTt)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Quảng cáo</div><div class="k-value">${fmtCompact(tongAds)}</div><div class="k-sub">Shopee ${fmtCompact(adsSp)} · TikTok ${fmtCompact(adsTt)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Lương &amp; vật tư</div><div class="k-value">${fmtCompact(luong + vatTu)}</div><div class="k-sub">Lương ${fmtCompact(luong)} · Vật tư ${fmtCompact(vatTu)}</div></div>
+    <div class="kpi-tile"><div class="k-label">TỔNG CHI PHÍ</div><div class="k-value">${fmtCompact(tong)}</div><div class="k-sub">${pct(tong)} doanh thu hàng</div></div>
+  </div>
+  <table class="dtable" style="margin-top:12px;"><thead><tr><th>Khoản chi</th><th style="text-align:right">Số tiền</th><th style="text-align:right">% doanh thu</th></tr></thead><tbody>
+    ${row('Phí sàn Shopee', phiSp, '(từ file Income — đủ khoản)')}
+    ${row('Phí sàn TikTok', phiTt, '(từ file tài chính — đủ khoản)')}
+    ${row('Quảng cáo Shopee', adsSp, '(' + nguonAds + ')')}
+    ${row('Quảng cáo TikTok (GMV Max)', adsTt, '(cấn thẳng vào tiền quyết toán)')}
+    ${luong ? row('Lương nhân viên (kho + live)', luong, '') : ''}
+    ${vatTu ? row('Vật tư đóng gói', vatTu, '(chi phí biến đổi)') : ''}
+    ${khac ? row('Chi phí khác', khac, '') : ''}
+    ${row('TỔNG', tong, '', true)}
+  </tbody></table>
+  ${(roasSp || adsTt) ? `<p style="font-size:12px;color:var(--ink-faint);margin:8px 0 0;">
+    Hiệu quả quảng cáo: ${roasSp ? `<b>Shopee ROAS ${roasSp.toFixed(2)}</b> — tiêu ${fmtVND(adsSp)} thu về ${fmtVND(dsAdsSp)} doanh số` : 'Shopee chưa có file quảng cáo nên chưa tính được ROAS'}.
+    TikTok GMV Max ${adsTt ? fmtVND(adsTt) : '0đ'} — file tài chính không kèm doanh số từ quảng cáo nên chưa tính được ROAS.</p>` : ''}`;
 }
 
 // ---------- ZONE Tồn kho & cần nhập (mục tuần 4 doc Chuẩn hoá, 21/10/2026) ----------
@@ -445,7 +505,7 @@ function buildInventoryHtml(res){
   const costData = (typeof window !== 'undefined' ? window.COST_CATALOG : globalThis.COST_CATALOG);
   const zoneHead = `
   <!-- ZONE 3: TỒN KHO -->
-  <div class="zone"><span class="z-num">3</span><span class="z-title">📦 Tồn kho &amp; đặt hàng</span><span class="z-note">tồn Sapo · điểm đặt hàng theo thời gian nhập</span></div>`;
+  <div class="zone"><span class="z-num">4</span><span class="z-title">📦 Tồn kho &amp; đặt hàng</span><span class="z-note">tồn Sapo · điểm đặt hàng theo thời gian nhập</span></div>`;
   if (!invData || !invData.inventory || !catalog || !catalog.variants){
     return zoneHead + '<div class="card"><p style="font-size:12.5px;color:var(--ink-faint);margin:0;">Chưa tải được tồn kho (inventory-snapshot.json) hoặc danh mục SKU — kiểm tra 2 file này có được deploy cùng web không.</p></div>';
   }
@@ -796,12 +856,14 @@ function render(res, opts){
   </div>
   ${buildPhiSanChiTietHtml(res)}
 
+  ${buildChiPhiHtml(res, opts)}
+
   ${buildPnlHtml(res, opts)}
 
   ${buildInventoryHtml(res)}
 
   <!-- ZONE 4 (chủ shop bỏ zone "Khách hàng theo khu vực" ngày 21/10/2026) -->
-  <div class="zone"><span class="z-num">4</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
+  <div class="zone"><span class="z-num">5</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">huỷ · trả · hoàn · lỗi do shop · hoàn về kho</span></div>
   <div class="grid cols-2">
     <div class="card"><div class="c-title">Tỷ lệ huỷ hoàn trả <span style="font-weight:400;color:var(--ink-faint)">(/ tổng đơn đặt)</span></div>
       <div class="c-row shopee"><span class="plat shopee"><i></i>Shopee</span><span class="val">${fmtPct(s.huyHoanTra/(s.tongDon||1))}</span></div><div class="divider"></div>
@@ -821,7 +883,7 @@ function render(res, opts){
   </div>
 
   <!-- ZONE 5 -->
-  <div class="zone"><span class="z-num">5</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
+  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
       <div class="c-row"><span class="val">${fmtRatio(n4.slove)}</span>${pill(n4.slove>=1,'hỗ trợ > phí thu','hỗ trợ < phí thu')}</div>
@@ -837,7 +899,7 @@ function render(res, opts){
 
   <!-- ZONE 6 (chủ shop bỏ 2 chart CTR / tỷ lệ chuyển đổi và bảng Chi tiết sản
        phẩm của Shop Stats ngày 21/10/2026 — chỉ giữ doanh thu theo kênh) -->
-  <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
+  <div class="zone"><span class="z-num">7</span><span class="z-title">Hiệu suất sản phẩm &amp; kênh</span><span class="z-note">Shopee, nguồn Shop Stats</span></div>
   <div class="chart-card" style="margin-bottom:14px;"><div class="ct-title">Doanh thu theo kênh</div>${channelHtml}</div>
 
   <div class="sub-label">Hiệu suất theo SKU/size <span style="text-transform:none;font-weight:400;">— gộp 2 sàn, chỉ tính đơn Hoàn thành</span></div>

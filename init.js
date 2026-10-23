@@ -756,6 +756,11 @@ async function onCompute(){
     await ensureSkuCatalog(); await ensureCostCatalog(); await ensureInventory(); await ensureVelocity();
     statusEl.textContent = 'Đang đọc và tính toán…';
     const result = await computeAll(selectedFiles);
+    // (23/10/2026) Có file quảng cáo Shopee thì tự điền luôn vào ô chi phí —
+    // Shopee không đưa tiền quảng cáo vào file Income nên trước đây phải gõ tay.
+    if (result.shopee && result.shopee.ads && result.shopee.ads.chiPhi){
+      result.chiPhiVanHanh = Object.assign({}, result.chiPhiVanHanh, { adsKhac: Math.round(result.shopee.ads.chiPhi) });
+    }
     currentResult = result;
     const resultsEl = document.getElementById('results');
     renderResults(resultsEl, result);
@@ -1188,6 +1193,16 @@ async function onSaveHistory(){
   }
 
   const statusEl = document.getElementById('history-note');
+  // (23/10/2026) BẢO TOÀN chi phí vận hành đã nhập: lưu đè ghi lại toàn bộ cột
+  // `data` bằng currentResult, mà currentResult vừa tính lại thì KHÔNG kèm
+  // chiPhiVanHanh → mỗi lần tính lại là chủ shop mất sạch số đã nhập (đã dính
+  // thật 23/10). Giờ đọc lại bản ghi cũ cùng nhãn và gộp vào trước khi ghi.
+  if (!currentResult.chiPhiVanHanh || !Object.keys(currentResult.chiPhiVanHanh).length){
+    try {
+      const cu = await sbFetch('monthly_reports?select=chiPhi:data->chiPhiVanHanh&label=eq.' + encodeURIComponent(label));
+      if (cu && cu[0] && cu[0].chiPhi) currentResult.chiPhiVanHanh = cu[0].chiPhi;
+    } catch (e){ /* không lấy được thì thôi, không chặn việc lưu */ }
+  }
   statusEl.textContent = 'Đang tải file gốc lên…';
   const files = await uploadOriginalFiles(slugifyForPath(label));
 
