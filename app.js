@@ -459,6 +459,7 @@ function buildChiPhiHtml(res, opts){
   const tongAds = adsSp + adsTt;
   const tong = tongPhiSan + tongAds + luong + vatTu + khac;
   const pct = (v) => dt ? fmtPct(v / dt, 1) : '—';
+  const pctCp = (v) => tong ? fmtPct(v / tong, 1) : '—';
 
   const roasSp = (s2.ads && s2.ads.roas) ? s2.ads.roas : null;
   const dsAdsSp = (s2.ads && s2.ads.doanhSo) ? n(s2.ads.doanhSo) : null;
@@ -466,7 +467,42 @@ function buildChiPhiHtml(res, opts){
   const row = (ten, giaTri, ghiChu, dam) => `<tr${dam ? ' style="font-weight:700;"' : ''}>
     <td>${ten}${ghiChu ? ` <span class="pnl-note">${ghiChu}</span>` : ''}</td>
     <td class="num">${fmtVND(giaTri)}</td>
-    <td class="num">${pct(giaTri)}</td></tr>`;
+    <td class="num">${pct(giaTri)}</td>
+    <td class="num">${pctCp(giaTri)}</td></tr>`;
+
+  // Biểu đồ quạt gộp theo LOẠI chi phí, không theo sàn: bảng bên dưới đã tách
+  // sàn rồi, còn "khoản nào chiếm bao nhiêu phần tiền đi ra" là câu hỏi theo loại.
+  const slices = [
+    { name: 'Phí sàn', v: tongPhiSan, c: 'var(--p1)' },
+    { name: 'Quảng cáo', v: tongAds, c: 'var(--p2)' },
+    { name: 'Lương nhân viên', v: luong, c: 'var(--p3)' },
+    { name: 'Vật tư đóng gói', v: vatTu, c: 'var(--p4)' },
+    { name: 'Chi phí khác', v: khac, c: 'var(--p6)' },
+  ];
+  let acc = 0;
+  const stops = [];
+  for (const sl of slices){
+    if (sl.v <= 0) continue;
+    const p = tong ? sl.v / tong * 100 : 0;
+    stops.push(`${sl.c} ${acc.toFixed(1)}% ${(acc + p).toFixed(1)}%`);
+    acc += p;
+  }
+  const legend = slices.map(sl => `<div class="dl-row${sl.v <= 0 ? ' muted' : ''}"><i style="background:${sl.c}"></i><span class="dl-name">${sl.name}</span><span class="dl-pct">${sl.v > 0 ? pctCp(sl.v) : 'chưa có số'}</span></div>`).join('');
+  const quatHtml = tong ? `<div class="donut-body" style="margin-top:14px;">
+      <div class="donut-ring" style="background:conic-gradient(${stops.join(', ')})">
+        <div class="donut-center"><span class="d-val">${fmtCompact(tong)}</span><span class="d-lbl">tổng chi phí</span></div>
+      </div>
+      <div class="donut-legend">${legend}</div>
+    </div>` : '';
+
+  // Thiếu lương/vật tư thì cột "% tổng chi phí" làm các khoản ĐÃ CÓ trông to hơn
+  // thật (mẫu số hụt) — phải nói ra, không để đọc % như số đã đủ.
+  const thieu = [];
+  if (!luong) thieu.push('lương nhân viên');
+  if (!vatTu) thieu.push('vật tư đóng gói');
+  const canhBao = thieu.length
+    ? `<p style="font-size:12px;color:var(--warn);margin:8px 0 0;">⚠ Kỳ này chưa điền <b>${thieu.join(' và ')}</b>, nên TỔNG CHI PHÍ còn thiếu và cột “% tổng chi phí” đang làm các khoản đã có trông <b>to hơn thật</b>. Điền ở form “Chi phí vận hành tháng” trong khu 💰 Lãi lỗ.</p>`
+    : '';
 
   const nguonAds = (adsSpFile !== null)
     ? 'tự đọc từ file Dịch vụ Hiển thị'
@@ -481,7 +517,8 @@ function buildChiPhiHtml(res, opts){
     <div class="kpi-tile"><div class="k-label">Lương &amp; vật tư</div><div class="k-value">${fmtCompact(luong + vatTu)}</div><div class="k-sub">Lương ${fmtCompact(luong)} · Vật tư ${fmtCompact(vatTu)}</div></div>
     <div class="kpi-tile"><div class="k-label">TỔNG CHI PHÍ</div><div class="k-value">${fmtCompact(tong)}</div><div class="k-sub">${pct(tong)} doanh thu hàng</div></div>
   </div>
-  <table class="dtable" style="margin-top:12px;"><thead><tr><th>Khoản chi</th><th style="text-align:right">Số tiền</th><th style="text-align:right">% doanh thu</th></tr></thead><tbody>
+  ${quatHtml}
+  <table class="dtable" style="margin-top:12px;"><thead><tr><th>Khoản chi</th><th style="text-align:right">Số tiền</th><th style="text-align:right">% doanh thu</th><th style="text-align:right">% tổng chi phí</th></tr></thead><tbody>
     ${row('Phí sàn Shopee', phiSp, '(từ file Income — đủ khoản)')}
     ${row('Phí sàn TikTok', phiTt, '(từ file tài chính — đủ khoản)')}
     ${row('Quảng cáo Shopee', adsSp, '(' + nguonAds + ')')}
@@ -491,6 +528,7 @@ function buildChiPhiHtml(res, opts){
     ${khac ? row('Chi phí khác', khac, '') : ''}
     ${row('TỔNG', tong, '', true)}
   </tbody></table>
+  ${canhBao}
   ${(roasSp || adsTt) ? `<p style="font-size:12px;color:var(--ink-faint);margin:8px 0 0;">
     Hiệu quả quảng cáo: ${roasSp ? `<b>Shopee ROAS ${roasSp.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> — tiêu ${fmtVND(adsSp)} thu về ${fmtVND(dsAdsSp)} doanh số` : 'Shopee chưa có file quảng cáo nên chưa tính được ROAS'}.
     TikTok GMV Max ${adsTt ? fmtVND(adsTt) : '0đ'} — file tài chính không kèm doanh số từ quảng cáo nên chưa tính được ROAS.</p>` : ''}`;
