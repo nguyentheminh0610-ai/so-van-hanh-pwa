@@ -78,6 +78,30 @@ cứu" — AI chỉ cần tìm đúng dòng chiều cao và chép câu mẫu.
 - Thử 1 câu khi chưa có bảng tra ("nữ 1m56 50kg"): đúng size M + đúng mẫu,
   nhưng ghi dài 94cm (số caro) thay vì 95cm → xác nhận bảng tra là bắt buộc.
 
+## Kết quả chạy test trong Xem trước (27/10/2026)
+
+Chủ shop đã tự tải 5 file bảng tra lên. Thử ở chế độ "AI phản hồi tự động"
+(bot chưa kích hoạt), xong đã trả về "AI gợi ý câu trả lời".
+
+- **Lượt 1 — prompt v1 + 5 file bảng tra:** 0/4 đúng. AI không tra tài liệu,
+  tự bịa dài quần (107, 110cm). → Tài liệu .docx KHÔNG được AI dùng để tính
+  size.
+- **Lượt 2 — đưa bảng quyết định + 5 bước tính + ví dụ vào prompt** (bản
+  hiện tại của `prompt-sapo.txt`, ~7.300 ký tự, Sapo nhận đủ): câu nằm sẵn
+  trong ví dụ thì đúng; câu mới **3/9 đúng (~33%)**.
+  Lỗi gặp: đọc sai "cao 146 38 ký" thành thiếu chiều cao; 1m83 ra XL (đúng
+  2XL); caro thừa cân + quét đất ra M 94 (đúng XL 100); kẹp 3XL nhưng dùng câu
+  "đã có mốc"; tự hỏi thêm "bạn quan tâm mẫu nào"; có lần viết lộ phép tính
+  ngưỡng cân cho khách.
+- **FAQ:** chào ✓; unisex đúng câu nhưng tự gợi ý sản phẩm kèm giá sai
+  ("15,000 VND" — lấy giá gốc từ dữ liệu sản phẩm); sợ chật eo đúng câu nhưng
+  tự thêm câu hỏi; "giao thiếu" AI tự trả lời khách thay vì chuyển nhân viên.
+- Thời gian trả lời 10–20 giây/câu.
+
+**Kết luận:** AI của Sapo không đạt được mức 99% giống skill — tối đa ~33% ở
+phần tư vấn size, dù đã đưa đủ bảng + ví dụ. Không nên bật tự động cho tư vấn
+size; giữ task CSKH 15 phút. Chờ chủ shop quyết hướng tiếp.
+
 ## Phần Sapo AI KHÔNG làm được như skill (giữ cho task CSKH hoặc nhân viên)
 
 - TikTok Shop (Sapo không hỗ trợ kênh này).
