@@ -211,6 +211,13 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
   `../daily-warehouse-report/references/reference_telegram_bot.md`) để chủ
   shop tự vào xử lý tiếp.
 
+## Bản cho Sapo Chatbot AI (bắt đầu 27/10/2026)
+
+Đang làm bộ cấu hình để Chatbot AI của Sapo (chỉ Shopee) trả lời giống skill
+này: [sapo-chatbot-ai/huong-dan-cai-dat.md](sapo-chatbot-ai/huong-dan-cai-dat.md).
+Sửa quy tắc ở file này / size-spec / size-rules.json thì chạy lại
+`python sapo-chatbot-ai/build_sapo_files.py` và nạp lại file mới lên Sapo.
+
 ## Test nhanh trước khi tin tưởng thay đổi logic
 
 Nếu sửa lại thuật toán hoặc bảng số liệu, chạy thử qua 20 test case trong
