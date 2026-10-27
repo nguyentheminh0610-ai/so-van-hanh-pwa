@@ -58,6 +58,26 @@ cứu" — AI chỉ cần tìm đúng dòng chiều cao và chép câu mẫu.
 7. Đạt ≥99% → bật Kích hoạt (hỏi chủ shop trước). Khi Sapo chạy Shopee, phải
    **tắt phần Shopee của task CSKH 15 phút** để khách không bị trả lời 2 lần.
 
+## Nhật ký nạp cấu hình (27/10/2026, sau khi chủ shop mua điểm AI)
+
+- Đã nạp: prompt (giữ nguyên chế độ "AI gợi ý"), bật "Chuyển nhân viên khi AI
+  không hiểu", 17 câu FAQ, 3 tình huống mặc định (huỷ đơn / vận chuyển / đổi
+  địa chỉ) → Nhân viên, Tồn kho → thêm hướng dẫn hỏi phân loại trước.
+- **Không tải được tài liệu bằng Claude in Chrome**: trang cấu hình nằm trong
+  iframe khác domain (`sapo-socials.sapoapps.vn`), công cụ không thấy ô chọn
+  file; mở thẳng iframe thì bị chuyển về trang admin. → Người phải tự kéo thả 5
+  file `out/bang-tra-size-*.docx`. Giới hạn ghi trên hộp tải: tối đa 10 file,
+  35.000 từ/văn bản, 200 dòng/excel.
+- Ô FAQ: câu hỏi ≤300 ký tự, hướng dẫn ≤600; khung tự giãn tới ~3 dòng nên vị
+  trí nút Lưu đổi theo độ dài — nhập tay bằng tool thì chụp màn hình trước khi
+  bấm Lưu.
+- FAQ còn **15 câu mẫu cũ của Sapo (28/04/2025)**, vài câu đang để Chatbot AI
+  tự trả lời việc skill không làm (phí ship, thời gian giao, đổi trả, khuyến
+  mãi, thanh toán…), câu "Chương trình khuyến mãi" ngược với câu mới "Hỏi giá,
+  khuyến mãi → Nhân viên". Chưa sửa — chờ chủ shop quyết.
+- Thử 1 câu khi chưa có bảng tra ("nữ 1m56 50kg"): đúng size M + đúng mẫu,
+  nhưng ghi dài 94cm (số caro) thay vì 95cm → xác nhận bảng tra là bắt buộc.
+
 ## Phần Sapo AI KHÔNG làm được như skill (giữ cho task CSKH hoặc nhân viên)
 
 - TikTok Shop (Sapo không hỗ trợ kênh này).
