@@ -112,6 +112,32 @@ tự chèn gợi ý. Prompt v4 thêm mục "CẤM GỢI Ý SẢN PHẨM" lên đ
 Nếu AI vẫn chèn sản phẩm → vào Nguồn dữ liệu > **Sản phẩm** bỏ chọn hết sản
 phẩm (prompt không chặn được phần Sapo tự gắn).
 
+### Kết quả test prompt v4 (28/10/2026, chế độ "AI gợi ý", 15 câu)
+
+Đúng 11/15 ≈ **73%** (tăng từ ~33% ở v3). **Không câu nào chèn gợi ý sản phẩm
+hay giá nữa** — prompt v4 chặn được, chưa phải tắt nguồn Sản phẩm.
+
+Câu đúng: 1m65 55kg (L); nữ 1m58 60kg (M); 1m75 90kg (3XL thừa cân); cao 1m63
+(L chỉ chiều cao); 1m52 45kg (S); 1m70 65kg mắt cá (M); cao 148 (S); 1m60 48
+nữ (M); 1m80 70kg (2XL); caro nữ 1m55 68kg (caro L thừa cân); + câu hỏi phí
+ship → từ chối an toàn, không bịa giá. Đọc "m7/m8/1m95" và phân biệt caro/quần
+lông (không nối câu quần lông cho caro) đều đúng.
+
+Câu SAI — đều là bước **tính ngưỡng thừa cân** và **chọn câu kẹp/mốc**:
+- "cao 172 80kg nam": ra XL thừa cân, đúng L (172−90=82, 80<82 chưa thừa cân).
+- "caro 1m68 72kg": ra XL thừa cân, đúng L (168−90=78, 72<78). Cùng lỗi ngưỡng.
+- "1m85 quét đất": size 3XL đúng nhưng dùng câu "kẹp lớn nhất" (nói ngắn hơn
+  quét đất), đúng phải câu "đã nói mốc" (3XL vừa đẹp) — 1m85+quét đất đạt 3XL
+  tự nhiên, không bị kẹp.
+- "nam 1m78 95kg quét đất": size 3XL đúng nhưng dùng câu "thừa cân" (nói dài
+  hơn chạm gót), đúng phải "kẹp lớn nhất" (ngắn hơn quét đất) — đây mới là ca
+  kẹp thật, AI lại bỏ mốc quét đất.
+
+**Kết luận v4:** ~73%, chưa đạt 99%. Lỗi còn lại đúng chỗ AI phải tính nhẩm
+(ngưỡng cân sát mốc) và chọn đúng câu khi vừa thừa cân vừa có mốc dài / bị kẹp
+— những bước này chỉ code làm chuẩn được. Dùng Sapo thì nên để "AI gợi ý" cho
+nhân viên duyệt, không bật tự động cho tư vấn size.
+
 ## Phần Sapo AI KHÔNG làm được như skill (giữ cho task CSKH hoặc nhân viên)
 
 - TikTok Shop (Sapo không hỗ trợ kênh này).
