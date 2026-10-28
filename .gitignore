@@ -1,6 +1,11 @@
 backup
 logs/
 
+# Quyen cuc bo cua Claude Code - chua token/API key trong cac rule da allow.
+# Mac co san rule nay o ~/.config/git/ignore, nhung PC Windows thi khong
+# -> phai ghi vao day de khong bao gio bi commit len repo PUBLIC.
+.claude/settings.local.json
+
 # File export tu san (co ten/SDT/dia chi khach) - repo PUBLIC, khong duoc commit
 doi-chieu-hoan/
 *-hang-hoan.xlsx

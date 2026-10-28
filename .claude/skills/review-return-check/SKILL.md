@@ -153,6 +153,12 @@ Mỗi lần chạy, với mỗi đánh giá 1–2★ đã có dòng trong `cskh_
     đã trả lời, ổn". Không flag.
 - **Đã flag rồi** (`needs_action = true` từ lượt trước): giữ nguyên, việc này
   chờ chủ shop, đừng tự hạ cờ.
+- **Thread đã có người (chủ shop/NV) nhắn trước, khách chưa trả lời** — tức
+  mình gặp đánh giá xấu mà chat đã có tin của shop rồi (Hard rule 3: không
+  nhắn lại): coi như first-contact đã xong từ trước, **flag luôn không cần
+  đợi 12h** — `needs_action = true`, `action_type = 'lien_he_khach'`,
+  `message_note = "chủ shop/NV đã nhắn trước, khách chưa trả lời"`. Đây đúng
+  là tình huống đơn 586593929059403539 (chủ shop tự nhắn, khách im).
 
 ### 2. Trả hàng / hoàn tiền
 
