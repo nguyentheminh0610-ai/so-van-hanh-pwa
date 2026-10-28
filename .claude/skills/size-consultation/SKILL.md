@@ -1,6 +1,6 @@
 ---
 name: size-consultation
-description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22/23) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không" -- must confirm which phân loại first), closing out finished conversations, and short product-FAQ questions (unisex? có dây rút không?). Do NOT use this for khiếu nại, giao thiếu hàng, logistics, KOC/affiliate, or a customer's post-purchase worry/complaint even if it mentions "size"/"dài"/"rộng" -- those stay unanswered for the shop owner or another skill.
+description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22/23) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không" -- must confirm which phân loại first), closing out finished conversations, and short product-FAQ questions (unisex? có dây rút không?). Also handles (chốt 2026-10-28, xem references/cskh-ship-faq.md) shipping-time questions / giục giao gấp / "khi nào đơn đến / khi nào vận chuyển" (TikTok=J&T, Shopee=SPX, kho Hà Nội, mốc 3h chiều gửi trong ngày), "được kiểm tra hàng trước khi nhận không", a customer's post-purchase worry "sợ dài/rộng quá" (now reassure đổi trả), and a KOC/creator messaging in the inbox to xin mẫu. Still do NOT use this for khiếu nại nặng, giao thiếu hàng, or đổi size/đổi hàng sau khi mua -- those stay unanswered for the shop owner or another skill.
 ---
 
 # Tư vấn size cho khách (chat TikTok Shop & Shopee)
@@ -210,6 +210,28 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
   gửi Telegram báo chủ shop (token + chat ID + lệnh curl:
   `../daily-warehouse-report/references/reference_telegram_bot.md`) để chủ
   shop tự vào xử lý tiếp.
+
+## Vận chuyển & CSKH khác (chốt 28/10/2026)
+
+Rà FAQ chat TikTok 1 tháng (28/10/2026), chủ shop train thêm 6 tình huống mà
+TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đủ bảng + mẫu câu ở
+[references/cskh-ship-faq.md](references/cskh-ship-faq.md). Tóm tắt:
+
+- **Hãng theo sàn:** TikTok dùng **J&T** (chậm hơn), Shopee dùng **SPX** (nhanh
+  hơn ~1–3 ngày). Kho gửi **Hà Nội**. Báo thời gian giao theo đúng hãng của sàn;
+  không chắc → báo theo J&T (dải chậm, an toàn).
+- **Mốc 3h chiều:** đơn đặt trước 3h chiều gửi đi trong ngày; đơn đi tới 19:59
+  vẫn tính là gửi hôm nay (nên 4h chiều vẫn tính hôm nay).
+- **Giục giao / khi nào đến / khi nào vận chuyển:** báo mốc 3h chiều + thời gian
+  theo khu vực khách (tra bảng J&T/SPX trong file trên); nói rõ là "dự kiến".
+- **Kiểm tra hàng trước nhận:** sàn có cho kiểm tra trước, không ưng vẫn trả được.
+- **Lo sau mua (sợ dài/rộng):** nay TRẢ LỜI "sẵn sàng hỗ trợ đổi trả nếu không
+  vừa" — **thay quy tắc cũ** (trước để trống cho chủ shop).
+- **KOC inbox xin mẫu:** hướng khách bấm yêu cầu mẫu, bộ phận duyệt sẽ duyệt.
+- **Khách chỉ cho cân nặng:** tư vấn size theo cân nặng trước rồi xin chiều cao
+  (mẫu `missing_height` trong size-rules.json đã sửa 28/10).
+- **Văn phong:** bỏ tym/emoji cuối câu, viết tự nhiên như người thật.
+- **CHƯA train:** đổi size/đổi hàng sau mua — để trống chờ chủ shop.
 
 ## Bản cho Sapo Chatbot AI (bắt đầu 27/10/2026)
 
