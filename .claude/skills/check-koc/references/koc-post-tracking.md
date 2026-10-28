@@ -169,14 +169,43 @@ Trang "Đã hoàn thành" của TikTok CÓ ghi đúng phân loại đã gửi (v
 `Chất Lông-Shin,L`) => dùng nguồn đó backfill cột F, rồi R tính theo F.
 (28/10 mới điền tay R cho 5 dòng để kiểm công thức, chưa đụng cột F.)
 
-## TODO còn lại
+## ⏸ ĐANG DỞ Ở ĐÂU — đọc mục này đầu tiên khi quay lại (28/10/2026)
 
-- [x] ~~Xác minh có xuất được file báo cáo không~~ => **CÓ nút Export**.
-- [x] ~~Kiểm công thức Q/S/T~~ => chạy đúng (ROI 93,5 / 28,4 / 51,3 -> Hiệu quả).
-- [x] ~~Chủ shop chốt lại ngưỡng Xếp loại~~ => **>=50 Hiệu quả / 20-50 Tạm
-      / <20 Kém** (chốt 28/10; kiểm thật: 93,5->Hiệu quả, 51,3->Hiệu quả,
-      28,4->Tạm).
-- [ ] **Trên PC**: Export `/insights/video-analysis`, parse file, đổ số cho toàn
-      bộ KOC trong Book (không làm trọn từ Mac được).
-- [ ] Backfill cột F từ trang "Đã hoàn thành" để R/ROI tự tính.
-- [ ] Cài chạy **2 ngày/lần**.
+### Đã xong, KHÔNG cần làm lại
+- Tab "3.Quản lý Book" đã có đủ khối cột I–T + công thức Q/S/T + tô màu.
+- Ngưỡng Xếp loại đã chốt **>=50 / 20-50 / <20** (đã kiểm chạy đúng).
+- **Đã đổ số thật cho 8 KOC** (lấy từ trang 1 của `/insights/video-analysis`,
+  khoảng ngày 27/9–26/10/2026). Dòng trong Book (dòng = STT + 1):
+
+  | Dòng | KOC | View | Đơn | GMV | Video | Đã điền R (giá vốn)? |
+  |---|---|---|---|---|---|---|
+  | 5 | zithung07 | 100.900 | 64 | 11,7tr | 1 | chưa |
+  | 8 | trvietanh.2004 | 14.300 | 26 | 5,1tr | 1 | 54.560 |
+  | 9 | stuaupinkin | 15.100 | 7 | 1,6tr | 1 | 56.360 |
+  | 10 | chungg2t | 6.000 | 14 | 2,8tr | 1 | 54.560 |
+  | 12 | ima.pongh_ | 95.400 | 133 | 23,8tr | 1 | chưa |
+  | 17 | awhtun_ | 31.600 | 10 | 1,6tr | 1 | 56.360 |
+  | 27 | ouishop20 | 15.700 | 10 | 2,1tr | 1 | 54.560 |
+  | 36 | huy_tapphoido | 99.900 | 63 | 12,0tr | 3 | chưa |
+
+  Cột P (hoa hồng) CHƯA điền cho dòng nào (bảng video-analysis không có cột
+  hoa hồng; phải lấy ở `/insights/transaction-analysis`).
+
+### Việc tiếp theo, theo thứ tự nên làm
+
+**1. Backfill cột F "Sản phẩm gửi cho KOC"** — làm được từ BẤT KỲ máy nào
+(chỉ đọc web, không cần tải file). Đây là việc đáng làm trước vì không có F
+thì R/ROI/Xếp loại trống ở hầu hết dòng.
+- `select_browser` deviceId `40800ac7-074b-4077-be62-257ed7e08ef7` (Chrome PC).
+- Mở trang Yêu cầu hàng mẫu, tab **"Đã hoàn thành"** (3 trang, 50 dòng/trang).
+- Mỗi dòng ghi sẵn đúng phân loại đã gửi (vd `Chất Lông-Shin,L`) → map sang
+  giá trị dropdown trong `'0.Danh mục SKU'!F2:F45` rồi ghi vào cột F của Book.
+- Sau đó tính R từ `cost-catalog.json` (xem mục "Giá vốn mẫu").
+- Chủ shop đã duyệt cách này 28/10; nếu điền sai mẫu thì chủ shop sửa lại.
+
+**2. Đổ số cho TOÀN BỘ KOC — BẮT BUỘC chạy ở phía PC.**
+Bảng có 1.345 video / 68 trang nên phải dùng nút **Export**, mà file Export tải
+về máy PC → phiên chạy trên Mac không đọc được (Bash chạy ở Mac). Từ Mac chỉ
+lấy được trang 1 như lần này.
+
+**3. Cài chạy 2 ngày/lần** (mỗi KOC theo dõi 15 ngày từ ngày lên bài).
