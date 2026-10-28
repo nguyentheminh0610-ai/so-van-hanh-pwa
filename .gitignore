@@ -1,2 +1,7 @@
 backup
 logs/
+
+# File export tu san (co ten/SDT/dia chi khach) - repo PUBLIC, khong duoc commit
+doi-chieu-hoan/
+*-hang-hoan.xlsx
+*-tra-hang*.xlsx
