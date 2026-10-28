@@ -1464,15 +1464,27 @@ function computeAllFromAOA(aoa){
   const skuAgg = {}; // tên hiển thị -> { name, tongSL, sizes, doanhThu, giaVon }
   const skuUnknown = {}; // mã lạ -> SL (gom cảnh báo 1 lần)
   const costMissing = {}; // mã chưa có giá vốn -> SL (cảnh báo, KHÔNG coi giá vốn = 0 trong im lặng)
-  function pushSkuAgg(name, size, qty, revenue, cost){
+  // THÊM 28/10/2026 — cộng giá vốn TÁCH THEO SÀN. Trước đây chỉ có giá vốn
+  // TỔNG nên sổ không trả lời được "sàn nào lãi thật hơn": phí sàn đã tách sẵn
+  // mỗi sàn nhưng giá vốn thì gộp, muốn so biên lãi phải giả định 2 sàn cùng
+  // tỷ lệ giá vốn — mà AOV lệch nhau (Shopee 195.515đ vs TikTok 169.775đ ở
+  // T9/2026) nên giả định đó không an toàn.
+  const giaVonTheoSan = { Shopee: 0, TikTok: 0 };
+  const thieuGiaVonTheoSan = { Shopee: 0, TikTok: 0 };
+  function pushSkuAgg(name, size, qty, revenue, cost, plat){
     if (!skuAgg[name]) skuAgg[name] = { name, tongSL: 0, sizes: {}, doanhThu: 0, giaVon: 0, thieuGiaVon: 0 };
     const it = skuAgg[name];
     it.tongSL += qty;
     const sizeKey = size || '(không rõ size)';
     it.sizes[sizeKey] = (it.sizes[sizeKey] || 0) + qty;
     it.doanhThu += revenue || 0;
-    if (cost === null || cost === undefined) it.thieuGiaVon += qty;
-    else it.giaVon += cost;
+    if (cost === null || cost === undefined){
+      it.thieuGiaVon += qty;
+      if (plat) thieuGiaVonTheoSan[plat] += qty;
+    } else {
+      it.giaVon += cost;
+      if (plat) giaVonTheoSan[plat] += cost;
+    }
   }
   // Tách 1 dòng bán thành các SKU ĐƠN thật sự xuất kho (combo → các SKU con),
   // kèm giá vốn từng phần. Trả [] khi không tra được mã.
@@ -1504,7 +1516,7 @@ function computeAllFromAOA(aoa){
   }
   /** 1 dòng bán: tách combo, cộng SL + giá vốn, và CHIA doanh thu dòng cho các
    *  SKU con theo tỷ trọng giá vốn (combo bán 1 giá nhưng gồm nhiều SP). */
-  function addSkuLine(rawCode, qty, revenue){
+  function addSkuLine(rawCode, qty, revenue, plat){
     if (!rawCode || !qty) return;
     const parts = expandSkuParts(rawCode, qty, 0);
     if (!parts.length) return;
@@ -1517,7 +1529,7 @@ function computeAllFromAOA(aoa){
     parts.forEach((p, i) => {
       // phân bổ doanh thu: theo giá vốn nếu biết, không thì chia đều
       const share = knownTotal ? ((costs[i] || 0) / knownTotal) : (1 / parts.length);
-      pushSkuAgg(p.name, p.size, p.qty, (revenue || 0) * share, costs[i]);
+      pushSkuAgg(p.name, p.size, p.qty, (revenue || 0) * share, costs[i], plat);
     });
   }
   const skuColMissing = [];
@@ -1534,7 +1546,7 @@ function computeAllFromAOA(aoa){
       const oid = r['Mã đơn hàng'];
       if (oid === undefined || !(oid in spCompleted)) continue;
       const lineRev = spRevCanCompute ? (num(r[C_SP_GIA_GOC]) * num(r[C_SP_SL_REV]) - num(r[C_SP_NB_TRO_GIA])) : 0;
-      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]), lineRev);
+      addSkuLine(r[COL_SP_SKU_SIZE], num(r[COL_SP_SL]), lineRev, 'Shopee');
     }
   }
   if (COL_TT_SKU_SIZE && COL_TT_SL){
@@ -1542,7 +1554,7 @@ function computeAllFromAOA(aoa){
       const oid = r['Order ID'];
       if (oid === undefined || !(oid in ttCompleted)) continue;
       const lineRev = ttRevCanCompute ? (num(r[C_TT_BEFORE]) - num(r[C_TT_SELLER_DISC])) : 0;
-      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]), lineRev);
+      addSkuLine(r[COL_TT_SKU_SIZE], num(r[COL_TT_SL]), lineRev, 'TikTok');
     }
   }
   if (!skuCatalog){
@@ -1804,6 +1816,7 @@ function computeAllFromAOA(aoa){
       doanhThu: spRevenue, doanhThuCu: spRevenueCu, gmvDat: spGmvDat,
       thucNhan: spThucNhan, dieuChinh: spDieuChinh,
       phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
+      giaVon: costCatalog ? giaVonTheoSan.Shopee : null, thieuGiaVonSL: thieuGiaVonTheoSan.Shopee,
       shipHoan: spShipHoan, ads: spAds,
       troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
@@ -1816,6 +1829,7 @@ function computeAllFromAOA(aoa){
       doanhThu: ttRevenue, doanhThuCu: ttRevenueCu, gmvDat: ttGmvDat,
       thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
       phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
+      giaVon: costCatalog ? giaVonTheoSan.TikTok : null, thieuGiaVonSL: thieuGiaVonTheoSan.TikTok,
       shipHoan: ttShipHoan, ads: { chiPhi: ttQuangCaoGmvMax || 0, doanhSo: null, roas: null },
       troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
