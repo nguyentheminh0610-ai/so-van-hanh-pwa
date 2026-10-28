@@ -182,6 +182,29 @@ hợp tuần/tháng cần đủ số. Lưu ý từng cột:
 Nếu POST lỗi (bảng chưa tạo, mất mạng): vẫn gửi Telegram như dưới, thêm vào
 dòng `Lưu ý:` là chưa ghi được lên Sổ Vận Hành.
 
+### Chạy bù ngược (backfill) — khi chủ shop bảo "chạy bù N ngày"
+
+Bảng chỉ có dữ liệu từ lượt chạy đầu tiên trở đi, nên lúc mới bật tab (hoặc sau
+một đợt nghỉ dài) chủ shop có thể yêu cầu lấp lại quá khứ. Khác lượt chạy
+thường ở đúng mấy điểm sau — **sai mấy điểm này là khách cũ bị nhắn lại**:
+
+1. **TUYỆT ĐỐI KHÔNG nhắn khách**, không mở thread chat, không gửi Telegram.
+   Chỉ đọc danh sách và ghi vào Supabase.
+2. Bỏ cửa sổ 2 ngày, lấy theo số ngày chủ shop yêu cầu (mặc định 7).
+3. `messaged_at` để trống, `message_note` ghi `chạy bù ngược <ngày>, không nhắn khách`.
+4. `needs_action`: chỉ bật `true` nếu **đến giờ vẫn còn treo thật** — đánh giá
+   1–2★ còn nằm trong hàng chờ trả lời, hoặc case trả hàng còn ở tab "Đang chờ
+   bạn". Việc cũ đã xong rồi thì để `false`, đừng dựng lại việc chủ shop đã làm.
+5. `insight_tag` vẫn gắn bình thường — đây chính là thứ làm cho phần Insight có
+   số liệu ngay thay vì đợi cả tháng.
+6. Báo lại trong chat: lấp được bao nhiêu dòng, từ ngày nào tới ngày nào, và
+   phần nào sàn không cho lấy lại.
+
+**Hạn chế phải nói trước với chủ shop:** đánh giá 4–5★ cũ gần như không lấy lại
+được (sàn chỉ giữ hàng chờ trả lời của 1–3★), nên tỷ lệ sao của kỳ chạy bù sẽ
+xấu hơn thực tế. Nói rõ điều này khi báo cáo, đừng để chủ shop tưởng shop vừa
+tụt đánh giá.
+
 ## Sending the report
 
 Chạy theo lịch (08:00 / 20:00) → gửi Telegram **1–2 dòng** (chốt 2026-10-28,
