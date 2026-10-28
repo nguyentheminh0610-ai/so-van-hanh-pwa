@@ -387,6 +387,10 @@ Toàn bộ chi tiết (cấu trúc tab, công thức, map giá vốn từ `cost-
 bẫy KOC trùng tên, việc còn phải làm trên PC): xem
 [references/koc-post-tracking.md](references/koc-post-tracking.md).
 
+Phần đẩy lên web Sổ Vận Hành thành tab **"Chấm điểm KOC"** (chốt 28/10:
+PC ghi Supabase → web chỉ đọc, gộp kỳ theo ngày đăng, có cả LIVE): xem
+[references/koc-dashboard-spec.md](references/koc-dashboard-spec.md).
+
 ## Report back
 
 End with a short summary: how many new KOC were scored, their
