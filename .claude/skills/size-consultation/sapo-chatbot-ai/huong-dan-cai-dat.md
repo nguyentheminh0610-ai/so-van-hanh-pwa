@@ -102,6 +102,16 @@ Chủ shop đã tự tải 5 file bảng tra lên. Thử ở chế độ "AI ph�
 phần tư vấn size, dù đã đưa đủ bảng + ví dụ. Không nên bật tự động cho tư vấn
 size; giữ task CSKH 15 phút. Chờ chủ shop quyết hướng tiếp.
 
+## Prompt v4 — cấm gợi ý sản phẩm (28/10/2026)
+
+Chủ shop test thấy AI tự nối "Bạn tham khảo các mẫu quần lông bên mình nhé: 1.
+Quần dài chất lông hoạt hình - 150.000 VND" và hỏi "Bạn quan tâm sản phẩm nào
+ạ?" → không muốn. Nguyên nhân: Sapo cho AI dùng nguồn dữ liệu **Sản phẩm** và
+tự chèn gợi ý. Prompt v4 thêm mục "CẤM GỢI Ý SẢN PHẨM" lên đầu, thêm cách đọc
+"m7"/"m8"/"m95" và 3 ví dụ đúng từ ảnh test (m7, m8 50kg quần lông, 1m95).
+Nếu AI vẫn chèn sản phẩm → vào Nguồn dữ liệu > **Sản phẩm** bỏ chọn hết sản
+phẩm (prompt không chặn được phần Sapo tự gắn).
+
 ## Phần Sapo AI KHÔNG làm được như skill (giữ cho task CSKH hoặc nhân viên)
 
 - TikTok Shop (Sapo không hỗ trợ kênh này).
