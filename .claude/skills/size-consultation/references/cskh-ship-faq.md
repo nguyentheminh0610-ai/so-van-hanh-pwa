@@ -108,7 +108,61 @@ thêm chiều cao để mình tư vấn độ dài quần cho chuẩn với ạ.
 (Mẫu này khớp `reply_templates.missing_height` trong size-rules.json — đã sửa
 28/10/2026, thay cho câu cũ chỉ hỏi lại mà chưa tư vấn gì.)
 
+### 7. KOC báo "đã gửi yêu cầu mẫu rồi" (chốt 28/10/2026)
+> Dạ shop nhận được yêu cầu rồi nha, bên bộ phận duyệt sẽ xử lý giúp mình, có gì
+> khác bạn cứ nhắn shop qua đây nha.
+
+### 8. Khách chỉ gửi card sản phẩm / "shop ơi" mà chưa hỏi gì (chốt 28/10/2026)
+> Dạ bạn cần shop tư vấn gì về mẫu này không ạ?
+
+### 9. Khách nam chê vải mỏng/mềm, ngại mặc ra ngoài (chốt 28/10/2026)
+Mấy mẫu vải dày hơn (kitty hồng, thỏ nơ, đốm hồng) là **mẫu nữ** → KHÔNG gợi ý
+cho khách nam. Gợi ý **Shin 01–03** (mẫu nam, nhiều nam + KOC nam mặc), chỉ khách
+xem phần đăng lại (video) của shop.
+> Dạ shop xin lỗi bạn nha. Mấy mẫu kitty hồng, thỏ nơ, đốm hồng hơi thiên nữ, bạn
+> nam mặc Shin 01–03 hợp hơn đó, vải dày dặn mà nhiều bạn nam với KOC nam mặc
+> rồi. Bạn xem thử ở mục đăng lại của shop cho dễ hình dung nha.
+
+## Đổi size / đổi trả hàng sau khi mua (chốt 28/10/2026)
+
+TRƯỚC ĐÂY ghi "chưa train, để trống" — **nay đã xử lý được**: quy trình đầy đủ ở
+tài liệu CSKH Mục 8, mẫu câu chuẩn ở **Google Sheet "Mau tin nhan"** (xem dưới).
+
+**Nguồn mẫu câu CSKH CHÍNH THỨC (master):** Google Sheet của shop
+`1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`, tab **"Mau tin nhan"** — chứa
+mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 sàn, và tab
+"Chinh sach xu ly loi". Khi cần mẫu CSKH ngoài size → đọc Sheet này, nó thắng.
+
+**Luồng xử lý "khách muốn đổi size" (TikTok/Shopee):**
+1. Chưa hỏi lý do đổi trước. Trả lời mẫu gợi ý giữ hàng + sẵn sàng đổi:
+   > Dạ, nếu rộng hoặc chật không quá nhiều thì bạn cố gắng mặc giúp mình là hợp
+   > lý nhất đó ạ, tuy nhiên mình cũng sẵn sàng hỗ trợ bạn đổi hàng ạ.
+   → hỏi khách muốn đổi sang size nào + kiểm còn hàng (xin cao/nặng nếu cần).
+2. Hướng dẫn đổi hàng (ưu tiên Cách 1: đặt đơn mới + trả hàng đơn cũ):
+   - **TikTok Shop:** "Mình xin hướng dẫn bạn đổi hàng ạ. Đầu tiên, bạn giúp shop
+     đặt lại một đơn mới ngay trên sàn. Sau đó, bạn bấm "Yêu cầu hoàn tiền" cho
+     đơn hàng vừa rồi, và chọn "Tôi nhận đủ mặt hàng nhưng hàng có vấn đề" và chọn
+     đúng lý do gặp phải. Sau đó, sẽ có shipper qua lấy hàng, bạn nhớ lưu lại mã
+     trả hàng để cung cấp cho shipper. Tiền của đơn hàng cũ sẽ được hoàn về ví
+     trên sàn nhé ạ."
+   - **Shopee:** như trên nhưng bấm "Trả hàng/Hoàn tiền" và chọn "Đã nhận được
+     hàng nhưng hàng có vấn đề".
+3. Sau khi hướng dẫn xong mới hỏi lý do (mẫu "Hỏi xác định lý do đổi size"):
+   > Dạ b ơi, cho mình hỏi thêm chút là sản phẩm mình mặc bị rộng/chật quá là do
+   > mình đã chọn size theo đúng bảng size của shop hay mình có thể đã đặt nhầm
+   > size ạ? Với b cho mình xin thêm chiều cao, cân nặng của bạn để shop tham khảo
+   > và ghi nhận, từ đó có thể điều chỉnh bảng size cho phù hợp hơn ạ.
+
+**Điều kiện (Mục 8):** trong 15 ngày kể từ nhận hàng; chưa giặt/chưa dùng, còn
+tem mác. Cách 1 tiền hoàn về ví sàn (gửi mã giảm 10k nếu lỗi khách, 15k nếu lỗi
+shop để đặt lại); khách ngại kẹt ví sàn → Cách 2 (shop qua lấy hàng cũ, gửi lại
+size mới; lỗi khách ~15k/15k, lỗi shop shop chịu cả 2 chiều). Hết size muốn đổi →
+hướng trả hàng hoàn tiền + gợi ý mẫu/màu khác.
+
 ## CHƯA train (để trống chờ chủ shop)
 
-- **Đổi size / đổi hàng sau khi mua** (điều kiện, ai chịu phí ship đổi, quy
-  trình): chủ shop dặn "từ từ" 28/10/2026 — chưa có mẫu, để trống cho chủ shop.
+- **chbllng-kiểu ca sửa thông tin đơn** (khách báo sai SĐT giao, shipper không
+  liên hệ được…): là thao tác sửa đơn + TikTok chặn chia sẻ SĐT trong chat →
+  chủ shop/PC tự xử lý, không trả lời tự động.
+- Khiếu nại nặng khác chưa có mẫu cụ thể → tra Sheet "Mau tin nhan"; không có thì
+  để trống cho chủ shop.
