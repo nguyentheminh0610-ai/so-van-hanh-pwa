@@ -38,9 +38,9 @@ Script chỉ ghi **I, J, K, L, M, N, O, P, R**. Tô màu đã có sẵn: I `Đã
 
 ⚠️ `Ghi chú` giờ ở **cột U**, nhãn `Tìm KOC` ở **V**, ô gõ tìm ở **W1**.
 
-## Ngưỡng Xếp loại (chủ shop chốt 2026-10-28, chỉnh sau khi chạy thật nếu cần)
+## Ngưỡng Xếp loại (chủ shop chốt lại 2026-10-28 SAU khi chạy thật, thay ngưỡng đầu ≥10/3/<3)
 
-Theo ROI = GMV ÷ giá vốn mẫu: **≥10 = Hiệu quả · 3–<10 = Tạm · <3 = Kém.**
+Theo ROI = GMV ÷ giá vốn mẫu: **≥50 = Hiệu quả · 20–<50 = Tạm · <20 = Kém.**
 
 ## Nguồn dữ liệu — ĐÃ XÁC MINH THẬT trên Chrome PC ngày 2026-10-28
 
@@ -156,7 +156,7 @@ ima.pongh_, awhtun_, ouishop20, huy_tapphoido (gộp 3 video).
 2. **File Export tải về MÁY PC.** Phiên chạy trên Mac KHÔNG đọc được file đó
    (Bash chạy ở Mac). => **Phần đổ số hàng loạt PHẢI chạy ở phía PC.** Từ Mac
    chỉ đọc được nội dung trang web, không lấy được file tải về.
-3. **Ngưỡng Xếp loại >=10 quá thấp:** giá vốn mẫu chỉ ~55K đ mà GMV tính bằng
+3. ~~**Ngưỡng Xếp loại >=10 quá thấp:**~~ **ĐÃ SỬA, nay là >=50/20/<20.** giá vốn mẫu chỉ ~55K đ mà GMV tính bằng
    triệu, nên ROI thực tế rơi vào khoảng **28–93** => gần như ai cũng thành
    "Hiệu quả", mất tác dụng phân loại. **Cần chủ shop chốt lại ngưỡng**
    (gợi ý: >=50 Hiệu quả / 20–50 Tạm / <20 Kém). KOC không ra đơn vẫn đúng là
@@ -173,7 +173,9 @@ Trang "Đã hoàn thành" của TikTok CÓ ghi đúng phân loại đã gửi (v
 
 - [x] ~~Xác minh có xuất được file báo cáo không~~ => **CÓ nút Export**.
 - [x] ~~Kiểm công thức Q/S/T~~ => chạy đúng (ROI 93,5 / 28,4 / 51,3 -> Hiệu quả).
-- [ ] **Chủ shop chốt lại ngưỡng Xếp loại** (xem chướng ngại số 3).
+- [x] ~~Chủ shop chốt lại ngưỡng Xếp loại~~ => **>=50 Hiệu quả / 20-50 Tạm
+      / <20 Kém** (chốt 28/10; kiểm thật: 93,5->Hiệu quả, 51,3->Hiệu quả,
+      28,4->Tạm).
 - [ ] **Trên PC**: Export `/insights/video-analysis`, parse file, đổ số cho toàn
       bộ KOC trong Book (không làm trọn từ Mac được).
 - [ ] Backfill cột F từ trang "Đã hoàn thành" để R/ROI tự tính.

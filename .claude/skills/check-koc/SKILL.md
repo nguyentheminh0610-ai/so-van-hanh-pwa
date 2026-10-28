@@ -381,7 +381,7 @@ Book", từ cột I đến cột T** (gộp chung để mỗi KOC chỉ 1 dòng 
 ghi **I, J, K, L, M, N, O, P, R**. Nguồn số là
 **TikTok Affiliate Center → báo cáo Nội dung/Video**; không gắn link affiliate
 = ghi `Chưa lên`. Chạy **2 ngày/lần**, mỗi KOC theo dõi **15 ngày từ ngày lên
-bài**. Ngưỡng ROI: ≥10 Hiệu quả / 3–<10 Tạm / <3 Kém.
+bài**. Ngưỡng ROI: ≥50 Hiệu quả / 20–<50 Tạm / <20 Kém.
 
 Toàn bộ chi tiết (cấu trúc tab, công thức, map giá vốn từ `cost-catalog.json`,
 bẫy KOC trùng tên, việc còn phải làm trên PC): xem

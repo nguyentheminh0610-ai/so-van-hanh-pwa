@@ -84,7 +84,7 @@ Only rows for DUYỆT KOC exist here, auto-populated via the RANK key.
 | Q | Đơn/1.000 view | **formula**: `=IF(OR($L2="";$L2=0);"";ROUND($M2/$L2*1000;2))` |
 | R | Giá vốn mẫu | **script ghi** (tra `cost-catalog.json` theo cột F) |
 | S | ROI (GMV/vốn) | **formula**: `=IF(OR($R2="";$R2=0;$N2="");"";ROUND($N2/$R2;1))` |
-| T | Xếp loại | **formula**: `=IF($S2="";"";IF($S2>=10;"Hiệu quả";IF($S2>=3;"Tạm";"Kém")))` |
+| T | Xếp loại | **formula**: `=IF($S2="";"";IF($S2>=50;"Hiệu quả";IF($S2>=20;"Tạm";"Kém")))` |
 | U | Ghi chú | manual (Book-specific notes, separate from Nhập KOC's column M) |
 | V | Tìm KOC | label |
 | W | (live search input) | manual |
