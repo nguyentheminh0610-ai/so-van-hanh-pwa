@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v30'; // v30: SUA LOI cong trung Phi dich vu Shopee (phi san thua 39,29tr/12 thang)
+const CACHE_NAME = 'vanhanh-shop-v31'; // v31: doc cot Service Fee Details theo chuoi chua (Shopee doi ten cot 3 lan)
 const ASSETS = [
   './',
   './index.html',

@@ -1142,8 +1142,21 @@ function computeAllFromAOA(aoa){
   // ---------- 7) Income — Service Fee Details (Voucher Xtra + Phí Hạ Tầng) ----------
   const sfdAOA = aoa.income_ServiceFee;
   const sfdRows = rowsAsDicts(sfdAOA, 1);
-  const voucherXtraTotal = sfdRows.reduce((s, r) => s + Math.abs(num(r['Voucher Xtra'])), 0);
-  const phiHaTangTotal = sfdRows.reduce((s, r) => s + Math.abs(num(r['Phí Hạ Tầng'])), 0);
+  // 28/10/2026 — Shopee ĐÃ ĐỔI TÊN CỘT ở sheet này 3 lần, nên phải khớp theo
+  // CHUỖI CHỨA chứ không khớp tên chính xác:
+  //   09–10/2025: "Gói Content Xtra" | "Gói Voucher Xtra" | "Phí Hạ Tầng"
+  //   11/2025–01/2026: "Phí Hạ Tầng" | "Voucher Xtra 2.5%" | "Voucher Xtra 3%"
+  //   02/2026→nay: "Phí Hạ Tầng" | "Voucher Xtra"
+  // Khớp đúng tên 'Voucher Xtra' nên 4 tháng cũ đọc ra 0 (11/2025 hụt
+  // 7.024.859đ, 09/2025 hụt 556.723đ). CHÚ Ý: 2 số này CHỈ để hiện "trong đó",
+  // KHÔNG cộng vào phí sàn — tổng đã nằm ở cột "Phí dịch vụ" (sheet Doanh thu).
+  const sfdSumWhere = (test) => sfdRows.reduce((s, r) => {
+    let t = 0;
+    for (const k of Object.keys(r)) if (test(String(k))) t += Math.abs(num(r[k]));
+    return s + t;
+  }, 0);
+  const voucherXtraTotal = sfdSumWhere((k) => /voucher\s*xtra|content\s*xtra/i.test(k));
+  const phiHaTangTotal = sfdSumWhere((k) => /^phí\s*hạ\s*tầng$/i.test(k.trim()));
 
   // ---------- 7b) Shopee: THỰC NHẬN + PHÍ SÀN THẬT từ file Income (lỗi #3, #4)
   // Thực nhận = Σ "Tổng tiền đã thanh toán" (dòng Order, sheet "Doanh thu")
