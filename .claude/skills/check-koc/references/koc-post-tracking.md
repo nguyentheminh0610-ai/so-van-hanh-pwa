@@ -1,4 +1,4 @@
-# Theo dõi KOC đã lên bài chưa + hiệu quả (tab "4.Hiệu quả KOC")
+# Theo dõi KOC đã lên bài chưa + hiệu quả (tab "3.Quản lý Book", cột I–T)
 
 Chốt 2026-10-28 (chủ shop Minh). Mục tiêu: sau khi tặng mẫu free cho KOC,
 chủ shop mở Google Sheet là biết ngay **đứa nào đã lên bài, đứa nào ôm mẫu
@@ -6,35 +6,37 @@ mất tích, và video đó hiệu quả tới đâu** (view / đơn / doanh thu
 
 ## "Xong" nghĩa là gì
 
-Trong file **"Bảng Chấm Điểm KOC"** (`1-ccH9D7SklgEIqJbLlNEbKlpDlYkzHsikDNUy_Ss9Sc`)
-có tab **"4.Hiệu quả KOC"** (sheetId `4040404`), mỗi KOC đã DUYỆT có đủ số và
-tự cập nhật. Chủ shop chỉ cần mở tab đó.
+Trong file **"Bảng Chấm Điểm KOC"** (`1-ccH9D7SklgEIqJbLlNEbKlpDlYkzHsikDNUy_Ss9Sc`),
+tab **"3.Quản lý Book"** (sheetId `1952146322`), mỗi KOC đã DUYỆT có đủ số ở
+**cột I–T** và tự cập nhật. Chủ shop chỉ cần mở tab đó — 1 KOC = 1 dòng, thấy
+cả mẫu đã gửi lẫn hiệu quả.
 
-## Tab "4.Hiệu quả KOC" — cấu trúc (đã dựng sẵn 2026-10-28)
+**Lịch sử:** ban đầu (28/10) dựng ở tab riêng "4.Hiệu quả KOC"; chủ shop yêu
+cầu gộp chung vào Book cho đỡ nhảy tab → đã gộp từ **cột I** và **xoá tab 4**.
+Hai cột cũ `Giá book` + `Deadline đăng` bị thay (cả hai trống ở mọi dòng, không
+mất dữ liệu). Chủ shop chốt **bỏ hẳn cột Deadline**.
 
-| Col | Tên | Cách điền |
+## Cột I–T (xem bảng đầy đủ ở [sheet-structure.md](sheet-structure.md))
+
+| Col | Tên | Ai điền |
 |---|---|---|
-| A | STT | **công thức** — mirror `'3.Quản lý Book'!A` (tự đồng bộ theo đúng dòng) |
-| B | Tên KOC | **công thức** — `=IF('3.Quản lý Book'!B2="";"";TRIM('3.Quản lý Book'!B2))` |
-| C | Mẫu đã gửi | **công thức** — mirror `'3.Quản lý Book'!F` (cột "Sản phẩm gửi cho KOC") |
-| D | Đã lên bài? | **script ghi**: `Đã lên` / `Chưa lên` |
-| E | Ngày lên bài | **script ghi** (`DD/MM/YYYY`) |
-| F | Link bài đăng | **script ghi** |
-| G | View | **script ghi** (số) |
-| H | Số đơn | **script ghi** (số) |
-| I | GMV (doanh thu) | **script ghi** (số, đ) |
-| J | Số video | **script ghi** (số) |
-| K | Hoa hồng đã trả | **script ghi** (số, đ) |
-| L | Đơn/1.000 view | **công thức**: `=IF(OR($G2="";$G2=0);"";ROUND($H2/$G2*1000;2))` |
-| M | Giá vốn mẫu | **script ghi** (tra từ `cost-catalog.json` theo cột C — xem dưới) |
-| N | ROI (GMV/vốn) | **công thức**: `=IF(OR($M2="";$M2=0;$I2="");"";ROUND($I2/$M2;1))` |
-| O | Xếp loại | **công thức**: `=IF($N2="";"";IF($N2>=10;"Hiệu quả";IF($N2>=3;"Tạm";"Kém")))` |
+| I | Đã lên bài? | script — `Đã lên` / `Chưa lên` |
+| J | Ngày lên bài | script — `DD/MM/YYYY` |
+| K | Link bài đăng | script |
+| L | View | script |
+| M | Số đơn | script |
+| N | GMV (doanh thu) | script |
+| O | Số video | script |
+| P | Hoa hồng đã trả | script |
+| Q | Đơn/1.000 view | **công thức — không ghi đè** |
+| R | Giá vốn mẫu | script (tra `cost-catalog.json`) |
+| S | ROI (GMV/vốn) | **công thức — không ghi đè** |
+| T | Xếp loại | **công thức — không ghi đè** |
 
-A/B/C và L/N/O đã có công thức sẵn, **không ghi đè**. Script chỉ ghi
-**D, E, F, G, H, I, J, K, M** (các cột dữ liệu + giá vốn).
+Script chỉ ghi **I, J, K, L, M, N, O, P, R**. Tô màu đã có sẵn: I `Đã lên`=xanh
+/ `Chưa lên`=đỏ; T `Hiệu quả`=xanh / `Tạm`=vàng / `Kém`=đỏ.
 
-Tô màu có sẵn (conditional format): O `Hiệu quả`=xanh, `Tạm`=vàng, `Kém`=đỏ;
-D `Đã lên`=xanh, `Chưa lên`=đỏ.
+⚠️ `Ghi chú` giờ ở **cột U**, nhãn `Tìm KOC` ở **V**, ô gõ tìm ở **W1**.
 
 ## Ngưỡng Xếp loại (chủ shop chốt 2026-10-28, chỉnh sau khi chạy thật nếu cần)
 
@@ -58,27 +60,27 @@ không gắn link affiliate thì sẽ KHÔNG hiện trong báo cáo Nội dung �
 
 ## Ghép dữ liệu vào đúng dòng
 
-Tab 4 mirror tab Book **theo đúng số dòng**. Với mỗi dòng (KOC) trong Book
-đã DUYỆT, tìm KOC đó trong báo cáo affiliate (khớp theo username ở cột B,
-nhớ `TRIM` vì vài tên trong Book có lẫn ký tự xuống dòng), rồi ghi D–K, M
-vào **cùng số dòng** ở tab 4.
+Với mỗi dòng DUYỆT trong Book, khớp username ở **cột B** (nhớ `TRIM` vì vài
+tên có lẫn ký tự xuống dòng) với tên nhà sáng tạo trong báo cáo affiliate, rồi
+ghi I–P, R vào **chính dòng đó**.
 
-**Bẫy KOC trùng tên nhiều dòng:** vài KOC (vd `trvietanh.2004`) có nhiều
-dòng Book (tặng mẫu nhiều lần). Báo cáo affiliate gộp theo nhà sáng tạo nên
-không tách được theo từng lần tặng → tạm thời ghi cùng số cho các dòng đó và
-ghi chú; đừng coi là chính xác tuyệt đối cho KOC trùng.
+**Bẫy KOC trùng tên nhiều dòng:** vài KOC (vd `trvietanh.2004`) có nhiều dòng
+Book (tặng mẫu nhiều lần). Báo cáo affiliate gộp theo nhà sáng tạo nên không
+tách được theo từng lần tặng → tạm thời ghi cùng số cho các dòng đó và ghi chú
+ở cột U; đừng coi là chính xác tuyệt đối cho KOC trùng.
 
-## Giá vốn mẫu (cột M)
+## Giá vốn mẫu (cột R)
 
 Đọc `cost-catalog.json` trong repo (`cost.{MÃ}` = giá vốn 1 cái). Lấy mã từ
-cột C "Mẫu đã gửi" (format `CL01 - Chất Lông-Shin` → mã `CL01`, cắt phần
-trước `" - "`). Nếu C có nhiều mã ngăn bằng dấu phẩy → **cộng** giá vốn các
-mã. Mã thiếu trong `missing` (vd CL13) → để trống M, ghi chú.
+**cột F "Sản phẩm gửi cho KOC"** (format `CL01 - Chất Lông-Shin` → mã `CL01`,
+cắt phần trước `" - "`). Nếu F có nhiều mã ngăn bằng dấu phẩy → **cộng** giá
+vốn các mã. Mã nằm trong danh sách `missing` (vd CL13) → để trống R, ghi chú.
+F trống (chưa điền mẫu đã gửi) → để trống R, ROI sẽ tự trống theo.
 
 ## Tần suất + vòng đời (chủ shop chốt 2026-10-28)
 
 - Chạy **2 ngày/lần**.
-- Mỗi KOC chỉ **theo dõi & cập nhật trong 15 ngày kể từ Ngày lên bài (cột E)**;
+- Mỗi KOC chỉ **theo dõi & cập nhật trong 15 ngày kể từ Ngày lên bài (cột J)**;
   quá 15 ngày thì **đóng băng** số (không ghi đè nữa) để khỏi quét lại mãi.
 - KOC chưa lên bài thì vẫn kiểm mỗi lần cho tới khi lên (hoặc chủ shop bỏ).
 
@@ -90,13 +92,13 @@ TikTok — xem Bước 0 của SKILL.md). Vì **ghi vào Google Sheet cần quy�
 cách gọn nhất hiện tại: **gộp vào routine Claude đã có trên PC, chạy bằng
 Haiku** cho nhẹ quota. Nếu sau này set service-account Google trên PC thì có
 thể tách thành script Python thuần `tools/sync_koc.py` chạy 0 token — khi đó
-script tự ghi D–K, M; phần A/B/C/L/N/O vẫn để công thức.
+script tự ghi I–P, R; Q/S/T vẫn để công thức.
 
 ## TODO còn lại (phải làm trên PC)
 
 1. Mở Affiliate Center → xác minh có **xuất file báo cáo Nội dung/Video**
    không, lấy 1 file mẫu → chốt đúng tên cột.
-2. Viết phần đọc affiliate + ghi tab 4 (script thuần nếu có creds, hoặc bước
-   trong routine Claude/Haiku nếu chưa).
+2. Viết phần đọc affiliate + ghi cột I–P, R (script thuần nếu có creds, hoặc
+   bước trong routine Claude/Haiku nếu chưa).
 3. Cài chạy 2 ngày/lần. Chạy thử lần đầu, báo chủ shop xem số thật rồi chỉnh
    ngưỡng Xếp loại nếu cần.

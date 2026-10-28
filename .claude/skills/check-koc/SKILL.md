@@ -193,7 +193,8 @@ asked:
    follow-up cleanup. Use the Sheets API directly (`update_spreadsheet`
    batchUpdate), **two separate `copyPaste` requests**, source = the row
    immediately above (same sheet, `sheetId` 1952146322), destination =
-   the new row(s), columns A–P (index 0–16):
+   the new row(s), columns A–W (index 0–23 — **mở rộng từ A–P sau khi gộp
+   khối hiệu quả KOC vào Book ngày 2026-10-28**):
    - `pasteType: "PASTE_FORMAT"` first — carries borders, background,
      font, alignment, and (usually) the plain-list dropdown on column G.
    - `pasteType: "PASTE_DATA_VALIDATION"` on **columns E–F specifically**
@@ -374,9 +375,10 @@ than entering credentials yourself.
 ## Part 3 — theo dõi KOC đã lên bài chưa + hiệu quả (chốt 2026-10-28)
 
 Sau khi tặng mẫu, chủ shop cần biết **KOC đã lên bài chưa và hiệu quả ra
-sao** (view/đơn/doanh thu/ROI). Có tab **"4.Hiệu quả KOC"** (sheetId
-`4040404`) đã dựng sẵn trong file Bảng Chấm Điểm KOC: cột A/B/C tự mirror
-từ tab Book, cột L/N/O là công thức, script chỉ ghi D–K + M. Nguồn số là
+sao** (view/đơn/doanh thu/ROI). Khối này nằm **ngay trong tab "3.Quản lý
+Book", từ cột I đến cột T** (gộp chung để mỗi KOC chỉ 1 dòng — chủ shop chốt
+2026-10-28). Q/S/T là công thức (Đơn/1.000 view, ROI, Xếp loại), script chỉ
+ghi **I, J, K, L, M, N, O, P, R**. Nguồn số là
 **TikTok Affiliate Center → báo cáo Nội dung/Video**; không gắn link affiliate
 = ghi `Chưa lên`. Chạy **2 ngày/lần**, mỗi KOC theo dõi **15 ngày từ ngày lên
 bài**. Ngưỡng ROI: ≥10 Hiệu quả / 3–<10 Tạm / <3 Kém.

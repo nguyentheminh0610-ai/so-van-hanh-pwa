@@ -73,14 +73,28 @@ Only rows for DUYỆT KOC exist here, auto-populated via the RANK key.
 | F | Sản phẩm gửi cho KOC | manual — same dropdown source as E |
 | G | Hành động | manual — dropdown, 4 values: `Chưa bấm duyệt mẫu` / `Chờ KOC phản hồi thêm mẫu` / `Đã duyệt` / `Đã từ chối`. **Always write an explicit value, never leave blank.** |
 | H | Cảnh báo | **formula**: `=IF(Fr<>"";"Điền vào sổ kho";"")` |
-| I | Giá book | manual |
-| J | Deadline đăng | manual |
-| K | Link bài đăng | manual |
-| L | View | manual |
-| M | Đơn hàng | manual |
-| N | Ghi chú | manual (Book-specific notes, separate from Nhập KOC's column M) |
-| O | Tìm KOC | label |
-| P | (live search input) | manual |
+| I | Đã lên bài? | **script ghi** — `Đã lên` / `Chưa lên` |
+| J | Ngày lên bài | **script ghi** — `DD/MM/YYYY` |
+| K | Link bài đăng | **script ghi** |
+| L | View | **script ghi** (số) |
+| M | Số đơn | **script ghi** (số) |
+| N | GMV (doanh thu) | **script ghi** (số, đ) |
+| O | Số video | **script ghi** (số) |
+| P | Hoa hồng đã trả | **script ghi** (số, đ) |
+| Q | Đơn/1.000 view | **formula**: `=IF(OR($L2="";$L2=0);"";ROUND($M2/$L2*1000;2))` |
+| R | Giá vốn mẫu | **script ghi** (tra `cost-catalog.json` theo cột F) |
+| S | ROI (GMV/vốn) | **formula**: `=IF(OR($R2="";$R2=0;$N2="");"";ROUND($N2/$R2;1))` |
+| T | Xếp loại | **formula**: `=IF($S2="";"";IF($S2>=10;"Hiệu quả";IF($S2>=3;"Tạm";"Kém")))` |
+| U | Ghi chú | manual (Book-specific notes, separate from Nhập KOC's column M) |
+| V | Tìm KOC | label |
+| W | (live search input) | manual |
+
+**Đổi cấu trúc 2026-10-28** (chủ shop chốt): khối theo dõi hiệu quả KOC được
+gộp thẳng vào tab Book từ **cột I**, thay cho 2 cột cũ `Giá book` + `Deadline
+đăng` (cả hai đều đang trống ở mọi dòng, không mất dữ liệu). `Ghi chú` và ô
+`Tìm KOC` bị đẩy sang phải nhưng giữ nguyên — ô gõ tìm giờ là **W1** (công
+thức tô sáng đã tự đổi thành `=AND(TRIM($W$1)<>"";TRIM($B2)=TRIM($W$1))`).
+Chi tiết cách điền: [koc-post-tracking.md](koc-post-tracking.md).
 
 Row `RANK n` lives at spreadsheet row `n + 1` (row 1 = header, same as
 Nhập KOC).
