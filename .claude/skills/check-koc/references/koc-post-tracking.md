@@ -189,6 +189,56 @@ mà chỉ 2 yêu cầu hoàn thành, chưa xác định dòng nào ứng với l
 đăng nhập — đã thử cả khi chủ shop mở sẵn profile Minh trên PC) ⇒ **việc chạy
 SQL bắt buộc chủ shop tự bấm**, làm ở máy nào cũng được.
 
+## Cập nhật 29/10/2026 (lần 2) — đã điền "Đã lên bài?" cho CẢ 69 dòng
+
+Nguồn: 3 tab trạng thái hàng mẫu trên TikTok (chuẩn hơn suy từ link affiliate).
+
+| Cột I | Số dòng | Nghĩa |
+|---|---|---|
+| `Đã lên` | 53 | có trong tab "Đã hoàn thành" (3 trang, ~134 lượt) |
+| `Chưa lên` | 5 | tab "Đang tiến hành" = **đã nhận mẫu mà chưa đăng** → cần giục |
+| `Đang giao` | 4 | tab "Đã vận chuyển" = hàng còn đang đi → **KHÔNG được giục** |
+| (trống) | 7 | STT 3,6,18,24,27,40,49 — không thấy ở tab nào, có thể nằm ở "Chờ xem xét" (11) hoặc "Đã hủy". **Cần kiểm thêm.** |
+
+**Thêm trạng thái thứ 3 `Đang giao`** (ngoài 2 giá trị chủ shop chốt ban đầu):
+nếu gộp chung vào `Chưa lên` thì danh sách giục sẽ gọi nhầm 4 người chưa nhận
+được hàng. Dễ đổi lại nếu chủ shop không thích.
+
+Điền thêm cột F cho 4 dòng (STT 1, 4, 5, 11) từ trang 2 → **tổng 25 dòng đã
+backfill**, còn 13 dòng trống (các KOC không ghi phân loại trên TikTok).
+
+### Phát hiện: SỔ BOOK THIẾU RẤT NHIỀU so với thực tế
+
+TikTok có **~134 lượt hàng mẫu đã hoàn thành**, trong khi Book chỉ có **69
+dòng**. Hàng chục KOC đã nhận mẫu free và đăng bài nhưng **chưa từng được
+chấm điểm / ghi vào sheet** (dongtrishop.affiliate, ngocthuskincare, leith_62,
+chienlew86, huyenyeuthoitrang, lynh_bynh, meozbasic...). Nên **% duyệt tính
+trên sheet sẽ không phản ánh đúng quy mô thật** — cần báo chủ shop.
+
+TikTok còn tự cảnh báo **"2 nhà sáng tạo đã nhận hàng mẫu 5 ngày trước nhưng
+chưa đăng bài"** kèm nút **"Nhắc tất cả mọi người"** — dùng được thay cho cột
+Deadline đã bỏ.
+
+### Đường lấy số liệu: 2 ngõ cụt đã loại trừ
+
+1. **Lọc "Loại cộng tác"** trên `/insights/video-analysis`: chỉ có Cộng tác mở /
+   mục tiêu / Đối tác, **KHÔNG có "Hàng mẫu"**; hơn nữa TikTok ghi rõ *"Dữ liệu
+   lưu lượng truy cập và tương tác chỉ có sẵn khi chọn Tất cả"* → lọc là **mất
+   số view**. Bỏ hướng này.
+2. **Trang `/data/creator-analysis`** (Phân tích → Nhà sáng tạo): gộp sẵn theo
+   KOC, **có cả "Buổi LIVE liên kết" + "Hoa hồng ước tính"** (đúng 2 thứ thiếu),
+   NHƯNG **1.481 nhà sáng tạo / 149 trang / 10 dòng mỗi trang** và TikTok báo
+   **trang này sắp ngừng hoạt động**. Không quét hết được.
+
+⇒ Vẫn phải dùng **Export** (file rơi về PC) cho phần đổ số hàng loạt.
+
+### ⚠️ Bài học kỹ thuật khi ghi sheet
+
+Ghi 1 mảng dài 69 phần tử vào `updateCells` thì **lệch mất 1 dòng** (thiếu 1
+phần tử ở giữa) → `hoangthehaim8` bị gán nhầm "Đã lên". **Luôn ghi theo KHỐI
+liền nhau bằng `repeatCell`** (mỗi khối 1 giá trị) thay vì mảng dài, rồi đọc
+lại đối chiếu tên KOC với trạng thái.
+
 ## ⏸ ĐANG DỞ Ở ĐÂU — đọc mục này đầu tiên khi quay lại (28/10/2026)
 
 ### Đã xong, KHÔNG cần làm lại
