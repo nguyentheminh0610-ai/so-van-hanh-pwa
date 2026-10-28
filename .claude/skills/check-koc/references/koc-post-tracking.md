@@ -169,6 +169,26 @@ Trang "Đã hoàn thành" của TikTok CÓ ghi đúng phân loại đã gửi (v
 `Chất Lông-Shin,L`) => dùng nguồn đó backfill cột F, rồi R tính theo F.
 (28/10 mới điền tay R cho 5 dòng để kiểm công thức, chưa đụng cột F.)
 
+## Cập nhật 29/10/2026 — đã backfill cột F + giá vốn
+
+- Book có **69 dòng DUYỆT**. Cột F trước đó trống 38 dòng.
+- Đối chiếu với trang "Đã hoàn thành" của TikTok (trang 1) → **điền được cột F
+  cho 21 dòng**; đã kiểm dòng có sẵn F KHÔNG bị ghi đè.
+- **Điền giá vốn (cột R) cho 52 dòng** (21 dòng mới + 31 dòng đã có F mà chưa
+  có giá vốn), tính bằng script từ `cost-catalog.json`, không mã nào thiếu giá.
+- Chuỗi công thức chạy đúng đầu-cuối: stuaupinkin ROI 28,4 → **Tạm**;
+  chungg2t ROI 51,3 → **Hiệu quả**.
+
+**Còn 17 dòng chưa có cột F** (STT 1,2,3,4,5,6,7,10,11,12,18,20,24,27,28,35,49):
+không thấy trong trang 1 "Đã hoàn thành" → phải đọc **trang 2 và 3** mới khớp
+được. Riêng `trvietanh.2004` (STT 7/10/28) cố tình để trống vì có 3 dòng Book
+mà chỉ 2 yêu cầu hoàn thành, chưa xác định dòng nào ứng với lần nào.
+
+**Supabase:** `scripts/koc-tables.sql` đã soạn + push. **Claude KHÔNG mở được
+`supabase.com`** (công cụ trình duyệt chặn cứng tên miền này, không liên quan
+đăng nhập — đã thử cả khi chủ shop mở sẵn profile Minh trên PC) ⇒ **việc chạy
+SQL bắt buộc chủ shop tự bấm**, làm ở máy nào cũng được.
+
 ## ⏸ ĐANG DỞ Ở ĐÂU — đọc mục này đầu tiên khi quay lại (28/10/2026)
 
 ### Đã xong, KHÔNG cần làm lại
