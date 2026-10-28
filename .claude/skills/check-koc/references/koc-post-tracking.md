@@ -42,21 +42,61 @@ Script chỉ ghi **I, J, K, L, M, N, O, P, R**. Tô màu đã có sẵn: I `Đã
 
 Theo ROI = GMV ÷ giá vốn mẫu: **≥10 = Hiệu quả · 3–<10 = Tạm · <3 = Kém.**
 
-## Nguồn dữ liệu
+## Nguồn dữ liệu — ĐÃ XÁC MINH THẬT trên Chrome PC ngày 2026-10-28
 
-**TikTok Shop Affiliate Center → mục Nội dung / Video liên kết** (báo cáo
-video các nhà sáng tạo gắn link sản phẩm shop). Lấy theo từng KOC: có video
-hay không, link, ngày đăng, view, số đơn, GMV, số video, hoa hồng.
+Mở bằng Claude in Chrome, `select_browser` deviceId `40800ac7-…` (Chrome PC,
+có sẵn đăng nhập TikTok). Lưu ý tên hiển thị "Browser N" đổi theo thứ tự kết
+nối — hôm xác minh nó hiện là "Browser 3"; **chỉ tin deviceId**.
 
-- **Ưu tiên XUẤT FILE báo cáo** nếu affiliate center có nút xuất (giống cách
-  tải file tháng) → đọc file = **0 token**. Chưa xác minh được có nút xuất
-  hay không (phải mở trên PC coi) — **việc đầu tiên cần làm trên PC là kiểm
-  tra điều này và lấy 1 file mẫu** để biết đúng tên cột.
-- Nếu không xuất được, đành đọc bằng trình duyệt tự động (tốn chút quota).
+### 1. "Đã lên bài?" — lấy THẲNG từ trạng thái hàng mẫu của TikTok ⭐
 
-**Quy tắc "không gắn link = Chưa lên" (chủ shop chốt):** KOC lên bài nhưng
-không gắn link affiliate thì sẽ KHÔNG hiện trong báo cáo Nội dung → cứ ghi
-`Chưa lên` để chủ shop tự vào check tay. KHÔNG đi mò profile từng đứa.
+`affiliate.tiktok.com/affiliate/sample/sample-request?shop_region=VN&shop_id=7494594978743617682`
+
+Các tab trạng thái chính là câu trả lời, **không cần suy đoán qua link
+affiliate nữa**:
+
+| Tab | Nghĩa | Ghi cột I |
+|---|---|---|
+| `Đã hoàn thành` (~100+, 3 trang) | KOC **đã đăng bài** | `Đã lên` |
+| `Đang tiến hành` | đã nhận mẫu, **chưa đăng** | `Chưa lên` |
+| `Đã vận chuyển` / `Sẵn sàng vận chuyển` | hàng còn đang đi | `Chưa lên` |
+
+Mỗi dòng có sẵn **tên KOC + đúng phân loại mẫu đã gửi** (vd `Chất Lông-Shin,L`)
+→ khớp được với cột F của Book, và vì **mỗi yêu cầu hàng mẫu là 1 dòng riêng**
+nên **giải quyết luôn bẫy KOC xin mẫu nhiều lần** (trvietanh.2004 có 2 dòng
+riêng biệt, không bị gộp).
+
+TikTok còn có sẵn tính năng **"Nhắc nhà sáng tạo đăng bài"** (gửi nhắc hàng
+loạt cho ai nhận mẫu 5 ngày mà chưa đăng) — dùng được thay cho cột Deadline
+đã bỏ.
+
+### 2. Số liệu từng video — nút "Xem nội dung" ở mỗi dòng
+
+Mở modal **"Chi tiết nội dung"**, có: tab `Video n` / `LIVE n` (→ **số video**,
+cột O), **Thời gian phát hành** (→ cột J), **lượt xem** (→ L), lượt tim, bình
+luận, **số đơn hàng** (→ M), và nút **"Xem video trên TikTok"** (→ link, cột K).
+
+Ví dụ thật đã đọc: `taothao2410` — đăng 21/10/2026, 83 view, 1 tim, 0 bình
+luận, **0 đơn hàng**.
+
+### 3. GMV + hoa hồng — mục "Phân tích"
+
+- **Phân tích → Hiệu suất**: `affiliate.tiktok.com/insights/transaction-analysis`
+  — bảng theo nhà sáng tạo có **GMV nhà sáng tạo**, **Hoa hồng ước tính**,
+  Hoàn tiền. Có chọn khoảng ngày + so sánh kỳ.
+- **Phân tích → Tất cả video**: `affiliate.tiktok.com/insights/video-analysis`
+  — **từng video 1 dòng**: ngày đăng, nhà sáng tạo, thông tin sản phẩm, và các
+  cột số liệu. Đây là nguồn gọn nhất cho cột N (GMV) và P (hoa hồng).
+
+### 4. ⭐ CÓ NÚT "Export" → chạy 0 token được
+
+Cả 2 trang Phân tích đều có nút **Export** ở góc phải bảng. Nghĩa là **tải file
+báo cáo được** → script Python thuần đọc file, không cần trình duyệt, **không
+tốn token**. (Vẫn còn vướng việc ghi vào Google Sheet cần credentials — xem mục
+"Chạy ở đâu + token".)
+
+**Quy tắc cũ "không gắn link = Chưa lên" ĐÃ BỎ** (chốt 28/10 sau khi xác minh):
+trạng thái hàng mẫu của TikTok chính xác hơn nhiều, dùng nó thay thế.
 
 ## Ghép dữ liệu vào đúng dòng
 
@@ -64,10 +104,12 @@ Với mỗi dòng DUYỆT trong Book, khớp username ở **cột B** (nhớ `TR
 tên có lẫn ký tự xuống dòng) với tên nhà sáng tạo trong báo cáo affiliate, rồi
 ghi I–P, R vào **chính dòng đó**.
 
-**Bẫy KOC trùng tên nhiều dòng:** vài KOC (vd `trvietanh.2004`) có nhiều dòng
-Book (tặng mẫu nhiều lần). Báo cáo affiliate gộp theo nhà sáng tạo nên không
-tách được theo từng lần tặng → tạm thời ghi cùng số cho các dòng đó và ghi chú
-ở cột U; đừng coi là chính xác tuyệt đối cho KOC trùng.
+**Bẫy KOC trùng tên nhiều dòng — đã có cách xử lý (28/10):** vài KOC (vd
+`trvietanh.2004`) có nhiều dòng Book vì xin mẫu nhiều lần. **Trang "Yêu cầu
+hàng mẫu" cũng tách thành nhiều dòng riêng**, mỗi dòng kèm đúng phân loại mẫu
+(vd `Chất Lông-Shin 02,XXL` vs `Chất Lông-Shin 02,M`) → ghép theo **cặp
+(tên KOC + phân loại mẫu)** thay vì chỉ theo tên, là khớp đúng từng lần tặng.
+Chỉ khi cột F của Book trống mới phải đoán theo thứ tự thời gian.
 
 ## Giá vốn mẫu (cột R)
 
@@ -94,11 +136,16 @@ Haiku** cho nhẹ quota. Nếu sau này set service-account Google trên PC thì
 thể tách thành script Python thuần `tools/sync_koc.py` chạy 0 token — khi đó
 script tự ghi I–P, R; Q/S/T vẫn để công thức.
 
-## TODO còn lại (phải làm trên PC)
+## TODO còn lại
 
-1. Mở Affiliate Center → xác minh có **xuất file báo cáo Nội dung/Video**
-   không, lấy 1 file mẫu → chốt đúng tên cột.
-2. Viết phần đọc affiliate + ghi cột I–P, R (script thuần nếu có creds, hoặc
-   bước trong routine Claude/Haiku nếu chưa).
-3. Cài chạy 2 ngày/lần. Chạy thử lần đầu, báo chủ shop xem số thật rồi chỉnh
-   ngưỡng Xếp loại nếu cần.
+- [x] ~~Xác minh có xuất được file báo cáo không~~ → **CÓ nút Export** (28/10).
+- [ ] Bấm Export ở `/insights/video-analysis` + `/insights/transaction-analysis`,
+      lấy 1 file mẫu → chốt đúng tên cột để viết parser.
+- [ ] Lần chạy đầu: quét 3 trang tab "Đã hoàn thành" + tab "Đang tiến hành",
+      ghi cột I–P, R cho toàn bộ KOC trong Book.
+- [ ] Cài chạy **2 ngày/lần**; báo chủ shop xem số thật rồi chỉnh ngưỡng
+      Xếp loại nếu thấy chưa hợp.
+
+**Lưu ý khối lượng:** ~100+ dòng "Đã hoàn thành" × mở modal từng dòng để lấy
+view/đơn là **rất tốn** nếu làm bằng trình duyệt. Ưu tiên đi đường **Export**
+(1 file ra hết) và chỉ mở modal cho dòng nào file không có.
