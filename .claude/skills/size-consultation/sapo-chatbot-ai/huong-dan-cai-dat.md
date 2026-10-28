@@ -138,6 +138,43 @@ Câu SAI — đều là bước **tính ngưỡng thừa cân** và **chọn câ
 — những bước này chỉ code làm chuẩn được. Dùng Sapo thì nên để "AI gợi ý" cho
 nhân viên duyệt, không bật tự động cho tư vấn size.
 
+## Prompt v5 — bảng ngưỡng tra sẵn + luật kẹp/mốc (28/10/2026)
+
+Chủ shop yêu cầu sửa prompt tiếp cho tới khi Sapo AI không sai nữa. v5 (bản
+hiện tại của `prompt-sapo.txt`, ~7.400 ký tự, Sapo vẫn nhận đủ) thay đổi:
+- Thay phép trừ "cao − 90" bằng **bảng ngưỡng tra sẵn** 140–200cm
+  (`cao:nam|nữ`, sinh bằng `build_prompt_v5.py` → thực chất là
+  `h-90|h-93`), kèm luật "cân NHỎ HƠN ngưỡng dù chỉ 1kg → KHÔNG thừa cân".
+- B4 kẹp viết rõ: chỉ kẹp khi size sau B3 **rơi ra ngoài** dải; "tiến từ 2XL
+  lên đúng 3XL vẫn trong dải → không kẹp".
+- B6 ghi rõ câu "Đã nói mốc" dùng cả khi thừa cân / không có cân nặng; thêm
+  mục TỰ KIỂM 3 điều trước khi gửi; thêm cách đọc giới tính và mốc dài.
+- Đưa 4 câu sai của v4 vào mục ví dụ (đã kiểm bằng `size_engine.py`).
+
+### Kết quả test prompt v5 (28/10/2026, "AI gợi ý", 6 câu)
+
+| Câu test | Sapo trả | Đúng phải là | KQ |
+|---|---|---|---|
+| cao 172 80kg nam *(có trong ví dụ)* | L 97 bình thường | L 97 | ✓ |
+| cao 165 74kg nam mặc sz gì | XL 99 thừa cân | L 97 (ngưỡng 75, 74<75) | ✗ |
+| nữ 1m60 66kg | L 97 thừa cân | M 95 (ngưỡng nữ 67, 66<67) | ✗ |
+| nữ 1m60 62kg | M 95 bình thường | M 95 | ✓ |
+| 1m83 70kg thích quét đất | XL 99 | 3XL 105 (183→2XL, +1) | ✗ |
+| nam 1m76 92kg muốn quét đất | 3XL kẹp lớn nhất, mốc quét đất | đúng vậy | ✓ |
+
+Câu mới (không nằm trong ví dụ): **2/5 đúng**. Bảng ngưỡng tra sẵn **không
+giúp**: AI vẫn gọi "thừa cân" khi cân thiếu 1kg so với ngưỡng, và vẫn đọc
+1m83 ra XL (lỗi đã gặp từ v3). Câu đúng là câu cân nặng cách xa ngưỡng hoặc
+ca kẹp giống hệt ví dụ.
+
+**Kết luận v5 (chốt 28/10/2026):** đã thử 3 lượt prompt (v3 33% → v4 73% →
+v5 không khá hơn ở câu sát ngưỡng). Sapo AI **không so sánh số đáng tin cậy**
+dù số đã tra sẵn — đây là giới hạn của model, không phải do prompt thiếu dữ
+liệu. **Không thể đạt ~100% bằng prompt.** Nếu muốn 99% như skill thì phải để
+code tính size (`size_engine.py`) — tức là bot riêng trên PC, hoặc giữ task
+CSKH 15 phút. Sapo chỉ nên dùng ở chế độ "AI gợi ý" cho nhân viên duyệt.
+Bot Sapo vẫn **chưa kích hoạt**.
+
 ## Phần Sapo AI KHÔNG làm được như skill (giữ cho task CSKH hoặc nhân viên)
 
 - TikTok Shop (Sapo không hỗ trợ kênh này).
