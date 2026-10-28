@@ -371,6 +371,20 @@ than entering credentials yourself.
   score is needed; only score once per creator unless the shop owner
   says otherwise.
 
+## Part 3 — theo dõi KOC đã lên bài chưa + hiệu quả (chốt 2026-10-28)
+
+Sau khi tặng mẫu, chủ shop cần biết **KOC đã lên bài chưa và hiệu quả ra
+sao** (view/đơn/doanh thu/ROI). Có tab **"4.Hiệu quả KOC"** (sheetId
+`4040404`) đã dựng sẵn trong file Bảng Chấm Điểm KOC: cột A/B/C tự mirror
+từ tab Book, cột L/N/O là công thức, script chỉ ghi D–K + M. Nguồn số là
+**TikTok Affiliate Center → báo cáo Nội dung/Video**; không gắn link affiliate
+= ghi `Chưa lên`. Chạy **2 ngày/lần**, mỗi KOC theo dõi **15 ngày từ ngày lên
+bài**. Ngưỡng ROI: ≥10 Hiệu quả / 3–<10 Tạm / <3 Kém.
+
+Toàn bộ chi tiết (cấu trúc tab, công thức, map giá vốn từ `cost-catalog.json`,
+bẫy KOC trùng tên, việc còn phải làm trên PC): xem
+[references/koc-post-tracking.md](references/koc-post-tracking.md).
+
 ## Report back
 
 End with a short summary: how many new KOC were scored, their
