@@ -58,6 +58,27 @@ Tốt hơn nữa: dùng `switch_browser` rồi **đặt tên có ý nghĩa** cho
 (vd "PC - TikTok + Sapo", "PC - Shopee") — khi đó `list_connected_browsers` trả
 về tên thay vì "Browser 2/3" và không cần tra deviceId nữa.
 
+## ⚠️ Quyền domain của extension có thể MẤT — kiểm lại trước khi kết luận
+
+**Gặp thật 2026-10-29:** cả **3** browser đều trả về `Navigation to this domain
+is not allowed` khi mở `banhang.shopee.vn` — kể cả Browser 1 (Mac) mà bảng trên
+ghi là "chỉ có quyền banhang.shopee.vn". TikTok (`seller-vn.tiktok.com`) lúc đó
+vẫn vào bình thường trên Chrome PC.
+
+Nghĩa là: **quyền domain nằm ở extension của từng Chrome và có thể bị reset**,
+độc lập với chuyện Chrome đó có đăng nhập sàn hay không.
+
+**Phân biệt 3 lỗi, đừng gộp làm một:**
+
+| Hiện tượng | Nguyên nhân | Cách xử lý |
+|---|---|---|
+| `Navigation to this domain is not allowed` | extension chưa/không còn quyền domain | chủ shop cấp quyền trong extension |
+| Trang mở được nhưng nhảy về màn đăng nhập | Chrome đó chưa đăng nhập sàn | đổi sang Chrome đúng (bảng trên) |
+| Trang mở được, hiện "Không có quyền" | gõ sai URL | đi lại bằng menu thật, đừng gõ URL đoán |
+
+Cách gỡ: chủ shop mở extension Claude trong đúng Chrome đó và cấp quyền cho
+domain, Claude không tự cấp được.
+
 ## Lưu ý an toàn
 
 Trang nhạy cảm (vd Hồ Sơ Shop của Shopee) sẽ bật hộp "nhập mật khẩu Shopee để
