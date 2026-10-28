@@ -22,7 +22,12 @@ create table if not exists public.cskh_reviews (
   sku           text,
   customer      text,                   -- tên/handle khách, sàn thường che bớt
   order_code    text,
-  needs_action  boolean not null default false, -- cần chủ shop động tay (1-2★ chưa phản hồi công khai...)
+  needs_action  boolean not null default false, -- cần chủ shop động tay (xem action_type)
+  action_type   text,                   -- loại việc của chủ shop (chốt 29/10/2026):
+                                         --   'lien_he_khach' = đánh giá xấu đã nhắn 12h khách
+                                         --        không trả lời → anh tìm tên khách trên TikTok nhắn hỗ trợ
+                                         --   'tranh_chap'     = khách đang tranh chấp/khiếu nại (Hard rule 4)
+                                         -- null khi needs_action = false
   action_note   text,                   -- vì sao cần xử lý, 1 câu
   insight_tag   text,                   -- chủ đề lặp lại, vd 'tuot-chi-cap' — để gom nhóm phần Insight
   insight_note  text,                   -- diễn giải ngắn chủ đề đó
@@ -48,6 +53,7 @@ create table if not exists public.cskh_returns (
                                         -- (KHÁC tin nhắn chat — đừng trộn 2 thứ)
   auto_approved boolean,                -- sàn tự duyệt hoàn hay chưa
   needs_action  boolean not null default false, -- tranh chấp / khách hỏi lại — chờ chủ shop
+  action_type   text,                   -- 'tranh_chap' | 'lien_he_khach' (xem bảng cskh_reviews)
   action_note   text,
   insight_tag   text,
   insight_note  text,
@@ -57,6 +63,12 @@ create table if not exists public.cskh_returns (
 );
 create index if not exists cskh_returns_date_idx on public.cskh_returns (request_date desc);
 create index if not exists cskh_returns_action_idx on public.cskh_returns (needs_action) where needs_action;
+
+-- ------------------------------------------------- bổ sung cột về sau -------
+-- Cột thêm sau khi 2 bảng đã tạo (chốt 29/10/2026 — cơ chế flag "anh tự liên hệ
+-- khách" cho đánh giá xấu). Chạy lại cả file an toàn: add column if not exists.
+alter table public.cskh_reviews add column if not exists action_type text;
+alter table public.cskh_returns add column if not exists action_type text;
 
 -- ---------------------------------------------------------------- quyền -----
 -- Cùng mô hình với platform_returns_feed / warehouse_error_log đang chạy: app

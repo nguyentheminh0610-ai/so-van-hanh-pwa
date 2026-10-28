@@ -52,6 +52,11 @@ version) but go reconcile the doc, the shop owner corrects this often.
    report. Never apply policy, never propose a resolution (%, đổi hàng,
    etc), never wait for or chase a reply — that's the shop owner's job from
    there.
+   - **Ngoại lệ DUY NHẤT (chốt 29/10/2026):** với đánh giá xấu đã nhắn, được
+     phép **mở lại thread để ĐỌC** xem khách đã trả lời chưa, nhưng chỉ sau
+     mốc 12h và chỉ để **báo chủ shop** (bật cờ `lien_he_khach` trên Sổ Vận
+     Hành). Vẫn tuyệt đối **không nhắn lại khách lần 2**. Chi tiết ở mục
+     "Theo dõi 12h cho đánh giá xấu".
 2. **Anything refund-related → always the shop owner's call**, no matter
    how small. Never click "Chấp nhận bưu kiện trả hàng" or "Kháng nghị" on
    the return-management page — those buttons are refund/dispute actions,
@@ -123,6 +128,32 @@ when you do.
    breakdown + full verbatim text of negative ones and any positive ones
    with real insight (not just a star rating).
 
+#### Theo dõi 12h cho đánh giá xấu (chốt 29/10/2026)
+
+Chủ shop muốn: đánh giá xấu em nhắn mẫu dòng 24 xong, **nếu qua 12 tiếng khách
+vẫn chưa trả lời thì mới báo anh** lên Sổ Vận Hành để anh tự tìm tên khách trên
+TikTok nhắn hỗ trợ; **khách trả lời rồi thì thôi, không hiện gì.** Vì skill chạy
+08:00 & 20:00 (đúng 12h/lần) nên lượt sau chính là mốc kiểm.
+
+Mỗi lần chạy, với mỗi đánh giá 1–2★ đã có dòng trong `cskh_reviews`:
+
+- **`messaged_at` còn trống** (lần đầu gặp): nhắn mẫu dòng 24 như bước 3, ghi
+  `messaged_at` = giờ nhắn. **Chưa flag** — `needs_action = false`,
+  `action_type` null. Đang trong 12h chờ.
+- **`messaged_at` đã có, chưa flag, và `now >= messaged_at + 12h`**: **mở lại
+  đúng thread chat đó, CHỈ ĐỌC** (xem ngoại lệ Hard rule 1 bên dưới) — đừng
+  nhắn lại gì:
+  - Khách **chưa trả lời** → `needs_action = true`,
+    `action_type = 'lien_he_khach'`, `action_note` kiểu nêu trên. Cập nhật
+    `message_note` = "đã nhắn mẫu dòng 24 <giờ>, qua 12h khách chưa trả lời".
+  - Khách **đã trả lời nhưng còn bức xúc/đòi xử lý** → `needs_action = true`,
+    `action_type = 'tranh_chap'` (Hard rule 4).
+  - Khách **trả lời xã giao** ("ok", "cảm ơn", "dạ") → để nguyên
+    `needs_action = false`, `action_type` null. Ghi `message_note` = "khách
+    đã trả lời, ổn". Không flag.
+- **Đã flag rồi** (`needs_action = true` từ lượt trước): giữ nguyên, việc này
+  chờ chủ shop, đừng tự hạ cờ.
+
 ### 2. Trả hàng / hoàn tiền
 
 1. Open the return-management "Đang chờ bạn" list, `get_page_text` it.
@@ -162,11 +193,21 @@ hợp tuần/tháng cần đủ số. Lưu ý từng cột:
 - `dedup_key`: `platform|order_code|ngày|40 ký tự đầu nội dung` (trả hàng:
   `platform|order_code|ngày`). Chạy lại 20:00 gặp đúng case của 08:00 thì ghi
   đè chính dòng đó, không nhân đôi.
-- `needs_action` + `action_note`: bật `true` cho đúng 2 nhóm — đánh giá 1–2★
-  (chủ shop còn phải phản hồi công khai, Claude không được làm) và case
-  tranh chấp (Hard rule 4). `action_note` viết 1 câu ngắn đúng kiểu
-  "Đánh giá 1★ — chờ anh phản hồi công khai". Việc đã nhắn xong theo mẫu thì
-  `needs_action = false`.
+- `needs_action` + `action_type` + `action_note` (quy tắc mới chốt 29/10/2026,
+  thay cho quy tắc cũ "1–2★ luôn bật `needs_action` để anh phản hồi công khai"):
+  bật `true` cho đúng 2 nhóm, mỗi nhóm có `action_type` riêng để web tách:
+  - **`action_type = 'lien_he_khach'`** — đánh giá xấu (1–2★) mà **đã nhắn
+    mẫu dòng 24 nhưng qua 12 tiếng khách vẫn chưa trả lời** (xem mục "Theo
+    dõi 12h" trong bước Reviews). `action_note` kiểu "Đánh giá 1★, đã nhắn 12h khách chưa trả lời —
+    anh tìm tên khách trên TikTok nhắn hỗ trợ + phản hồi công khai".
+  - **`action_type = 'tranh_chap'`** — khách đang tranh chấp/khiếu nại (Hard
+    rule 4), kể cả khi đó là khách trả lời lại tin nhắn đánh giá xấu mà vẫn
+    còn bức xúc. `action_note` nêu ngắn khách đang đòi gì.
+  - Mọi trường hợp khác để `needs_action = false`, `action_type` null. Cụ
+    thể: đánh giá xấu **vừa nhắn xong, chưa tới mốc 12h** (chờ, chưa flag);
+    và đánh giá xấu mà **khách đã trả lời xã giao** ("ok", "cảm ơn", "dạ") —
+    chủ shop chốt 29/10: khách đã trả lời rồi thì KHÔNG hiện thông báo gì,
+    coi như hội thoại đang sống, để chủ shop/nhân viên tự theo trong chat.
 - `insight_tag` + `insight_note`: **phần giá trị nhất, đừng bỏ.** Đọc nội dung
   rồi tự gắn 1 chủ đề dạng slug (`tuot-chi-cap`, `size-m-chat`,
   `giao-cham-cuoi-tuan`) cho những gì nói về chất lượng sản phẩm hoặc dịch vụ
@@ -195,6 +236,9 @@ thường ở đúng mấy điểm sau — **sai mấy điểm này là khách c
 4. `needs_action`: chỉ bật `true` nếu **đến giờ vẫn còn treo thật** — đánh giá
    1–2★ còn nằm trong hàng chờ trả lời, hoặc case trả hàng còn ở tab "Đang chờ
    bạn". Việc cũ đã xong rồi thì để `false`, đừng dựng lại việc chủ shop đã làm.
+   Khi bật `true`: đánh giá xấu còn treo → `action_type = 'lien_he_khach'`;
+   case tranh chấp → `'tranh_chap'`. (Backfill không nhắn khách nên không tính
+   mốc 12h — cứ coi đánh giá xấu còn treo là cần chủ shop liên hệ.)
 5. `insight_tag` vẫn gắn bình thường — đây chính là thứ làm cho phần Insight có
    số liệu ngay thay vì đợi cả tháng.
 6. Báo lại trong chat: lấp được bao nhiêu dòng, từ ngày nào tới ngày nào, và

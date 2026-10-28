@@ -120,6 +120,14 @@ function cskhActionCardHtml(row, kind){
   </div>`;
 }
 
+// Nhóm con trong "Cần anh xử lý" theo action_type (chốt 29/10/2026). Thứ tự ưu
+// tiên: anh tự nhắn khách trước, rồi tranh chấp, rồi phần còn lại không gắn loại.
+const CSKH_ACTION_GROUPS = [
+  { type: 'lien_he_khach', title: 'Anh tự nhắn khách', note: 'đánh giá xấu đã nhắn 12h khách chưa trả lời — tìm tên khách trên TikTok, nhắn hỗ trợ' },
+  { type: 'tranh_chap',    title: 'Tranh chấp / khiếu nại', note: 'khách đang đòi xử lý — chờ anh quyết' },
+  { type: null,            title: 'Khác cần anh xem', note: '' },
+];
+
 function cskhActionHtml(reviews, returns){
   const items = [
     ...reviews.filter(r => r.needs_action).map(r => ({ row: r, kind: 'review', d: r.review_date })),
@@ -128,12 +136,23 @@ function cskhActionHtml(reviews, returns){
   const restReviews = reviews.length - reviews.filter(r => r.needs_action).length;
   const restReturns = returns.length - returns.filter(r => r.needs_action).length;
   const quiet = (restReviews || restReturns)
-    ? `<p class="cskh-quiet">${fmtInt(restReviews)} đánh giá và ${fmtInt(restReturns)} case trả hàng còn lại đã xử lý xong (đã nhắn khách theo mẫu, hoặc đã có người trả lời trước) — không cần anh làm gì.</p>`
+    ? `<p class="cskh-quiet">${fmtInt(restReviews)} đánh giá và ${fmtInt(restReturns)} case trả hàng còn lại đã xử lý xong (đã nhắn khách theo mẫu, khách đã trả lời ổn, hoặc đã có người trả lời trước) — không cần anh làm gì.</p>`
     : '';
   if (!items.length){
     return `<p class="cskh-quiet">Không có gì cần anh xử lý trong kỳ này.</p>${quiet}`;
   }
-  return '<div class="feed">' + items.map(i => cskhActionCardHtml(i.row, i.kind)).join('') + '</div>' + quiet;
+  const known = new Set(['lien_he_khach', 'tranh_chap']);
+  const html = CSKH_ACTION_GROUPS.map(g => {
+    const rows = g.type
+      ? items.filter(i => i.row.action_type === g.type)
+      : items.filter(i => !known.has(i.row.action_type));
+    if (!rows.length) return '';
+    return `<div class="act-group"><div class="act-head"><b>${esc(g.title)}</b>`
+      + `<span class="act-n">${fmtInt(rows.length)}</span>`
+      + (g.note ? `<span class="act-note">${esc(g.note)}</span>` : '') + '</div>'
+      + '<div class="feed">' + rows.map(i => cskhActionCardHtml(i.row, i.kind)).join('') + '</div></div>';
+  }).join('');
+  return html + quiet;
 }
 
 // ---------------------------------------------------------- khối insight ---
@@ -243,7 +262,7 @@ function cskhRender(period){
   const returns = cskhRows.returns.filter(r => cskhInRange(r.request_date, range));
   bodyEl.innerHTML = `
     ${cskhKpiHtml(reviews, returns)}
-    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đánh giá xấu chưa phản hồi · case tranh chấp</span></div>
+    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp</span></div>
     ${cskhActionHtml(reviews, returns)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">Insight để cải thiện</span><span class="z-note">vấn đề lặp lại về sản phẩm / dịch vụ</span></div>
     ${cskhInsightHtml(reviews, returns, CSKH_PERIOD_LABEL[period])}

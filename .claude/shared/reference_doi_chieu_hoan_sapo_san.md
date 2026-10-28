@@ -79,6 +79,67 @@ mã trong mọi cột nên không vỡ khi sàn đổi tên cột.
 Kết quả ghi ra `~/doi-chieu-hoan/ket-qua/`: `sapo-phieu-tra.csv`,
 `sapo-THIEU-<sàn>.csv`, `sapo-THUA-<sàn>.csv`.
 
+## 4b. ⚠️ KẾT QUẢ THẬT TIKTOK (chạy 29/10/2026, kỳ 20/09→28/10)
+
+**Phát hiện quan trọng nhất: trang "Quản lý trả hàng và hoàn tiền" của TikTok
+KHÔNG liệt kê đơn bom hàng / giao thất bại.** Nó chỉ chứa yêu cầu do khách chủ
+động tạo. Vì vậy không thể lấy riêng trang đó làm "chuẩn" cho hàng về kho.
+
+Số liệu (lấy qua API `POST /api/v1/reverse/component/orders/list` mà chính
+trang đó gọi — xem mục 7):
+
+| | Số phiếu |
+|---|---|
+| Sapo có trong kỳ | **148** |
+| — khớp với trang trả hàng TikTok | **86** = 77 `return_and_refund` + 9 `refund` |
+| — KHÔNG có trên trang trả hàng | **62** — và **100% là `delivery_failed`** |
+| Sàn có trong kỳ (khách chủ động trả/hoàn) | **91** |
+| → **Sapo THIẾU** | **6** |
+| → Tỷ lệ khớp | **85/91 = 93,4%** |
+
+Phân tách tuyệt đối sạch: 62 phiếu "thừa" **không lẫn một phiếu
+return_and_refund nào** → đây không phải lỗi dữ liệu, mà là Sapo ghi nhận thêm
+nhóm bom hàng mà trang trả hàng TikTok không có. **Sapo rộng hơn sàn ở nhóm
+này, và đó là phần có giá trị.**
+
+6 mã Sapo thiếu (đã kéo lại Sapo ngày 29/10, vẫn thiếu → **lỗi thật, không phải
+trễ đồng bộ**):
+
+| Ngày | Mã đơn hàng | Mã phiếu hoàn |
+|---|---|---|
+| 15/10 | 586503282607621657 | 4042693672764278297 |
+| 19/10 | 586610131822281747 | 4042742562801288211 |
+| 21/10 | 586649719548052588 | 4042759189264893036 |
+| 28/10 | 586752779638113660 | 4042844047037990268 |
+| 28/10 | 586754423000565329 | 4042850476321441361 |
+| 28/10 | 586807163917076096 | 4042849491612108416 |
+
+## 7. Lấy dữ liệu đơn hoàn TikTok KHÔNG cần tải file
+
+Trang `seller-vn.tiktok.com/order/return` gọi
+`POST /api/v1/reverse/component/orders/list`. Gọi lại chính URL đó trong tab đã
+đăng nhập là lấy được đủ dữ liệu, nhanh và chắc hơn xuất Excel.
+
+Thân request:
+```json
+{"search_condition":{"tab":{"str_value_list":["100"]},
+ "order_sort_comp":{"str_value_list":["OrderSort_UPADTE_TIME_DESC"]}},
+ "pagination_type":0,"offset":0,"count":50,"component_version":"hit_ui_opt"}
+```
+`tab` = `100` (Tất cả) / `800` (Đang chờ bạn xử lý).
+
+**Bẫy phân trang:** chỉ tăng `offset` thì chết ở 100 bản ghi. Phải lấy
+`search_next_cursor` ở trang đầu rồi **gửi kèm `search_cursor` đó cho mọi trang
+sau**, đồng thời vẫn tăng `offset`. Làm đúng thì ra đủ 502/502 bản ghi.
+
+Mỗi bản ghi: `biz_data.main_order_id` = mã đơn sàn, `biz_data.reverse_main_order_id`
+= mã phiếu hoàn (khớp thẳng với `order.name` và `name` bên Sapo).
+
+**Bẫy ngày tháng:** không có trường ngày dạng chuỗi; UI tự format từ
+`target_timestamp`. Mỗi thẻ có **nhiều** `target_timestamp` (có cả hạn xử lý ở
+tương lai), lấy bừa sẽ ra ngày sai tận 2022. Lấy **giá trị nhỏ nhất** thì đúng —
+đã kiểm chứng: 85/86 phiếu đã khớp rơi đúng trong kỳ.
+
 ## 5. Ngưỡng kết luận
 
 - Khớp **≥98%** và phần thiếu giải thích được → Sapo dùng làm chuẩn được.
