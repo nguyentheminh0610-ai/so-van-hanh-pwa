@@ -1,6 +1,6 @@
 ---
 name: review-return-check
-description: Check of new public reviews (đánh giá) and return/refund requests (trả hàng/hoàn tiền) on TikTok Shop + Shopee -- runs on schedule twice a day (08:00 and 20:00), and also whenever the shop owner says "check đánh giá", "check trả hàng", "làm luôn đi", "a báo e làm" (in the context of reviews/returns), or otherwise asks to run this check. Covers: finding genuinely new reviews/return requests, messaging the customer with the correct canned template (skipping any case that already has a reply thread), and sending the shop owner a report in the exact bullet format below. Does NOT cover inbox/chat monitoring (paused for now, see Scope) or any refund/policy decision (always the shop owner's call).
+description: Check of new public reviews (đánh giá) and return/refund requests (trả hàng/hoàn tiền) on TikTok Shop + Shopee -- runs on schedule twice a day (08:00 and 20:00), and also whenever the shop owner says "check đánh giá", "check trả hàng", "làm luôn đi", "a báo e làm" (in the context of reviews/returns), or otherwise asks to run this check. Covers: finding genuinely new reviews/return requests, messaging the customer with the correct canned template (skipping any case that already has a reply thread), writing every review/return as one row into the Supabase tables behind the "Đánh giá &amp; Trả hàng" tab of Sổ Vận Hành (including the needs_action flag and the insight tag that groups repeat product/service problems), and pinging the shop owner on Telegram with a one-line alert only when something actually needs them. Does NOT cover inbox/chat monitoring (paused for now, see Scope) or any refund/policy decision (always the shop owner's call).
 ---
 
 # Check đánh giá & trả hàng
@@ -138,11 +138,71 @@ when you do.
    request on the platform — this is NOT the same thing as a chat
    message; don't confuse the two in the report).
 
+## 3. Ghi vào Sổ Vận Hành (BẮT BUỘC, chốt 2026-10-28)
+
+Từ 28/10/2026 báo cáo chính nằm trên **tab "Đánh giá & Trả hàng"** của Sổ Vận
+Hành (`https://so-van-hanh-pwa.vercel.app`), Telegram rút còn 1 dòng cảnh báo.
+Lý do chủ shop chốt: Telegram chỉ đọc 1 lần rồi trôi, không xem lại được theo
+tuần/tháng, và không thấy được vấn đề nào đang lặp lại.
+
+Sau khi check xong, **upsert từng đánh giá / từng case thành 1 dòng** vào 2
+bảng Supabase `cskh_reviews` và `cskh_returns` (schema + ý nghĩa từng cột:
+[scripts/cskh-tables.sql](../../../scripts/cskh-tables.sql) trong repo này; URL + anon key lấy y như
+[scripts/sync_returns_feed.py](../../../scripts/sync_returns_feed.py) đang dùng).
+
+```
+POST {SUPABASE_URL}/rest/v1/cskh_reviews?on_conflict=dedup_key
+Headers: apikey, Authorization: Bearer <anon key>, Content-Type: application/json,
+         Prefer: resolution=merge-duplicates,return=minimal
+```
+
+Ghi **mọi** đánh giá/case gặp trong kỳ, không chỉ cái cần xử lý — phần tổng
+hợp tuần/tháng cần đủ số. Lưu ý từng cột:
+
+- `dedup_key`: `platform|order_code|ngày|40 ký tự đầu nội dung` (trả hàng:
+  `platform|order_code|ngày`). Chạy lại 20:00 gặp đúng case của 08:00 thì ghi
+  đè chính dòng đó, không nhân đôi.
+- `needs_action` + `action_note`: bật `true` cho đúng 2 nhóm — đánh giá 1–2★
+  (chủ shop còn phải phản hồi công khai, Claude không được làm) và case
+  tranh chấp (Hard rule 4). `action_note` viết 1 câu ngắn đúng kiểu
+  "Đánh giá 1★ — chờ anh phản hồi công khai". Việc đã nhắn xong theo mẫu thì
+  `needs_action = false`.
+- `insight_tag` + `insight_note`: **phần giá trị nhất, đừng bỏ.** Đọc nội dung
+  rồi tự gắn 1 chủ đề dạng slug (`tuot-chi-cap`, `size-m-chat`,
+  `giao-cham-cuoi-tuan`) cho những gì nói về chất lượng sản phẩm hoặc dịch vụ
+  có thể sửa được; `insight_note` là tên hiển thị cho chủ đề đó, vd
+  "Tuột chỉ cạp — Bộ dài Shin 02 size L". **Dùng lại đúng slug cũ** cho cùng
+  một vấn đề, nếu không web sẽ đếm tách thành 2 nhóm. Đánh giá kiểu "ok shop",
+  "giao nhanh" không có gì sửa được thì để trống.
+- `messaged_at` + `message_note`: ghi lúc nhắn và nhắn mẫu nào ("đã nhắn mẫu
+  dòng 24 lúc 14:40"), hoặc lý do bỏ qua ("thread đã có người trả lời").
+- `customer_note` (bảng trả hàng) chỉ dành cho ô "Nhận xét của khách hàng"
+  trên thẻ trả hàng — KHÔNG phải tin nhắn chat, đừng trộn 2 thứ.
+
+Nếu POST lỗi (bảng chưa tạo, mất mạng): vẫn gửi Telegram như dưới, thêm vào
+dòng `Lưu ý:` là chưa ghi được lên Sổ Vận Hành.
+
 ## Sending the report
 
-Chạy theo lịch (08:00 / 20:00) → gửi qua Telegram. Gọi tay trong chat → trả
-lời ngay trong chat.
-Exact structure, chốt 2026-10-07:
+Chạy theo lịch (08:00 / 20:00) → gửi Telegram **1–2 dòng** (chốt 2026-10-28,
+thay cho khung 3+3 dòng cũ — khung cũ giờ là nội dung của tab trên web):
+
+```
+<N> đánh giá mới (<x> cái 1–2★), <M> case trả hàng — <K> việc cần anh.
+Lưu ý: <gộp mọi thứ cần chủ shop biết, bỏ hẳn dòng này nếu không có gì>
+```
+
+- **Không có đánh giá ≤3★, không có case tranh chấp, không có lỗi → KHÔNG gửi
+  gì cả.** Im lặng = mọi thứ đã xử lý xong, xem web khi nào rảnh.
+- Không khung, không tiêu đề, không emoji, không liệt kê từng đơn — chi tiết
+  đã nằm trên web rồi.
+- Lỗi không check được gì: chỉ 1 dòng
+  `Lưu ý: chưa check được đánh giá & trả hàng (<lý do ngắn>) — <anh cần làm gì>.`
+
+Gọi tay trong chat → trả lời ngay trong chat, theo khung cũ bên dưới (chủ shop
+đang ngồi đọc, không cần mở web).
+
+Khung cũ (CHỈ dùng khi trả lời trong chat), chốt 2026-10-07:
 
 ```
 1. Đánh giá:
@@ -156,7 +216,7 @@ Exact structure, chốt 2026-10-07:
 - Bình luận trả hàng thêm của khách: <nội dung ô "Nhận xét của khách hàng", nếu có — nếu không có case nào thì nói rõ "không có">
 ```
 
-**Gửi ĐÚNG khung trên, không thêm gì** (chủ shop nhắc lại 2026-10-21 vì
+**Trả lời ĐÚNG khung trên, không thêm gì** (chủ shop nhắc lại 2026-10-21 vì
 báo cáo bị dài):
 - Không dòng tiêu đề, không lời chào, không emoji.
 - Không thêm gạch đầu dòng nào ngoài 3+3 dòng trong khung. Không ghi chi
@@ -170,9 +230,6 @@ gộp mọi việc cần chủ shop biết, ngắn gọn, vd:
 `Lưu ý: chưa nhắn đơn 586616931475490643 (Chrome bị chặn quyền) — anh nhắn "check trả hàng" khi ở máy.`
 Các case tranh chấp (Hard rule 4) hoặc đã có người xử lý (Hard rule 3)
 cũng gộp vào dòng này. Không có gì thì bỏ hẳn dòng `Lưu ý:`.
-
-Nếu lỗi không check được gì: chỉ gửi 1 dòng
-`Lưu ý: chưa check được đánh giá & trả hàng (<lý do ngắn>) — <anh cần làm gì>.`
 
 ## Reference
 

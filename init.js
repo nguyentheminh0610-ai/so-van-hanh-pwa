@@ -172,6 +172,7 @@ function buildTabsHTML(){
   return `<div class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
     <button class="tab-btn" data-tab="library">Tải file &amp; lịch sử</button>
+    <button class="tab-btn" data-tab="cskh">Đánh giá &amp; Trả hàng</button>
   </div>`;
 }
 
@@ -179,7 +180,9 @@ function switchToTab(tab){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
   document.getElementById('screen-dashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('screen-library').classList.toggle('active', tab === 'library');
+  document.getElementById('screen-cskh').classList.toggle('active', tab === 'cskh');
   if (tab === 'library') refreshLibrary();
+  if (tab === 'cskh') refreshCskh(); // tải lười: chỉ gọi Supabase khi mở tab
 }
 
 function refreshDashboardEmptyState(){
@@ -1390,10 +1393,12 @@ async function onChotLaiThang(){
 function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
-    `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>`;
+    `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>` +
+    `<div class="screen" id="screen-cskh">${buildCskhScreenHTML()}</div>`;
   wireInstallHint();
   wireUpload();
   wireTabs();
+  wireCskh();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   wireRcDropdown();
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);
