@@ -123,6 +123,42 @@ xem phần đăng lại (video) của shop.
 > nam mặc Shin 01–03 hợp hơn đó, vải dày dặn mà nhiều bạn nam với KOC nam mặc
 > rồi. Bạn xem thử ở mục đăng lại của shop cho dễ hình dung nha.
 
+### 10. Khách hỏi chất liệu dày/mỏng (chốt 29/10/2026)
+
+Không rõ khách đang hỏi mẫu nào → hỏi lại trước (giống quy tắc xác nhận mẫu ở
+SKILL.md), đừng đoán. Biết đúng mẫu rồi thì trả lời theo bảng:
+
+**Quần Hoạt Hình (Quần Lông):**
+| Mẫu | Chất liệu | Phù hợp |
+|---|---|---|
+| Thỏ Nơ, Kitty Hồng, Đốm Hồng | vải 260g, dày dặn | mùa đông |
+| Các mẫu còn lại (Shin...) | vải 220g | mùa thu và đông |
+
+> Mẫu 260g (Thỏ Nơ/Kitty Hồng/Đốm Hồng):
+> "Dạ mẫu này vải 260g dày dặn lắm, hợp mặc mùa đông nha bạn."
+
+> Mẫu 220g (còn lại):
+> "Dạ mẫu này vải 220g, hợp mặc thu đông nha bạn, không quá dày cũng không
+> mỏng."
+
+**Quần Caro** (3 mức chất liệu, dày/co giãn tăng dần):
+| Chất liệu | Độ dày | Co giãn |
+|---|---|---|
+| Cotton thường | mỏng nhất | ít, 1–2% |
+| Cotton mềm | dày dặn hơn | nhiều hơn, 3–4% |
+| Chất dạ cao cấp | dày nhất | nhiều nhất, 5–8% |
+
+> "Dạ bên mình có 3 loại vải Caro nha: Cotton thường mỏng nhẹ co giãn ít,
+> Cotton mềm dày dặn hơn co giãn tốt hơn, còn Chất dạ cao cấp dày nhất co
+> giãn nhiều nhất. Bạn đang hỏi về mẫu nào để mình tư vấn đúng nha?"
+
+(Nếu khách đã hỏi đúng 1 mẫu Caro cụ thể thì trả lời thẳng dòng tương ứng,
+không cần liệt kê cả 3.)
+
+**Quần Thun:**
+> "Dạ quần thun bên mình vải mỏng nhẹ, thoáng mát, hợp mặc mùa hè hoặc mặc
+> ở nhà cho thoải mái nha bạn."
+
 ## Đổi size / đổi trả hàng sau khi mua (chốt 28/10/2026)
 
 TRƯỚC ĐÂY ghi "chưa train, để trống" — **nay đã xử lý được**: quy trình đầy đủ ở
