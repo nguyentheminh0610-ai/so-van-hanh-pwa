@@ -136,16 +136,45 @@ Haiku** cho nhẹ quota. Nếu sau này set service-account Google trên PC thì
 thể tách thành script Python thuần `tools/sync_koc.py` chạy 0 token — khi đó
 script tự ghi I–P, R; Q/S/T vẫn để công thức.
 
+## Lần chạy thật đầu tiên — 28/10/2026 (từ máy Mac qua Chrome PC)
+
+Bảng `/insights/video-analysis` (30 ngày 27/9–26/10) có đủ cột:
+**GMV đến từ video liên kết · GPM video · Số món bán ra ghi nhận vào video ·
+Hoàn tiền · Tỷ lệ xem hết · Lượt xem video · Đơn hàng nhờ video · AOV**,
+kèm Ngày đăng + Nhà sáng tạo + ID video.
+
+**Link video dựng từ ID:** `https://www.tiktok.com/@{username}/video/{ID}`
+
+Đã đổ số thật vào Book cho **8 KOC** lấy từ trang 1 (bảng sắp xếp GMV giảm dần
+nên trang 1 = nhóm mạnh nhất): zithung07, trvietanh.2004, stuaupinkin, chungg2t,
+ima.pongh_, awhtun_, ouishop20, huy_tapphoido (gộp 3 video).
+
+### 3 chướng ngại đã gặp — ĐỌC TRƯỚC KHI LÀM TIẾP
+
+1. **Bảng quá lớn để đọc bằng trình duyệt:** tổng **1.345 video / 68 trang /
+   20 dòng mỗi trang** => đọc hết là không khả thi, **bắt buộc đi đường Export**.
+2. **File Export tải về MÁY PC.** Phiên chạy trên Mac KHÔNG đọc được file đó
+   (Bash chạy ở Mac). => **Phần đổ số hàng loạt PHẢI chạy ở phía PC.** Từ Mac
+   chỉ đọc được nội dung trang web, không lấy được file tải về.
+3. **Ngưỡng Xếp loại >=10 quá thấp:** giá vốn mẫu chỉ ~55K đ mà GMV tính bằng
+   triệu, nên ROI thực tế rơi vào khoảng **28–93** => gần như ai cũng thành
+   "Hiệu quả", mất tác dụng phân loại. **Cần chủ shop chốt lại ngưỡng**
+   (gợi ý: >=50 Hiệu quả / 20–50 Tạm / <20 Kém). KOC không ra đơn vẫn đúng là
+   Kém (vd `taothao2410`: 83 view, 0 đơn).
+
+### Cột F (Sản phẩm gửi cho KOC) đang trống ở phần lớn dòng
+
+Không có F thì không tra được giá vốn => R trống => **ROI và Xếp loại trống**.
+Trang "Đã hoàn thành" của TikTok CÓ ghi đúng phân loại đã gửi (vd
+`Chất Lông-Shin,L`) => dùng nguồn đó backfill cột F, rồi R tính theo F.
+(28/10 mới điền tay R cho 5 dòng để kiểm công thức, chưa đụng cột F.)
+
 ## TODO còn lại
 
-- [x] ~~Xác minh có xuất được file báo cáo không~~ → **CÓ nút Export** (28/10).
-- [ ] Bấm Export ở `/insights/video-analysis` + `/insights/transaction-analysis`,
-      lấy 1 file mẫu → chốt đúng tên cột để viết parser.
-- [ ] Lần chạy đầu: quét 3 trang tab "Đã hoàn thành" + tab "Đang tiến hành",
-      ghi cột I–P, R cho toàn bộ KOC trong Book.
-- [ ] Cài chạy **2 ngày/lần**; báo chủ shop xem số thật rồi chỉnh ngưỡng
-      Xếp loại nếu thấy chưa hợp.
-
-**Lưu ý khối lượng:** ~100+ dòng "Đã hoàn thành" × mở modal từng dòng để lấy
-view/đơn là **rất tốn** nếu làm bằng trình duyệt. Ưu tiên đi đường **Export**
-(1 file ra hết) và chỉ mở modal cho dòng nào file không có.
+- [x] ~~Xác minh có xuất được file báo cáo không~~ => **CÓ nút Export**.
+- [x] ~~Kiểm công thức Q/S/T~~ => chạy đúng (ROI 93,5 / 28,4 / 51,3 -> Hiệu quả).
+- [ ] **Chủ shop chốt lại ngưỡng Xếp loại** (xem chướng ngại số 3).
+- [ ] **Trên PC**: Export `/insights/video-analysis`, parse file, đổ số cho toàn
+      bộ KOC trong Book (không làm trọn từ Mac được).
+- [ ] Backfill cột F từ trang "Đã hoàn thành" để R/ROI tự tính.
+- [ ] Cài chạy **2 ngày/lần**.
