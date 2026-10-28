@@ -966,11 +966,17 @@ function computeAllFromAOA(aoa){
         if (/quảng\s*cáo/i.test(loai)) ttQuangCaoGmvMax += Math.abs(num(r[C_FIN_QT]));
         continue;
       }
-      const phiGD = Math.abs(num(COL_PHI_GIAO_DICH ? r[COL_PHI_GIAO_DICH] : 0));
-      const hhTT = Math.abs(num(COL_HOA_HONG ? r[COL_HOA_HONG] : 0));
-      const phiXL = Math.abs(num(COL_PHI_XU_LY ? r[COL_PHI_XU_LY] : 0));
-      const aff = Math.abs(num(C_FIN_AFF ? r[C_FIN_AFF] : 0)) + Math.abs(num(C_FIN_AFF_QC ? r[C_FIN_AFF_QC] : 0))
-        + Math.abs(num(C_FIN_AFF_DT ? r[C_FIN_AFF_DT] : 0)) + Math.abs(num(C_FIN_AFF_DT_QC ? r[C_FIN_AFF_DT_QC] : 0));
+      // SỬA 28/10/2026 — cộng CÓ DẤU, KHÔNG lấy trị tuyệt đối từng dòng. File
+      // tài chính TikTok có dòng HOÀN PHÍ (giá trị DƯƠNG khi sàn trả lại phí của
+      // đơn bị hoàn/huỷ): Math.abs() biến khoản trả lại thành khoản phải trả →
+      // CỘNG THÊM thay vì TRỪ ĐI. Đếm thật: T1/2026 có 15 dòng hoàn phí, T2 9
+      // dòng, T3 6 dòng, T9/2026 4 dòng; phí sàn TikTok bị phồng tổng 1,22tr
+      // trong 12 tháng. Lấy abs() MỘT LẦN ở cuối (từng khoản đã net xong).
+      const phiGD = num(COL_PHI_GIAO_DICH ? r[COL_PHI_GIAO_DICH] : 0);
+      const hhTT = num(COL_HOA_HONG ? r[COL_HOA_HONG] : 0);
+      const phiXL = num(COL_PHI_XU_LY ? r[COL_PHI_XU_LY] : 0);
+      const aff = num(C_FIN_AFF ? r[C_FIN_AFF] : 0) + num(C_FIN_AFF_QC ? r[C_FIN_AFF_QC] : 0)
+        + num(C_FIN_AFF_DT ? r[C_FIN_AFF_DT] : 0) + num(C_FIN_AFF_DT_QC ? r[C_FIN_AFF_DT_QC] : 0);
       // SỬA 23/10/2026 — ship shop chịu = ĐÚNG cột "Phí vận chuyển của người bán".
       // Sheet "Giải thích về phí" của chính TikTok ghi: "Phí vận chuyển của người
       // bán = phí vận chuyển thực tế − giảm phí vận chuyển của nền tảng − phí vận
@@ -978,10 +984,10 @@ function computeAllFromAOA(aoa){
       // ròng shop phải chịu. Công thức cũ cộng thêm "thực tế" và "chiết khấu nền
       // tảng" vào nữa nên ĐẾM TRÙNG: T9/2026 ra 3.354.276đ thay vì 1.328.883đ
       // (gấp 2,5 lần), kéo theo bảng phí sàn chi tiết lệch 2,08tr so với tổng.
-      const ship = Math.abs(num(C_FIN_SHIP_NB ? r[C_FIN_SHIP_NB] : 0));
-      const shipTra = Math.abs(num(C_FIN_SHIP_TRA ? r[C_FIN_SHIP_TRA] : 0));
-      const thue = Math.abs(num(C_FIN_THUE_GTGT ? r[C_FIN_THUE_GTGT] : 0)) + Math.abs(num(C_FIN_THUE_TNCN ? r[C_FIN_THUE_TNCN] : 0));
-      const tongPhi = Math.abs(num(C_FIN_TONG_PHI ? r[C_FIN_TONG_PHI] : 0));
+      const ship = num(C_FIN_SHIP_NB ? r[C_FIN_SHIP_NB] : 0);
+      const shipTra = num(C_FIN_SHIP_TRA ? r[C_FIN_SHIP_TRA] : 0);
+      const thue = num(C_FIN_THUE_GTGT ? r[C_FIN_THUE_GTGT] : 0) + num(C_FIN_THUE_TNCN ? r[C_FIN_THUE_TNCN] : 0);
+      const tongPhi = num(C_FIN_TONG_PHI ? r[C_FIN_TONG_PHI] : 0);
       bd['Phí giao dịch'] += phiGD; bd['Hoa hồng TikTok Shop'] += hhTT; bd['Phí xử lý đơn hàng'] += phiXL;
       bd['Hoa hồng affiliate (liên kết)'] += aff; bd['Phí vận chuyển shop chịu'] += ship; bd['Phí vận chuyển trả hàng'] += shipTra;
       tongPhiAbs += tongPhi; thueAbs += thue;
@@ -989,15 +995,28 @@ function computeAllFromAOA(aoa){
         + Math.abs(num(C_FIN_HOAN_SAU_GG ? r[C_FIN_HOAN_SAU_GG] : 0));
       if (tienHoan > 0){
         ttShipHoan.soDon += 1;
-        ttShipHoan.traHang += shipTra;
-        ttShipHoan.shipShopChiu += ship;
+        ttShipHoan.traHang += Math.abs(shipTra);
+        ttShipHoan.shipShopChiu += Math.abs(ship);
       }
     }
+    // Từng khoản giờ là số CÓ DẤU (âm = shop trả) → đổi sang số dương để hiện.
+    for (const k of Object.keys(bd)) bd[k] = Math.abs(bd[k]);
+    const shipTraAbs = bd['Phí vận chuyển trả hàng'];
+    // SỬA 28/10/2026 — cột "Tổng phí" của TikTok KHÔNG gồm phí vận chuyển trả
+    // hàng: đã kiểm 5 tháng (03,06,07,08,09/2026) phần vượt bằng ĐÚNG khoản đó
+    // tới từng đồng → phải cộng thêm, không thì phí sàn hụt.
     ttPhiSanFull = C_FIN_TONG_PHI
-      ? Math.max(0, tongPhiAbs - thueAbs)
+      ? Math.max(0, Math.abs(tongPhiAbs) - Math.abs(thueAbs)) + shipTraAbs
       : Object.values(bd).reduce((s, v) => s + v, 0);
-    bd['Phí khác'] = Math.max(0, ttPhiSanFull - (bd['Phí giao dịch'] + bd['Hoa hồng TikTok Shop'] + bd['Phí xử lý đơn hàng'] + bd['Hoa hồng affiliate (liên kết)'] + bd['Phí vận chuyển shop chịu'] + bd['Phí vận chuyển trả hàng']));
-    bd['Thuế khấu trừ (không tính vào phí sàn)'] = thueAbs;
+    // Phần dư: KHÔNG kẹp về 0 nữa. Kẹp 0 che mất trường hợp các khoản đã biết
+    // VƯỢT tổng (dính thật ở 8/12 tháng) nên bảng chi tiết cộng ra khác tổng mà
+    // không ai thấy. Dư dương = khoản phí chưa bóc tên; dư âm = còn sai, phải soi.
+    const dkb = bd['Phí giao dịch'] + bd['Hoa hồng TikTok Shop'] + bd['Phí xử lý đơn hàng']
+      + bd['Hoa hồng affiliate (liên kết)'] + bd['Phí vận chuyển shop chịu'] + shipTraAbs;
+    const du = ttPhiSanFull - dkb;
+    if (Math.abs(du) >= 1) bd[du > 0 ? 'Phí khác (chưa bóc tên)' : 'CHƯA KHỚP — các khoản đã biết vượt tổng'] = Math.abs(du);
+    delete bd['Phí khác'];
+    bd['Thuế khấu trừ (không tính vào phí sàn)'] = Math.abs(thueAbs);
     if (ttQuangCaoGmvMax > 0) bd['Quảng cáo GMV Max (trừ vào quyết toán, không tính vào phí sàn)'] = ttQuangCaoGmvMax;
     ttPhiSanChiTiet = bd;
   } else {

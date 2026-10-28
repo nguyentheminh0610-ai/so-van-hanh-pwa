@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v31'; // v31: doc cot Service Fee Details theo chuoi chua (Shopee doi ten cot 3 lan)
+const CACHE_NAME = 'vanhanh-shop-v32'; // v32: TikTok cong co dau (hoan phi) + Tong phi khong gom ship tra hang
 const ASSETS = [
   './',
   './index.html',
