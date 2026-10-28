@@ -1193,9 +1193,18 @@ function computeAllFromAOA(aoa){
       giaoKhongTC: incOrderRows.reduce((s, r) => s + Math.abs(num(C_INC_VC_TRA_2 ? r[C_INC_VC_TRA_2] : 0)), 0),
       goiPhi: piShipPhi, goiHoan: piShipHoan,
     };
-    bd['Voucher Xtra (Freeship Xtra)'] = voucherXtraTotal;
-    bd['Phí hạ tầng'] = phiHaTangTotal;
+    // SỬA 28/10/2026 — "Phí dịch vụ" (sheet "Doanh thu") ĐÃ LÀ TỔNG của
+    // "Phí Hạ Tầng" + "Voucher Xtra". Sheet "Service Fee Details" dùng tiêu đề
+    // 2 TẦNG: dòng 1 ô C ghi "Phí Dịch Vụ" trải ngang 2 cột, dòng 2 mới là tên
+    // 2 cột con. Công thức cũ cộng CẢ cột tổng LẪN 2 cột con → ĐẾM 2 LẦN; đã
+    // kiểm 8/12 tháng có Hạ tầng + Voucher Xtra = Phí dịch vụ khớp từng đồng,
+    // phí sàn Shopee bị thừa 39.294.669đ trong 12 tháng (nặng nhất T1/2026
+    // thừa 14.006.400đ). 4 tháng cũ (09–11/2025, 01/2026) lệch thêm vì hồi đó
+    // phí dịch vụ còn thành phần thứ ba không có cột riêng → GIỮ cột tổng và
+    // chỉ hiện 2 cột con dạng "trong đó" (không cộng), đúng cho cả 12 tháng.
     spPhiSanFull = Object.values(bd).reduce((s, v) => s + v, 0);
+    bd['Trong đó: Phí hạ tầng (không tính vào phí sàn — đã nằm trong Phí dịch vụ)'] = phiHaTangTotal;
+    bd['Trong đó: Voucher Xtra / Freeship Xtra (không tính vào phí sàn — đã nằm trong Phí dịch vụ)'] = voucherXtraTotal;
     bd['Thuế khấu trừ (không tính vào phí sàn)'] = thueAbs;
     if (spDieuChinh !== 0) bd['Điều chỉnh (đã cộng vào thực nhận, không phải phí)'] = spDieuChinh;
     spPhiSanChiTiet = bd;
