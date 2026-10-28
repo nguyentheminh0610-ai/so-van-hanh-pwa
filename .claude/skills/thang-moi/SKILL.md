@@ -93,6 +93,14 @@ Sau khi tính, đọc hết khối "⚠ Cần chủ shop xác nhận thêm". Ba 
 - **"LỆCH KỲ — số lãi tháng này đang THẤP GIẢ TẠO"** → file tải sớm, xem lại Bước 1.
 - **"Lãi đang CAO hơn thật khoảng X đồng"** → có mã chưa có giá vốn. Ghi lại danh sách mã để báo chủ shop bổ sung vào sheet GiaCong.
 - **"THIẾU CỘT ..."** → sàn đã đổi tên cột, số liên quan đang bị tính bằng 0. Phải báo ngay và sửa `calc.js`, đừng lưu đè số sai.
+- **"CHƯA KHỚP — các khoản đã biết vượt tổng"** (bảng phí sàn TikTok) → có khoản đang bị cộng 2 lần hoặc sàn đổi cột. Phải soi, đừng bỏ qua.
+
+**TRƯỚC KHI SỬA BẤT KỲ CÔNG THỨC PHÍ SÀN NÀO**, đọc
+[references/bay-phi-san.md](references/bay-phi-san.md). Trong đó có 8 bẫy đã làm
+sai số tiền thật (cộng trùng 39,29tr, lấy trị tuyệt đối làm hoàn phí thành phải
+trả, Shopee đổi tên cột 3 lần, thứ tự cột TikTok khác nhau giữa các tháng...) và
+**quy tắc số 1: tỷ lệ phí phải lấy mẫu số nằm trong cùng file với tử số** — chia
+phí sàn cho doanh thu của sổ là sai, đã khiến kết luận sai 2 lần.
 
 ## Bước 5 — Điền chi phí vận hành
 

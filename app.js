@@ -464,6 +464,17 @@ function buildChiPhiHtml(res, opts){
   const roasSp = (s2.ads && s2.ads.roas) ? s2.ads.roas : null;
   const dsAdsSp = (s2.ads && s2.ads.doanhSo) ? n(s2.ads.doanhSo) : null;
 
+  // TỶ LỆ PHÍ THẬT (thêm 28/10/2026). "% doanh thu" bên dưới trả lời câu KINH TẾ
+  // ("tháng này bao nhiêu phần doanh thu đi vào phí") nhưng KHÔNG dùng được để
+  // theo dõi sàn có tăng phí hay không: tử từ file quyết toán, mẫu từ file đơn
+  // hàng theo ngày đặt → 2 tập đơn khác nhau, nhảy ±4 điểm vô nghĩa. Tỷ lệ THẬT
+  // lấy mẫu số nằm TRONG CÙNG FILE với tử nên mới so được giữa các tháng.
+  const tlThat = (x) => (x && x.phiSanTyLeThat) ? fmtPct(x.phiSanTyLeThat, 2) : null;
+  const tlSp = tlThat(s2), tlTt = tlThat(t2);
+  const ghiChuPhi = (x, tl) => tl
+    ? `(từ file tài chính — đủ khoản · <b>sàn thu thật ${tl}</b> trên ${fmtVND(n(x.phiSanMauSo))} tiền hàng của chính các đơn trong file)`
+    : '(từ file tài chính — đủ khoản)';
+
   const row = (ten, giaTri, ghiChu, dam) => `<tr${dam ? ' style="font-weight:700;"' : ''}>
     <td>${ten}${ghiChu ? ` <span class="pnl-note">${ghiChu}</span>` : ''}</td>
     <td class="num">${fmtVND(giaTri)}</td>
@@ -512,15 +523,15 @@ function buildChiPhiHtml(res, opts){
   <!-- ZONE 2: CHI PHÍ -->
   <div class="zone"><span class="z-num">2</span><span class="z-title">💸 Chi phí</span><span class="z-note">mọi khoản tiền ra trong kỳ · tách theo sàn</span></div>
   <div class="kpi-row">
-    <div class="kpi-tile"><div class="k-label">Phí sàn</div><div class="k-value">${fmtCompact(tongPhiSan)}</div><div class="k-sub">Shopee ${fmtCompact(phiSp)} · TikTok ${fmtCompact(phiTt)}</div></div>
+    <div class="kpi-tile"><div class="k-label">Phí sàn</div><div class="k-value">${fmtCompact(tongPhiSan)}</div><div class="k-sub">${(tlSp || tlTt) ? 'Sàn thu thật: Shopee ' + (tlSp || '—') + ' · TikTok ' + (tlTt || '—') : 'Shopee ' + fmtCompact(phiSp) + ' · TikTok ' + fmtCompact(phiTt)}</div></div>
     <div class="kpi-tile"><div class="k-label">Quảng cáo</div><div class="k-value">${fmtCompact(tongAds)}</div><div class="k-sub">Shopee ${fmtCompact(adsSp)} · TikTok ${fmtCompact(adsTt)}</div></div>
     <div class="kpi-tile"><div class="k-label">Lương &amp; vật tư</div><div class="k-value">${fmtCompact(luong + vatTu)}</div><div class="k-sub">Lương ${fmtCompact(luong)} · Vật tư ${fmtCompact(vatTu)}</div></div>
     <div class="kpi-tile"><div class="k-label">TỔNG CHI PHÍ</div><div class="k-value">${fmtCompact(tong)}</div><div class="k-sub">${pct(tong)} doanh thu hàng</div></div>
   </div>
   ${quatHtml}
   <table class="dtable" style="margin-top:12px;"><thead><tr><th>Khoản chi</th><th style="text-align:right">Số tiền</th><th style="text-align:right">% doanh thu</th><th style="text-align:right">% tổng chi phí</th></tr></thead><tbody>
-    ${row('Phí sàn Shopee', phiSp, '(từ file Income — đủ khoản)')}
-    ${row('Phí sàn TikTok', phiTt, '(từ file tài chính — đủ khoản)')}
+    ${row('Phí sàn Shopee', phiSp, ghiChuPhi(s2, tlSp))}
+    ${row('Phí sàn TikTok', phiTt, ghiChuPhi(t2, tlTt))}
     ${row('Quảng cáo Shopee', adsSp, '(' + nguonAds + ')')}
     ${row('Quảng cáo TikTok (GMV Max)', adsTt, '(cấn thẳng vào tiền quyết toán)')}
     ${luong ? row('Lương nhân viên (kho + live)', luong, '') : ''}
@@ -529,6 +540,11 @@ function buildChiPhiHtml(res, opts){
     ${row('TỔNG', tong, '', true)}
   </tbody></table>
   ${canhBao}
+  ${(tlSp || tlTt) ? `<p style="font-size:12px;color:var(--ink-faint);margin:8px 0 0;">
+    <b>Hai cột % khác nhau chỗ nào:</b> “% doanh thu” cho biết tháng này bao nhiêu phần doanh thu đi vào khoản đó — dùng để xem lãi lỗ.
+    Còn <b>“sàn thu thật”</b> là tỷ lệ phí đo trên tiền hàng của <i>chính các đơn trong file tài chính</i> — chỉ số này mới dùng được để so giữa các tháng
+    xem sàn có tăng phí hay không. Đừng dùng “% doanh thu” cho việc đó: phí lấy từ file quyết toán còn doanh thu lấy từ file đơn hàng theo ngày đặt,
+    hai tập đơn khác nhau nên con số nhảy ±4 điểm mà không có nghĩa gì.</p>` : ''}
   ${(roasSp || adsTt) ? `<p style="font-size:12px;color:var(--ink-faint);margin:8px 0 0;">
     Hiệu quả quảng cáo: ${roasSp ? `<b>Shopee ROAS ${roasSp.toLocaleString('vi-VN', { maximumFractionDigits: 2 })}</b> — tiêu ${fmtVND(adsSp)} thu về ${fmtVND(dsAdsSp)} doanh số` : 'Shopee chưa có file quảng cáo nên chưa tính được ROAS'}.
     TikTok GMV Max ${adsTt ? fmtVND(adsTt) : '0đ'} — file tài chính không kèm doanh số từ quảng cáo nên chưa tính được ROAS.</p>` : ''}`;

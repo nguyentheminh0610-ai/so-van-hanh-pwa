@@ -947,13 +947,23 @@ function computeAllFromAOA(aoa){
   const C_FIN_THUE_TNCN = findColKey(finHeaderKeys, [/^thuế\s*tncn\s*do\s*tiktok/i]);
   const C_FIN_TIEN_HOAN = findColKey(finHeaderKeys, [/^tiền\s*hoàn\s*của\s*khách$/i]);
   const C_FIN_HOAN_SAU_GG = findColKey(finHeaderKeys, [/^tổng\s*phụ\s*của\s*khoản\s*hoàn\s*tiền\s*sau\s*giảm\s*giá/i]);
+  // THÊM 28/10/2026 — MẪU SỐ ĐÚNG để tính TỶ LỆ PHÍ. Tuyệt đối không chia phí
+  // sàn cho doanh thu của sổ: tử lấy từ file quyết toán (đơn settle trong kỳ),
+  // mẫu lấy từ file đơn hàng (đơn ĐẶT trong kỳ) → 2 tập đơn khác nhau, tỷ lệ
+  // nhảy ±4 điểm vô nghĩa (đã 2 lần kết luận sai vì nó). Mẫu số phải nằm TRONG
+  // CÙNG FILE với tử. Đo thử 12 tháng: "Tổng phụ sau giảm giá của người bán"
+  // cho tỷ lệ ổn định 19-23% (T7/T8/T9: 20,07/22,57/20,99%), còn "Tổng phụ
+  // trước giảm giá" nhảy 12-21% → chọn cột "sau giảm giá".
+  const C_FIN_TIEN_HANG = findColKey(finHeaderKeys, [/^tổng\s*phụ\s*sau\s*giảm\s*giá\s*của\s*người\s*bán$/i]);
   let ttThucNhan = null, ttPhiSanFull = null, ttPhiSanChiTiet = null, ttQuangCaoGmvMax = 0;
+  let ttPhiSanMauSo = null;
   // Ship hoàn/huỷ TikTok: chỉ cộng phần ship của ĐÚNG các đơn có hoàn tiền —
   // khoản "Phí vận chuyển shop chịu" tổng gồm cả đơn bán bình thường (freeship),
   // không phải chi phí do hoàn/bom nên không được đem so với gói hoàn phí VC.
   let ttShipHoan = null;
   if (C_FIN_QT && finRows.length){
     ttShipHoan = { traHang: 0, shipShopChiu: 0, soDon: 0 };
+    ttPhiSanMauSo = 0;
     ttThucNhan = 0;
     const bd = { 'Phí giao dịch': 0, 'Hoa hồng TikTok Shop': 0, 'Phí xử lý đơn hàng': 0,
       'Hoa hồng affiliate (liên kết)': 0, 'Phí vận chuyển shop chịu': 0, 'Phí vận chuyển trả hàng': 0, 'Phí khác': 0 };
@@ -991,6 +1001,7 @@ function computeAllFromAOA(aoa){
       bd['Phí giao dịch'] += phiGD; bd['Hoa hồng TikTok Shop'] += hhTT; bd['Phí xử lý đơn hàng'] += phiXL;
       bd['Hoa hồng affiliate (liên kết)'] += aff; bd['Phí vận chuyển shop chịu'] += ship; bd['Phí vận chuyển trả hàng'] += shipTra;
       tongPhiAbs += tongPhi; thueAbs += thue;
+      ttPhiSanMauSo += num(C_FIN_TIEN_HANG ? r[C_FIN_TIEN_HANG] : 0);
       const tienHoan = Math.abs(num(C_FIN_TIEN_HOAN ? r[C_FIN_TIEN_HOAN] : 0))
         + Math.abs(num(C_FIN_HOAN_SAU_GG ? r[C_FIN_HOAN_SAU_GG] : 0));
       if (tienHoan > 0){
@@ -1195,12 +1206,17 @@ function computeAllFromAOA(aoa){
   const C_INC_VC_TRA_2 = findColKey(incHdrKeys, [/^phí\s*vận\s*chuyển\s*trả\s*hàng\s*\(đơn\s*giao/i]);
   const C_INC_THUE_GTGT = findColKey(incHdrKeys, [/^thuế\s*gtgt$/i]);
   const C_INC_THUE_TNCN = findColKey(incHdrKeys, [/^thuế\s*tncn$/i]);
+  // Mẫu số đúng cho tỷ lệ phí Shopee = "Giá sản phẩm" của chính các đơn trong
+  // file này. Đã xác minh đây ĐÚNG là cơ sở Shopee thu phí cố định: 115/156 đơn
+  // T8 và 86/171 đơn T9 có phí cố định = ĐÚNG 16,5% cột này (số còn lại 15,5%).
+  const C_INC_TIEN_HANG = findColKey(incHdrKeys, [/^giá\s*sản\s*phẩm$/i]);
   let spThucNhan = null, spPhiSanFull = null, spPhiSanChiTiet = null, spDieuChinh = 0;
   // Ship hoàn/huỷ Shopee tách 2 loại + số gói PiShip (phục vụ câu "nên đăng ký
   // gói hoàn phí vận chuyển không?"). Tách riêng vì PiShip chỉ hoàn phần đơn
   // Trả hàng/hoàn tiền, KHÔNG hoàn đơn giao không thành công.
-  let spShipHoan = null;
+  let spShipHoan = null, spPhiSanMauSo = null;
   if (C_INC_PAID && incOrderRows.length){
+    spPhiSanMauSo = incOrderRows.reduce((t, r) => t + Math.abs(num(C_INC_TIEN_HANG ? r[C_INC_TIEN_HANG] : 0)), 0);
     if (aoa.income_Adjustment){
       const adjRaw = findLabeledValue(aoa.income_Adjustment, 'Tổng số tiền điều chỉnh');
       if (adjRaw !== null && adjRaw !== undefined) spDieuChinh = num(adjRaw);
@@ -1817,6 +1833,8 @@ function computeAllFromAOA(aoa){
       thucNhan: spThucNhan, dieuChinh: spDieuChinh,
       phiSan: spPhiSanHienThi, phiSanUocTinh: spPhiSan, phiSanChiTiet: spPhiSanChiTiet,
       giaVon: costCatalog ? giaVonTheoSan.Shopee : null, thieuGiaVonSL: thieuGiaVonTheoSan.Shopee,
+      phiSanMauSo: spPhiSanMauSo,
+      phiSanTyLeThat: (spPhiSanMauSo && spPhiSanFull !== null) ? spPhiSanFull / spPhiSanMauSo : null,
       shipHoan: spShipHoan, ads: spAds,
       troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
@@ -1830,6 +1848,8 @@ function computeAllFromAOA(aoa){
       thucNhan: ttThucNhan, quangCaoGmvMax: ttQuangCaoGmvMax,
       phiSan: ttPhiSanHienThi, phiSanUocTinh: ttPhiSan, phiSanChiTiet: ttPhiSanChiTiet,
       giaVon: costCatalog ? giaVonTheoSan.TikTok : null, thieuGiaVonSL: thieuGiaVonTheoSan.TikTok,
+      phiSanMauSo: ttPhiSanMauSo ? Math.abs(ttPhiSanMauSo) : null,
+      phiSanTyLeThat: (ttPhiSanMauSo && ttPhiSanFull !== null) ? ttPhiSanFull / Math.abs(ttPhiSanMauSo) : null,
       shipHoan: ttShipHoan, ads: { chiPhi: ttQuangCaoGmvMax || 0, doanhSo: null, roas: null },
       troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
