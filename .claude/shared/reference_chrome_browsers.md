@@ -14,7 +14,8 @@ TikTok" (gặp thật 22/10).
 | Browser | deviceId | Máy | Dùng cho | Shortcut trên desktop PC |
 |---|---|---|---|---|
 | Browser 2 | `40800ac7-074b-4077-be62-257ed7e08ef7` | Windows (PC trực) | **TikTok Shop Seller + Sapo** | "Minh - Chrome" (icon xanh, chữ M) |
-| Browser 3 | `81a996d1-12b5-4382-98bf-5f4cad64cb1d` | Windows (PC trực) | **Shopee Seller (banhang.shopee.vn)** | "SOMETIME Chrome" (icon vàng) |
+| — | `14db4f42-cf48-4668-9bbb-633ede2a6d7f` | Windows (PC trực) | **Shopee Seller (banhang.shopee.vn)** — dùng cái này từ 29/10/2026 | "SOMETIME Chrome (2)"? (icon vàng) |
+| Browser 3 | `81a996d1-12b5-4382-98bf-5f4cad64cb1d` | Windows (PC trực) | Shopee — **29/10/2026 không còn kết nối**, trước đó bị chặn domain | "SOMETIME Chrome" (icon vàng) |
 | Browser 1 | `af1ae8fc-e64d-4535-8f38-2c363921db7d` | macOS (máy Mac) | Chỉ có quyền `banhang.shopee.vn` — **không vào được TikTok** | — |
 
 Chủ shop còn 1 Chrome thứ 3 trên PC ("SOMETIME Chrome (2)", cũng icon vàng, cũng
@@ -25,7 +26,7 @@ là Shopee) nhưng lúc xác minh **không thấy kết nối** — nếu sau n�
 
 ```
 select_browser  deviceId = 40800ac7-...   → rồi mở seller-vn.tiktok.com / Sapo
-select_browser  deviceId = 81a996d1-...   → rồi mở banhang.shopee.vn
+select_browser  deviceId = 14db4f42-...   → rồi mở banhang.shopee.vn
 ```
 
 Luôn `select_browser` TRƯỚC khi mở trang. Không chọn thì rơi về browser mặc định
@@ -105,6 +106,21 @@ thấy **4** browser thì mới đi tiếp được.
 
 Cách gỡ: chủ shop mở extension Claude trong đúng Chrome đó và cấp quyền cho
 domain, Claude không tự cấp được.
+
+### ✅ ĐÃ GỠ ĐƯỢC — Chrome Shopee thứ 4 đã nối extension (09:35 ngày 29/10/2026)
+
+Lượt CSKH 09:35 ngày 29/10/2026 chạy `list_connected_browsers` thấy đúng dự đoán
+ở mục trên: `81a996d1…` biến mất, thay vào đó là một Chrome Windows **mới**
+`14db4f42-cf48-4668-9bbb-633ede2a6d7f` (hiện tên "Browser 1", `onThisComputer`).
+`select_browser` sang nó rồi mở `banhang.shopee.vn/webchat/conversations` thì
+**vào thẳng webchat, đã đăng nhập (VN) SOMETIME, đọc được danh sách hội thoại** —
+không còn `Navigation to this domain is not allowed`.
+
+Vậy "Chrome thứ 4" chính là Chrome đang đăng nhập Shopee, và nay đã có extension.
+**Từ nay dùng `14db4f42…` cho Shopee**, đừng dựa vào `81a996d1…` nữa.
+
+Nhắc lại cái bẫy tên: lần này `14db4f42…` hiển thị là **"Browser 1"**, đúng cái
+tên mà bảng cũ gán cho Chrome Mac. Chỉ tin deviceId, đừng tin tên.
 
 ## Lưu ý an toàn
 
