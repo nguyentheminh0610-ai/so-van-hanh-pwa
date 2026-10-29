@@ -452,6 +452,16 @@
   .fi-head{ display:flex; align-items:center; gap:9px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft); margin-bottom:7px; }
   .fi-body{ font-size:13px; line-height:1.5; }
   .fi-foot{ margin-top:9px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; font-size:11.5px; color:var(--ink-faint); }
+  /* thẻ gọn Khối 1 (29/10/2026): 2 dòng, padding nhỏ, nội dung cắt 1 dòng */
+  .fi.compact{ padding:9px 12px; }
+  .feed{ gap:7px; }
+  .fi-line1{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft); }
+  .fi-line1 .when{ color:var(--ink-faint); }
+  .fi-line1 .cust b{ color:var(--ink); }
+  .fi-line2{ display:flex; align-items:center; gap:10px; margin-top:4px; }
+  .fi-line2 .snippet{ flex:1; min-width:0; font-size:12.5px; line-height:1.45; color:var(--ink);
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .fi-line2 .lnk{ flex:none; }
   .tag{ font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:5px; }
   .tag.shopee{ background:var(--shopee-soft); color:var(--shopee); }
   .tag.tiktok{ background:var(--tiktok-soft); color:var(--tiktok); }
@@ -462,13 +472,13 @@
   .lnk:hover{ background:var(--accent); color:#fff; }
   .code{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11.5px; color:var(--ink-soft); }
   .ins{ background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--p2); border-radius:10px;
-    padding:13px 15px; box-shadow:var(--shadow); }
-  .ins-head{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:6px; }
-  .ins-title{ font-size:14px; font-weight:700; }
+    padding:9px 13px; box-shadow:var(--shadow); }
+  .ins-head{ display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; margin-bottom:3px; }
+  .ins-title{ font-size:13.5px; font-weight:700; }
   .ins-count{ font-size:12px; color:var(--warn); font-weight:700; }
-  .ins-sub{ font-size:11.5px; color:var(--ink-faint); }
-  .quote{ font-size:12.5px; line-height:1.5; color:var(--ink-soft); border-left:2px solid var(--line-strong);
-    padding-left:10px; margin:7px 0 0; }
+  .ins-sub{ font-size:11px; color:var(--ink-faint); }
+  .quote{ font-size:12px; line-height:1.45; color:var(--ink-soft); border-left:2px solid var(--line-strong);
+    padding-left:9px; margin:5px 0 0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .spark{ display:flex; align-items:flex-end; gap:5px; height:96px; }
   .spark .sc{ flex:1; display:flex; flex-direction:column; align-items:center; gap:4px; }
   .spark .sb{ width:100%; display:flex; flex-direction:column; justify-content:flex-end; height:72px; }

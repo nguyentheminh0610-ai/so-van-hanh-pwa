@@ -96,27 +96,26 @@ function cskhKpiHtml(reviews, returns){
 }
 
 // ------------------------------------------------------- khối cần xử lý ----
+// Thẻ gọn (chốt 29/10/2026): bỏ action_note (nhóm cha đã nói), bỏ message_note
+// và product khỏi mặt thẻ. Còn đúng 2 dòng — dòng meta để nhận diện + tra khách,
+// dòng nội dung cắt gọn 1 dòng (hover xem đủ) kèm link mở.
 function cskhActionCardHtml(row, kind){
   const plat = cskhPlatName(row.platform);
   const link = kind === 'return' && row.order_code
-    ? `<a class="lnk" href="${CSKH_ORDER_URL[row.platform] ? CSKH_ORDER_URL[row.platform](row.order_code) : '#'}" target="_blank" rel="noopener">↗ Mở đơn trên ${plat}</a>`
-    : `<a class="lnk" href="${CSKH_REVIEW_URL[row.platform] || CSKH_REVIEW_URL.tiktok}" target="_blank" rel="noopener">↗ Mở trang đánh giá ${plat}</a>`;
+    ? `<a class="lnk" href="${CSKH_ORDER_URL[row.platform] ? CSKH_ORDER_URL[row.platform](row.order_code) : '#'}" target="_blank" rel="noopener">↗ Mở đơn</a>`
+    : `<a class="lnk" href="${CSKH_REVIEW_URL[row.platform] || CSKH_REVIEW_URL.tiktok}" target="_blank" rel="noopener">↗ Đánh giá</a>`;
   const stars = row.stars ? '<span class="stars">' + '★'.repeat(row.stars) + '☆'.repeat(5 - row.stars) + '</span>' : '';
-  const body = kind === 'return'
-    ? [row.reason ? '<b>' + esc(row.reason) + '</b>' : '', row.amount ? fmtVND(row.amount) : '',
-       row.customer_note ? 'Khách ghi: “' + esc(row.customer_note) + '”' : ''].filter(Boolean).join(' · ')
-    : esc(row.content || '(khách chỉ bấm sao, không viết gì)');
+  const tag = kind === 'return' && row.reason ? '<span class="tag why">' + esc(row.reason) + '</span>' : '';
+  const snippet = kind === 'return'
+    ? (row.customer_note ? 'Khách ghi: “' + esc(row.customer_note) + '”' : (row.amount ? fmtVND(row.amount) : ''))
+    : esc(row.content || '(chỉ bấm sao, không viết)');
   const when = kind === 'return' ? row.request_date : row.review_date;
-  return `<div class="fi bad">
-    <div class="fi-head"><span class="tag ${row.platform === 'shopee' ? 'shopee' : 'tiktok'}">${plat}</span>
-      ${row.action_note ? '<span class="tag why">' + esc(row.action_note) + '</span>' : ''}
-      ${stars}<span>${esc(cskhWhen(when))}</span></div>
-    <div class="fi-body">${body}</div>
-    <div class="fi-foot">${link}
-      ${row.customer ? '<span>Khách <b>' + esc(row.customer) + '</b></span>' : ''}
-      ${row.order_code ? '<span class="code">' + esc(row.order_code) + '</span>' : ''}
-      ${row.product ? '<span>' + esc(row.product) + '</span>' : ''}
-      ${row.messaged_at ? '<span>· ' + esc(row.message_note || 'đã nhắn khách') + '</span>' : ''}</div>
+  return `<div class="fi bad compact">
+    <div class="fi-line1"><span class="tag ${row.platform === 'shopee' ? 'shopee' : 'tiktok'}">${plat}</span>
+      ${stars}${tag}<span class="when">${esc(cskhWhen(when))}</span>
+      ${row.customer ? '<span class="cust">Khách <b>' + esc(row.customer) + '</b></span>' : ''}
+      ${row.order_code ? '<span class="code">' + esc(row.order_code) + '</span>' : ''}</div>
+    <div class="fi-line2">${snippet ? '<span class="snippet" title="' + esc(snippet.replace(/<[^>]*>/g, '')) + '">' + snippet + '</span>' : '<span class="snippet"></span>'}${link}</div>
   </div>`;
 }
 
@@ -173,14 +172,12 @@ function cskhInsightHtml(reviews, returns, periodLabel){
   const sorted = [...groups.entries()].sort((a, b) => b[1].items.length - a[1].items.length);
   return '<div class="feed">' + sorted.map(([tag, g]) => {
     const items = g.items.sort((a, b) => (b.d || '').localeCompare(a.d || ''));
-    const quotes = items.slice(0, 2).map(i => {
+    // Gọn (29/10/2026): chỉ trích 1 câu mới nhất, cắt 1 dòng — hover xem đủ
+    const quotes = items.slice(0, 1).map(i => {
       const text = i.kind === 'return'
         ? (i.row.customer_note || i.row.reason || '')
         : (i.row.content || '');
-      const src = i.kind === 'return'
-        ? 'lý do trả hàng, đơn ' + (i.row.order_code || '—')
-        : 'đánh giá ' + (i.row.stars ? i.row.stars + '★' : '') + ', ' + cskhWhen(i.row.review_date);
-      return text ? `<p class="quote">“${esc(text)}” — ${esc(src)}</p>` : '';
+      return text ? `<p class="quote" title="${esc(text)}">“${esc(text)}”</p>` : '';
     }).join('');
     const latest = items.find(i => i.row.order_code);
     const link = latest
