@@ -265,7 +265,24 @@ const KOC_TRANG_THAI_LABEL = {
 function kocTableHtml(scores, byKoc){
   const duyet = scores.filter(r => r.ket_qua === 'DUYỆT');
   const m = new Map(byKoc.map(k => [k.koc, k]));
+  // Một KOC xin mẫu nhiều lần => nhiều dòng Book, nhưng số liệu affiliate gộp
+  // theo nhà sáng tạo nên KHÔNG tách được theo từng lần tặng. Nếu in số lên cả
+  // mấy dòng thì nhìn như nhân đôi/nhân ba. Chỉ gắn số vào dòng ĐẦU, dòng sau
+  // ghi rõ đã tính ở dòng nào.
+  const daGan = new Map();
   const body = duyet.map(r => {
+    const first = daGan.get(r.koc_username);
+    if (first !== undefined){
+      return `<tr>
+        <td class="num">${fmtInt(r.book_stt || 0)}</td>
+        <td><b>${esc(r.koc_username)}</b></td>
+        <td class="num">${fmtInt(r.diem || 0)}</td>
+        <td>${esc(r.sku_gui || '—')}</td>
+        <td style="color:var(--ink-faint);font-weight:700">${esc(KOC_TRANG_THAI_LABEL[r.trang_thai_mau] || '—')}</td>
+        <td colspan="6" style="color:var(--ink-faint)">số liệu đã tính ở STT ${fmtInt(first)} (cùng KOC, TikTok không tách theo từng lần tặng mẫu)</td>
+        <td>—</td></tr>`;
+    }
+    daGan.set(r.koc_username, r.book_stt || 0);
     const k = m.get(r.koc_username);
     const roi = (k && k.roi !== null && k.roi !== undefined) ? k.roi : null;
     const xl = kocXepLoai(roi);

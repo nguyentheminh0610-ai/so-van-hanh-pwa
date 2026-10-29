@@ -42,7 +42,7 @@
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-c",
-        "cd '/Users/apple/Documents/App của Minh/so-van-hanh-pwa' && exec python3 -m http.server 8830"
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/3a0586c4-72b4-40be-b92f-fda7eb2383e5/scratchpad/kocsite' && exec python3 -m http.server 8830"
       ],
       "port": 8830
     }
