@@ -462,6 +462,15 @@
   .fi-line2 .snippet{ flex:1; min-width:0; font-size:12.5px; line-height:1.45; color:var(--ink);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .fi-line2 .lnk{ flex:none; }
+  /* thẻ "Ghi lỗi Sổ Kho" (29/10/2026) — viền cam phân biệt với thẻ cảnh báo đỏ */
+  .fi.err{ border-color:var(--proc); background:var(--proc-soft); }
+  .err-foot{ margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .btn-errlog{ font-family:inherit; font-size:12px; font-weight:700; color:#fff; background:var(--proc);
+    border:none; border-radius:7px; padding:6px 13px; cursor:pointer; }
+  .btn-errlog:hover{ filter:brightness(.94); }
+  .btn-errlog:disabled{ opacity:.6; cursor:default; }
+  .err-done{ font-size:12px; font-weight:700; color:var(--good); }
+  .err-skip{ font-size:11.5px; color:var(--ink-faint); }
   .tag{ font-size:10.5px; font-weight:700; padding:2px 7px; border-radius:5px; }
   .tag.shopee{ background:var(--shopee-soft); color:var(--shopee); }
   .tag.tiktok{ background:var(--tiktok-soft); color:var(--tiktok); }
@@ -490,17 +499,32 @@
   }
 
   /* ---------- Tab "Chấm điểm KOC" (koc.js) ---------- */
-  .koc-kpi6{ grid-template-columns:repeat(6,1fr); gap:10px; }
-  .koc-kpi6 .kpi-tile{ padding:13px 14px; }
+  /* Thanh phan bo Video/LIVE: --p1 xanh = Video, --p2 cam = LIVE (thu tu co
+     dinh). Khe 2px giua 2 doan + bo tron 4px theo chuan mark cua bo dataviz. */
+  .koc-legend{ display:flex; gap:16px; align-items:center; margin:0 0 10px;
+    font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .koc-legend span{ display:inline-flex; align-items:center; gap:6px; }
+  .d1, .d2{ width:9px; height:9px; border-radius:3px; display:inline-block; flex:none; }
+  .d1{ background:var(--p1); } .d2{ background:var(--p2); }
+  .koc-kpi4{ grid-template-columns:repeat(4,1fr); }
+  .koc-stat{ padding:14px 16px; }
+  .koc-big{ font-size:26px; font-weight:700; color:var(--accent); letter-spacing:-0.01em;
+    line-height:1.15; margin-bottom:11px; white-space:nowrap; }
+  .koc-bar{ display:flex; gap:2px; height:8px; }
+  .koc-bar span{ border-radius:4px; min-width:3px; }
+  .koc-bar .s1{ background:var(--p1); } .koc-bar .s2{ background:var(--p2); }
+  .koc-bar-empty{ background:var(--surface-soft); border-radius:4px; }
+  .koc-split{ display:flex; justify-content:space-between; gap:8px; margin-top:7px;
+    font-size:11.5px; font-weight:600; color:var(--ink-soft); }
+  .koc-split span{ display:inline-flex; align-items:center; gap:5px; white-space:nowrap; }
   .koc-ky{ font-size:13px; font-weight:700; color:var(--ink-soft); background:var(--surface);
     border:1px solid var(--line-strong); border-radius:8px; padding:8px 13px; box-shadow:var(--shadow); }
-  .koc-sheetrow{ display:flex; flex-wrap:wrap; align-items:center; gap:18px; margin-top:10px;
+  .koc-sheetrow{ display:flex; flex-wrap:wrap; align-items:center; gap:18px; margin-top:14px;
     padding:10px 14px; background:var(--surface-soft); border:1px solid var(--line); border-radius:9px;
     font-size:12.5px; color:var(--ink-soft); }
   .koc-sheetrow b{ color:var(--ink); font-size:14px; }
   .koc-sheetrow i{ font-style:normal; color:var(--ink-faint); }
   .koc-sheetrow .canh b{ color:var(--warn); }
   .koc-sheetrow .ngn{ color:var(--ink-faint); font-size:11.5px; margin-left:auto; }
-  @media (max-width: 1100px){ .koc-kpi6{ grid-template-columns:repeat(3,1fr); } }
-  @media (max-width: 760px){ .koc-kpi6{ grid-template-columns:repeat(2,1fr); }
-    .koc-sheetrow .ngn{ margin-left:0; } }
+  @media (max-width: 860px){ .koc-kpi4{ grid-template-columns:repeat(2,1fr); }
+    .koc-sheetrow .ngn{ margin-left:0; } } }

@@ -83,24 +83,54 @@ function kocMauXepLoai(xl){
   return 'var(--ink-faint)';
 }
 
-/* ----------------------------- hàng card: SỐ LIỆU TỪ SÀN ------------------*/
+/* ----------------------------- hàng card: SỐ LIỆU TỪ SÀN ------------------
+   Chốt 29/10: bỏ 6 card chữ dày đặc, còn 4 card — mỗi card 1 con số tổng + 1
+   thanh ngang cho thấy ngay phần Video / phần LIVE. Bỏ card "Tỷ trọng kênh"
+   (thanh đã nói điều đó) và card "Đơn/1.000 view" (chỉ số này nằm trong 2 bảng
+   KOC bên dưới, ở mức tổng không giúp quyết định gì).
+
+   Màu: --p1 (xanh) = Video, --p2 (cam) = LIVE, theo đúng thứ tự cố định của
+   bảng màu phân loại sẵn có. Đã chạy bộ kiểm 5 phép (dải sáng, độ bão hoà,
+   tách màu cho người mù màu protan/deutan, mắt thường, tương phản nền) — đạt
+   ở cả nền sáng lẫn nền tối.                                               */
+
+// Rút gọn số cho khỏi vỡ dòng: tiền và số lớn về "tr", số vừa về "K".
+function kocGon(n, laTien){
+  n = n || 0;
+  if (n >= 1e6) return fmtCompact(n) + (laTien ? '' : '');
+  if (!laTien && n >= 10000) return Math.round(n / 1000) + 'K';
+  return laTien ? fmtVND(n) : fmtInt(n);
+}
+
+function kocThanhHtml(v, l, laTien){
+  const t = (v || 0) + (l || 0);
+  if (!t) return '<div class="koc-bar koc-bar-empty"></div><div class="koc-split"><span>—</span></div>';
+  const pv = Math.round(v / t * 100);
+  return `<div class="koc-bar">
+      <span class="s1" style="width:${pv}%" title="Video: ${esc(kocGon(v, laTien))} (${pv}%)"></span>
+      <span class="s2" style="width:${100 - pv}%" title="LIVE: ${esc(kocGon(l, laTien))} (${100 - pv}%)"></span>
+    </div>
+    <div class="koc-split">
+      <span><i class="d1"></i>${esc(kocGon(v, laTien))}</span>
+      <span><i class="d2"></i>${esc(kocGon(l, laTien))}</span>
+    </div>`;
+}
+
 function kocCardSanHtml(channels){
-  const vid = channels.filter(c => c.kenh === 'video');
-  const liv = channels.filter(c => c.kenh === 'live');
-  const T = kocTongHop(channels), V = kocTongHop(vid), L = kocTongHop(liv);
-  const pct = T.gmv ? Math.round(V.gmv / T.gmv * 100) : 0;
+  const V = kocTongHop(channels.filter(c => c.kenh === 'video'));
+  const L = kocTongHop(channels.filter(c => c.kenh === 'live'));
+  const T = kocTongHop(channels);
   const cards = [
-    ['GMV từ KOC', fmtVND(T.gmv), 'Video ' + fmtVND(V.gmv) + ' · LIVE ' + fmtVND(L.gmv)],
-    ['Số đơn', fmtInt(T.don), 'Video ' + fmtInt(V.don) + ' · LIVE ' + fmtInt(L.don)],
-    ['Lượt xem', fmtInt(T.view), 'Video ' + fmtInt(V.view) + ' · LIVE ' + fmtInt(L.view)],
-    ['Đơn/1.000 view', T.don1k !== null ? fmtRatio(T.don1k) : '—', 'tính lại từ tổng, không phải trung bình'],
-    ['Hoa hồng đã trả', fmtVND(T.hoaHong), 'tiền trả cho nhà sáng tạo'],
-    ['Tỷ trọng kênh', pct + '% video', (100 - pct) + '% đến từ LIVE'],
+    ['GMV từ KOC', kocGon(T.gmv, true), V.gmv, L.gmv, true],
+    ['Số đơn', fmtInt(T.don), V.don, L.don, false],
+    ['Lượt xem', kocGon(T.view, false), V.view, L.view, false],
+    ['Hoa hồng đã trả', kocGon(T.hoaHong, true), V.hoaHong, L.hoaHong, true],
   ];
-  return '<div class="kpi-row koc-kpi6">' + cards.map(([a, b, c]) =>
-    `<div class="kpi-tile"><div class="k-label">${esc(a)}</div>
-      <div class="k-value" style="font-size:24px">${esc(b)}</div>
-      <div class="k-sub">${esc(c)}</div></div>`).join('') + '</div>';
+  return `<div class="koc-legend"><span><i class="d1"></i>Video</span><span><i class="d2"></i>LIVE</span></div>
+    <div class="kpi-row koc-kpi4">${cards.map(([ten, tong, v, l, tien]) =>
+      `<div class="kpi-tile koc-stat"><div class="k-label">${esc(ten)}</div>
+        <div class="koc-big">${esc(tong)}</div>
+        ${kocThanhHtml(v, l, tien)}</div>`).join('')}</div>`;
 }
 
 /* --------------------- hàng nhỏ: số từ SHEET chấm điểm --------------------*/
