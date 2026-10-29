@@ -118,6 +118,43 @@ trễ đồng bộ**):
 | 28/10 | 586754423000565329 | 4042850476321441361 |
 | 28/10 | 586807163917076096 | 4042849491612108416 |
 
+## 4c. ĐÃ XÁC MINH: 62 phiếu "thừa" đều là đơn thật trên TikTok (29/10/2026)
+
+Không dừng ở suy luận — đã tra ngược 62 mã đơn sang **Quản lý đơn hàng** của
+TikTok (khác trang trả hàng):
+
+| Kiểm tra | Kết quả |
+|---|---|
+| Có trong tab **"Giao không thành công"** | **62/62** |
+| Có trong tab **"Đã hủy"** | **62/62** |
+| Không tìm thấy ở đâu | **0** |
+
+→ **Sapo không bịa ra phiếu nào.** Toàn bộ 62 phiếu "thừa" là đơn có thật, đúng
+trạng thái giao thất bại, hàng thật sự quay về kho. Phần "thừa" của Sapo so với
+trang trả hàng chỉ là do **nhìn nhầm chỗ**: nhóm bom hàng nằm ở *Quản lý đơn
+hàng*, không nằm ở *Quản lý trả hàng*.
+
+**Hệ quả cho việc đối chiếu sau này:** muốn lấy "sàn làm chuẩn" cho hàng về kho
+thì phải gộp **2 nguồn** của TikTok, không chỉ 1:
+1. `Quản lý trả hàng và hoàn tiền` — khách chủ động trả/hoàn
+2. `Quản lý đơn hàng` → tab **Giao không thành công** (`search_tab`=`105`,
+   `abnormal_pkg_tag`=`ALL_FAIL_DELIVERY`) — bom hàng
+
+Số liệu tham khảo: tab "Giao không thành công" có **554** đơn tính từ trước tới
+nay, tab "Đã hủy" có **4.145**.
+
+**CÒN DỞ:** chưa kiểm chiều ngược lại — trong kỳ 39 ngày, TikTok có bao nhiêu
+đơn "Giao không thành công" và Sapo có bỏ sót đơn nào trong số đó không. Mới chỉ
+chứng minh được "Sapo không thừa bậy", chưa chứng minh "Sapo không thiếu bom
+hàng". Làm tiếp bằng cách kéo tab 105 kèm `cancelled_time` rồi lọc theo kỳ.
+
+### Bẫy khi kéo dữ liệu: đừng chạy 2 vòng lặp nền cùng lúc
+
+Gặp thật 29/10: chạy song song 2 vòng kéo (tab 105 và tab 104 = 4.145 đơn) thì
+vòng thứ hai **đứng im ở trang đầu** trong khi vòng kia vẫn chạy. Chạy lần lượt
+từng vòng một. Mỗi lượt `javascript_tool` cũng bị cắt ở **45 giây**, nên việc
+kéo dài phải cho chạy nền rồi hỏi tiến độ qua một biến `window.__prog`.
+
 ## 7. Lấy dữ liệu đơn hoàn TikTok KHÔNG cần tải file
 
 Trang `seller-vn.tiktok.com/order/return` gọi
