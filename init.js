@@ -173,6 +173,7 @@ function buildTabsHTML(){
     <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
     <button class="tab-btn" data-tab="library">Tải file &amp; lịch sử</button>
     <button class="tab-btn" data-tab="cskh">Đánh giá &amp; Trả hàng</button>
+    <button class="tab-btn" data-tab="koc">Chấm điểm KOC</button>
   </div>`;
 }
 
@@ -181,8 +182,10 @@ function switchToTab(tab){
   document.getElementById('screen-dashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('screen-library').classList.toggle('active', tab === 'library');
   document.getElementById('screen-cskh').classList.toggle('active', tab === 'cskh');
+  document.getElementById('screen-koc').classList.toggle('active', tab === 'koc');
   if (tab === 'library') refreshLibrary();
   if (tab === 'cskh') refreshCskh(); // tải lười: chỉ gọi Supabase khi mở tab
+  if (tab === 'koc') refreshKoc();
 }
 
 function refreshDashboardEmptyState(){
@@ -1394,11 +1397,13 @@ function init(){
   document.getElementById('app-root').innerHTML = buildInstallHintHTML() + buildTabsHTML() +
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
     `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>` +
-    `<div class="screen" id="screen-cskh">${buildCskhScreenHTML()}</div>`;
+    `<div class="screen" id="screen-cskh">${buildCskhScreenHTML()}</div>` +
+    `<div class="screen" id="screen-koc">${buildKocScreenHTML()}</div>`;
   wireInstallHint();
   wireUpload();
   wireTabs();
   wireCskh();
+  wireKoc();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   wireRcDropdown();
   document.getElementById('btn-save-history').addEventListener('click', onSaveHistory);

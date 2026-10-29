@@ -76,6 +76,33 @@ Nghĩa là: **quyền domain nằm ở extension của từng Chrome và có th�
 | Trang mở được nhưng nhảy về màn đăng nhập | Chrome đó chưa đăng nhập sàn | đổi sang Chrome đúng (bảng trên) |
 | Trang mở được, hiện "Không có quyền" | gõ sai URL | đi lại bằng menu thật, đừng gõ URL đoán |
 
+**Cách kiểm 10 giây xem có phải lỗi quyền domain không:** trên **chính Chrome
+đang lỗi**, mở một domain khác chắc chắn đang chạy được. Làm thật 29/10 trên
+Chrome `81a996d1`: `seller-vn.tiktok.com` mở OK, `banhang.shopee.vn` báo
+`Navigation to this domain is not allowed` → kết luận chắc chắn là allowlist
+domain của extension thiếu `banhang.shopee.vn`, không phải lỗi profile/đăng nhập.
+
+Hôm đó chủ shop đã bật quyền nhưng vẫn chặn — nên nếu gặp lại, **đừng thử đi
+thử lại nhiều lần**, báo ngay để chủ shop mở `banhang.shopee.vn` rồi bấm icon
+extension **ngay trên trang đó** mà cấp quyền cho site.
+
+### Hiện trạng đo được 29/10/2026 (cả 3 Chrome đều KHÔNG vào được Shopee)
+
+| deviceId | Máy | TikTok | Shopee |
+|---|---|---|---|
+| `40800ac7…` | Windows | mở được, **đã đăng nhập SOME.TIME** | chặn domain |
+| `81a996d1…` | Windows | mở được nhưng **chưa đăng nhập** | chặn domain |
+| `af1ae8fc…` | macOS | — | chặn domain |
+
+Chủ shop khẳng định TikTok và Shopee nằm ở 2 Chrome riêng. Vì không Chrome nào
+trong 3 cái này vào được Shopee, khả năng cao **Chrome đang đăng nhập Shopee là
+profile thứ 4 chưa nối extension vào Claude** (đúng cái "SOMETIME Chrome (2)"
+ghi ở trên, lần 22/10 cũng không thấy kết nối).
+
+**Việc cần làm khi gặp lại:** mở đúng Chrome đang đăng nhập Shopee → bật/kết nối
+extension Claude trong chính profile đó → chạy `list_connected_browsers`, phải
+thấy **4** browser thì mới đi tiếp được.
+
 Cách gỡ: chủ shop mở extension Claude trong đúng Chrome đó và cấp quyền cho
 domain, Claude không tự cấp được.
 

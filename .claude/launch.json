@@ -36,6 +36,15 @@
         "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/ea7041ac-2a1a-4f06-b1de-1076ebb52e99/scratchpad/so-kho-pyjama' && exec python3 -m http.server 8801"
       ],
       "port": 8801
+    },
+    {
+      "name": "koc-tab-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/Users/apple/Documents/App của Minh/so-van-hanh-pwa' && exec python3 -m http.server 8830"
+      ],
+      "port": 8830
     }
   ]
 }
