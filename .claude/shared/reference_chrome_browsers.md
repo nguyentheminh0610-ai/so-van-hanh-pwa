@@ -122,6 +122,27 @@ Vậy "Chrome thứ 4" chính là Chrome đang đăng nhập Shopee, và nay đ�
 Nhắc lại cái bẫy tên: lần này `14db4f42…` hiển thị là **"Browser 1"**, đúng cái
 tên mà bảng cũ gán cho Chrome Mac. Chỉ tin deviceId, đừng tin tên.
 
+### ⚠️ ĐÍNH CHÍNH 29/10/2026: quyền domain theo TỪNG PHIÊN, không theo Chrome
+
+Mục trên kết luận "quyền nằm ở extension của từng Chrome" — **chưa đúng hẳn**.
+
+Đo thật cùng ngày, sau khi phiên PC đã vào Shopee thành công bằng `14db4f42…`:
+một **phiên Claude khác (trên Mac)** chọn **đúng deviceId `14db4f42…` đó**, mở
+**đúng URL `banhang.shopee.vn/webchat/conversations` đó** → vẫn
+`Navigation to this domain is not allowed`.
+
+→ Quyền site của Claude in Chrome được cấp **cho từng phiên hội thoại**, không
+phải cấp một lần cho Chrome rồi mọi phiên dùng chung. Chủ shop bật quyền trong
+Chrome (menu "Tiện ích" của Chrome) là điều kiện cần, **chưa đủ**.
+
+**Hệ quả thực dụng:** nếu một phiên bị chặn domain mà phiên khác vào được, đừng
+đi sửa Chrome nữa — **giao việc đó cho phiên đang có quyền** (thường là phiên
+chạy trên PC trực), hoặc nhờ chủ shop xuất file rồi gửi thẳng vào chat.
+
+Ghi thêm: Chrome `81a996d1…` từng vào được `seller-vn.tiktok.com` ở phiên Mac
+nhưng không vào được Shopee — nên "allowlist domain" là có thật, chỉ là nó được
+xét **theo cặp (phiên × domain)**, không theo Chrome.
+
 ## Lưu ý an toàn
 
 Trang nhạy cảm (vd Hồ Sơ Shop của Shopee) sẽ bật hộp "nhập mật khẩu Shopee để
