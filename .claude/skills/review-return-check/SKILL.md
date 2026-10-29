@@ -255,6 +255,63 @@ thường ở đúng mấy điểm sau — **sai mấy điểm này là khách c
 xấu hơn thực tế. Nói rõ điều này khi báo cáo, đừng để chủ shop tưởng shop vừa
 tụt đánh giá.
 
+## 4. Đề xuất ghi lỗi sang Sổ Kho (chốt 29/10/2026)
+
+Chủ shop muốn: từ trả hàng + đánh giá, phát hiện case **lỗi do shop** (giao
+nhầm, giao thiếu, lỗi sản phẩm) rồi ghi vào Sổ Kho mục "Thống kê lỗi"
+(`warehouse_error_log`) để tính % lỗi NV/NCC. **Nhưng ghi sai là tăng nhầm %
+của người ta**, nên cơ chế là: **skill CHỈ ĐỀ XUẤT, chủ shop bấm nút "Xác nhận
+ghi Sổ Kho" trên tab Sổ Vận Hành mới thật sự insert.** Skill **TUYỆT ĐỐI
+không tự insert** `warehouse_error_log`.
+
+Với mỗi case trả hàng / đánh giá, sau khi đã upsert dòng cskh (mục 3), xét thêm
+và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
+`errlog_status`:
+
+### 4.1 Phân loại `shop_error_kind` (đọc lý do/nội dung, đừng đoán)
+
+- **Lỗi shop** → gắn kind tương ứng:
+  - `giao_thieu` — khách báo thiếu hàng trong đơn.
+  - `giao_nham` — shop gửi sai mẫu/sai sản phẩm/sai size so với đơn đặt.
+  - `san_pham_loi` — hàng lỗi/rách/bẩn/tuột chỉ/hỏng/kém chất lượng từ xưởng.
+- **KHÔNG phải lỗi shop** → `shop_error_kind = null`, `errlog_status = 'none'`:
+  khách đổi ý, không thích, tự đặt sai size/màu, "mặc không hợp", hoàn tiền vì
+  đổi quyết định... và **khách tráo hàng/trả hàng không phải của shop** (cái đó
+  là lỗi KHÁCH, do skill [return-item-not-shop-product](../return-item-not-shop-product/SKILL.md) ghi ở bảng
+  `warehouse_return_checks`, KHÔNG phải bảng này).
+
+### 4.2 Chống trùng — làm đúng, nếu không % lỗi NV/NCC bị thổi phồng
+
+1. **`giao_thieu` → KHÔNG đề xuất nút.** Đặt `errlog_status = 'owned_resend'`.
+   Giao thiếu do skill [resend-missing-item](../resend-missing-item/SKILL.md) độc quyền (nó tự tạo đơn gửi
+   bù + tự ghi `warehouse_error_log`). Mình chỉ hiện cho chủ shop biết, không
+   mở nút ghi để khỏi ghi 2 lần.
+2. **`giao_nham` / `san_pham_loi`:** phải lấy **mã vận đơn gốc** rồi dò trùng:
+   - **Lấy `errlog_code` (mã vận đơn):** trả hàng → cột `outbound_tracking`
+     của đúng dòng trong `platform_returns_feed` (match theo `order_name` =
+     mã đơn + `platform`). Đánh giá (không có phiếu trả) → tra bằng
+     [order_to_tracking.sh](../resend-missing-item/scripts/order_to_tracking.sh) từ `order_code`. Không ra mã vận đơn
+     → vẫn `errlog_status = 'suggest'` nhưng để `errlog_code` trống (web sẽ
+     hiện "thiếu mã vận đơn — anh kiểm tay", không cho bấm ghi).
+   - **Dò trùng:** `GET warehouse_error_log?code=eq.<errlog_code>&select=id&limit=1`.
+     Có rồi → `errlog_status = 'dup'`, `errlog_id` = id dòng cũ (đừng đề xuất
+     ghi nữa). Dò theo mã vận đơn là bắt được cả dòng do resend và dòng ghi
+     tay trước đó, vì tất cả đều khoá theo mã vận đơn gốc.
+   - Chưa có → `errlog_status = 'suggest'`, `errlog_reason` = 1 câu mô tả
+     ngắn (khách đặt gì / lỗi gì), đúng kiểu dòng `reason` mẫu đang có trong
+     bảng (không dấu cũng được, ngắn gọn).
+3. **Chỉ ghi 1 lần:** lượt chạy sau gặp lại dòng (dedup_key) mà `errlog_status`
+   đã là `written`/`dup`/`owned_resend` thì **giữ nguyên**, đừng hạ về
+   `suggest` (không dựng lại nút chủ shop đã xử lý).
+
+### 4.3 Nút nằm ở đâu
+
+Tab "Đánh giá & Trả hàng" → Khối "Cần anh xử lý" → mục **"Ghi lỗi vào Sổ Kho"**
+hiện mọi dòng có `errlog_status != 'none'`. Dòng `suggest` + đủ mã vận đơn →
+có nút "Xác nhận ghi Sổ Kho: giao nhầm (lỗi kho) / lỗi sản phẩm (NCC)". Bấm
+xong web tự insert `warehouse_error_log` + set dòng cskh sang `written` +
+`errlog_id`. Mình (skill) không làm bước insert này.
+
 ## Sending the report
 
 Chạy theo lịch (08:00 / 20:00) → gửi Telegram **1–2 dòng** (chốt 2026-10-28,

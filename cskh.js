@@ -154,6 +154,93 @@ function cskhActionHtml(reviews, returns){
   return html + quiet;
 }
 
+// ------------------------------------------- khối ghi lỗi sang Sổ Kho ------
+// Chốt 29/10/2026: skill CHỈ ĐỀ XUẤT (errlog_status='suggest'); chủ shop bấm
+// nút ở đây mới thật sự insert vào warehouse_error_log — tránh tự ghi làm tăng
+// nhầm % lỗi NV/NCC. giao_thieu không hiện nút (để resend-missing-item lo).
+const CSKH_ERRKIND = {
+  giao_nham:    { etype: 'kho_van',  dreason: 'giao_nham',    label: 'giao nhầm (lỗi kho)' },
+  san_pham_loi: { etype: 'san_pham', dreason: 'san_pham_loi', label: 'lỗi sản phẩm (NCC)' },
+};
+
+function cskhErrlogRows(reviews, returns){
+  return [
+    ...reviews.map(r => ({ row: r, kind: 'review', tbl: 'cskh_reviews', d: r.review_date })),
+    ...returns.map(r => ({ row: r, kind: 'return', tbl: 'cskh_returns', d: r.request_date })),
+  ].filter(i => i.row.errlog_status && i.row.errlog_status !== 'none')
+   .sort((a, b) => (b.d || '').localeCompare(a.d || ''));
+}
+
+function cskhErrlogCardHtml(i){
+  const r = i.row;
+  const plat = cskhPlatName(r.platform);
+  const kind = CSKH_ERRKIND[r.shop_error_kind];
+  const meta = `<span class="tag ${r.platform === 'shopee' ? 'shopee' : 'tiktok'}">${plat}</span>`
+    + (r.order_code ? '<span class="code">' + esc(r.order_code) + '</span>' : '')
+    + (r.errlog_code ? '<span class="code" title="mã vận đơn">VĐ ' + esc(r.errlog_code) + '</span>' : '')
+    + (r.customer ? '<span class="cust">Khách <b>' + esc(r.customer) + '</b></span>' : '');
+  const why = esc(r.errlog_reason || r.reason || r.content || '');
+  let ctrl;
+  if (r.errlog_status === 'written'){
+    ctrl = `<span class="err-done">✓ đã ghi Sổ Kho${r.errlog_id ? ' (#' + esc(String(r.errlog_id)) + ')' : ''}</span>`;
+  } else if (r.errlog_status === 'dup'){
+    ctrl = `<span class="err-skip">Sổ Kho đã có dòng cho mã vận đơn này — không ghi lại</span>`;
+  } else if (r.errlog_status === 'owned_resend'){
+    ctrl = `<span class="err-skip">Giao thiếu — đơn gửi bù (resend) đã/đang lo, không ghi ở đây</span>`;
+  } else if (r.errlog_status === 'suggest' && kind && r.errlog_code){
+    ctrl = `<button class="btn-errlog" data-tbl="${esc(i.tbl)}" data-id="${esc(String(r.id))}"`
+      + ` data-code="${esc(r.errlog_code)}" data-etype="${kind.etype}" data-dreason="${kind.dreason}"`
+      + ` data-reason="${esc(r.errlog_reason || '')}">Xác nhận ghi Sổ Kho: ${esc(kind.label)}</button>`;
+  } else if (r.errlog_status === 'suggest'){
+    ctrl = `<span class="err-skip">Nghi lỗi shop nhưng chưa đủ dữ liệu (thiếu mã vận đơn/loại lỗi) — anh kiểm tay</span>`;
+  } else { ctrl = ''; }
+  return `<div class="fi compact err"><div class="fi-line1">${meta}</div>`
+    + `<div class="fi-line2"><span class="snippet" title="${why}">${why}</span></div>`
+    + `<div class="err-foot">${ctrl}</div></div>`;
+}
+
+function cskhErrlogHtml(reviews, returns){
+  const rows = cskhErrlogRows(reviews, returns);
+  if (!rows.length) return '';
+  const pending = rows.filter(i => i.row.errlog_status === 'suggest' && CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code).length;
+  const head = `<div class="sub-label">Ghi lỗi vào Sổ Kho${pending ? ' · ' + fmtInt(pending) + ' chờ anh xác nhận' : ''}</div>`;
+  return head + '<div class="feed">' + rows.map(cskhErrlogCardHtml).join('') + '</div>';
+}
+
+// Bấm nút "Xác nhận ghi Sổ Kho" → insert warehouse_error_log + đánh dấu dòng cskh.
+async function cskhWriteErrlog(btn){
+  const code = btn.dataset.code;
+  btn.disabled = true; const old = btn.textContent; btn.textContent = 'Đang ghi…';
+  try {
+    // dò trùng ngay lúc bấm (phòng khi vừa có dòng khác ghi cùng mã vận đơn)
+    const dup = await sbFetch('warehouse_error_log?select=id&code=eq.' + encodeURIComponent(code) + '&limit=1');
+    let errId;
+    if (dup && dup.length){
+      errId = dup[0].id;
+      await sbFetch(btn.dataset.tbl + '?id=eq.' + encodeURIComponent(btn.dataset.id),
+        { method: 'PATCH', headers: { Prefer: 'return=minimal' },
+          body: JSON.stringify({ errlog_status: 'dup', errlog_id: errId }) });
+      btn.outerHTML = '<span class="err-skip">Sổ Kho đã có dòng cho mã vận đơn này — không ghi lại</span>';
+      return;
+    }
+    const ins = await sbFetch('warehouse_error_log', {
+      method: 'POST', headers: { Prefer: 'return=representation' },
+      body: JSON.stringify({ code, error_type: btn.dataset.etype, detail_reason: btn.dataset.dreason, reason: btn.dataset.reason || null }) });
+    errId = ins && ins[0] && ins[0].id;
+    await sbFetch(btn.dataset.tbl + '?id=eq.' + encodeURIComponent(btn.dataset.id),
+      { method: 'PATCH', headers: { Prefer: 'return=minimal' },
+        body: JSON.stringify({ errlog_status: 'written', errlog_id: errId || null }) });
+    // cập nhật cache cục bộ để lọc kỳ không dựng lại nút
+    const list = (btn.dataset.tbl === 'cskh_returns' ? cskhRows.returns : cskhRows.reviews);
+    const rec = list.find(x => String(x.id) === btn.dataset.id);
+    if (rec){ rec.errlog_status = 'written'; rec.errlog_id = errId; }
+    btn.outerHTML = '<span class="err-done">✓ đã ghi Sổ Kho' + (errId ? ' (#' + errId + ')' : '') + '</span>';
+  } catch (err){
+    btn.disabled = false; btn.textContent = old;
+    alert('Chưa ghi được Sổ Kho: ' + err.message);
+  }
+}
+
 // ---------------------------------------------------------- khối insight ---
 function cskhInsightHtml(reviews, returns, periodLabel){
   const groups = new Map();
@@ -259,8 +346,9 @@ function cskhRender(period){
   const returns = cskhRows.returns.filter(r => cskhInRange(r.request_date, range));
   bodyEl.innerHTML = `
     ${cskhKpiHtml(reviews, returns)}
-    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp</span></div>
+    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp · ghi lỗi Sổ Kho</span></div>
     ${cskhActionHtml(reviews, returns)}
+    ${cskhErrlogHtml(reviews, returns)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">Insight để cải thiện</span><span class="z-note">vấn đề lặp lại về sản phẩm / dịch vụ</span></div>
     ${cskhInsightHtml(reviews, returns, CSKH_PERIOD_LABEL[period])}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Số liệu kỳ</span><span class="z-note">xu hướng · lý do trả hàng</span></div>
@@ -281,7 +369,7 @@ function buildCskhScreenHTML(){
   </div>
   <div id="cskh-body"></div>
   <footer>
-    <p><b>Nguồn:</b> skill <code>review-return-check</code> chạy 08:00 &amp; 20:00 trên PC trực, mỗi lần ghi từng đánh giá / từng case trả hàng thành 1 dòng vào Supabase. Trang này chỉ đọc lên, không tự vào sàn.</p>
+    <p><b>Nguồn:</b> skill <code>review-return-check</code> chạy 08:00 &amp; 20:00 trên PC trực, mỗi lần ghi từng đánh giá / từng case trả hàng thành 1 dòng vào Supabase. Trang chỉ đọc lên, không tự vào sàn; riêng nút "Xác nhận ghi Sổ Kho" khi anh bấm sẽ ghi 1 dòng lỗi vào Sổ Kho (<code>warehouse_error_log</code>).</p>
     <p><b>Link:</b> nút "Mở đơn" ghép thẳng từ mã đơn. Sàn không có link riêng cho từng đánh giá nên nút đánh giá chỉ mở trang hàng chờ trả lời — tìm theo tên khách ghi kèm.</p>
   </footer>`;
 }
@@ -309,4 +397,10 @@ async function refreshCskh(){
 function wireCskh(){
   const sel = document.getElementById('cskh-period');
   if (sel) sel.addEventListener('change', (e) => cskhRender(e.target.value));
+  // nút "Xác nhận ghi Sổ Kho" (delegation — thẻ được render lại mỗi lần đổi kỳ)
+  const body = document.getElementById('cskh-body');
+  if (body) body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-errlog');
+    if (btn) cskhWriteErrlog(btn);
+  });
 }
