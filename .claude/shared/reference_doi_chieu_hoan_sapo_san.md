@@ -70,7 +70,11 @@ python scripts\doi_chieu_hoan_sapo_san.py --days 39
 ```
 
 Shopee: Kênh Người Bán → **Hàng hoàn** (không phải "Đối soát").
-TikTok: Đơn hàng → **Trả hàng/Hoàn tiền**.
+
+**TikTok thì KHÔNG cần xuất file nữa** (chốt 29/10/2026) — gọi thẳng API của
+chính trang đó qua Claude in Chrome, xem mục 7. Nhanh hơn, không phải chờ sàn
+dựng file, và không tạo ra file chứa SĐT/địa chỉ khách nằm lăn lóc trên đĩa.
+Đường đi: Đơn hàng → **Quản lý trả hàng** (menu thật, đừng gõ URL đoán).
 
 Script tự nới biên ±7 ngày cho Sapo (phiếu tạo trễ hơn ngày sàn ghi nhận vẫn
 khớp), tự đọc `.xlsx` bằng stdlib (PC không cần cài `openpyxl`/`pandas`), tự dò
