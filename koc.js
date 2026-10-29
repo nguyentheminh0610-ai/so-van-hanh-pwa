@@ -1,110 +1,72 @@
 /* ============================================================================
-   Tab "Chấm điểm KOC" — đọc 2 bảng koc_scores / koc_contents (schema ở
-   scripts/koc-tables.sql), do skill check-koc ghi vào mỗi 2 ngày trên PC trực.
-   Trang này CHỈ ĐỌC, không tự vào TikTok.
+   Tab "Chấm điểm KOC" — chỉ ĐỌC Supabase, không tự vào TikTok.
+     koc_scores        1 dòng = 1 lần chấm điểm (nguồn: Google Sheet)
+     koc_contents      1 dòng = 1 video/LIVE cụ thể (dùng cho "mới lên bài")
+     koc_channel_stats 1 dòng = 1 KOC × 1 kênh × 1 kỳ (nguồn: API TikTok Affiliate)
 
-   Chốt 28–29/10/2026 với chủ shop:
-   - "% duyệt" tính trên KOC ĐÃ CHẤM: DUYỆT / (DUYỆT + KHÔNG DUYỆT).
-   - Không có mốc "hôm nay" (đồng bộ 2 ngày/lần nên sẽ sai) → đổi thành
-     "Mới lên bài (2 ngày gần nhất)".
-   - Gộp kỳ tuần/tháng theo NGÀY ĐĂNG video, nên không cần lưu lịch sử số liệu.
-   - Xếp loại theo ROI: >=50 Hiệu quả / 20–50 Tạm / <20 Kém.
+   Bố cục chốt với chủ shop 29/10/2026 (thay bản đầu):
+   - Đầu trang: hàng card SỐ LIỆU TỪ SÀN (koc_channel_stats), dưới là hàng nhỏ
+     các số từ sheet chấm điểm (% duyệt, đã lên bài) — tách nguồn cho rõ.
+   - Mục "Cần xử lý": ép thành BẢNG 1 dòng/KOC, chỉ KOC · SKU nhận · tình trạng
+     · nút xử lý. Bỏ cột sàn và nhãn TikTok (shop chỉ làm KOC TikTok).
+   - Bỏ bảng tổng quan 69 dòng, thay bằng 2 bảng KOC Video và KOC LIVE, xếp
+     theo GMV giảm dần.
 
-   ⚠️ KHÔNG được cộng/trung bình các tỉ lệ khi gộp nhiều KOC. Đơn/1.000 view và
-   ROI phải tính lại từ số tổng (xem kocAgg). Cộng tỷ lệ ra số vô nghĩa.
+   ⚠️ KHÔNG cộng/trung bình các tỉ lệ. Đơn/1.000 view và ROI luôn tính lại từ
+   số tổng (xem kocAgg / kocTongHop).
 ============================================================================ */
 
-let kocRows = null; // {scores: [], contents: []} — cache sau lần tải đầu
+let kocRows = null;
 
-// Ngưỡng tiêu chí "KOC làm việc hiệu quả" (chủ shop có thể chỉnh)
-const KOC_MIN_DON = 10;        // tiêu chí 1
-const KOC_MIN_DON_1K = 1.0;    // tiêu chí 2 — đơn trên 1.000 view
-const KOC_MIN_ROI = 50;        // tiêu chí 3
-const KOC_ROI_TAM = 20;        // dưới mức này là Kém
-const KOC_MOI_DANG_NGAY = 2;   // "mới lên bài" = trong 2 ngày gần nhất
+const KOC_MIN_DON = 10;       // tiêu chí 1
+const KOC_MIN_DON_1K = 1.0;   // tiêu chí 2
+const KOC_MIN_ROI = 50;       // tiêu chí 3 — cũng là mốc "Hiệu quả"
+const KOC_ROI_TAM = 20;       // dưới mốc này là "Kém"
+const KOC_MOI_DANG_NGAY = 2;
 
 function kocToday(){
   const d = new Date();
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
-
 function kocDateKey(d){
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') +
          '-' + String(d.getDate()).padStart(2, '0');
 }
 
-// [from, to] dạng 'YYYY-MM-DD', bao gồm cả 2 đầu. 'all' = không giới hạn.
-function kocRange(period){
-  const today = kocToday();
-  if (period === 'all') return ['0000-01-01', kocDateKey(today)];
-  if (period === 'week'){
-    const from = new Date(today); from.setDate(from.getDate() - 6);
-    return [kocDateKey(from), kocDateKey(today)];
-  }
-  if (period === 'month'){
-    const from = new Date(today.getFullYear(), today.getMonth(), 1);
-    return [kocDateKey(from), kocDateKey(today)];
-  }
-  const from = new Date(today); from.setDate(from.getDate() - 89);
-  return [kocDateKey(from), kocDateKey(today)];
-}
-
-function kocInRange(d, range){ return d && d >= range[0] && d <= range[1]; }
-
 async function kocLoadRows(){
   if (kocRows) return kocRows;
-  const [scores, contents] = await Promise.all([
+  const [scores, contents, channels] = await Promise.all([
     sbFetch('koc_scores?select=*&order=stt.asc&limit=2000'),
     sbFetch('koc_contents?select=*&order=ngay_dang.desc&limit=5000'),
+    sbFetch('koc_channel_stats?select=*&order=gmv.desc&limit=2000').catch(() => []),
   ]);
-  kocRows = { scores: scores || [], contents: contents || [] };
+  kocRows = { scores: scores || [], contents: contents || [], channels: channels || [] };
   return kocRows;
 }
 
-/* --------------------------------------------------------------- gộp số ---
-   Trả về tổng tuyệt đối + CÁC TỈ LỆ TÍNH LẠI TỪ TỔNG (không phải trung bình).
-*/
-function kocAgg(contents){
-  const s = { view: 0, don: 0, gmv: 0, hoaHong: 0, monBan: 0, monHoan: 0,
-              video: 0, live: 0 };
-  contents.forEach(c => {
-    s.view += c.luot_xem || 0;
-    s.don += c.so_don || 0;
+/* --------- gộp số liệu kênh; tỉ lệ TÍNH LẠI TỪ TỔNG, không trung bình ------*/
+function kocTongHop(list){
+  const s = { noiDung: 0, gmv: 0, don: 0, view: 0, hoaHong: 0 };
+  list.forEach(c => {
+    s.noiDung += c.so_noi_dung || 0;
     s.gmv += c.gmv || 0;
+    s.don += c.so_don || 0;
+    s.view += c.luot_xem || 0;
     s.hoaHong += c.hoa_hong || 0;
-    s.monBan += c.so_mon_ban || 0;
-    s.monHoan += c.so_mon_hoan || 0;
-    if (c.loai === 'live') s.live++; else s.video++;
   });
   s.don1k = s.view > 0 ? s.don / s.view * 1000 : null;
-  s.tyLeHoan = s.monBan > 0 ? s.monHoan / s.monBan : null;
   return s;
 }
 
-// Gộp nội dung theo từng KOC, kèm giá vốn mẫu lấy từ koc_scores
-function kocByCreator(scores, contents){
-  const vonByKoc = new Map();
+// Giá vốn mẫu từ sheet — chỉ KOC từng được tặng mẫu mới có, nên ROI của KOC
+// ngoài chương trình sẽ để trống (đúng: họ không tốn mẫu nào của shop).
+function kocVonMap(scores){
+  const m = new Map();
   scores.forEach(r => {
     if (r.ket_qua !== 'DUYỆT' || !r.gia_von_mau) return;
-    vonByKoc.set(r.koc_username, (vonByKoc.get(r.koc_username) || 0) + r.gia_von_mau);
+    m.set(r.koc_username, (m.get(r.koc_username) || 0) + r.gia_von_mau);
   });
-  const byKoc = new Map();
-  contents.forEach(c => {
-    if (!byKoc.has(c.koc_username)) byKoc.set(c.koc_username, []);
-    byKoc.get(c.koc_username).push(c);
-  });
-  const out = [];
-  byKoc.forEach((list, koc) => {
-    const a = kocAgg(list);
-    const von = vonByKoc.get(koc) || null;
-    out.push({
-      koc, agg: a, von,
-      roi: von ? a.gmv / von : null,
-      ngayDau: list.map(c => c.ngay_dang).sort()[0],
-      link: (list.slice().sort((x, y) => (y.gmv || 0) - (x.gmv || 0))[0] || {}).link,
-    });
-  });
-  return out.sort((x, y) => y.agg.gmv - x.agg.gmv);
+  return m;
 }
 
 function kocXepLoai(roi){
@@ -114,121 +76,119 @@ function kocXepLoai(roi){
   return 'Kém';
 }
 
-/* 7 tiêu chí "nên gửi thêm mẫu". 3 tiêu chí cuối CHƯA CÓ DỮ LIỆU (tỷ lệ hoàn,
-   tỷ lệ xem hết, ngày nhận mẫu) nên chỉ chấm trên các tiêu chí có số thật và
-   nói rõ còn thiếu bao nhiêu — không im lặng coi như trượt. */
-function kocTieuChi(k){
-  const list = [];
-  list.push({ ten: 'Số đơn ≥ ' + KOC_MIN_DON, dat: k.agg.don >= KOC_MIN_DON, co: true });
-  list.push({ ten: 'Đơn/1.000 view ≥ ' + fmtRatio(KOC_MIN_DON_1K),
-              dat: k.agg.don1k !== null && k.agg.don1k >= KOC_MIN_DON_1K,
-              co: k.agg.don1k !== null });
-  list.push({ ten: 'ROI ≥ ' + KOC_MIN_ROI, dat: k.roi !== null && k.roi >= KOC_MIN_ROI,
-              co: k.roi !== null });
-  list.push({ ten: '≥ 2 video hoặc có LIVE',
-              dat: k.agg.video >= 2 || k.agg.live > 0, co: true });
-  list.push({ ten: 'Tỷ lệ hoàn ≤ 10%', dat: false, co: false });
-  list.push({ ten: 'Tỷ lệ xem hết ≥ 3%', dat: false, co: false });
-  list.push({ ten: 'Đăng trong 7 ngày từ khi nhận mẫu', dat: false, co: false });
-  const coSo = list.filter(t => t.co);
-  return { list, dat: coSo.filter(t => t.dat).length, tong: coSo.length,
-           thieu: list.length - coSo.length };
+function kocMauXepLoai(xl){
+  if (xl === 'Hiệu quả') return 'var(--ok, #2e7d32)';
+  if (xl === 'Tạm') return 'var(--proc, #b26a00)';
+  if (xl === 'Kém') return 'var(--warn)';
+  return 'var(--ink-faint)';
 }
 
-/* ------------------------------------------------------------ khối số -----*/
-function kocKpiHtml(scores, agg){
+/* ----------------------------- hàng card: SỐ LIỆU TỪ SÀN ------------------*/
+function kocCardSanHtml(channels){
+  const vid = channels.filter(c => c.kenh === 'video');
+  const liv = channels.filter(c => c.kenh === 'live');
+  const T = kocTongHop(channels), V = kocTongHop(vid), L = kocTongHop(liv);
+  const pct = T.gmv ? Math.round(V.gmv / T.gmv * 100) : 0;
+  const cards = [
+    ['GMV từ KOC', fmtVND(T.gmv), 'Video ' + fmtVND(V.gmv) + ' · LIVE ' + fmtVND(L.gmv)],
+    ['Số đơn', fmtInt(T.don), 'Video ' + fmtInt(V.don) + ' · LIVE ' + fmtInt(L.don)],
+    ['Lượt xem', fmtInt(T.view), 'Video ' + fmtInt(V.view) + ' · LIVE ' + fmtInt(L.view)],
+    ['Đơn/1.000 view', T.don1k !== null ? fmtRatio(T.don1k) : '—', 'tính lại từ tổng, không phải trung bình'],
+    ['Hoa hồng đã trả', fmtVND(T.hoaHong), 'tiền trả cho nhà sáng tạo'],
+    ['Tỷ trọng kênh', pct + '% video', (100 - pct) + '% đến từ LIVE'],
+  ];
+  return '<div class="kpi-row koc-kpi6">' + cards.map(([a, b, c]) =>
+    `<div class="kpi-tile"><div class="k-label">${esc(a)}</div>
+      <div class="k-value" style="font-size:24px">${esc(b)}</div>
+      <div class="k-sub">${esc(c)}</div></div>`).join('') + '</div>';
+}
+
+/* --------------------- hàng nhỏ: số từ SHEET chấm điểm --------------------*/
+function kocHangSheetHtml(scores){
   const duyet = scores.filter(r => r.ket_qua === 'DUYỆT');
   const pct = scores.length ? duyet.length / scores.length * 100 : 0;
   const daLen = duyet.filter(r => r.trang_thai_mau === 'da_dang').length;
   const canGiuc = duyet.filter(r => r.trang_thai_mau === 'da_nhan_chua_dang').length;
-  const tiles = [
-    ['% duyệt', fmtRatio(pct) + '%',
-     duyet.length + ' duyệt / ' + scores.length + ' KOC đã chấm', false],
-    ['Đã lên bài', daLen + '/' + duyet.length,
-     'trong số KOC đã duyệt', false],
-    ['Cần giục đăng bài', canGiuc,
-     canGiuc ? 'đã nhận mẫu mà chưa đăng' : 'không ai tồn', true],
-    ['Đơn từ KOC', fmtInt(agg.don),
-     fmtVND(agg.gmv) + ' · ' + fmtInt(agg.view) + ' view', false],
-  ];
-  return '<div class="kpi-row">' + tiles.map(([label, val, sub, warn]) =>
-    `<div class="kpi-tile"><div class="k-label">${esc(label)}</div>
-      <div class="k-value"${warn && val ? ' style="color:var(--warn)"' : ''}>${esc(String(val))}</div>
-      <div class="k-sub">${esc(sub)}</div></div>`
-  ).join('') + '</div>';
+  return `<div class="koc-sheetrow">
+    <span><b>${fmtRatio(pct)}%</b> duyệt <i>(${duyet.length}/${scores.length} KOC đã chấm)</i></span>
+    <span><b>${daLen}/${duyet.length}</b> đã lên bài</span>
+    <span class="${canGiuc ? 'canh' : ''}"><b>${canGiuc}</b> cần giục đăng bài</span>
+    <span class="ngn">— nhóm số này lấy từ sheet chấm điểm, không phải từ sàn</span>
+  </div>`;
 }
 
-/* ------------------------------------------- 1. KOC cần check bài đăng ----*/
+/* ------------------- 1. Cần xử lý — bảng dày, 1 dòng/KOC ------------------*/
+const KOC_LINK_HANGMAU = 'https://affiliate.tiktok.com/affiliate/sample/sample-request?shop_region=VN&shop_id=7494594978743617682';
+
 function kocActionHtml(scores){
   const chuaDang = scores.filter(r => r.trang_thai_mau === 'da_nhan_chua_dang');
   const dangGiao = scores.filter(r => r.trang_thai_mau === 'dang_giao');
   const chuaRo = scores.filter(r => r.ket_qua === 'DUYỆT' && !r.trang_thai_mau);
-
   let html = '';
   if (!chuaDang.length){
     html += '<p class="cskh-quiet">Không có KOC nào đã nhận mẫu mà chưa đăng bài.</p>';
   } else {
-    html += '<div class="feed">' + chuaDang.map(r => `<div class="fi bad">
-      <div class="fi-head"><span class="tag tiktok">TikTok</span>
-        <span class="tag why">đã nhận mẫu · chưa đăng</span>
-        <b>${esc(r.koc_username)}</b></div>
-      <div class="fi-body">Đã gửi <b>${esc(r.sp_gui || r.sku_gui || 'mẫu')}</b>${
-        r.gia_von_mau ? ' — giá vốn ' + fmtVND(r.gia_von_mau) : ''}. Chưa thấy bài đăng nào.</div>
-      <div class="fi-foot">
-        <a class="lnk" href="https://affiliate.tiktok.com/affiliate/sample/sample-request?shop_region=VN&shop_id=7494594978743617682" target="_blank" rel="noopener">↗ Mở trang hàng mẫu để nhắc</a>
-        <span>điểm ${fmtInt(r.diem || 0)}</span></div>
-    </div>`).join('') + '</div>';
+    html += `<div class="card"><table class="dtable">
+      <thead><tr><th>KOC</th><th>SKU nhận</th><th>Tình trạng</th><th></th></tr></thead>
+      <tbody>${chuaDang.map(r => `<tr>
+        <td><b>${esc(r.koc_username)}</b></td>
+        <td>${esc(r.sku_gui || '—')}</td>
+        <td style="color:var(--warn);font-weight:700">Đã nhận mẫu · chưa đăng</td>
+        <td style="text-align:right"><a class="lnk" href="${KOC_LINK_HANGMAU}" target="_blank" rel="noopener">↗ Xử lý</a></td>
+      </tr>`).join('')}</tbody></table></div>`;
   }
   if (dangGiao.length){
-    html += `<p class="cskh-quiet"><b>${fmtInt(dangGiao.length)} KOC đang trên đường nhận hàng</b>
-      (${dangGiao.map(r => esc(r.koc_username)).join(', ')}) — <b>chưa được giục</b>, họ chưa nhận được mẫu.</p>`;
+    html += `<p class="cskh-quiet"><b>${fmtInt(dangGiao.length)} KOC hàng đang trên đường</b>
+      (${dangGiao.map(r => esc(r.koc_username)).join(', ')}) — <b>chưa giục</b>, họ chưa nhận được mẫu.</p>`;
   }
   if (chuaRo.length){
-    html += `<p class="cskh-quiet">${fmtInt(chuaRo.length)} KOC đã duyệt trong sổ nhưng không thấy ở
-      tab trạng thái nào của TikTok (có thể còn ở "Chờ xem xét" hoặc đã huỷ):
-      ${chuaRo.map(r => esc(r.koc_username)).join(', ')}.</p>`;
+    html += `<p class="cskh-quiet">${fmtInt(chuaRo.length)} KOC đã duyệt nhưng không thấy ở tab trạng thái nào
+      (có thể còn "Chờ xem xét" hoặc đã huỷ): ${chuaRo.map(r => esc(r.koc_username)).join(', ')}.</p>`;
   }
   return html;
 }
 
-/* ------------------------------------------ 2. KOC làm việc hiệu quả -----*/
-function kocEffectiveHtml(list){
-  if (!list.length) return '<p class="cskh-quiet">Chưa có KOC nào có số liệu trong kỳ này.</p>';
-  const scored = list.map(k => ({ k, tc: kocTieuChi(k) }));
-  const nen = scored.filter(x => x.tc.dat >= Math.ceil(x.tc.tong * 0.75) && x.k.agg.don > 0);
-  const ngung = scored.filter(x => x.k.agg.don === 0);
+/* --------------------------- 2. KOC làm việc hiệu quả --------------------*/
+function kocTieuChi(k){
+  const t = [
+    { ten: 'Số đơn ≥ ' + KOC_MIN_DON, dat: k.don >= KOC_MIN_DON },
+    { ten: 'Đơn/1.000 view ≥ ' + fmtRatio(KOC_MIN_DON_1K), dat: k.don1k !== null && k.don1k >= KOC_MIN_DON_1K },
+    { ten: '≥ 2 nội dung', dat: k.noiDung >= 2 },
+  ];
+  if (k.roi !== null) t.push({ ten: 'ROI ≥ ' + KOC_MIN_ROI, dat: k.roi >= KOC_MIN_ROI });
+  return { list: t, dat: t.filter(x => x.dat).length, tong: t.length };
+}
+
+function kocEffectiveHtml(byKoc){
+  const scored = byKoc.filter(k => k.don > 0).map(k => ({ k, tc: kocTieuChi(k) }));
+  const nen = scored.filter(x => x.tc.dat === x.tc.tong).slice(0, 12);
+  const ngung = byKoc.filter(k => k.noiDung > 0 && k.don === 0);
   let html = '';
   if (nen.length){
     html += '<div class="feed">' + nen.map(({ k, tc }) => `<div class="fi">
       <div class="fi-head"><b>${esc(k.koc)}</b>
         <span class="tag why" style="background:var(--accent-soft);color:var(--accent)">đạt ${tc.dat}/${tc.tong} tiêu chí</span>
-        ${k.roi !== null ? '<span>ROI ' + fmtRatio(k.roi) + '</span>' : ''}</div>
-      <div class="fi-body">${fmtInt(k.agg.don)} đơn · ${fmtVND(k.agg.gmv)} ·
-        ${fmtInt(k.agg.view)} view · ${k.agg.don1k !== null ? fmtRatio(k.agg.don1k) + ' đơn/1.000 view' : '—'} ·
-        ${k.agg.video} video${k.agg.live ? ' + ' + k.agg.live + ' LIVE' : ''}</div>
-      <div class="fi-foot">${tc.list.filter(t => t.co).map(t =>
-        (t.dat ? '✅ ' : '⬜ ') + esc(t.ten)).join(' · ')}
-        ${k.link ? '<a class="lnk" href="' + esc(k.link) + '" target="_blank" rel="noopener">↗ Xem video</a>' : ''}</div>
+        ${k.roi !== null ? '<span>ROI ' + fmtRatio(k.roi) + '</span>' : '<span>chưa từng nhận mẫu</span>'}</div>
+      <div class="fi-body">${fmtVND(k.gmv)} · ${fmtInt(k.don)} đơn · ${fmtInt(k.view)} view ·
+        ${k.don1k !== null ? fmtRatio(k.don1k) + ' đơn/1.000 view' : '—'} ·
+        ${fmtInt(k.video)} video${k.live ? ' + ' + fmtInt(k.live) + ' LIVE' : ''}</div>
+      <div class="fi-foot">${tc.list.map(x => (x.dat ? '✅ ' : '⬜ ') + esc(x.ten)).join(' · ')}</div>
     </div>`).join('') + '</div>';
   } else {
-    html += '<p class="cskh-quiet">Chưa có KOC nào đạt đủ tiêu chí để gửi thêm mẫu trong kỳ này.</p>';
+    html += '<p class="cskh-quiet">Chưa có KOC nào đạt đủ tiêu chí.</p>';
   }
   if (ngung.length){
-    html += `<p class="cskh-quiet"><b>Đã đăng nhưng không ra đơn nào:</b>
-      ${ngung.map(x => esc(x.k.koc) + ' (' + fmtInt(x.k.agg.view) + ' view)').join(', ')}
+    html += `<p class="cskh-quiet"><b>Có đăng nhưng không ra đơn nào:</b>
+      ${ngung.slice(0, 15).map(k => esc(k.koc)).join(', ')}${ngung.length > 15 ? ' và ' + (ngung.length - 15) + ' người nữa' : ''}
       — cân nhắc ngưng gửi mẫu.</p>`;
   }
-  html += `<p class="cskh-quiet">Hiện mới chấm được <b>4/7 tiêu chí</b>. Ba tiêu chí còn lại
-    (tỷ lệ hoàn hàng, tỷ lệ xem hết, đăng đúng hạn) cần bổ sung dữ liệu từ TikTok rồi mới bật.</p>`;
   return html;
 }
 
-/* ------------------------------------ 3. Mới lên bài (2 ngày gần nhất) ---*/
+/* ---------------------- 3. Mới lên bài (2 ngày gần nhất) -----------------*/
 function kocRecentHtml(contents){
-  const today = kocToday();
-  const from = new Date(today); from.setDate(from.getDate() - (KOC_MOI_DANG_NGAY - 1));
-  const key = kocDateKey(from);
-  const moi = contents.filter(c => c.ngay_dang >= key);
+  const from = new Date(kocToday()); from.setDate(from.getDate() - (KOC_MOI_DANG_NGAY - 1));
+  const moi = contents.filter(c => c.ngay_dang >= kocDateKey(from));
   if (!moi.length){
     return `<p class="cskh-quiet">Không có video hay buổi LIVE nào trong ${KOC_MOI_DANG_NGAY} ngày gần nhất.</p>`;
   }
@@ -240,121 +200,98 @@ function kocRecentHtml(contents){
   </div>`).join('') + '</div>';
 }
 
-/* ----------------------------------------- 4. Card gộp số liệu theo kỳ ---*/
-function kocPeriodCardHtml(agg, periodLabel){
-  const rows = [
-    ['Lượt xem', fmtInt(agg.view)],
-    ['Số đơn', fmtInt(agg.don)],
-    ['GMV (doanh thu)', fmtVND(agg.gmv)],
-    ['Số video', fmtInt(agg.video) + (agg.live ? ' + ' + fmtInt(agg.live) + ' LIVE' : '')],
-    ['Hoa hồng đã trả', agg.hoaHong ? fmtVND(agg.hoaHong) : '— chưa có dữ liệu'],
-    ['Đơn/1.000 view', agg.don1k !== null ? fmtRatio(agg.don1k) : '—'],
-    ['Tỷ lệ hoàn', agg.tyLeHoan !== null ? fmtRatio(agg.tyLeHoan * 100) + '%' : '— chưa có dữ liệu'],
-  ];
-  return `<div class="card"><div class="c-title">Tổng hợp ${esc(periodLabel)}
-    <span style="font-weight:400;color:var(--ink-faint)">— gộp theo ngày đăng video; Đơn/1.000 view tính lại từ tổng, không phải trung bình</span></div>
-    <table class="dtable"><tbody>${rows.map(([a, b]) =>
-      `<tr><td>${esc(a)}</td><td class="num">${esc(b)}</td></tr>`).join('')}</tbody></table></div>`;
-}
-
-/* --------------------------------------------------- 5. Bảng tổng quan ---*/
-const KOC_TRANG_THAI_LABEL = {
-  da_dang: 'Đã lên', da_nhan_chua_dang: 'Chưa lên', dang_giao: 'Đang giao', huy: 'Huỷ',
-};
-
-function kocTableHtml(scores, byKoc){
-  const duyet = scores.filter(r => r.ket_qua === 'DUYỆT');
-  const m = new Map(byKoc.map(k => [k.koc, k]));
-  // Một KOC xin mẫu nhiều lần => nhiều dòng Book, nhưng số liệu affiliate gộp
-  // theo nhà sáng tạo nên KHÔNG tách được theo từng lần tặng. Nếu in số lên cả
-  // mấy dòng thì nhìn như nhân đôi/nhân ba. Chỉ gắn số vào dòng ĐẦU, dòng sau
-  // ghi rõ đã tính ở dòng nào.
-  const daGan = new Map();
-  const body = duyet.map(r => {
-    const first = daGan.get(r.koc_username);
-    if (first !== undefined){
-      return `<tr>
-        <td class="num">${fmtInt(r.book_stt || 0)}</td>
-        <td><b>${esc(r.koc_username)}</b></td>
-        <td class="num">${fmtInt(r.diem || 0)}</td>
-        <td>${esc(r.sku_gui || '—')}</td>
-        <td style="color:var(--ink-faint);font-weight:700">${esc(KOC_TRANG_THAI_LABEL[r.trang_thai_mau] || '—')}</td>
-        <td colspan="6" style="color:var(--ink-faint)">số liệu đã tính ở STT ${fmtInt(first)} (cùng KOC, TikTok không tách theo từng lần tặng mẫu)</td>
-        <td>—</td></tr>`;
-    }
-    daGan.set(r.koc_username, r.book_stt || 0);
-    const k = m.get(r.koc_username);
-    const roi = (k && k.roi !== null && k.roi !== undefined) ? k.roi : null;
+/* ------------------- 4 & 5. Bảng KOC Video / KOC LIVE --------------------*/
+function kocBangKenhHtml(channels, kenh, von, tieuDe, ghiChu){
+  const rows = channels.filter(c => c.kenh === kenh)
+    .sort((a, b) => (b.gmv || 0) - (a.gmv || 0));
+  if (!rows.length){
+    return `<div class="card"><div class="c-title">${esc(tieuDe)}</div>
+      <p class="cskh-quiet">Chưa có dữ liệu.</p></div>`;
+  }
+  const tong = kocTongHop(rows);
+  const body = rows.map(c => {
+    const v = von.get(c.koc_username) || null;
+    const roi = v ? (c.gmv || 0) / v : null;
     const xl = kocXepLoai(roi);
-    const tt = KOC_TRANG_THAI_LABEL[r.trang_thai_mau] || '—';
-    const ttColor = r.trang_thai_mau === 'da_dang' ? 'var(--ok, var(--accent))'
-      : r.trang_thai_mau === 'da_nhan_chua_dang' ? 'var(--warn)' : 'var(--ink-faint)';
+    const d1k = c.luot_xem ? (c.so_don || 0) / c.luot_xem * 1000 : null;
     return `<tr>
-      <td class="num">${fmtInt(r.book_stt || 0)}</td>
-      <td><b>${esc(r.koc_username)}</b></td>
-      <td class="num">${fmtInt(r.diem || 0)}</td>
-      <td>${esc(r.sku_gui || '—')}</td>
-      <td style="color:${ttColor};font-weight:700">${esc(tt)}</td>
-      <td class="num">${k ? fmtInt(k.agg.view) : '—'}</td>
-      <td class="num">${k ? fmtInt(k.agg.don) : '—'}</td>
-      <td class="num">${k ? fmtVND(k.agg.gmv) : '—'}</td>
-      <td class="num">${k && k.agg.don1k !== null ? fmtRatio(k.agg.don1k) : '—'}</td>
-      <td class="num">${r.gia_von_mau ? fmtVND(r.gia_von_mau) : '—'}</td>
+      <td><b>${esc(c.koc_username)}</b></td>
+      <td class="num">${fmtInt(c.so_noi_dung || 0)}</td>
+      <td class="num">${fmtVND(c.gmv || 0)}</td>
+      <td class="num">${fmtInt(c.so_don || 0)}</td>
+      <td class="num">${fmtInt(c.luot_xem || 0)}</td>
+      <td class="num">${d1k !== null ? fmtRatio(d1k) : '—'}</td>
+      <td class="num">${fmtVND(c.hoa_hong || 0)}</td>
+      <td class="num">${v ? fmtVND(v) : '—'}</td>
       <td class="num">${roi !== null ? fmtRatio(roi) : '—'}</td>
-      <td>${xl ? esc(xl) : '—'}</td></tr>`;
+      <td style="color:${kocMauXepLoai(xl)};font-weight:700">${xl ? esc(xl) : '—'}</td></tr>`;
   }).join('');
-  return `<div class="card"><div class="c-title">Toàn bộ KOC đã duyệt (${fmtInt(duyet.length)})
-    <span style="font-weight:400;color:var(--ink-faint)">— lấy từ tab "3.Quản lý Book"</span></div>
+  return `<div class="card"><div class="c-title">${esc(tieuDe)} (${fmtInt(rows.length)} KOC)
+    <span style="font-weight:400;color:var(--ink-faint)">— ${esc(ghiChu)}</span></div>
     <div style="overflow-x:auto"><table class="dtable">
-      <thead><tr><th>STT</th><th>KOC</th><th>Điểm</th><th>Mẫu gửi</th><th>Bài đăng</th>
-      <th style="text-align:right">View</th><th style="text-align:right">Đơn</th>
-      <th style="text-align:right">GMV</th><th style="text-align:right">Đơn/1.000 view</th>
-      <th style="text-align:right">Giá vốn</th><th style="text-align:right">ROI</th><th>Xếp loại</th></tr></thead>
-      <tbody>${body}</tbody></table></div></div>`;
+    <thead><tr><th>KOC</th><th style="text-align:right">${kenh === 'live' ? 'Buổi' : 'Video'}</th>
+      <th style="text-align:right">GMV</th><th style="text-align:right">Đơn</th>
+      <th style="text-align:right">${kenh === 'live' ? 'Người xem' : 'View'}</th>
+      <th style="text-align:right">Đơn/1.000</th><th style="text-align:right">Hoa hồng</th>
+      <th style="text-align:right">Giá vốn mẫu</th><th style="text-align:right">ROI</th><th>Xếp loại</th></tr></thead>
+    <tbody>${body}</tbody>
+    <tfoot><tr style="border-top:2px solid var(--line-strong);font-weight:700">
+      <td>Tổng</td><td class="num">${fmtInt(tong.noiDung)}</td><td class="num">${fmtVND(tong.gmv)}</td>
+      <td class="num">${fmtInt(tong.don)}</td><td class="num">${fmtInt(tong.view)}</td>
+      <td class="num">${tong.don1k !== null ? fmtRatio(tong.don1k) : '—'}</td>
+      <td class="num">${fmtVND(tong.hoaHong)}</td><td colspan="3"></td></tr></tfoot>
+    </table></div></div>`;
 }
 
 /* ---------------------------------------------------------------- render --*/
-const KOC_PERIOD_LABEL = { week: '7 ngày qua', month: 'tháng này', quarter: '90 ngày qua', all: 'tất cả' };
-
-function kocRender(period){
+function kocRender(){
   const bodyEl = document.getElementById('koc-body');
   if (!bodyEl || !kocRows) return;
-  const range = kocRange(period);
-  const scores = kocRows.scores;
-  const contents = kocRows.contents.filter(c => kocInRange(c.ngay_dang, range));
-  const byKoc = kocByCreator(scores, contents);
-  const agg = kocAgg(contents);
+  const { scores, contents, channels } = kocRows;
+  const von = kocVonMap(scores);
+
+  // gộp cả 2 kênh theo từng KOC cho mục "hiệu quả"
+  const map = new Map();
+  channels.forEach(c => {
+    const k = map.get(c.koc_username) || { koc: c.koc_username, noiDung: 0, gmv: 0, don: 0, view: 0, video: 0, live: 0 };
+    k.noiDung += c.so_noi_dung || 0; k.gmv += c.gmv || 0; k.don += c.so_don || 0; k.view += c.luot_xem || 0;
+    if (c.kenh === 'live') k.live += c.so_noi_dung || 0; else k.video += c.so_noi_dung || 0;
+    map.set(c.koc_username, k);
+  });
+  const byKoc = [...map.values()].map(k => {
+    k.don1k = k.view > 0 ? k.don / k.view * 1000 : null;
+    const v = von.get(k.koc) || null;
+    k.roi = v ? k.gmv / v : null;
+    return k;
+  }).sort((a, b) => b.gmv - a.gmv);
+
+  const ky = channels.length ? (channels[0].ky_ngay + ' ngày, đến ' + (fmtDMY(channels[0].ky_den) || channels[0].ky_den)) : '';
+
   bodyEl.innerHTML = `
-    ${kocKpiHtml(scores, agg)}
-    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đã nhận mẫu mà chưa đăng bài — không phụ thuộc kỳ đang chọn</span></div>
+    ${kocCardSanHtml(channels)}
+    ${kocHangSheetHtml(scores)}
+    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đã nhận mẫu mà chưa đăng bài</span></div>
     ${kocActionHtml(scores)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">KOC làm việc hiệu quả</span><span class="z-note">nên liên hệ gửi thêm mẫu</span></div>
     ${kocEffectiveHtml(byKoc)}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Mới lên bài (${KOC_MOI_DANG_NGAY} ngày gần nhất)</span><span class="z-note">video hoặc LIVE</span></div>
-    ${kocRecentHtml(kocRows.contents)}
-    <div class="zone"><span class="z-num">4</span><span class="z-title">Số liệu kỳ</span><span class="z-note">gộp theo ngày đăng</span></div>
-    ${kocPeriodCardHtml(agg, KOC_PERIOD_LABEL[period] || '')}
-    <div class="zone"><span class="z-num">5</span><span class="z-title">Bảng tổng quan</span><span class="z-note">toàn bộ KOC đã duyệt</span></div>
-    ${kocTableHtml(scores, byKoc)}`;
+    ${kocRecentHtml(contents)}
+    <div class="zone"><span class="z-num">4</span><span class="z-title">KOC gắn link trên VIDEO</span><span class="z-note">xếp theo GMV</span></div>
+    ${kocBangKenhHtml(channels, 'video', von, 'KOC gắn link trên video', 'kỳ ' + ky)}
+    <div class="zone"><span class="z-num">5</span><span class="z-title">KOC gắn link trên LIVE</span><span class="z-note">xếp theo GMV</span></div>
+    ${kocBangKenhHtml(channels, 'live', von, 'KOC gắn link trên LIVE', 'kỳ ' + ky)}`;
 }
 
 function buildKocScreenHTML(){
   return `
   <div class="topbar">
-    <div class="period">
-      <select id="koc-period">
-        <option value="all" selected>Tất cả</option>
-        <option value="week">7 ngày qua</option>
-        <option value="month">Tháng này</option>
-        <option value="quarter">90 ngày qua</option>
-      </select>
-    </div>
+    <div class="period"><span id="koc-ky" class="koc-ky">Kỳ 30 ngày</span></div>
     <span class="up-status" id="koc-updated">Đang tải…</span>
   </div>
   <div id="koc-body"></div>
   <footer>
-    <p><b>Nguồn:</b> skill <code>check-koc</code> đọc TikTok Affiliate Center rồi ghi từng lần chấm điểm / từng video thành 1 dòng vào Supabase, 2 ngày/lần. Trang này chỉ đọc lên.</p>
-    <p><b>Lưu ý cách tính:</b> "% duyệt" tính trên KOC đã chấm điểm (không gồm yêu cầu bị huỷ/hết hạn chưa chấm). Số liệu kỳ gộp theo <b>ngày đăng video</b>. Đơn/1.000 view và ROI luôn tính lại từ số tổng, không lấy trung bình các tỉ lệ.</p>
+    <p><b>Nguồn:</b> số liệu kênh lấy từ TikTok Affiliate Center (API của chính trang Phân tích). Phần % duyệt / đã lên bài / giá vốn mẫu lấy từ Google Sheet "Bảng Chấm Điểm KOC". Trang này chỉ đọc.</p>
+    <p><b>Cách tính:</b> Đơn/1.000 view và ROI luôn tính lại từ số tổng, không lấy trung bình các tỉ lệ. ROI = GMV ÷ giá vốn mẫu, nên KOC chưa từng nhận mẫu sẽ không có ROI. Xếp loại: ROI ≥ 50 Hiệu quả · 20–50 Tạm · &lt; 20 Kém.</p>
   </footer>`;
 }
 
@@ -362,24 +299,23 @@ async function refreshKoc(){
   const statusEl = document.getElementById('koc-updated');
   const bodyEl = document.getElementById('koc-body');
   if (!bodyEl) return;
-  if (kocRows){ kocRender(document.getElementById('koc-period').value); return; }
+  if (kocRows){ kocRender(); return; }
   try {
     await kocLoadRows();
-    const all = [...kocRows.scores.map(r => r.synced_at), ...kocRows.contents.map(r => r.synced_at)]
-      .filter(Boolean).sort();
+    const all = [...kocRows.channels, ...kocRows.scores].map(r => r.synced_at).filter(Boolean).sort();
     const last = all.length ? new Date(all[all.length - 1]) : null;
     statusEl.textContent = last
-      ? 'Cập nhật ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) + ' · tự chạy 2 ngày/lần'
-      : 'Chưa có dữ liệu · skill tự chạy 2 ngày/lần trên PC trực';
-    kocRender(document.getElementById('koc-period').value);
+      ? 'Cập nhật ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
+      : 'Chưa có dữ liệu';
+    const c = kocRows.channels[0];
+    const kyEl = document.getElementById('koc-ky');
+    if (kyEl && c) kyEl.textContent = 'Kỳ ' + c.ky_ngay + ' ngày · đến ' + (fmtDMY(c.ky_den) || c.ky_den);
+    kocRender();
   } catch (err){
     statusEl.textContent = '';
     bodyEl.innerHTML = '<p class="cskh-quiet">Chưa đọc được dữ liệu: ' + esc(err.message) +
-      '. Nếu là lỗi bảng chưa tồn tại thì chạy <code>scripts/koc-tables.sql</code> trên Supabase trước.</p>';
+      '. Nếu là lỗi bảng chưa tồn tại thì chạy <code>scripts/koc-tables.sql</code> và <code>scripts/koc-channel-stats.sql</code> trên Supabase trước.</p>';
   }
 }
 
-function wireKoc(){
-  const sel = document.getElementById('koc-period');
-  if (sel) sel.addEventListener('change', (e) => kocRender(e.target.value));
-}
+function wireKoc(){ /* không còn bộ chọn kỳ — dữ liệu hiện lưu theo 1 kỳ cố định */ }
