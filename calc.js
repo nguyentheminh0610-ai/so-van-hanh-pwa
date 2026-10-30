@@ -1335,6 +1335,20 @@ function computeAllFromAOA(aoa){
     ...(Object.keys(ttErrTraHoan).length ? [{ reason: 'Không đúng mô tả', platform: 'TikTok', count: Object.keys(ttErrTraHoan).length }] : []),
   ];
 
+  // Lý do trả hàng TẤT CẢ (không chỉ lỗi shop) — tách theo sàn
+  const returnReasonRows = [
+    ...countReasons(spDonTra, 'Lí do Trả hàng/Hoàn tiền', 'Shopee'),
+    ...(Object.keys(spDonHoan).length ? [{ reason: 'Thiếu hàng (hoàn tiền)', platform: 'Shopee', count: Object.keys(spDonHoan).length }] : []),
+    ...countReasons(ttDonTra, 'Return Reason', 'TikTok'),
+    ...(Object.keys(ttDonHoan).length ? [{ reason: 'Refund only', platform: 'TikTok', count: Object.keys(ttDonHoan).length }] : []),
+  ];
+
+  // Lý do huỷ đơn TẤT CẢ — tách theo sàn
+  const cancelReasonRows = [
+    ...countReasons(spCancelledNative, 'Lý do hủy', 'Shopee'),
+    ...countReasons(ttCancelledNative, 'Cancel Reason', 'TikTok'),
+  ];
+
   // ---------- date range detected (for display only) ----------
   // (toDate() đã tách lên top-level phía trên, dùng chung với detectFile())
   // (rà soát 22/10/2026) TRƯỚC ĐÂY chỉ lấy từ đơn Shopee → tháng nào Shopee
@@ -1841,6 +1855,7 @@ function computeAllFromAOA(aoa){
       shipHoan: spShipHoan, ads: spAds,
       troGia: spTroGia, doanhThuRong: spRevenue - spPhiSanHienThi,
       huy: spCancelAllIds.size, tra: Object.keys(spDonTra).length, hoan: Object.keys(spDonHoan).length,
+      bomHang: Object.keys(spKhachKhongNhanHangThat).length + Object.keys(spReclassToCancel).length,
       huyHoanTra: spHuyHoanTra, loiShop: spErrTotal, hoanVeKho: spHoanVeKho,
       aov: Object.keys(spCompleted).length ? spRevenue / Object.keys(spCompleted).length : 0,
     },
@@ -1856,6 +1871,7 @@ function computeAllFromAOA(aoa){
       shipHoan: ttShipHoan, ads: { chiPhi: ttQuangCaoGmvMax || 0, doanhSo: null, roas: null },
       troGia: ttTroGia, doanhThuRong: ttRevenue - ttPhiSanHienThi,
       huy: Object.keys(ttCancelledNative).length, tra: Object.keys(ttDonTra).length, hoan: Object.keys(ttDonHoan).length,
+      bomHang: ttHuyDaGui,
       huyHoanTra: ttHuyHoanTra, loiShop: ttErrTotal, hoanVeKho: ttHoanVeKho,
       aov: Object.keys(ttCompleted).length ? ttRevenue / Object.keys(ttCompleted).length : 0,
     },
@@ -1875,7 +1891,7 @@ function computeAllFromAOA(aoa){
     daChotLai: !!(aoa.shopeeReturnRefundNext || aoa.tiktokReturnsNext),
     pnl,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
-    reasonRows,
+    reasonRows, returnReasonRows, cancelReasonRows,
     hoanVeKhoDetail: hoanVeKhoDetailAll, hoanVeKhoNgoaiKyCount,
     dailyRevenue,
     kenh, sanPham,
@@ -1949,6 +1965,7 @@ function combineMonthlyResults(entries){
     shipHoan: mergeChiTiet(d => d.shopee.shipHoan),
     troGia: sumField(d => d.shopee.troGia),
     huy: sumField(d => d.shopee.huy), tra: sumField(d => d.shopee.tra), hoan: sumField(d => d.shopee.hoan),
+    bomHang: sumField(d => d.shopee.bomHang || 0),
     huyHoanTra: sumField(d => d.shopee.huyHoanTra), loiShop: sumField(d => d.shopee.loiShop),
     hoanVeKho: sumField(d => d.shopee.hoanVeKho),
   };
@@ -1966,6 +1983,7 @@ function combineMonthlyResults(entries){
     shipHoan: mergeChiTiet(d => d.tiktok.shipHoan),
     troGia: sumField(d => d.tiktok.troGia),
     huy: sumField(d => d.tiktok.huy), tra: sumField(d => d.tiktok.tra), hoan: sumField(d => d.tiktok.hoan),
+    bomHang: sumField(d => d.tiktok.bomHang || 0),
     huyHoanTra: sumField(d => d.tiktok.huyHoanTra), loiShop: sumField(d => d.tiktok.loiShop),
     hoanVeKho: sumField(d => d.tiktok.hoanVeKho),
   };
@@ -2014,16 +2032,21 @@ function combineMonthlyResults(entries){
     warnings.push(`Gộp kỳ: ${monthsMissingRaw.join(', ')} chưa được tính lại theo công thức mới (thiếu số liệu gốc) — Slove/PiShip/Voucher extra gộp có thể hơi lệch cho các tháng này. Bấm "Cập nhật lại lịch sử" rồi gộp lại để có số chính xác.`);
   }
 
-  // reasonRows — gộp theo (reason, platform)
-  const reasonMap = {};
-  for (const d of list){
-    for (const r of (d.reasonRows || [])){
-      const key = r.platform + '|' + r.reason;
-      if (!reasonMap[key]) reasonMap[key] = { reason: r.reason, platform: r.platform, count: 0 };
-      reasonMap[key].count += r.count;
+  // reasonRows + returnReasonRows + cancelReasonRows — gộp theo (reason, platform)
+  function mergeReasonRows(field){
+    const map = {};
+    for (const d of list){
+      for (const r of (d[field] || [])){
+        const key = r.platform + '|' + r.reason;
+        if (!map[key]) map[key] = { reason: r.reason, platform: r.platform, count: 0 };
+        map[key].count += r.count;
+      }
     }
+    return Object.values(map);
   }
-  const reasonRows = Object.values(reasonMap);
+  const reasonRows = mergeReasonRows('reasonRows');
+  const returnReasonRows = mergeReasonRows('returnReasonRows');
+  const cancelReasonRows = mergeReasonRows('cancelReasonRows');
 
   // ngày kỳ gộp — nhỏ nhất/lớn nhất trong toàn bộ các tháng đã chọn
   let minDate = null, maxDate = null;
@@ -2160,7 +2183,7 @@ function combineMonthlyResults(entries){
     shopee, tiktok, tong,
     pnl, chiPhiVanHanh,
     nhanh4: { slove, tlove, piShipRatio, voucherExtra },
-    reasonRows,
+    reasonRows, returnReasonRows, cancelReasonRows,
     hoanVeKhoDetail, hoanVeKhoNgoaiKyCount,
     dailyRevenue,
     kenh, sanPham,
