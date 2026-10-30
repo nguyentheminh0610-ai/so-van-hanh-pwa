@@ -155,7 +155,70 @@ vòng thứ hai **đứng im ở trang đầu** trong khi vòng kia vẫn chạy
 từng vòng một. Mỗi lượt `javascript_tool` cũng bị cắt ở **45 giây**, nên việc
 kéo dài phải cho chạy nền rồi hỏi tiến độ qua một biến `window.__prog`.
 
-## 4d. KẾT QUẢ SHOPEE — nhóm bom hàng (chốt 30/10/2026, kỳ 01/10→29/10)
+## 4d-bis. ⭐⭐ QUY TẮC ĐÚNG để biết hàng có thật sự về kho không (chốt 30/10/2026)
+
+**Mục 4d và 4e bên dưới có kết luận SAI ("Shopee thiếu 6 đơn"). Giữ lại để biết
+đã sai ở đâu. Số đúng: Shopee khớp 9/9, THIẾU = 0.**
+
+### Sai ở đâu
+
+Đã dùng *"có Mã vận đơn + có Ngày gửi hàng"* làm bằng chứng kiện đã rời kho.
+**Sai**: Shopee cấp mã vận đơn ngay khi shop bấm **"Chuẩn bị hàng"**, còn
+*"Ngày gửi hàng"* là **hạn phải giao cho shipper**, không phải lúc shipper lấy
+thật. Đơn mới chuẩn bị xong mà khách hủy trước khi shipper tới lấy vẫn có đủ 2
+trường đó — nhưng **kiện hàng chưa bao giờ rời kho**, nó nằm lại trên kệ.
+
+Chủ shop chỉ ra điều này ngày 30/10, sau khi tự mở từng đơn ra xem.
+
+### Quy tắc đúng — kiểm trên 81 đơn thật, phân tách 100% sạch
+
+| Cột trong file export | Nhóm đã rời kho (9) | Nhóm chưa rời kho (72) |
+|---|---|---|
+| **`Thời gian giao hàng`** | **9/9 có giá trị** | **0/72 — trống hết** |
+| **`Trạng thái trả hàng`** | **9/9 = "Đã trả hàng"** | **0/72 — trống hết** |
+| `Ngày gửi hàng` | 9/9 có | 6/6 có ở nhóm đã chuẩn bị hàng ❌ không phân biệt được |
+| `Mã vận đơn` | 9/9 có | 6/6 có ở nhóm đã chuẩn bị hàng ❌ không phân biệt được |
+
+> **Kiện hàng thật sự rời kho ⟺ cột `Thời gian giao hàng` CÓ giá trị.**
+> **Kiện hàng thật sự quay về kho ⟺ cột `Trạng thái trả hàng` = `"Đã trả hàng"`.**
+>
+> Tuyệt đối KHÔNG dùng `Mã vận đơn` hay `Ngày gửi hàng` để suy ra điều này.
+
+Áp quy tắc đúng: 81 đơn → **9 đơn thật sự về kho**, cả 9 đều có phiếu Sapo →
+**Sapo THIẾU = 0**. 72 đơn còn lại hàng vẫn nằm ở kho, **Sapo không sinh phiếu là
+ĐÚNG**, không phải lỗi.
+
+`Lý do hủy` của 6 đơn từng bị quy oan: 5 đơn *"Hủy bởi người mua"*, 1 đơn
+*"Hủy bởi người bán — Hết hàng"* — khớp đúng lời chủ shop kể.
+
+### Kiểm chứng độc lập bằng lượt quét kho (cách chắc nhất)
+
+Bảng `warehouse_return_checks` của Sổ Kho ghi mã kiện **thật sự được quét khi
+hàng về**. Đây là bằng chứng vật lý, mạnh hơn mọi suy luận từ trạng thái sàn.
+
+Tra 12 đơn từng bị kết luận nhầm là "Sapo thiếu": **11/12 không có lượt quét
+nào** → hàng chưa từng về kho → Sapo đúng. Chỉ `261004Q31NEBV7` có quét ngày
+07/10 (kiện đã chuẩn bị, khách hủy, nhân viên quét khi xếp lại kệ — đúng nhóm
+`huy_truoc_gui` mà `sync_returns_feed.py` đã có sẵn cách phân loại).
+
+**Quy trình đối chiếu chuẩn từ nay là 3 chiều**, không phải 2:
+
+```
+SÀN (trạng thái)  ×  SAPO (phiếu trả)  ×  SỔ KHO (lượt quét thật)
+```
+
+Chỉ khi cả 3 cùng vắng mặt thì mới kết luận được. Sàn + Sapo lệch nhau mà chưa
+tra lượt quét thì **chưa đủ căn cứ nói ai sai**.
+
+### Bài học
+
+Đừng suy ra sự kiện vật lý (hàng về kho) từ trường dữ liệu hành chính (mã vận
+đơn, hạn gửi hàng). Phải tìm đúng trường ghi nhận **hành động đã xảy ra**
+(`Thời gian giao hàng`, `Trạng thái trả hàng`), hoặc tra thẳng lượt quét kho.
+
+---
+
+## 4d. KẾT QUẢ SHOPEE — nhóm bom hàng (⚠️ KẾT LUẬN SAI, xem 4d-bis)
 
 Nguồn: 2 file chủ shop tự xuất từ Shopee — `Order.cancelled` và
 `Order.failed_delivery` (Shopee chỉ cho xuất tối đa 30 ngày/lần).
