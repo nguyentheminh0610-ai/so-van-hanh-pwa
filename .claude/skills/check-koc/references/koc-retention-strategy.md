@@ -34,7 +34,7 @@ LIVE → chỉ nhận bộ ưu đãi LIVE; làm cả 2 → nhận **cả 2 bộ*
 
 | Ưu đãi | Điều kiện áp dụng | VIP Video | Thường Video | VIP LIVE | Thường LIVE |
 |---|---|:---:|:---:|:---:|:---:|
-| **Hoa hồng tiêu chuẩn** tăng | Chỉ KOC GMV >30tr/**tháng** | ✅ tăng | giữ 9% | ✅ tăng | giữ 9% |
+| **Hoa hồng mục tiêu** tăng (xem bảng 3 loại dưới) | Mọi VIP — **9% → 10%** *(chốt 30/10, thay cho rule cũ ">30tr/tháng" — xem cảnh báo bên dưới)* | ✅ 10% | giữ 9% | ✅ 10% | giữ 9% |
 | **Hoa hồng Quảng cáo cửa hàng** | Không phân biệt — **giữ 3% cho tất cả** | 3% | 3% | — | — |
 | **Chạy Ads cho video** | Mọi KOC làm video, không phân biệt tier | ✅ | ✅ | — | — |
 | **Ưu tiên mời mẫu SP mới** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
@@ -42,15 +42,30 @@ LIVE → chỉ nhận bộ ưu đãi LIVE; làm cả 2 → nhận **cả 2 bộ*
 | **FS trên LIVE** | Mọi KOC làm LIVE, không phân biệt tier | — | — | ✅ | ✅ |
 | **Liên hệ hỗ trợ riêng** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
 
-### Lưu ý quan trọng về 2 loại hoa hồng — đừng gộp lẫn
+### ⚠️ 3 khái niệm hoa hồng — đừng gộp lẫn (sửa lại 30/10, bản trước chỉ ghi 2 cái và gọi sai tên)
 
-TikTok có **2 con số hoa hồng tách biệt**, không phải 1:
-- **Hoa hồng tiêu chuẩn** (hiện 9%) — ĐÂY mới là chỗ phân biệt VIP/Thường,
-  và chỉ tăng cho ai đạt >30tr/tháng (ngưỡng RIÊNG, cao hơn hẳn ngưỡng vào
-  VIP 1,2tr/kỳ — không phải mọi VIP đều đạt mức này).
-- **Hoa hồng Quảng cáo cửa hàng** (hiện 3%, dùng khi video được uỷ quyền
-  chạy Ads) — **giữ nguyên 3% cho TẤT CẢ**, không phải công cụ phân biệt
-  tier. Mọi KOC làm video, Thường hay VIP, đều chạy Ads được như nhau.
+TikTok có **3 khái niệm tách biệt**, không phải 2:
+
+| | Set ở đâu | Mức hiện tại | Khác theo VIP? |
+|---|---|---|---|
+| **① Hoa hồng tiêu chuẩn** | *Cộng tác mở* — 1 mức áp dụng chung cho **mọi** KOC tự tham gia | **9%** | Không — mức nền, cố định |
+| **② Hoa hồng mục tiêu** | *Cộng tác mục tiêu* — set **riêng từng KOC** khi mời đích danh | Thường **9%** · VIP **10%** | **Có — đây mới là đòn bẩy VIP thật sự** |
+| **③ Hoa hồng Quảng cáo cửa hàng** | Khoản **cộng thêm, tách biệt** — KOC vẫn nhận dù đơn đến từ Ads do **shop** tự chạy (dùng video KOC đã uỷ quyền), không cần chính KOC bán | **3%** | Không — như nhau mọi người |
+
+**① và ② thực ra là CÙNG 1 trường "hoa hồng tiêu chuẩn" trên TikTok, chỉ khác
+đường set** (đại trà qua Cộng tác mở, hay riêng từng người qua Cộng tác mục
+tiêu) — ② mới là chỗ thật sự phân biệt VIP/Thường. **③ là một dòng tiền hoàn
+toàn khác, không liên quan VIP/Thường** — nhưng chủ shop nhấn mạnh (30/10)
+đây là thứ **KOC rất quan tâm**, vì nhiều người không biết mình vẫn được ăn
+hoa hồng ngay cả khi đơn đến từ Ads do SHOP tự chạy, không phải chính họ bán.
+
+**⚠️ Mâu thuẫn CHƯA GIẢI QUYẾT, cần hỏi lại chủ shop nếu phiên sau động vào
+số này:** bản chốt 29/10 nói hoa hồng mục tiêu chỉ tăng cho VIP đạt riêng
+**>30tr/tháng** (không phải mọi VIP). Bản chốt 30/10 nói đơn giản "Thường 9%,
+VIP 10%" không nhắc lại mốc 30tr. Claude đã hiểu là **bỏ hẳn mốc 30tr, mọi
+VIP đều lên 10%**, và ghi vào bảng trên theo hướng đó — nhưng **chưa được
+chủ shop xác nhận lại bằng lời**, chỉ là suy luận hợp lý nhất từ câu nói sau
+cùng. Nếu sai, chủ shop sẽ sửa.
 
 ## 4 công cụ thật đã xác minh trên TikTok Affiliate Center (29–30/10/2026)
 
@@ -59,7 +74,7 @@ tác hôm 29/10 (bảng sản phẩm "Cộng tác mở" có đúng 2 cột tỷ 
 
 | Công cụ | Áp dụng kênh | Nơi dùng trên TikTok | Mức chuẩn hiện tại |
 |---|---|---|---|
-| Hoa hồng tiêu chuẩn | Video & LIVE | *Cộng tác mở* (áp chung mọi KOC) hoặc *Cộng tác mục tiêu* (set riêng từng KOC) | **9%** |
+| Hoa hồng tiêu chuẩn / mục tiêu | Video & LIVE | *Cộng tác mở* = 1 mức chung; *Cộng tác mục tiêu* = set riêng từng KOC | Mở: **9%** · Mục tiêu: Thường **9%** / VIP **10%** |
 | Hoa hồng Quảng cáo cửa hàng | Chỉ Video | *Cộng tác mở* hoặc *Cộng tác mục tiêu* — form thêm sản phẩm của lời mời mục tiêu có đúng cột "Tỷ lệ hoa hồng Quảng cáo cửa hàng" riêng | **3%** |
 | Mã giảm giá trên LIVE | Chỉ LIVE | Khuyến mãi LIVE | — |
 | FS trên LIVE của KOC | Chỉ LIVE | Khuyến mãi LIVE / Flash Sale (xem skill `tiktok-koc-flashsale`, `tiktok-live-flashsale`) | — |
