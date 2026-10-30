@@ -81,41 +81,53 @@ Read the live rows before sending — don't paraphrase from memory, the shop
 owner edits these. As of 2026-10-07:
 - Row 24 ("Nhắn khách đánh giá xấu") — gửi qua **tin nhắn chat riêng** cho
   khách đánh giá xấu, KHÔNG đăng làm phản hồi công khai dưới đánh giá.
-- Row 25 (same loại, Tình huống "Nhắn khách trả hàng") — use for **any**
-  return/refund request, regardless of the reason the platform shows —
-  always use this generic opener, don't pick a reason-specific template.
-  **Nội dung đã đổi 29/10/2026 (xem mục "Khuyến khích đổi lý do trả hàng"
-  bên dưới) — đọc lại nguyên văn từ Sheet trước khi gửi, đừng dùng bản cũ
-  trong trí nhớ.**
+- Row 25 (same loại, Tình huống "Nhắn khách trả hàng") — dùng cho case **KHÔNG
+  phải lỗi shop** (xem phân loại ngay dưới) — opener trung lập, chỉ hỏi lý do,
+  không mời đổi gì cả.
+- Row 35/36 (Tình huống "Nhắn khách đổi lý do trả hàng (case lỗi shop)", cột
+  Sàn tách riêng TikTok Shop / Shopee — **2 tên lý do khác nhau, đừng lấy
+  nhầm**) — dùng cho case **lỗi shop** (xem ngay dưới). Đọc đúng dòng theo
+  platform của case đang xử lý.
 
-### Khuyến khích đổi lý do trả hàng về "Đổi ý/Không có nhu cầu" (chốt 29/10/2026)
+### Khuyến khích đổi lý do trả hàng — CHỈ với case lỗi shop (chốt 29–30/10/2026)
 
 Chủ shop chốt: **ưu tiên chỉ số shop + không mất phí ship hoàn hơn thu thập
-insight chính xác.** Lý do: lý do trả hàng do khách chọn trên sàn quyết định
-ai trả phí ship hoàn và có bị tính vào chỉ số lỗi/chỉ số bị phạt của shop hay
-không — lý do "Đổi ý/Không có nhu cầu" (hàng còn nguyên vẹn) thì khách tự
-chịu/k ảnh hưởng shop, còn lý do kiểu "hàng lỗi/giao sai/không đúng mô tả"
-thì shop chịu phí ship + bị tính vào chỉ số, dù hàng có thật sự lỗi hay
-không. Vì vậy tin nhắn dòng 25 giờ **gộp luôn lời mời đổi lý do vào ngay
-tin nhắn đầu tiên** (không cần tin nhắn thứ 2, không cần chờ khách trả lời
-trước — vẫn đúng Hard rule 1, đây là 1 tin nhắn first-contact duy nhất):
-mời khách đổi sang "Đổi ý/Không có nhu cầu" **cho mọi case**, kể cả case
-platform đang ghi lỗi sản phẩm/giao sai — không cần tự lọc "case nhẹ" mới
-mời. Khách đồng ý hay không là tuỳ khách, mình chỉ hỏi.
+insight chính xác**, nhưng **chỉ áp dụng cho case thật sự là lỗi shop**
+(chốt lại 30/10/2026, thu hẹp từ quyết định ban đầu 29/10 là mời mọi case) —
+case khách tự đổi ý/tự chọn sai size thì sàn vốn đã không tính lỗi shop,
+không có gì để "nhờ đổi".
 
-- Việc duy nhất skill làm: **gửi đúng tin nhắn dòng 25 (đã gộp lời mời)**
-  khi mở thread trả hàng, giống hệt flow cũ — không thêm bước nào khác, không
-  tự vào sàn bấm đổi lý do giúp khách (khách phải tự làm trên app của họ).
-- Khách trả lời đồng ý / đã đổi lý do, hay từ chối / khẳng định là lỗi thật
-  → ghi vào `message_note` (mục 3 dưới), không cần quay lại nhắn thêm (Hard
-  rule 1), đây là thông tin tham khảo cho chủ shop khi xem thread, không
-  phải việc cần skill xử lý tiếp.
-- **Insight/errlog vẫn phân loại theo nội dung chat khách trả lời (lỗi gì
-  thật), KHÔNG phải theo lý do khách chọn trên sàn** — mục 4
-  (`shop_error_kind`) không đổi, dù khách đổi lý do hiển thị trên sàn thành
-  "đổi ý" thì nội bộ vẫn ghi đúng là lỗi shop nếu đúng là lỗi shop. Tin nhắn
-  này chỉ nhằm đổi con số chỉ số **trên sàn**, không nhằm che giấu lỗi
-  **trong nội bộ** — hai việc tách biệt.
+**Phân loại lỗi shop dùng bảng có sẵn**
+[reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
+— tái dùng đúng logic `shop_error_kind` ở mục 4.1 bên dưới (đọc nội dung
+lý do/mô tả trên thẻ trả hàng, đừng đoán): case ra `giao_nham` / `giao_thieu`
+/ `san_pham_loi` → lỗi shop, mời đổi lý do. Case `null` (đổi ý, tự chọn sai
+size...) → không mời, dùng row 25 bình thường.
+
+Vì lý do hiển thị trên thẻ trả hàng đã đọc được **ngay khi mở case** (bước 2
+của mục "2. Trả hàng/hoàn tiền" dưới), việc phân loại + chọn đúng template
+làm được **ngay trong 1 lượt mở thread, không cần tin nhắn thứ 2 / không cần
+chờ khách trả lời trước** — vẫn đúng Hard rule 1 (1 tin nhắn first-contact
+duy nhất mỗi case):
+
+1. Đọc lý do trên thẻ trả hàng → tra bảng phân loại → xác định lỗi shop hay
+   không.
+2. **Lỗi shop** → mở thread, nếu untouched (Hard rule 3) thì gửi đúng dòng
+   35 (TikTok) hoặc 36 (Shopee) — tên lý do mời đổi **khác nhau theo sàn**,
+   đọc nguyên văn từ Sheet, đừng paraphrase:
+   - TikTok Shop: mời đổi sang lý do **"Đổi ý"**.
+   - Shopee: mời đổi sang lý do **"Hàng nguyên vẹn nhưng không còn nhu cầu"**.
+3. **Không phải lỗi shop** → gửi row 25 (opener trung lập, không mời gì).
+4. Khách đồng ý/đổi lý do thật, hay từ chối/không thấy lựa chọn đó (xem hạn
+   chế trong file tham chiếu — không phải sản phẩm/khách nào cũng đổi được)
+   → ghi vào `message_note` (mục 3 dưới) nếu biết được, không cần nhắn lại
+   lần 2 để hỏi thêm (Hard rule 1).
+5. **Insight/errlog vẫn phân loại theo nội dung thật (lỗi gì thật sự xảy
+   ra), KHÔNG phải theo lý do khách chọn trên sàn** — mục 4 (`shop_error_kind`)
+   không đổi, dù khách đổi lý do hiển thị trên sàn thành "đổi ý" thì nội bộ
+   vẫn ghi đúng là lỗi shop nếu đúng là lỗi shop. Tin nhắn này chỉ nhằm đổi
+   con số **trên sàn**, không nhằm che giấu lỗi **trong nội bộ** — hai việc
+   tách biệt.
 
 **TikTok Shop Seller Center** — dùng **Claude in Chrome** ([reference_chrome_browsers](../../shared/reference_chrome_browsers.md))
 deviceId TikTok, KHÔNG dùng built-in browser:
@@ -196,12 +208,17 @@ Mỗi lần chạy, với mỗi đánh giá 1–2★ đã có dòng trong `cskh_
 
 1. Open the return-management "Đang chờ bạn" list, `get_page_text` it.
 2. For each case within the date window: note mã đơn, buyer handle, lý do,
-   ngày.
-3. Open its chat thread (bubble icon). If untouched (Hard rule 3), send
-   the row-25 template (đã gộp lời mời đổi lý do, xem mục "Khuyến khích đổi
-   lý do trả hàng" ở trên — đọc nguyên văn từ Sheet, đừng paraphrase). If it
-   already has a reply, or the customer is disputing something (Hard rule
-   4), skip — note it for the report instead of messaging.
+   ngày. **Tra lý do này vào bảng**
+   [reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
+   ngay ở bước này → xác định case lỗi shop hay không (xem mục "Khuyến khích
+   đổi lý do trả hàng" ở trên) — quyết định template nào sẽ gửi ở bước 3.
+3. Open its chat thread (bubble icon). If untouched (Hard rule 3), send:
+   - **Lỗi shop** → row 35 (TikTok) hoặc row 36 (Shopee), đúng theo platform
+     của case.
+   - **Không phải lỗi shop** → row 25 (opener trung lập).
+   Đọc nguyên văn template từ Sheet, đừng paraphrase. If it already has a
+   reply, or the customer is disputing something (Hard rule 4), skip — note
+   it for the report instead of messaging.
 4. Tally for the report: total new cases, lý do breakdown with counts, and
    any "Nhận xét của khách hàng" field value shown on the return card
    itself (a free-text comment the customer attaches to the return
@@ -255,7 +272,11 @@ hợp tuần/tháng cần đủ số. Lưu ý từng cột:
   một vấn đề, nếu không web sẽ đếm tách thành 2 nhóm. Đánh giá kiểu "ok shop",
   "giao nhanh" không có gì sửa được thì để trống.
 - `messaged_at` + `message_note`: ghi lúc nhắn và nhắn mẫu nào ("đã nhắn mẫu
-  dòng 24 lúc 14:40"), hoặc lý do bỏ qua ("thread đã có người trả lời").
+  dòng 24 lúc 14:40"), hoặc lý do bỏ qua ("thread đã có người trả lời"). Với
+  bảng trả hàng, case lỗi shop đã mời đổi lý do → ghi rõ "đã mời đổi lý do
+  (dòng 35/36)" + nếu đọc được phản hồi của khách thì thêm luôn ("khách đồng
+  ý đổi" / "khách từ chối, khẳng định lỗi thật" / "khách báo không có lựa
+  chọn đó").
 - `customer_note` (bảng trả hàng) chỉ dành cho ô "Nhận xét của khách hàng"
   trên thẻ trả hàng — KHÔNG phải tin nhắn chat, đừng trộn 2 thứ.
 
