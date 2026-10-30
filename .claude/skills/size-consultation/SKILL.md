@@ -238,6 +238,17 @@ TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đ
   (`1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`) — đổi/trả/hoàn/deal lỗi 2 sàn.
 - **CHƯA train:** sửa thông tin đơn (sai SĐT, shipper không liên hệ được) +
   khiếu nại nặng chưa có mẫu → chủ shop/PC xử lý.
+- **Không in tên SP/giá trên hộp (chốt 30/10):** từ chối khéo, nêu lý do vận
+  hành (shipper cần giá, kho cần tên SP) — xem mục 11 file trên.
+- **Đổi size TRƯỚC khi đóng gói (chốt 30/10):** phải tra trạng thái đơn
+  trước (TikTok "Chờ vận chuyển" / Shopee "Đã xử lý"?); đã xử lý thì không
+  kịp đổi, chưa xử lý thì ưu tiên khuyên đặt lại đơn mới hơn là ghi chú (ghi
+  chú rủi ro cao) — xem mục 12.
+- **"Chưa nhận được hàng" (chốt 30/10):** hướng khách tự kiểm tra cuộc gọi
+  nhỡ/người nhà trước, rồi tự gọi shipper; LUÔN kèm câu hẹn khách quay lại
+  nếu vẫn không thấy để shop tìm/khiếu nại sàn — xem mục 13.
+- **Khách tự huỷ/đặt lại sàn khác, không phải lỗi SP (chốt 30/10):** không
+  dùng sticker như CSKH thường — trả lời ngắn "Dạ vâng ạ" rồi đóng — mục 14.
 
 ## Bản cho Sapo Chatbot AI (bắt đầu 27/10/2026)
 
