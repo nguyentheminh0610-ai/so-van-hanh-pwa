@@ -531,5 +531,8 @@
   .koc-sheetrow i{ font-style:normal; color:var(--ink-faint); }
   .koc-sheetrow .canh b{ color:var(--warn); }
   .koc-sheetrow .ngn{ color:var(--ink-faint); font-size:11.5px; margin-left:auto; }
+  .viec{ list-style:none; margin:9px 0 0; padding:0; display:flex; flex-direction:column; gap:5px; }
+  .viec li{ font-size:12.5px; color:var(--ink); padding-left:22px; position:relative; line-height:1.45; }
+  .viec li::before{ content:"\2610"; position:absolute; left:0; top:-1px; color:var(--accent); font-size:15px; }
   @media (max-width: 860px){ .koc-kpi4{ grid-template-columns:repeat(2,1fr); }
     .koc-sheetrow .ngn{ margin-left:0; } } }

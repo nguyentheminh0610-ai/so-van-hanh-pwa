@@ -18,9 +18,11 @@
 
 let kocRows = null;
 
-const KOC_MIN_DON = 10;       // tiêu chí 1
-const KOC_MIN_DON_1K = 1.0;   // tiêu chí 2
-const KOC_MIN_ROI = 50;       // tiêu chí 3 — cũng là mốc "Hiệu quả"
+const KOC_MIN_ROI = 50;       // mốc "Hiệu quả" ở bảng 2 kênh (ROI)
+// Ngưỡng VIP (chốt 30/10): vào VIP nếu GMV >= 1,2tr/kỳ-7-ngày HOẶC top 40% số
+// nội dung trong kênh. Ngưỡng tự co giãn theo độ dài kỳ dữ liệu thực tế.
+const NGUONG_VIP_7NGAY = 1200000;   // đ / kỳ 7 ngày
+const NGUONG_HH_THANG = 30000000;   // đ / tháng — mốc riêng để được hoa hồng mục tiêu 10%
 const KOC_ROI_TAM = 20;       // dưới mốc này là "Kém"
 const KOC_MOI_DANG_NGAY = 2;
 
@@ -179,40 +181,48 @@ function kocActionHtml(scores){
 }
 
 /* --------------------------- 2. KOC làm việc hiệu quả --------------------*/
-function kocTieuChi(k){
-  const t = [
-    { ten: 'Số đơn ≥ ' + KOC_MIN_DON, dat: k.don >= KOC_MIN_DON },
-    { ten: 'Đơn/1.000 view ≥ ' + fmtRatio(KOC_MIN_DON_1K), dat: k.don1k !== null && k.don1k >= KOC_MIN_DON_1K },
-    { ten: '≥ 2 nội dung', dat: k.noiDung >= 2 },
-  ];
-  if (k.roi !== null) t.push({ ten: 'ROI ≥ ' + KOC_MIN_ROI, dat: k.roi >= KOC_MIN_ROI });
-  return { list: t, dat: t.filter(x => x.dat).length, tong: t.length };
+// Tập KOC thuộc top 40% số nội dung của 1 kênh (cửa "chịu khó")
+function kocTop40Set(rows){
+  const sorted = rows.filter(r => (r.so_noi_dung || 0) > 0)
+                     .sort((a, b) => (b.so_noi_dung || 0) - (a.so_noi_dung || 0));
+  const n = Math.ceil(sorted.length * 0.4);
+  return new Set(sorted.slice(0, n).map(r => r.koc_username));
 }
 
-function kocEffectiveHtml(byKoc){
-  const scored = byKoc.filter(k => k.don > 0).map(k => ({ k, tc: kocTieuChi(k) }));
-  const nen = scored.filter(x => x.tc.dat === x.tc.tong).slice(0, 12);
-  const ngung = byKoc.filter(k => k.noiDung > 0 && k.don === 0);
-  let html = '';
-  if (nen.length){
-    html += '<div class="feed">' + nen.map(({ k, tc }) => `<div class="fi">
-      <div class="fi-head"><b>${esc(k.koc)}</b>
-        <span class="tag why" style="background:var(--accent-soft);color:var(--accent)">đạt ${tc.dat}/${tc.tong} tiêu chí</span>
-        ${k.roi !== null ? '<span>ROI ' + fmtRatio(k.roi) + '</span>' : '<span>chưa từng nhận mẫu</span>'}</div>
-      <div class="fi-body">${fmtVND(k.gmv)} · ${fmtInt(k.don)} đơn · ${fmtInt(k.view)} view ·
-        ${k.don1k !== null ? fmtRatio(k.don1k) + ' đơn/1.000 view' : '—'} ·
-        ${fmtInt(k.video)} video${k.live ? ' + ' + fmtInt(k.live) + ' LIVE' : ''}</div>
-      <div class="fi-foot">${tc.list.map(x => (x.dat ? '✅ ' : '⬜ ') + esc(x.ten)).join(' · ')}</div>
-    </div>`).join('') + '</div>';
-  } else {
-    html += '<p class="cskh-quiet">Chưa có KOC nào đạt đủ tiêu chí.</p>';
+// Zone 2 — danh sách KOC cần đưa vào VIP ở 1 kênh, kèm việc phải làm cho từng
+// người. gmvThangMap: GMV cả 2 kênh quy về tháng (để xét mốc hoa hồng 10%).
+function kocVipKenhHtml(channels, kenh, nguongVip, gmvThangMap){
+  const rows = channels.filter(c => c.kenh === kenh);
+  const top40 = kocTop40Set(rows);
+  const ds = rows.filter(r => (r.gmv || 0) >= nguongVip || top40.has(r.koc_username))
+                 .sort((a, b) => (b.gmv || 0) - (a.gmv || 0));
+  const donVi = kenh === 'live' ? 'buổi' : 'video';
+  if (!ds.length){
+    return '<p class="cskh-quiet">Chưa có KOC nào đạt ngưỡng VIP ở kênh này trong kỳ.</p>';
   }
-  if (ngung.length){
-    html += `<p class="cskh-quiet"><b>Có đăng nhưng không ra đơn nào:</b>
-      ${ngung.slice(0, 15).map(k => esc(k.koc)).join(', ')}${ngung.length > 15 ? ' và ' + (ngung.length - 15) + ' người nữa' : ''}
-      — cân nhắc ngưng gửi mẫu.</p>`;
-  }
-  return html;
+  return '<div class="feed">' + ds.map(r => {
+    const koc = r.koc_username;
+    const datTien = (r.gmv || 0) >= nguongVip;
+    const lyDo = datTien ? ('GMV ' + fmtVND(r.gmv || 0))
+                         : ('Chăm đăng · ' + fmtInt(r.so_noi_dung || 0) + ' ' + donVi);
+    const hhCao = (gmvThangMap.get(koc) || 0) >= NGUONG_HH_THANG;
+    const viec = [];
+    if (hhCao) viec.push('Mời Cộng tác mục tiêu → tăng hoa hồng lên <b>10%</b>');
+    if (kenh === 'live'){
+      viec.push('Cấp mã giảm giá riêng cho LIVE');
+      viec.push('Thêm vào Flash Sale LIVE');
+    }
+    viec.push('Ưu tiên gửi mẫu mới + thêm mẫu');
+    return `<div class="fi">
+      <div class="fi-head">
+        <b>${esc(koc)}</b>
+        <span class="tag why" style="background:var(--accent-soft);color:var(--accent)">${esc(lyDo)}</span>
+        ${hhCao ? '<span class="tag" style="background:var(--good-soft);color:var(--good)">&gt;30tr/tháng</span>' : ''}
+        <span>${fmtInt(r.so_noi_dung || 0)} ${donVi} · ${fmtInt(r.so_don || 0)} đơn</span>
+      </div>
+      <ul class="viec">${viec.map(v => '<li>' + v + '</li>').join('')}</ul>
+    </div>`;
+  }).join('') + '</div>';
 }
 
 /* ---------------------- 3. Mới lên bài (2 ngày gần nhất) -----------------*/
@@ -280,30 +290,25 @@ function kocRender(){
   const { scores, contents, channels } = kocRows;
   const von = kocVonMap(scores);
 
-  // gộp cả 2 kênh theo từng KOC cho mục "hiệu quả"
-  const map = new Map();
-  channels.forEach(c => {
-    const k = map.get(c.koc_username) || { koc: c.koc_username, noiDung: 0, gmv: 0, don: 0, view: 0, video: 0, live: 0 };
-    k.noiDung += c.so_noi_dung || 0; k.gmv += c.gmv || 0; k.don += c.so_don || 0; k.view += c.luot_xem || 0;
-    if (c.kenh === 'live') k.live += c.so_noi_dung || 0; else k.video += c.so_noi_dung || 0;
-    map.set(c.koc_username, k);
-  });
-  const byKoc = [...map.values()].map(k => {
-    k.don1k = k.view > 0 ? k.don / k.view * 1000 : null;
-    const v = von.get(k.koc) || null;
-    k.roi = v ? k.gmv / v : null;
-    return k;
-  }).sort((a, b) => b.gmv - a.gmv);
+  const kyNgay = channels.length ? (channels[0].ky_ngay || 30) : 30;
+  const ky = channels.length ? (kyNgay + ' ngày, đến ' + (fmtDMY(channels[0].ky_den) || channels[0].ky_den)) : '';
 
-  const ky = channels.length ? (channels[0].ky_ngay + ' ngày, đến ' + (fmtDMY(channels[0].ky_den) || channels[0].ky_den)) : '';
+  // ngưỡng VIP co giãn theo độ dài kỳ; GMV tháng = gộp 2 kênh rồi quy về 30 ngày
+  const nguongVip = NGUONG_VIP_7NGAY * kyNgay / 7;
+  const gmvThangMap = new Map();
+  channels.forEach(c => gmvThangMap.set(c.koc_username, (gmvThangMap.get(c.koc_username) || 0) + (c.gmv || 0)));
+  gmvThangMap.forEach((v, k) => gmvThangMap.set(k, v * 30 / kyNgay));
 
   bodyEl.innerHTML = `
     ${kocCardSanHtml(channels)}
     ${kocHangSheetHtml(scores)}
     <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đã nhận mẫu mà chưa đăng bài</span></div>
     ${kocActionHtml(scores)}
-    <div class="zone"><span class="z-num">2</span><span class="z-title">KOC làm việc hiệu quả</span><span class="z-note">nên liên hệ gửi thêm mẫu</span></div>
-    ${kocEffectiveHtml(byKoc)}
+    <div class="zone"><span class="z-num">2</span><span class="z-title">KOC cần đưa vào VIP</span><span class="z-note">đạt ngưỡng kỳ này · việc cần làm theo từng người</span></div>
+    <div class="sub-label">🎬 Kênh Video</div>
+    ${kocVipKenhHtml(channels, 'video', nguongVip, gmvThangMap)}
+    <div class="sub-label">🔴 Kênh LIVE</div>
+    ${kocVipKenhHtml(channels, 'live', nguongVip, gmvThangMap)}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Mới lên bài (${KOC_MOI_DANG_NGAY} ngày gần nhất)</span><span class="z-note">video hoặc LIVE</span></div>
     ${kocRecentHtml(contents)}
     <div class="zone"><span class="z-num">4</span><span class="z-title">KOC gắn link trên VIDEO</span><span class="z-note">xếp theo GMV</span></div>
