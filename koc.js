@@ -207,31 +207,60 @@ function kocVipGop(channels, nguongVip, gmvThangMap){
   return all.filter(k => k.vip);
 }
 
-// 1 bảng VIP tự điền của 1 kênh — gọn: chỉ tên + chip >30tr + chip "+kênh kia".
-// Không nút, không GMV (chi tiết GMV xem ở bảng 4/5 bên dưới). Có thanh cuộn.
-function kocVipRosterHtml(ds, kenh){
+// Đánh dấu "đã thêm vào VIP" — lưu cục bộ trên máy đang xem (localStorage).
+function kocVipAdded(){
+  try { return new Set(JSON.parse(localStorage.getItem('koc_vip_added') || '[]')); }
+  catch (e){ return new Set(); }
+}
+function kocToggleAdded(koc){
+  const s = kocVipAdded();
+  if (s.has(koc)) s.delete(koc); else s.add(koc);
+  try { localStorage.setItem('koc_vip_added', JSON.stringify([...s])); } catch (e){}
+  kocRender();
+}
+
+// 1 bảng ứng viên của 1 kênh — tên + chip + nút "Đã thêm". Có thanh cuộn.
+function kocVipRosterHtml(ds, kenh, added){
   const body = ds.map(k => {
     const other = kenh === 'live' ? k.v : k.l;
+    const isAdded = added.has(k.koc);
     const badge = k.hhCao ? ' <span class="tag" style="background:var(--good-soft);color:var(--good)">&gt;30tr</span>' : '';
     const chip = other.n > 0 ? ` <span class="tag" style="background:var(--surface-2);color:var(--ink-soft)">+ ${kenh === 'live' ? 'Video' : 'LIVE'}</span>` : '';
-    return `<tr><td><b>${esc(k.koc)}</b>${badge}${chip}</td></tr>`;
+    return `<tr class="${isAdded ? 'koc-done' : ''}">
+      <td><b>${esc(k.koc)}</b>${badge}${chip}</td>
+      <td style="text-align:right"><button type="button" class="btn-them ${isAdded ? 'on' : ''}" data-koc="${esc(k.koc)}">${isAdded ? '✓ Đã thêm' : '＋ Thêm'}</button></td></tr>`;
   }).join('');
   return `<div class="koc-scroll"><table class="dtable">
     <tbody>${body || '<tr><td class="cskh-quiet">—</td></tr>'}</tbody></table></div>`;
 }
 
+// Bảng tổng: TẤT CẢ KOC VIP đủ điều kiện — Tên · Kênh · note >30tr (không GMV).
+function kocVipAllHtml(vips){
+  const body = vips.slice().sort((a, b) => b.tGmv - a.tGmv).map(k => {
+    const kenh = (k.v.n > 0 && k.l.n > 0) ? 'Cả Video + LIVE' : k.v.n > 0 ? 'Video' : 'LIVE';
+    const note = k.hhCao ? '<span class="tag" style="background:var(--good-soft);color:var(--good)">&gt;30tr — hoa hồng 10%</span>' : '—';
+    return `<tr><td><b>${esc(k.koc)}</b></td><td>${kenh}</td><td>${note}</td></tr>`;
+  }).join('');
+  return `<div class="koc-scroll" style="max-height:420px"><table class="dtable">
+    <thead><tr><th>KOC</th><th>Kênh</th><th>Ghi chú</th></tr></thead>
+    <tbody>${body}</tbody></table></div>`;
+}
+
 function kocVipSplitHtml(channels, nguongVip, gmvThangMap){
   const vips = kocVipGop(channels, nguongVip, gmvThangMap);
   if (!vips.length) return '<p class="cskh-quiet">Chưa có KOC nào đạt ngưỡng VIP trong kỳ.</p>';
+  const added = kocVipAdded();
   // xếp mỗi người vào kênh bán MẠNH hơn (GMV cao hơn)
   const videoList = vips.filter(k => k.v.gmv >= k.l.gmv).sort((a, b) => b.v.gmv - a.v.gmv);
   const liveList = vips.filter(k => k.v.gmv < k.l.gmv).sort((a, b) => b.l.gmv - a.l.gmv);
   const note = `<p class="cskh-quiet" style="margin:0 0 12px">Việc cần làm: <b>tất cả</b> → ưu tiên gửi mẫu mới · <b style="color:var(--good)">&gt;30tr</b> → mời tăng hoa hồng 10% · nhóm <b>LIVE</b> → cấp mã giảm giá + thêm Flash Sale LIVE.</p>`;
   return note +
     `<div class="koc-vip-grid">
-      <div><div class="sub-label">🎬 VIP bán mạnh qua Video (${videoList.length})</div>${kocVipRosterHtml(videoList, 'video')}</div>
-      <div><div class="sub-label">🔴 VIP bán mạnh qua LIVE (${liveList.length})</div>${kocVipRosterHtml(liveList, 'live')}</div>
-    </div>`;
+      <div><div class="sub-label">🎬 Bán mạnh qua Video (${videoList.length})</div>${kocVipRosterHtml(videoList, 'video', added)}</div>
+      <div><div class="sub-label">🔴 Bán mạnh qua LIVE (${liveList.length})</div>${kocVipRosterHtml(liveList, 'live', added)}</div>
+    </div>
+    <div class="sub-label">⭐ Danh sách KOC VIP đủ điều kiện (${vips.length})</div>
+    ${kocVipAllHtml(vips)}`;
 }
 
 /* ---------------------- 3. Mới lên bài (2 ngày gần nhất) -----------------*/
@@ -359,4 +388,12 @@ async function refreshKoc(){
   }
 }
 
-function wireKoc(){ /* VIP tự điền sẵn — không còn nút/tương tác trong Zone 2 */ }
+function wireKoc(){
+  // Event delegation trên #koc-body (phần tử giữ nguyên qua mỗi lần re-render)
+  // nên nút "Đã thêm" luôn bắt được click.
+  const body = document.getElementById('koc-body');
+  if (body) body.addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn-them');
+    if (btn && btn.dataset.koc) kocToggleAdded(btn.dataset.koc);
+  });
+}
