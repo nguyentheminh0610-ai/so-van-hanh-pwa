@@ -1012,8 +1012,7 @@ function render(res, opts){
     <div class="kpi-tile"><div class="k-label">Hoàn về kho</div><div class="k-value">${fmtInt(g.hoanVeKho)}</div><div class="k-sub">Shopee ${fmtInt(s.hoanVeKho)} · TikTok ${fmtInt(t.hoanVeKho)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tỷ lệ huỷ hoàn trả</div><div class="k-value">${fmtPct(g.huyHoanTra/(g.tongDon||1))}</div><div class="k-sub">Shopee ${fmtPct(s.huyHoanTra/(s.tongDon||1))} · TikTok ${fmtPct(t.huyHoanTra/(t.tongDon||1))} (/ tổng đơn đặt)</div></div>
   </div>
-  <details style="margin:8px 0 4px;"><summary style="font-size:12px;color:var(--ink-faint);cursor:pointer;">Lý do trả hàng · Lý do huỷ đơn <span style="font-weight:400;">(bấm mở)</span></summary>
-  <div style="margin-top:6px;">
+  <div style="margin:8px 0 4px;">
     <div class="sub-label" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px;">
       <span>Lý do trả hàng <span style="text-transform:none;font-weight:400;">— theo sàn, không tính giao thất bại</span></span>
       <span class="legend" style="margin:0;"><span><i class="i-shopee"></i>Shopee</span><span><i class="i-tiktok"></i>TikTok</span></span>
@@ -1024,7 +1023,6 @@ function render(res, opts){
     </div>
     ${buildReasonBarsHtml(res.cancelReasonRows)}
   </div>
-  </details>
 
   <!-- ZONE 5 -->
   <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
