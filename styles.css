@@ -462,6 +462,11 @@
   .fi-line2 .snippet{ flex:1; min-width:0; font-size:12.5px; line-height:1.45; color:var(--ink);
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .fi-line2 .lnk{ flex:none; }
+  /* nút "Đã xử lý"/"Đã xem" (30/10/2026) — cách duy nhất 1 case rời Zone 1 */
+  .btn-ack{ flex:none; font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-soft);
+    background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:4px 10px; cursor:pointer; }
+  .btn-ack:hover{ background:var(--line); color:var(--ink); }
+  .btn-ack:disabled{ opacity:.6; cursor:default; }
   /* thẻ "Ghi lỗi Sổ Kho" (29/10/2026) — viền cam phân biệt với thẻ cảnh báo đỏ */
   .fi.err{ border-color:var(--proc); background:var(--proc-soft); }
   .err-foot{ margin-top:7px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }

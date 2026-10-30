@@ -50,6 +50,10 @@ function cskhDateKey(d){
 function cskhRange(period){
   const today = cskhToday();
   if (period === 'day') return [cskhDateKey(today), cskhDateKey(today)];
+  if (period === 'yesterday'){
+    const y = new Date(today); y.setDate(y.getDate() - 1);
+    return [cskhDateKey(y), cskhDateKey(y)];
+  }
   if (period === 'week'){
     const from = new Date(today); from.setDate(from.getDate() - 6);
     return [cskhDateKey(from), cskhDateKey(today)];
@@ -75,9 +79,9 @@ async function cskhLoadRows(){
 }
 
 // ---------------------------------------------------------------- khối số --
-function cskhKpiHtml(reviews, returns){
+function cskhKpiHtml(reviews, returns, pendingAction){
   const bad = reviews.filter(r => (r.stars || 5) <= 2).length;
-  const action = reviews.filter(r => r.needs_action).length + returns.filter(r => r.needs_action).length;
+  const action = pendingAction;
   const byPlat = (rows) => {
     const tt = rows.filter(r => r.platform === 'tiktok').length;
     const sp = rows.filter(r => r.platform === 'shopee').length;
@@ -86,7 +90,7 @@ function cskhKpiHtml(reviews, returns){
   const tiles = [
     ['Đánh giá mới', reviews.length, byPlat(reviews) + (bad ? ' · ' + bad + ' cái 1–2★' : ''), false],
     ['Case trả hàng mới', returns.length, byPlat(returns), false],
-    ['Cần anh xử lý', action, action ? 'xem danh sách ngay dưới' : 'không có gì tồn', true],
+    ['Cần anh xử lý', action, action ? 'xem danh sách ngay dưới — không phụ thuộc kỳ' : 'không có gì tồn', true],
   ];
   return '<div class="kpi-row cskh-kpi">' + tiles.map(([label, val, sub, warn]) =>
     `<div class="kpi-tile"><div class="k-label">${esc(label)}</div>
@@ -110,12 +114,14 @@ function cskhActionCardHtml(row, kind){
     ? (row.customer_note ? 'Khách ghi: “' + esc(row.customer_note) + '”' : (row.amount ? fmtVND(row.amount) : ''))
     : esc(row.content || '(chỉ bấm sao, không viết)');
   const when = kind === 'return' ? row.request_date : row.review_date;
-  return `<div class="fi bad compact">
+  const ackLabel = kind === 'return' ? 'Đã xem' : 'Đã xử lý';
+  const ackBtn = `<button class="btn-ack" data-tbl="${kind === 'return' ? 'cskh_returns' : 'cskh_reviews'}" data-id="${esc(String(row.id))}">${esc(ackLabel)}</button>`;
+  return `<div class="fi bad compact" data-row-tbl="${kind === 'return' ? 'cskh_returns' : 'cskh_reviews'}" data-row-id="${esc(String(row.id))}">
     <div class="fi-line1"><span class="tag ${row.platform === 'shopee' ? 'shopee' : 'tiktok'}">${plat}</span>
       ${stars}${tag}<span class="when">${esc(cskhWhen(when))}</span>
       ${row.customer ? '<span class="cust">Khách <b>' + esc(row.customer) + '</b></span>' : ''}
       ${row.order_code ? '<span class="code">' + esc(row.order_code) + '</span>' : ''}</div>
-    <div class="fi-line2">${snippet ? '<span class="snippet" title="' + esc(snippet.replace(/<[^>]*>/g, '')) + '">' + snippet + '</span>' : '<span class="snippet"></span>'}${link}</div>
+    <div class="fi-line2">${snippet ? '<span class="snippet" title="' + esc(snippet.replace(/<[^>]*>/g, '')) + '">' + snippet + '</span>' : '<span class="snippet"></span>'}${link}${ackBtn}</div>
   </div>`;
 }
 
@@ -127,18 +133,25 @@ const CSKH_ACTION_GROUPS = [
   { type: null,            title: 'Khác cần anh xem', note: '' },
 ];
 
-function cskhActionHtml(reviews, returns){
+// Zone 1 CỐ TÌNH không lọc theo kỳ (period) — case nửa đêm vẫn phải hiện sáng
+// hôm sau, không bị khung Hôm nay/Hôm qua che mất (chốt 30/10/2026). Chỉ ẩn
+// khi đã bấm "Đã xử lý/Đã xem" (acked_at) — đây là cách duy nhất item biến mất.
+function cskhActionHtml(allReviews, allReturns){
+  const pendingReviews = allReviews.filter(r => r.needs_action && !r.acked_at);
+  const pendingReturns = allReturns.filter(r => r.needs_action && !r.acked_at);
   const items = [
-    ...reviews.filter(r => r.needs_action).map(r => ({ row: r, kind: 'review', d: r.review_date })),
-    ...returns.filter(r => r.needs_action).map(r => ({ row: r, kind: 'return', d: r.request_date })),
+    ...pendingReviews.map(r => ({ row: r, kind: 'review', d: r.review_date })),
+    ...pendingReturns.map(r => ({ row: r, kind: 'return', d: r.request_date })),
   ].sort((a, b) => (b.d || '').localeCompare(a.d || ''));
-  const restReviews = reviews.length - reviews.filter(r => r.needs_action).length;
-  const restReturns = returns.length - returns.filter(r => r.needs_action).length;
+  const restReviews = allReviews.filter(r => r.needs_action && r.acked_at).length
+    + allReviews.filter(r => !r.needs_action).length;
+  const restReturns = allReturns.filter(r => r.needs_action && r.acked_at).length
+    + allReturns.filter(r => !r.needs_action).length;
   const quiet = (restReviews || restReturns)
-    ? `<p class="cskh-quiet">${fmtInt(restReviews)} đánh giá và ${fmtInt(restReturns)} case trả hàng còn lại đã xử lý xong (đã nhắn khách theo mẫu, khách đã trả lời ổn, hoặc đã có người trả lời trước) — không cần anh làm gì.</p>`
+    ? `<p class="cskh-quiet">${fmtInt(restReviews)} đánh giá và ${fmtInt(restReturns)} case trả hàng còn lại đã xử lý xong (đã nhắn khách theo mẫu, khách đã trả lời ổn, đã có người trả lời trước, hoặc anh đã bấm đã xử lý/đã xem) — không cần anh làm gì.</p>`
     : '';
   if (!items.length){
-    return `<p class="cskh-quiet">Không có gì cần anh xử lý trong kỳ này.</p>${quiet}`;
+    return `<p class="cskh-quiet">Không có gì cần anh xử lý — kể cả những việc phát sinh ngoài giờ, không phụ thuộc kỳ đang chọn ở trên.</p>${quiet}`;
   }
   const known = new Set(['lien_he_khach', 'tranh_chap']);
   const html = CSKH_ACTION_GROUPS.map(g => {
@@ -336,7 +349,7 @@ function cskhReasonsHtml(returns){
 }
 
 // ---------------------------------------------------------------- render ---
-const CSKH_PERIOD_LABEL = { day: 'hôm nay', week: '7 ngày', month: 'tháng này' };
+const CSKH_PERIOD_LABEL = { day: 'hôm nay', yesterday: 'hôm qua', week: '7 ngày', month: 'tháng này' };
 
 function cskhRender(period){
   const bodyEl = document.getElementById('cskh-body');
@@ -344,11 +357,16 @@ function cskhRender(period){
   const range = cskhRange(period);
   const reviews = cskhRows.reviews.filter(r => cskhInRange(r.review_date, range));
   const returns = cskhRows.returns.filter(r => cskhInRange(r.request_date, range));
+  // Zone 1 + ghi lỗi Sổ Kho dùng TOÀN BỘ dữ liệu đã tải (không lọc theo kỳ
+  // đang chọn) — chốt 30/10/2026: case phát sinh nửa đêm không được biến mất
+  // chỉ vì đang xem "Hôm nay" mà nó rơi vào "Hôm qua". Chỉ hết khi bấm ack.
+  const pendingAction = cskhRows.reviews.filter(r => r.needs_action && !r.acked_at).length
+    + cskhRows.returns.filter(r => r.needs_action && !r.acked_at).length;
   bodyEl.innerHTML = `
-    ${cskhKpiHtml(reviews, returns)}
-    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp · ghi lỗi Sổ Kho</span></div>
-    ${cskhActionHtml(reviews, returns)}
-    ${cskhErrlogHtml(reviews, returns)}
+    ${cskhKpiHtml(reviews, returns, pendingAction)}
+    <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp · ghi lỗi Sổ Kho — luôn hiện đủ, không phụ thuộc kỳ đang chọn</span></div>
+    ${cskhActionHtml(cskhRows.reviews, cskhRows.returns)}
+    ${cskhErrlogHtml(cskhRows.reviews, cskhRows.returns)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">Insight để cải thiện</span><span class="z-note">vấn đề lặp lại về sản phẩm / dịch vụ</span></div>
     ${cskhInsightHtml(reviews, returns, CSKH_PERIOD_LABEL[period])}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Số liệu kỳ</span><span class="z-note">xu hướng · lý do trả hàng</span></div>
@@ -361,6 +379,7 @@ function buildCskhScreenHTML(){
     <div class="period">
       <select id="cskh-period">
         <option value="day">Hôm nay</option>
+        <option value="yesterday">Hôm qua</option>
         <option value="week">7 ngày qua</option>
         <option value="month">Tháng này</option>
       </select>
@@ -394,13 +413,35 @@ async function refreshCskh(){
   }
 }
 
+// Bấm "Đã xử lý"/"Đã xem" → set acked_at, cập nhật cache cục bộ rồi render lại
+// (chốt 30/10/2026 — cách duy nhất 1 case rời khỏi Zone 1, không liên quan kỳ).
+async function cskhAck(btn){
+  const tbl = btn.dataset.tbl, id = btn.dataset.id;
+  btn.disabled = true; const old = btn.textContent; btn.textContent = 'Đang lưu…';
+  try {
+    const now = new Date().toISOString();
+    await sbFetch(tbl + '?id=eq.' + encodeURIComponent(id),
+      { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ acked_at: now }) });
+    const list = (tbl === 'cskh_returns' ? cskhRows.returns : cskhRows.reviews);
+    const rec = list.find(x => String(x.id) === id);
+    if (rec) rec.acked_at = now;
+    cskhRender(document.getElementById('cskh-period').value);
+  } catch (err){
+    btn.disabled = false; btn.textContent = old;
+    alert('Chưa lưu được: ' + err.message);
+  }
+}
+
 function wireCskh(){
   const sel = document.getElementById('cskh-period');
   if (sel) sel.addEventListener('change', (e) => cskhRender(e.target.value));
-  // nút "Xác nhận ghi Sổ Kho" (delegation — thẻ được render lại mỗi lần đổi kỳ)
+  // nút "Xác nhận ghi Sổ Kho" / "Đã xử lý" / "Đã xem" (delegation — thẻ được
+  // render lại mỗi lần đổi kỳ hoặc sau khi ack).
   const body = document.getElementById('cskh-body');
   if (body) body.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-errlog');
-    if (btn) cskhWriteErrlog(btn);
+    const errBtn = e.target.closest('.btn-errlog');
+    if (errBtn){ cskhWriteErrlog(errBtn); return; }
+    const ackBtn = e.target.closest('.btn-ack');
+    if (ackBtn) cskhAck(ackBtn);
   });
 }

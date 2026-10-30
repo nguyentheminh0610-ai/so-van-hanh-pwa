@@ -101,6 +101,14 @@ alter table public.cskh_returns add column if not exists errlog_reason text;
 alter table public.cskh_returns add column if not exists errlog_status text default 'none';
 alter table public.cskh_returns add column if not exists errlog_id     bigint;
 
+-- Cột "đã xem/xử lý" (chốt 30/10/2026): chủ shop bấm nút trên web, KHÔNG phải
+-- skill ghi — mục đích tách việc "mới" ra khỏi mốc ngày (12h đêm vẫn cần thấy
+-- sáng hôm sau, không bị khung "Hôm nay/Hôm qua" che mất). null = chưa xem.
+-- Lưu ý: skill upsert KHÔNG gửi cột này trong payload nên không bị ghi đè về
+-- null mỗi lần chạy lại — PostgREST on_conflict chỉ set đúng cột có trong payload.
+alter table public.cskh_reviews add column if not exists acked_at timestamptz;
+alter table public.cskh_returns add column if not exists acked_at timestamptz;
+
 -- ---------------------------------------------------------------- quyền -----
 -- Cùng mô hình với platform_returns_feed / warehouse_error_log đang chạy: app
 -- và script đều dùng anon key, ranh giới bảo mật nằm ở chỗ 2 bảng này không
