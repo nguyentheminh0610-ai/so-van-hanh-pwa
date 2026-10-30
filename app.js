@@ -540,12 +540,11 @@ function buildChiPhiHtml(res, opts){
     <div class="stacked-legend">${leg}</div>`;
   }
 
-  // --- ② Donut: phân bổ chi phí tách 2 sàn ---
+  // --- ② Donut: phân bổ chi phí (phí sàn gộp chung) ---
   let donutHtml = '';
   if (tong > 0) {
     const donutItems = [
-      { name: 'Phí sàn Shopee', v: phiSp, c: 'var(--p1)' },
-      { name: 'Phí sàn TikTok', v: phiTt, c: 'var(--p5)' },
+      { name: 'Phí sàn', v: tongPhiSan, c: 'var(--p1)' },
       { name: 'Quảng cáo', v: tongAds, c: 'var(--p2)' },
       { name: 'Lương', v: luong, c: 'var(--p3)' },
       { name: 'Vật tư', v: vatTu, c: 'var(--p4)' },
@@ -563,7 +562,7 @@ function buildChiPhiHtml(res, opts){
     const donutLeg = donutItems.map(x =>
       `<div style="display:flex;align-items:center;gap:4px;"><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${x.c};flex-shrink:0;"></i><span>${esc(x.name)} — ${fmtPct(x.v / tong, 0)}</span></div>`
     ).join('');
-    donutHtml = `<div class="sub-label" style="margin-top:16px;">Phân bổ chi phí — tách 2 sàn <span style="text-transform:none;font-weight:400;">— tổng chi phí = 100%</span></div>
+    donutHtml = `<div class="sub-label" style="margin-top:16px;">Phân bổ chi phí <span style="text-transform:none;font-weight:400;">— tổng chi phí = 100%</span></div>
     <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;margin:8px 0;">
       <svg viewBox="0 0 200 200" width="170" height="170" style="flex-shrink:0;">
         <g transform="rotate(-90 ${CX} ${CY})">${arcs}</g>
@@ -573,12 +572,57 @@ function buildChiPhiHtml(res, opts){
     </div>`;
   }
 
-  // --- ③ Thanh phí sàn chi tiết (visible, không ẩn trong details) ---
-  const platBarsHtml = (spTotal || ttTotal)
-    ? `<div class="sub-label" style="margin-top:16px;">Phí sàn chi tiết — mỗi sàn 1 thanh <span style="text-transform:none;font-weight:400;">— % trên tổng phí từng sàn</span></div>
-       ${stackBar(spItems, spTotal, 'shopee')}
-       ${stackBar(ttItems, ttTotal, 'tiktok')}`
-    : '';
+  // --- ③ So sánh chi phí 2 sàn (% trên DT riêng từng sàn) ---
+  const dtSp = n(s2.doanhThu), dtTt = n(t2.doanhThu);
+  let soSanh2SanHtml = '';
+  if ((spTotal || ttTotal) && (dtSp || dtTt)) {
+    const spCT = s2.phiSanChiTiet || {}, ttCT = t2.phiSanChiTiet || {};
+    const affSp = n(spCT['Hoa hồng affiliate (tiếp thị liên kết)']);
+    const affTt = n(ttCT['Hoa hồng affiliate (liên kết)']);
+    const vcTraSp = n(spCT['Phí vận chuyển trả hàng']);
+    const vcTraTt = n(ttCT['Phí vận chuyển trả hàng']);
+    const phiNenSp = phiSp - affSp - vcTraSp;
+    const phiNenTt = phiTt - affTt - vcTraTt;
+    const pSan = (v, base) => base ? fmtPct(v / base, 1) : '—';
+    const barW = (v, base) => base ? Math.min(100, Math.max(1, (v / base) * 100 / 0.30)).toFixed(1) : '0';
+    const barLine = (tag, cls, v, base) => {
+      const p = pSan(v, base);
+      const w = barW(v, base);
+      const showLabel = base && (v / base) >= 0.04;
+      return `<div style="display:flex;align-items:center;gap:8px;height:26px;">
+        <span style="font-size:11px;color:var(--ink-faint);min-width:52px;text-align:right;">${tag}</span>
+        <div style="flex:1;height:22px;background:var(--bg-2);border-radius:4px;overflow:hidden;">
+          <div class="cmp-bar ${cls}" style="width:${w}%;">${showLabel ? '<span>' + p + '</span>' : ''}</div>
+        </div>
+        <span class="cmp-pct ${cls}">${p}</span>
+        <span style="font-size:11px;color:var(--ink-faint);">${fmtCompact(v)}</span>
+      </div>`;
+    };
+    const group = (label, vSp, vTt) => `<div style="margin-bottom:16px;">
+      <div style="font-size:13px;font-weight:500;margin:0 0 6px;">${label}</div>
+      ${barLine('Shopee', 'cmp-sp', vSp, dtSp)}
+      <div style="height:4px;"></div>
+      ${barLine('TikTok', 'cmp-tt', vTt, dtTt)}
+    </div>`;
+    const tongSp = phiNenSp + affSp + adsSp + vcTraSp;
+    const tongTt = phiNenTt + affTt + adsTt + vcTraTt;
+    soSanh2SanHtml = `<div class="sub-label" style="margin-top:16px;">So sánh chi phí 2 sàn <span style="text-transform:none;font-weight:400;">— % trên doanh thu <b>riêng từng sàn</b></span></div>
+    <div style="display:flex;gap:16px;margin:0 0 16px;font-size:12px;color:var(--ink-faint);">
+      <span><i style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--p2);vertical-align:-1px;margin-right:5px;"></i>Shopee (DT ${fmtCompact(dtSp)})</span>
+      <span><i style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--p5);vertical-align:-1px;margin-right:5px;"></i>TikTok (DT ${fmtCompact(dtTt)})</span>
+    </div>
+    ${group('Phí sàn (tất cả phí nền tảng)', phiNenSp, phiNenTt)}
+    ${group('Hoa hồng affiliate', affSp, affTt)}
+    ${group('Quảng cáo', adsSp, adsTt)}
+    ${group('Phí vận chuyển trả hàng', vcTraSp, vcTraTt)}
+    <div style="border-top:1.5px solid var(--line);padding:10px 0 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:13px;font-weight:500;">Tổng 4 khoản / DT sàn đó</span>
+      <div style="display:flex;gap:20px;font-size:13px;">
+        <span class="cmp-pct cmp-sp" style="font-weight:500;">Shopee: <b>${pSan(tongSp, dtSp)}</b> <span style="font-size:11px;color:var(--ink-faint);">(${fmtCompact(tongSp)} / ${fmtCompact(dtSp)})</span></span>
+        <span class="cmp-pct cmp-tt" style="font-weight:500;">TikTok: <b>${pSan(tongTt, dtTt)}</b> <span style="font-size:11px;color:var(--ink-faint);">(${fmtCompact(tongTt)} / ${fmtCompact(dtTt)})</span></span>
+      </div>
+    </div>`;
+  }
 
   const thieu = [];
   if (!luong) thieu.push('lương nhân viên');
@@ -604,7 +648,7 @@ function buildChiPhiHtml(res, opts){
 
   ${donutHtml}
 
-  ${platBarsHtml}
+  ${soSanh2SanHtml}
 
   ${canhBao}
 
