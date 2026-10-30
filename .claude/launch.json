@@ -38,13 +38,13 @@
       "port": 8801
     },
     {
-      "name": "koc-tab-preview",
+      "name": "cskh-preview",
       "runtimeExecutable": "bash",
       "runtimeArgs": [
         "-c",
-        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/3a0586c4-72b4-40be-b92f-fda7eb2383e5/scratchpad/kocsite' && exec python3 -m http.server 8830"
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/eb250e10-b5fb-49ef-a71a-21d6ce6628d0/scratchpad/cskhpreview' && exec python3 -m http.server 8860"
       ],
-      "port": 8830
+      "port": 8860
     },
     {
       "name": "guide-preview",
@@ -54,6 +54,24 @@
         "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/3a0586c4-72b4-40be-b92f-fda7eb2383e5/scratchpad/guidepreview' && exec python3 -m http.server 8850"
       ],
       "port": 8850
+    },
+    {
+      "name": "sovanhanh-local",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/Users/apple/Documents/App của Minh/so-van-hanh-pwa' && exec python3 -m http.server 8870"
+      ],
+      "port": 8870
+    },
+    {
+      "name": "koc-tab-preview",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": [
+        "-c",
+        "cd '/private/tmp/claude-502/-Users-apple-Documents-App-c-a-Minh-so-van-hanh-pwa/8c3d1387-c595-4828-9f0f-441a271cafb0/scratchpad/kocsite' && exec python3 -m http.server 8830"
+      ],
+      "port": 8830
     }
   ]
 }
