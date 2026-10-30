@@ -10,51 +10,44 @@ nếu thấy số khác với trí nhớ cũ (kỳ 30 ngày, ngưỡng 5tr) thì
 
 ## Tiêu chí phân nhóm — 1 nhãn VIP, 2 cửa vào, tính RIÊNG theo từng kênh
 
-Vào VIP (ở kênh đó) nếu đạt **1 trong 2**, tính theo **kỳ 7 ngày**:
+Vào VIP (ở kênh đó, Video và LIVE tính riêng vì quy mô khác hẳn nhau — kỳ 30
+ngày gần nhất chỉ 16 KOC có doanh thu LIVE so với 52 KOC Video) nếu đạt
+**1 trong 2 cửa**:
 
 | Cửa | Điều kiện |
 |---|---|
-| ① Ra tiền | GMV ≥ **1,2 triệu đồng / kỳ 7 ngày** |
-| ② Chịu khó | Top 40% số nội dung đã đăng (trong nhóm cùng kênh, cùng kỳ) |
+| ① Ra tiền | GMV ≥ **1,2 triệu đồng / kỳ 7 ngày** *(= 5tr÷30×7, quy đổi giữ nguyên độ khó khi đổi sang theo dõi theo tuần 29/10)* |
+| ② Chịu khó | Top 40% số nội dung đã đăng, cùng kênh cùng kỳ *(tỷ lệ tương đối, không cần quy đổi)* |
 
-*(1,2tr = 5tr÷30×7 — quy đổi từ ngưỡng gốc 30 ngày khi đổi sang theo dõi theo
-tuần 29/10, giữ nguyên độ khó. Cửa ② là tỷ lệ tương đối nên không cần quy
-đổi, tự khớp theo bất kỳ độ dài kỳ nào.)*
-
-**Tính riêng theo kênh** (Video / LIVE) vì quy mô khác hẳn nhau — kỳ 30 ngày
-gần nhất chỉ có 16 KOC có doanh thu từ LIVE so với 52 KOC từ Video.
-
-**Công nhận VIP:** đạt ngưỡng **2 kỳ liên tiếp (= 14 ngày)** mới chính thức —
-chống nhiễu 1 buổi LIVE đột biến đẩy ai đó vào rồi biến mất ngay kỳ sau.
-
-**Rà lại hàng tháng (lớp kiểm thứ 2, chốt 30/10):** vẫn giữ 1 màn hình tổng
-hợp theo THÁNG (gộp ~4 kỳ/30 ngày) bên cạnh màn hình theo tuần. Trong đó có
-riêng 1 mục: **"KOC đạt VIP theo tuần nhưng GMV gộp cả tháng chưa đạt 5tr"**
-— liệt kê riêng để chủ shop **tự xem xét hạ**, không tự động hạ. Hai lớp
-phục vụ 2 việc khác nhau: "2 kỳ liên tiếp" để **công nhận VIP mới** (chống
-nhiễu ngắn hạn lúc vào), "đối chiếu tháng" để **rà lại VIP đang có** theo
-góc nhìn dài hơn.
+| | Điều kiện | Ghi chú |
+|---|---|---|
+| **Vào VIP** | Đạt 1 trong 2 cửa trên | Phải đạt **2 kỳ liên tiếp (14 ngày)** mới công nhận — chống nhiễu 1 buổi LIVE đột biến |
+| **Rà lại hàng tháng** | Đối chiếu GMV gộp cả tháng (~4 kỳ/30 ngày) | VIP-tuần mà gộp tháng chưa đạt 5tr → liệt riêng, chủ shop **tự xem xét hạ** (không tự động hạ) |
 
 **KOC làm CẢ Video lẫn LIVE:** VIP là 1 trạng thái chung — đạt ở ÍT NHẤT 1
 kênh là được công nhận VIP. Nhưng **công cụ áp dụng mở theo đúng kênh họ
 đang hoạt động**: VIP chỉ nhờ Video → chỉ nhận bộ ưu đãi Video; VIP chỉ nhờ
 LIVE → chỉ nhận bộ ưu đãi LIVE; làm cả 2 → nhận **cả 2 bộ**.
 
-## Bảng ưu đãi (bản gọn, chốt 30/10 — thay bản liệt kê 7 dòng/4 cột lúc đầu)
+## Bảng ưu đãi (bản chi tiết, chốt 30/10 — giữ nguyên dạng 7 dòng × 4 cột,
+## KHÔNG rút gọn thành "Ưu đãi | Ai được" vì chủ shop xác nhận bản này đã ổn)
 
-| Ưu đãi | Ai được |
-|---|---|
-| Ưu tiên mời mẫu SP mới + hỗ trợ liên hệ riêng | Mọi VIP (Video & LIVE như nhau, không phân biệt kênh) |
-| Tăng hoa hồng **tiêu chuẩn** (hiện 9%) | Chỉ KOC GMV **>30 triệu/tháng** — Video & LIVE đều áp dụng. **Đây là ngưỡng RIÊNG, cao hơn hẳn ngưỡng vào VIP (1,2tr/kỳ)** — không phải mọi VIP đều đạt mức này |
-| Mã giảm giá riêng trên LIVE | Chỉ VIP LIVE |
-| FS trên LIVE | Mọi KOC làm LIVE — **Thường lẫn VIP**, không phải đặc quyền riêng VIP |
-| Ads cho video (= hoa hồng Quảng cáo cửa hàng) | Mọi KOC làm video — **Thường lẫn VIP**, mức **cố định 3%**, không đổi theo tier |
+| Ưu đãi | Điều kiện áp dụng | VIP Video | Thường Video | VIP LIVE | Thường LIVE |
+|---|---|:---:|:---:|:---:|:---:|
+| **Hoa hồng tiêu chuẩn** tăng | Chỉ KOC GMV >30tr/**tháng** | ✅ tăng | giữ 9% | ✅ tăng | giữ 9% |
+| **Hoa hồng Quảng cáo cửa hàng** | Không phân biệt — **giữ 3% cho tất cả** | 3% | 3% | — | — |
+| **Chạy Ads cho video** | Mọi KOC làm video, không phân biệt tier | ✅ | ✅ | — | — |
+| **Ưu tiên mời mẫu SP mới** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
+| **Mã giảm giá riêng trên LIVE** | Chỉ VIP LIVE | — | — | ✅ | ❌ |
+| **FS trên LIVE** | Mọi KOC làm LIVE, không phân biệt tier | — | — | ✅ | ✅ |
+| **Liên hệ hỗ trợ riêng** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
 
 ### Lưu ý quan trọng về 2 loại hoa hồng — đừng gộp lẫn
 
 TikTok có **2 con số hoa hồng tách biệt**, không phải 1:
 - **Hoa hồng tiêu chuẩn** (hiện 9%) — ĐÂY mới là chỗ phân biệt VIP/Thường,
-  và chỉ tăng cho ai đạt >30tr/tháng.
+  và chỉ tăng cho ai đạt >30tr/tháng (ngưỡng RIÊNG, cao hơn hẳn ngưỡng vào
+  VIP 1,2tr/kỳ — không phải mọi VIP đều đạt mức này).
 - **Hoa hồng Quảng cáo cửa hàng** (hiện 3%, dùng khi video được uỷ quyền
   chạy Ads) — **giữ nguyên 3% cho TẤT CẢ**, không phải công cụ phân biệt
   tier. Mọi KOC làm video, Thường hay VIP, đều chạy Ads được như nhau.
