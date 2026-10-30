@@ -1261,9 +1261,13 @@ function computeAllFromAOA(aoa){
   }
 
   // ---------- 8) Slove / Tlove ----------
-  const sloveHotro = spTroGia, slovePhi = spPhiSan + piShipPhi;
+  // Mẫu số = phí THẬT từ file tài chính (spPhiSanFull/ttPhiSanFull); thiếu file
+  // thì rơi về phí ước tính từ file đơn hàng.
+  const sloveHotro = spTroGia;
+  const slovePhi = (spPhiSanFull !== null ? spPhiSanFull : spPhiSan) + piShipPhi;
   const slove = slovePhi ? sloveHotro / slovePhi : 0;
-  const tloveHotro = ttTroGia, tlovePhi = ttPhiSan;
+  const tloveHotro = ttTroGia;
+  const tlovePhi = ttPhiSanFull !== null ? ttPhiSanFull : ttPhiSan;
   const tlove = tlovePhi ? tloveHotro / tlovePhi : 0;
 
   // ---------- 9) ShopStats — Voucher extra / kênh / sản phẩm ----------
@@ -1762,9 +1766,8 @@ function computeAllFromAOA(aoa){
     warnings.push('TỰ KIỂM: doanh thu trung bình/đơn < 1.000đ — gần như chắc chắn file đang dùng định dạng số khác (phẩy/chấm) và bị đọc sai. KHÔNG tin các số tiền của kỳ này cho tới khi kiểm tra lại file.');
   }
 
-  // Phí sàn hiển thị: ưu tiên phí THẬT từ file tài chính (lỗi #4); thiếu file
-  // thì rơi về số ước tính cũ từ file đơn hàng (spPhiSan/ttPhiSan — vẫn là
-  // mẫu số của Slove/Tlove để giữ nguyên định nghĩa 2 chỉ số đó).
+  // Phí sàn hiển thị: ưu tiên phí THẬT từ file tài chính; thiếu file thì rơi
+  // về số ước tính cũ từ file đơn hàng. Slove/Tlove cũng dùng phí thật.
   const spPhiSanHienThi = (spPhiSanFull !== null) ? spPhiSanFull : spPhiSan;
   const ttPhiSanHienThi = (ttPhiSanFull !== null) ? ttPhiSanFull : ttPhiSan;
 
@@ -2001,11 +2004,10 @@ function combineMonthlyResults(entries){
       if (d.raw.shopeeTroGia !== null && d.raw.shopeeTroGia !== undefined){ shopeeTroGiaSum += num(d.raw.shopeeTroGia) || 0; hasVoucherData = true; }
     }
   }
-  // Slove/Tlove giữ ĐÚNG định nghĩa cũ: mẫu số là phí ƯỚC TÍNH từ file đơn
-  // hàng (phiSanUocTinh) — không phải phí thật từ file tài chính (phiSan mới).
-  const slovePhi = shopee.phiSanUocTinh + piShipPhiSum; // xấp xỉ nếu có tháng thiếu raw (thiếu phần piShipPhi của tháng đó)
+  // Slove/Tlove: mẫu số = phí THẬT (phiSan) khi có file tài chính.
+  const slovePhi = shopee.phiSan + piShipPhiSum;
   const slove = safeDiv(shopee.troGia, slovePhi);
-  const tlove = safeDiv(tiktok.troGia, tiktok.phiSanUocTinh);
+  const tlove = safeDiv(tiktok.troGia, tiktok.phiSan);
   const piShipRatio = safeDiv(piShipHoanSum, piShipPhiSum);
   const voucherExtra = hasVoucherData ? safeDiv(shopeeTroGiaSum, voucherXtraSum) : null;
   if (monthsMissingRaw.length){
