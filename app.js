@@ -1068,12 +1068,8 @@ function render(res, opts){
   <!-- ZONE 4 (chủ shop bỏ zone "Khách hàng theo khu vực" ngày 21/10/2026) -->
   <div class="zone"><span class="z-num">5</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">trả hàng · bom hàng · hoàn về kho · lý do</span></div>
   <div class="kpi-row">
-    <div class="kpi-tile"><div class="k-label">% trả hàng thật</div><div class="k-value">${s.hoanThanh ? fmtPct((s.tra||0)/(s.hoanThanh)) : '—'}</div><div class="k-sub">Shopee ${fmtInt(s.tra||0)}/${fmtInt(s.hoanThanh)} đơn HT</div></div>
-    <div class="kpi-tile"><div class="k-label">% trả hàng thật</div><div class="k-value">${t.hoanThanh ? fmtPct((t.tra||0)/(t.hoanThanh)) : '—'}</div><div class="k-sub">TikTok ${fmtInt(t.tra||0)}/${fmtInt(t.hoanThanh)} đơn HT</div></div>
-    <div class="kpi-tile"><div class="k-label">% bom hàng</div><div class="k-value">${s.hoanThanh ? fmtPct((s.bomHang||0)/(s.hoanThanh)) : '—'}</div><div class="k-sub">Shopee ${fmtInt(s.bomHang||0)}/${fmtInt(s.hoanThanh)}</div></div>
-    <div class="kpi-tile"><div class="k-label">% bom hàng</div><div class="k-value">${t.hoanThanh ? fmtPct((t.bomHang||0)/(t.hoanThanh)) : '—'}</div><div class="k-sub">TikTok ${fmtInt(t.bomHang||0)}/${fmtInt(t.hoanThanh)}</div></div>
-  </div>
-  <div class="kpi-row" style="margin-top:6px;">
+    <div class="kpi-tile"><div class="k-label">% trả hàng thật</div><div class="k-value">${g.hoanThanh ? fmtPct(((s.tra||0)+(t.tra||0))/g.hoanThanh) : '—'}</div><div class="k-sub">Shopee ${s.hoanThanh ? fmtPct((s.tra||0)/s.hoanThanh) : '—'} · TikTok ${t.hoanThanh ? fmtPct((t.tra||0)/t.hoanThanh) : '—'}</div></div>
+    <div class="kpi-tile"><div class="k-label">% bom hàng</div><div class="k-value">${g.hoanThanh ? fmtPct(((s.bomHang||0)+(t.bomHang||0))/g.hoanThanh) : '—'}</div><div class="k-sub">Shopee ${s.hoanThanh ? fmtPct((s.bomHang||0)/s.hoanThanh) : '—'} · TikTok ${t.hoanThanh ? fmtPct((t.bomHang||0)/t.hoanThanh) : '—'}</div></div>
     <div class="kpi-tile"><div class="k-label">Hoàn về kho</div><div class="k-value">${fmtInt(g.hoanVeKho)}</div><div class="k-sub">Shopee ${fmtInt(s.hoanVeKho)} · TikTok ${fmtInt(t.hoanVeKho)}</div></div>
     <div class="kpi-tile"><div class="k-label">Tỷ lệ huỷ hoàn trả</div><div class="k-value">${fmtPct(g.huyHoanTra/(g.tongDon||1))}</div><div class="k-sub">Shopee ${fmtPct(s.huyHoanTra/(s.tongDon||1))} · TikTok ${fmtPct(t.huyHoanTra/(t.tongDon||1))} (/ tổng đơn đặt)</div></div>
   </div>
