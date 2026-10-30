@@ -1059,13 +1059,7 @@ function render(res, opts){
   </details>
   ${buildDailyRevenueChartHtml(res)}
 
-  ${buildChiPhiHtml(res, opts)}
-
-  ${buildPnlHtml(res, opts)}
-
-  ${buildInventoryHtml(res)}
-
-  <!-- ZONE 4 (chủ shop bỏ zone "Khách hàng theo khu vực" ngày 21/10/2026) -->
+  <!-- ZONE 5: Đơn huỷ hoàn trả — đẩy lên trước chi phí (chốt 30/10/2026) -->
   <div class="zone"><span class="z-num">5</span><span class="z-title">Đơn huỷ hoàn trả</span><span class="z-note">trả hàng · bom hàng · hoàn về kho · lý do</span></div>
   <div class="kpi-row">
     <div class="kpi-tile"><div class="k-label">% trả hàng thật</div><div class="k-value">${g.hoanThanh ? fmtPct(((s.tra||0)+(t.tra||0))/g.hoanThanh) : '—'}</div><div class="k-sub">Shopee ${s.hoanThanh ? fmtPct((s.tra||0)/s.hoanThanh) : '—'} · TikTok ${t.hoanThanh ? fmtPct((t.tra||0)/t.hoanThanh) : '—'}</div></div>
@@ -1085,7 +1079,13 @@ function render(res, opts){
     ${buildReasonBarsHtml(res.cancelReasonRows)}
   </div>
 
-  <!-- ZONE 5 -->
+  ${buildChiPhiHtml(res, opts)}
+
+  ${buildPnlHtml(res, opts)}
+
+  ${buildInventoryHtml(res)}
+
+  <!-- ZONE 6 -->
   <div class="zone"><span class="z-num">6</span><span class="z-title">Hiệu quả sàn</span><span class="z-note">số cố định cả kỳ — nguồn chỉ xuất theo tháng</span></div>
   <div class="grid">
     <div class="card single"><div class="c-title">Slove — Shopee</div>
