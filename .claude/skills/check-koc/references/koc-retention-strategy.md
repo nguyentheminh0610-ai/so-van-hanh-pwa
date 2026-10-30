@@ -34,22 +34,28 @@ LIVE → chỉ nhận bộ ưu đãi LIVE; làm cả 2 → nhận **cả 2 bộ*
 
 | Ưu đãi | Điều kiện áp dụng | VIP Video | Thường Video | VIP LIVE | Thường LIVE |
 |---|---|:---:|:---:|:---:|:---:|
-| **Hoa hồng mục tiêu** tăng (xem bảng 3 loại dưới) | Mọi VIP — **9% → 10%** *(chốt 30/10, thay cho rule cũ ">30tr/tháng" — xem cảnh báo bên dưới)* | ✅ 10% | giữ 9% | ✅ 10% | giữ 9% |
+| **Hoa hồng mục tiêu** tăng (xem bảng 3 loại dưới) | Chỉ KOC GMV **>30 triệu/tháng** — 9% → 10% *(chốt lại 30/10, xem lịch sử bên dưới)* | ✅ 10% nếu đạt | giữ 9% | ✅ 10% nếu đạt | giữ 9% |
 | **Hoa hồng Quảng cáo cửa hàng** | Không phân biệt — **giữ 3% cho tất cả** | 3% | 3% | — | — |
 | **Chạy Ads cho video** | Mọi KOC làm video, không phân biệt tier | ✅ | ✅ | — | — |
-| **Ưu tiên mời mẫu SP mới** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
+| **Ưu tiên gửi mẫu mới + thêm mẫu** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
 | **Mã giảm giá riêng trên LIVE** | Chỉ VIP LIVE | — | — | ✅ | ❌ |
-| **FS trên LIVE** | Mọi KOC làm LIVE, không phân biệt tier | — | — | ✅ | ✅ |
-| **Liên hệ hỗ trợ riêng** | Mọi VIP, không phân biệt kênh | ✅ | ❌ | ✅ | ❌ |
+| **FS trên LIVE** | Mọi KOC làm LIVE, không phân biệt tier (đại trà, không phải đặc quyền VIP) | — | — | (có, như Thường) | ✅ |
 
-### ⚠️ 3 khái niệm hoa hồng — đừng gộp lẫn (sửa lại 30/10, bản trước chỉ ghi 2 cái và gọi sai tên)
+Bỏ khỏi danh sách đặc quyền công khai (artifact gửi KOC chỉ còn 3 thẻ, chốt
+30/10 sau khi chủ shop phát hiện vấn đề thực tế — xem lịch sử dưới):
+- ~~Ưu tiên suất Flash Sale LIVE~~ — rút, FS LIVE vốn đã mở cho cả Thường,
+  không phải đặc quyền riêng để liệt kê.
+- ~~Liên hệ hỗ trợ riêng~~ — rút khỏi danh sách công khai (shop vẫn làm,
+  chỉ không ghi thành 1 dòng đặc quyền trên trang nữa).
+
+### ⚠️ 3 khái niệm hoa hồng — đừng gộp lẫn
 
 TikTok có **3 khái niệm tách biệt**, không phải 2:
 
 | | Set ở đâu | Mức hiện tại | Khác theo VIP? |
 |---|---|---|---|
 | **① Hoa hồng tiêu chuẩn** | *Cộng tác mở* — 1 mức áp dụng chung cho **mọi** KOC tự tham gia | **9%** | Không — mức nền, cố định |
-| **② Hoa hồng mục tiêu** | *Cộng tác mục tiêu* — set **riêng từng KOC** khi mời đích danh | Thường **9%** · VIP **10%** | **Có — đây mới là đòn bẩy VIP thật sự** |
+| **② Hoa hồng mục tiêu** | *Cộng tác mục tiêu* — set **riêng từng KOC** khi mời đích danh | Thường **9%** · VIP đạt mốc **10%** | **Có — đây mới là đòn bẩy VIP thật sự** |
 | **③ Hoa hồng Quảng cáo cửa hàng** | Khoản **cộng thêm, tách biệt** — KOC vẫn nhận dù đơn đến từ Ads do **shop** tự chạy (dùng video KOC đã uỷ quyền), không cần chính KOC bán | **3%** | Không — như nhau mọi người |
 
 **① và ② thực ra là CÙNG 1 trường "hoa hồng tiêu chuẩn" trên TikTok, chỉ khác
@@ -59,13 +65,18 @@ toàn khác, không liên quan VIP/Thường** — nhưng chủ shop nhấn mạ
 đây là thứ **KOC rất quan tâm**, vì nhiều người không biết mình vẫn được ăn
 hoa hồng ngay cả khi đơn đến từ Ads do SHOP tự chạy, không phải chính họ bán.
 
-**⚠️ Mâu thuẫn CHƯA GIẢI QUYẾT, cần hỏi lại chủ shop nếu phiên sau động vào
-số này:** bản chốt 29/10 nói hoa hồng mục tiêu chỉ tăng cho VIP đạt riêng
-**>30tr/tháng** (không phải mọi VIP). Bản chốt 30/10 nói đơn giản "Thường 9%,
-VIP 10%" không nhắc lại mốc 30tr. Claude đã hiểu là **bỏ hẳn mốc 30tr, mọi
-VIP đều lên 10%**, và ghi vào bảng trên theo hướng đó — nhưng **chưa được
-chủ shop xác nhận lại bằng lời**, chỉ là suy luận hợp lý nhất từ câu nói sau
-cùng. Nếu sai, chủ shop sẽ sửa.
+### Lịch sử chốt mốc ②  (để hiểu vì sao có "GMV >30tr/tháng" — đã giải quyết 30/10)
+
+- **29/10:** chốt hoa hồng mục tiêu chỉ tăng cho VIP đạt riêng **>30tr/tháng**
+  (không phải mọi VIP).
+- **30/10 sáng:** chủ shop nói gọn "Thường 9%, VIP 10%" không nhắc lại mốc —
+  Claude hiểu nhầm là bỏ hẳn mốc 30tr, mọi VIP lên 10%, và từng ghi sai vào
+  artifact công khai theo hướng đó.
+- **30/10 chiều — chốt THẬT:** chủ shop tự phát hiện vấn đề khi thử áp dụng
+  thực tế (nhắn hỗ trợ riêng cho KOC VIP) — không phải VIP nào cũng được
+  10%, nên trang công khai nói "VIP = 10%" là sai, gây mất lòng tin với KOC.
+  **Xác nhận lại dùng đúng mốc cũ >30tr/tháng**, ghi rõ ngay trên artifact
+  gửi KOC (không giấu điều kiện) để kỳ vọng đúng với thực tế shop áp dụng.
 
 ## 4 công cụ thật đã xác minh trên TikTok Affiliate Center (29–30/10/2026)
 
