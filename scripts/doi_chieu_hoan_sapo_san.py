@@ -251,6 +251,12 @@ def load_sapo(d_from, d_to):
             "outbound_tracking": "+".join(si.get("fulfillment_tracking_numbers") or []),
             "return_type": r.get("return_type"),
             "shipment_status": r.get("shipment_status"),
+            # status = open | canceled | closed.
+            # "canceled" = YÊU CẦU TRẢ ĐÃ BỊ HUỶ (khách tạo yêu cầu rồi không
+            # đưa hàng cho shipper, quá hạn tự huỷ) -> HÀNG VẪN Ở CHỖ KHÁCH,
+            # không bao giờ về kho. Đừng coi là "hoàn về chưa nhận".
+            # Đo 30/10: 25/193 phiếu từ 20/09 ở trạng thái này.
+            "status": r.get("status"),
             "created_on": day,
             "returned_on": (r.get("returned_on") or "")[:10],
             "qty": r.get("total_quantity"),
@@ -386,6 +392,15 @@ def main():
         if s["sapo_return_id"] in hit or s["platform"] not in co_file:
             continue
         q = quet_cua(s["order_code"], s["return_tracking"], *(s["outbound_tracking"] or "").split("+"))
+        if s.get("status") == "canceled" and not q:
+            # yêu cầu trả đã huỷ + kho chưa quét -> hàng còn ở chỗ khách, đúng
+            rows.append({"nhom": "YEU CAU TRA DA HUY — hang con o cho khach",
+                         "san": s["platform"], "ngay": s["created_on"],
+                         "ma_don": s["order_code"], "ma_van_don": s["return_tracking"],
+                         "trang_thai_san": "", "tt_tra_hang": "", "da_roi_kho": "",
+                         "sapo": s["return_type"], "kho_quet": "",
+                         "ghi_chu": "Khach tao yeu cau roi khong dua hang cho shipper. Khong phai loi."})
+            continue
         rows.append({"nhom": "SAPO THUA — co phieu nhung file san khong co don nay",
                      "san": s["platform"], "ngay": s["created_on"], "ma_don": s["order_code"],
                      "ma_van_don": s["return_tracking"], "trang_thai_san": "",
