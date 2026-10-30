@@ -204,6 +204,55 @@ sai hoàn toàn. Số đúng là 15 và 6.
 Đơn hủy mà 2 trường này trống là hủy trước khi gửi, không có hàng về — đưa vào
 đối chiếu là tự tạo ra "Sapo thiếu" giả (66/81 đơn rơi vào nhóm này).
 
+## 4e. ⭐ NGUYÊN NHÂN GỐC của chênh lệch Shopee (chốt 30/10/2026)
+
+### Vì sao Sapo THIẾU — lỗ hổng cơ học, tách 100% sạch
+
+Chia 15 đơn Shopee đã gửi hàng theo file nguồn:
+
+| Đơn nằm ở | Sapo có phiếu? |
+|---|---|
+| File **Giao không thành công** (9 đơn) | **9/9 — có đủ** |
+| File **Đã hủy** nhưng đã gửi hàng rồi (6 đơn) | **0/6 — không có cái nào** |
+
+Không một ngoại lệ. Kết luận:
+
+> **Sapo chỉ sinh phiếu trả khi Shopee gắn nhãn "Giao không thành công".
+> Đơn bị HỦY SAU KHI ĐÃ GỬI thì Shopee không gắn nhãn đó, nên Sapo không bao giờ
+> biết — dù kiện hàng vẫn thật sự quay về kho.**
+
+Đây không phải lỗi đồng bộ chậm hay mất kết nối, mà là **lỗ hổng cố định**: cứ
+có đơn hủy sau khi gửi là Sapo sót, lần nào cũng sót. 6/15 = 40% trong kỳ đo.
+
+**Cách bịt:** đối chiếu định kỳ file `Order.cancelled` của Shopee, lọc những dòng
+**có cả "Ngày gửi hàng" lẫn "Mã vận đơn"** — đó chính là nhóm Sapo không thấy.
+
+### Vì sao THỪA chỉ xuất hiện ở Shopee — do đo không đều tay, không phải Sapo sai
+
+| | Dữ liệu sàn đã quét |
+|---|---|
+| TikTok | **Toàn bộ** danh sách đơn: 554 đơn "Giao không thành công" + 4.145 đơn "Đã hủy", **không giới hạn thời gian** → tra ra hết 62/62 → **thừa = 0** |
+| Shopee | Chỉ 2 file, lọc theo **ngày đặt hàng 01/10–29/10** và đúng **2 trạng thái** → **thiếu hẳn danh sách Trả hàng/Hoàn tiền** |
+
+Nên con số "thừa 10" của Shopee **không so sánh được** với "thừa 0" của TikTok —
+hai bên không cùng độ phủ dữ liệu.
+
+Bằng chứng 10 đơn đó là bom hàng thật, Sapo không bịa:
+
+- **10/10** có mã vận đơn chiều về **trùng** chiều đi — đúng đặc trưng hàng quay
+  đầu (xem mục 2), giống hệt 9 đơn đã khớp.
+- 9/10 có `returned_on` — Sapo ghi nhận hàng đã về kho thật.
+- Khoảng cách từ ngày đặt đến ngày tạo phiếu: trung bình **3,2 ngày** (1–8), còn
+  nhanh hơn nhóm đã khớp (6,2 ngày). Quá ngắn để là khách chủ động trả hàng
+  (thường 7–14 ngày) → đúng là shipper trả về sớm.
+
+Nhiều khả năng 8 đơn trong kỳ nằm ở danh sách **Trả hàng/Hoàn tiền** của Shopee
+(kiện bật về → Shopee tự hoàn tiền → đơn chuyển sang trạng thái đó, không nằm ở
+"Đã hủy"). Cần file đó để xác nhận. 2 đơn còn lại đặt từ tháng 9 nên ngoài kỳ file.
+
+**Bài học cho lần sau: muốn so "thừa" thì phải quét TOÀN BỘ đơn của sàn, không
+lọc trạng thái.** Lọc trạng thái chỉ dùng được cho chiều "thiếu".
+
 ## 7. Lấy dữ liệu đơn hoàn TikTok KHÔNG cần tải file
 
 Trang `seller-vn.tiktok.com/order/return` gọi
