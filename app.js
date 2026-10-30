@@ -913,24 +913,42 @@ function render(res, opts){
     'item too big or too small': 'Size không vừa',
     'change of mind': 'Đổi ý',
     "product doesn't match description": 'Khác với mô tả',
+    'item not as described': 'Khác với mô tả',
     'wrong product sent': 'Gửi sai sản phẩm',
+    'received wrong item': 'Gửi sai sản phẩm',
     'ordered wrong size': 'Đặt sai size',
     'refund only': 'Chỉ hoàn tiền',
     'item is defective': 'Hàng lỗi',
+    'item broken on arrival': 'Hàng lỗi',
     'missing item': 'Thiếu hàng',
     'item damaged during delivery': 'Hỏng khi vận chuyển',
-    'received wrong item': 'Nhận sai hàng',
-    'item not as described': 'Không đúng mô tả',
+    'package damaged': 'Hỏng khi vận chuyển',
     'out of delivery area': 'Ngoài vùng giao hàng',
     'buyer no show': 'Không liên lạc được',
     'cash not prepared': 'Chưa chuẩn bị tiền',
     'request by seller': 'Shop yêu cầu huỷ',
+    'seller requested': 'Shop yêu cầu huỷ',
+    'no longer needed': 'Không còn nhu cầu',
+    'found a better price': 'Có giá tốt hơn',
+    'duplicate order': 'Đặt trùng đơn',
+    'delivery too slow': 'Giao quá lâu',
+    'wrong address': 'Sai địa chỉ',
+    'payment issue': 'Lỗi thanh toán',
+    'out of stock': 'Hết hàng',
+    'failed delivery': 'Giao thất bại',
+    'delivery failed': 'Giao thất bại',
+    'incorrect color/size': 'Sai màu/size',
   };
   function _cleanReason(r){
     const lo = r.toLowerCase().trim();
     if (_reasonVi[lo]) return _reasonVi[lo];
     let c = r.replace(/^Hủy bởi người mua\s+lí do là:\s*/i, '');
     c = c.replace(/^Tự động hủy bởi hệ thống \S+\s+lí do là:\s*/i, '');
+    c = c.replace(/^Hủy bởi hệ thống\s+lí do là:\s*/i, '');
+    c = c.replace(/^Hủy bởi người bán\s+lí do là:\s*/i, '');
+    c = c.trim();
+    const lo2 = c.toLowerCase();
+    if (_reasonVi[lo2]) return _reasonVi[lo2];
     return c;
   }
   function buildReasonBarsHtml(rows, excludePatterns){
@@ -946,20 +964,21 @@ function render(res, opts){
       if (r.platform === 'Shopee') merged[key].sp += r.count;
       else merged[key].tt += r.count;
     }
-    const items = Object.values(merged).map(m => ({ ...m, total: m.sp + m.tt })).sort((a,b) => b.total - a.total).slice(0, 10);
+    const items = Object.values(merged).map(m => ({ ...m, total: m.sp + m.tt })).sort((a,b) => b.total - a.total).slice(0, 12);
     const maxCount = Math.max(1, ...items.map(r => r.total));
+    const total = items.reduce((s, r) => s + r.total, 0);
     return `<div class="reason-bars">${items.map(r => {
-      const pct = Math.max(6, Math.round(r.total / maxCount * 100));
-      const short = r.reason.length > 35 ? r.reason.slice(0, 34) + '…' : r.reason;
+      const pct = Math.max(8, Math.round(r.total / maxCount * 100));
       const tipParts = [];
       if (r.sp) tipParts.push('Shopee ' + r.sp);
       if (r.tt) tipParts.push('TikTok ' + r.tt);
       const tip = r.reason + ': ' + r.total + ' (' + tipParts.join(', ') + ')';
       const spW = r.total ? (r.sp / r.total * 100) : 0;
       const barInner = (r.sp && r.tt)
-        ? `<div style="width:${spW.toFixed(0)}%;background:var(--shopee);height:100%;"></div><div style="width:${(100-spW).toFixed(0)}%;background:var(--tiktok);height:100%;"></div>`
-        : `<div style="width:100%;background:${r.sp ? 'var(--shopee)' : 'var(--tiktok)'};height:100%;"></div>`;
-      return `<div class="reason-row" title="${esc(tip)}"><span class="reason-name">${esc(short)}</span><div class="reason-bar-wrap"><div style="width:${pct}%;display:flex;height:20px;border-radius:4px;overflow:hidden;">${barInner}</div><span style="font-size:11px;font-weight:600;color:var(--ink-soft);min-width:24px;">${r.total}</span></div></div>`;
+        ? `<div class="rb-seg" style="width:${spW.toFixed(0)}%;background:var(--shopee);"></div><div class="rb-seg" style="width:${(100-spW).toFixed(0)}%;background:var(--tiktok);"></div>`
+        : `<div class="rb-seg" style="width:100%;background:${r.sp ? 'var(--shopee)' : 'var(--tiktok)'};"></div>`;
+      const pctOfTotal = total ? Math.round(r.total / total * 100) : 0;
+      return `<div class="reason-row" title="${esc(tip)}"><span class="reason-name">${esc(r.reason)}</span><div class="reason-bar-wrap"><div class="rb-track" style="width:${pct}%;">${barInner}</div><span class="rb-count">${r.total}</span><span class="rb-pct">${pctOfTotal}%</span></div></div>`;
     }).join('')}</div>`;
   }
 
