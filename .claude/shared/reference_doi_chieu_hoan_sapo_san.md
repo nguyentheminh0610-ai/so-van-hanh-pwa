@@ -155,6 +155,55 @@ vòng thứ hai **đứng im ở trang đầu** trong khi vòng kia vẫn chạy
 từng vòng một. Mỗi lượt `javascript_tool` cũng bị cắt ở **45 giây**, nên việc
 kéo dài phải cho chạy nền rồi hỏi tiến độ qua một biến `window.__prog`.
 
+## 4d. KẾT QUẢ SHOPEE — nhóm bom hàng (chốt 30/10/2026, kỳ 01/10→29/10)
+
+Nguồn: 2 file chủ shop tự xuất từ Shopee — `Order.cancelled` và
+`Order.failed_delivery` (Shopee chỉ cho xuất tối đa 30 ngày/lần).
+
+| | Số đơn |
+|---|---|
+| Tổng đơn trong 2 file (đã gộp trùng) | 81 |
+| — hủy **trước** khi gửi → không có hàng về kho | 66 |
+| — **đã gửi** rồi hủy/giao thất bại → hàng về kho | **15** |
+| Khớp với Sapo | 9 |
+| **Sapo THIẾU** | **6** |
+| **Sapo THỪA** (phiếu `delivery_failed` không có trong 2 file) | **10** |
+
+**⚠️ Shopee tệ hơn TikTok rõ rệt: sót 6/15 = 40% đơn bom hàng.** 6 đơn này đều
+có mã vận đơn thật và đã gửi đi, tức hàng chắc chắn quay về kho, mà Sapo không
+hề có phiếu:
+
+| Ngày gửi | Mã đơn | Mã vận đơn |
+|---|---|---|
+| 05/10 | 261004Q31NEBV7 | SPXVN06504194613A |
+| 09/10 | 2610095A177YNM | SPXVN06689241513A |
+| 15/10 | 261015NPEHRVDK | SPXVN06168303672A |
+| 18/10 | 261018W1BVMSBH | SPXVN06034920777A |
+| 20/10 | 2610192WD7Q441 | VN266810113441E (không phải SPX) |
+| 21/10 | 2610205Q066FG3 | SPXVN06281415350A |
+
+Còn 10 đơn "thừa": 2 đơn đặt từ tháng 9 nên nằm ngoài kỳ của file (bình thường);
+**8 đơn còn lại đặt trong kỳ nhưng không ở trạng thái hủy/giao thất bại trên
+Shopee** — cần thêm file `Trả hàng/Hoàn tiền` mới kết luận được.
+
+### ⚠️ 3 bẫy khi đọc file export Shopee (dính cả 3 ngày 30/10)
+
+1. **Thứ tự cột KHÁC nhau giữa các file.** File `cancelled` có thêm cột
+   "Lý do hủy" nên mọi cột sau đó lệch 1 vị trí so với `failed_delivery`.
+   Đọc theo **số thứ tự cột là sai**, phải tra theo **tên cột**.
+2. **Tên cột phải chuẩn hoá Unicode NFC.** Tra `'Ngày gửi hàng'` trực tiếp ra
+   `None` vì file dùng dạng tổ hợp khác. Luôn
+   `unicodedata.normalize('NFC', ...)` cả tên cột lẫn chuỗi cần so.
+3. **File lọc theo NGÀY ĐẶT HÀNG, không phải ngày hủy.** Đơn đặt 28/09 mà bom
+   ngày 05/10 sẽ không có trong file kỳ 01/10–29/10.
+
+Hậu quả nếu dính bẫy 1+2: lần chạy đầu ra "42 đơn đã gửi, Sapo thiếu 33" —
+sai hoàn toàn. Số đúng là 15 và 6.
+
+**Và: một đơn phải tính là "có hàng về kho" khi có NGÀY GỬI HÀNG + MÃ VẬN ĐƠN.**
+Đơn hủy mà 2 trường này trống là hủy trước khi gửi, không có hàng về — đưa vào
+đối chiếu là tự tạo ra "Sapo thiếu" giả (66/81 đơn rơi vào nhóm này).
+
 ## 7. Lấy dữ liệu đơn hoàn TikTok KHÔNG cần tải file
 
 Trang `seller-vn.tiktok.com/order/return` gọi
