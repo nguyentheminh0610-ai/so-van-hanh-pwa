@@ -148,12 +148,10 @@
   .dt-bar div{ min-width:0; }
 
   /* reason horizontal bars (Zone 5) */
-  .reason-bars{ margin:6px 0; }
-  .reason-row{ display:flex; align-items:center; gap:6px; margin:2px 0; font-size:11px; }
-  .reason-name{ width:160px; text-align:right; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
-  .reason-bar-wrap{ flex:1; display:flex; align-items:center; gap:4px; }
-  .reason-bar{ height:16px; border-radius:3px; display:flex; align-items:center; padding:0 4px; font-size:9px; color:#fff; font-weight:600; min-width:16px; }
-  .reason-count{ font-size:10px; color:var(--ink-faint); width:36px; }
+  .reason-bars{ margin:8px 0; }
+  .reason-row{ display:flex; align-items:center; gap:8px; margin:3px 0; font-size:12px; }
+  .reason-name{ width:180px; text-align:right; color:var(--ink-soft); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:0; }
+  .reason-bar-wrap{ flex:1; display:flex; align-items:center; gap:6px; }
 
   /* ---------- Chart cards ---------- */
   .chart-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }

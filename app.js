@@ -902,18 +902,57 @@ function render(res, opts){
     ? `<span class="pill good"><span class="dot"></span>${okText}</span>`
     : `<span class="pill warn"><span class="dot"></span>${warnText}</span>`;
 
+  const _reasonVi = {
+    'item too big or too small': 'Size không vừa',
+    'change of mind': 'Đổi ý',
+    "product doesn't match description": 'Khác với mô tả',
+    'wrong product sent': 'Gửi sai sản phẩm',
+    'ordered wrong size': 'Đặt sai size',
+    'refund only': 'Chỉ hoàn tiền',
+    'item is defective': 'Hàng lỗi',
+    'missing item': 'Thiếu hàng',
+    'item damaged during delivery': 'Hỏng khi vận chuyển',
+    'received wrong item': 'Nhận sai hàng',
+    'item not as described': 'Không đúng mô tả',
+    'out of delivery area': 'Ngoài vùng giao hàng',
+    'buyer no show': 'Không liên lạc được',
+    'cash not prepared': 'Chưa chuẩn bị tiền',
+    'request by seller': 'Shop yêu cầu huỷ',
+  };
+  function _cleanReason(r){
+    const lo = r.toLowerCase().trim();
+    if (_reasonVi[lo]) return _reasonVi[lo];
+    let c = r.replace(/^Hủy bởi người mua\s+lí do là:\s*/i, '');
+    c = c.replace(/^Tự động hủy bởi hệ thống \S+\s+lí do là:\s*/i, '');
+    return c;
+  }
   function buildReasonBarsHtml(rows, excludePatterns){
-    if (!rows || !rows.length) return '<div style="font-size:11px;color:var(--ink-faint);">Không có dữ liệu.</div>';
+    if (!rows || !rows.length) return '<div style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu.</div>';
     let filtered = rows;
     if (excludePatterns) filtered = rows.filter(r => !excludePatterns.some(p => r.reason.toLowerCase().includes(p)));
-    if (!filtered.length) return '<div style="font-size:11px;color:var(--ink-faint);">Không có dữ liệu.</div>';
-    const sorted = filtered.slice().sort((a,b) => b.count - a.count).slice(0, 12);
-    const maxCount = Math.max(1, ...sorted.map(r => r.count));
-    return `<div class="reason-bars">${sorted.map(r => {
-      const pct = Math.max(4, Math.round(r.count / maxCount * 100));
-      const bg = r.platform === 'Shopee' ? 'var(--shopee)' : 'var(--tiktok)';
-      const short = r.reason.length > 30 ? r.reason.slice(0, 29) + '…' : r.reason;
-      return `<div class="reason-row"><span class="reason-name" title="${esc(r.reason)}">${esc(short)}</span><div class="reason-bar-wrap"><div class="reason-bar" style="width:${pct}%;background:${bg}">${r.count}</div></div></div>`;
+    if (!filtered.length) return '<div style="font-size:12px;color:var(--ink-faint);">Không có dữ liệu.</div>';
+    const merged = {};
+    for (const r of filtered){
+      const reason = _cleanReason(r.reason);
+      const key = reason.toLowerCase();
+      if (!merged[key]) merged[key] = { reason, sp: 0, tt: 0 };
+      if (r.platform === 'Shopee') merged[key].sp += r.count;
+      else merged[key].tt += r.count;
+    }
+    const items = Object.values(merged).map(m => ({ ...m, total: m.sp + m.tt })).sort((a,b) => b.total - a.total).slice(0, 10);
+    const maxCount = Math.max(1, ...items.map(r => r.total));
+    return `<div class="reason-bars">${items.map(r => {
+      const pct = Math.max(6, Math.round(r.total / maxCount * 100));
+      const short = r.reason.length > 35 ? r.reason.slice(0, 34) + '…' : r.reason;
+      const tipParts = [];
+      if (r.sp) tipParts.push('Shopee ' + r.sp);
+      if (r.tt) tipParts.push('TikTok ' + r.tt);
+      const tip = r.reason + ': ' + r.total + ' (' + tipParts.join(', ') + ')';
+      const spW = r.total ? (r.sp / r.total * 100) : 0;
+      const barInner = (r.sp && r.tt)
+        ? `<div style="width:${spW.toFixed(0)}%;background:var(--shopee);height:100%;"></div><div style="width:${(100-spW).toFixed(0)}%;background:var(--tiktok);height:100%;"></div>`
+        : `<div style="width:100%;background:${r.sp ? 'var(--shopee)' : 'var(--tiktok)'};height:100%;"></div>`;
+      return `<div class="reason-row" title="${esc(tip)}"><span class="reason-name">${esc(short)}</span><div class="reason-bar-wrap"><div style="width:${pct}%;display:flex;height:20px;border-radius:4px;overflow:hidden;">${barInner}</div><span style="font-size:11px;font-weight:600;color:var(--ink-soft);min-width:24px;">${r.total}</span></div></div>`;
     }).join('')}</div>`;
   }
 

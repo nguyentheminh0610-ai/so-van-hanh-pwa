@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v51'; // v51: Zone5 ly do tra hang + huy don hien luon (bo details)
+const CACHE_NAME = 'vanhanh-shop-v52'; // v52: Zone5 dich ly do TikTok sang VN, gop trung, lam dep bar
 const ASSETS = [
   './',
   './index.html',
