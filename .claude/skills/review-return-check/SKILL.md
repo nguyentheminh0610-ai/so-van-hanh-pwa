@@ -318,6 +318,19 @@ của người ta**, nên cơ chế là: **skill CHỈ ĐỀ XUẤT, chủ shop 
 ghi Sổ Kho" trên tab Sổ Vận Hành mới thật sự insert.** Skill **TUYỆT ĐỐI
 không tự insert** `warehouse_error_log`.
 
+**Làm với TOÀN BỘ case, kể cả case tranh chấp/chạy bù (chốt 30/10/2026 sau khi
+phát hiện lỗ hổng thật):** đơn 586807062686958970 (action_type='tranh_chap',
+từ 1 lượt chạy bù 28/10) có lý do "Gửi sai sản phẩm" + action_note ghi rõ
+"nhân viên đã nhận lỗi đóng nhầm trong chat" — rõ ràng là `giao_nham` — nhưng
+lượt chạy đó để trống `shop_error_kind`/`errlog_status` luôn, khiến Sổ Kho đã
+có sẵn dòng lỗi (#24, do Giáp) mà bên này không biết để đối chiếu, khối "Ghi
+lỗi vào Sổ Kho" trên web cũng không hiện case này. Đã vá tay dòng đó
+(`errlog_status='dup'`, trỏ `errlog_id=24`). **Từ nay: mục 4 là bước BẮT BUỘC
+cho MỌI case**, không được bỏ qua chỉ vì case đó rơi vào nhóm tranh chấp (Hard
+rule 4) hoặc đang chạy bù ngược — việc "chờ chủ shop quyết" chỉ áp dụng cho
+quyết định xử lý khách (bồi thường, đổi trả), không áp dụng cho việc phân loại
+lỗi để đối chiếu Sổ Kho, đây là 2 việc khác nhau.
+
 Với mỗi case trả hàng / đánh giá, sau khi đã upsert dòng cskh (mục 3), xét thêm
 và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
 `errlog_status`:
