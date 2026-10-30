@@ -55,7 +55,13 @@ không phải `<a href>`; link cũ `export_task/list` hết chữ ký thì trả
 
 ## Đã áp dụng / nên áp dụng
 
-- **KOC (TikTok affiliate):** đang chuyển sang cách này (chốt 30/10), thay cho
-  cách cũ chạy phiên Claude điều khiển Chrome mỗi lần (tốn quota, dễ gãy).
+- **KOC (TikTok affiliate):** ĐÃ dựng xong script mẫu (30/10):
+  [`tools/koc_auto_sync.py`](../../tools/koc_auto_sync.py) (Playwright + ghi
+  Supabase, 0 token) + [`scripts/setup-koc-sync-task.ps1`](../../scripts/setup-koc-sync-task.ps1)
+  (đăng ký Task Scheduler tuần/lần). Còn CHỜ setup 1 lần trên PC: cài
+  Playwright + `py tools\koc_auto_sync.py --login` (đăng nhập TikTok vào
+  profile script). Bản này gọi API nội bộ qua trang (mượn chữ ký phiên) thay
+  vì tải file — cùng nguyên tắc 0-token-trên-PC; nếu API đổi thì chuyển sang
+  bấm Export tải file.
 - **Gợi ý mở rộng:** báo cáo tháng Shopee/TikTok (skill `thang-moi` vốn đã tải
   file tay), đối chiếu đơn hoàn, bất cứ số liệu sàn nào có nút Export.
