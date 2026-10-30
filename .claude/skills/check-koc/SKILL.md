@@ -391,6 +391,8 @@ Phần đẩy lên web Sổ Vận Hành thành tab **"Chấm điểm KOC"** (ch�
 PC ghi Supabase → web chỉ đọc, gộp kỳ theo ngày đăng, có cả LIVE): xem
 [references/koc-dashboard-spec.md](references/koc-dashboard-spec.md).
 
+Chiến lược phân nhóm VIP/Thường để giữ chân KOC + bảng đối chiếu với đúng công cụ hoa hồng/ưu đãi thật trên TikTok Affiliate Center (chốt 29–30/10, bao gồm cái nào không tồn tại / đang khoá): xem [references/koc-retention-strategy.md](references/koc-retention-strategy.md).
+
 ## Report back
 
 End with a short summary: how many new KOC were scored, their
