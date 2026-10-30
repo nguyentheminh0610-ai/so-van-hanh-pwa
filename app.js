@@ -512,14 +512,16 @@ function buildChiPhiHtml(res, opts){
   const ttTotal = ttItems.reduce((s, x) => s + x.v, 0);
 
   // --- ② Thanh DT → Chi phí ---
-  const conLai = Math.max(0, dt - tong);
+  const giaVon = n(res.pnl && res.pnl.giaVonHangBan);
+  const conLai = Math.max(0, dt - tong - giaVon);
   const dtBarItems = [
     { name: 'Phí sàn Shopee', v: phiSp, c: 'var(--p1)' },
     { name: 'Phí sàn TikTok', v: phiTt, c: '#1a1a2e' },
-    { name: 'Quảng cáo', v: tongAds, c: 'var(--p2)' },
+    { name: 'QC', v: tongAds, c: 'var(--p2)' },
     { name: 'Lương', v: luong, c: 'var(--p3)' },
     { name: 'Vật tư', v: vatTu, c: 'var(--p4)' },
     { name: 'Khác', v: khac, c: 'var(--p6)' },
+    { name: 'Giá vốn', v: giaVon, c: '#9ca3af' },
     { name: 'Còn lại', v: conLai, c: 'var(--good)' },
   ];
   let dtBarHtml = '';
@@ -527,7 +529,8 @@ function buildChiPhiHtml(res, opts){
     const segs = dtBarItems.filter(x => x.v > 0).map(x => {
       const p = x.v / dt * 100;
       const isConLai = x.name === 'Còn lại';
-      return `<div style="width:${p.toFixed(1)}%;background:${x.c};${isConLai ? 'color:var(--ink);' : ''}${p < 4 ? 'font-size:0;' : ''}" title="${esc(x.name)}: ${fmtPct(x.v / dt, 1)}">${p >= 4 ? (isConLai ? fmtPct(x.v / dt, 0) : fmtPct(x.v / dt, 0)) : ''}</div>`;
+      const label = p >= 5 ? fmtPct(x.v / dt, 0) : (p >= 2 ? fmtPct(x.v / dt, 0) : '');
+      return `<div style="width:${p.toFixed(1)}%;background:${x.c};${isConLai ? 'color:var(--ink);' : ''}${p < 2 ? 'font-size:0;' : (p < 5 ? 'font-size:8px;' : '')}" title="${esc(x.name)}: ${fmtPct(x.v / dt, 1)} = ${fmtCompact(x.v)}">${label}</div>`;
     }).join('');
     const leg = dtBarItems.filter(x => x.v > 0).map(x =>
       `<span><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${x.c};vertical-align:middle;margin-right:3px;"></i>${esc(x.name)} ${fmtPct(x.v / dt, 1)}</span>`
