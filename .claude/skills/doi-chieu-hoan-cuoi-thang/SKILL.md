@@ -96,9 +96,18 @@ vào `~/doi-chieu-hoan/ket-qua/`.
 | `SAPO THIEU — san bao da ve, Sapo va kho deu khong co` | nghi vấn | kiểm gấp, có thể thất lạc |
 | `SAPO THUA — co phieu nhung file san khong co don nay` | xem cột `kho_quet` trước khi kết luận | kho **đã quét** → hàng thật, chỉ là chưa xuất đủ file sàn. Kho **chưa quét** → mới đáng nghi |
 
-**Đừng vội báo "Sapo thừa".** Kết quả tháng 10: 20 đơn bị gắn nhãn thừa thì
-**17 đơn đã có lượt quét kho** — hàng thật, Sapo đúng, chỉ thiếu file sàn ở
-trạng thái khác. Chỉ 3 đơn thực sự cần xem.
+**Đừng vội báo "Sapo thừa" — phần lớn là FILE SÀN THIẾU, không phải Sapo sai.**
+
+Bằng chứng tháng 10: 19 phiếu Sapo không có trong 2 file Shopee, trong đó 7
+phiếu loại `delivery_failed` (bom hàng) — **cả 7/7 đều đã được kho quét**, ngày
+quét sát ngày tạo phiếu (chênh 0–2 ngày), và cả 7 đơn đều đặt trong kỳ export.
+
+Tức là: hàng về kho thật, Sapo ghi đúng, **nhưng Shopee không xếp chúng vào
+"Đã hủy" lẫn "Giao không thành công"** — nhiều khả năng kiện bật về thì Shopee
+tự hoàn tiền và đẩy đơn sang *Trả hàng/Hoàn tiền*.
+
+→ Khi thấy "Sapo thừa", việc đầu tiên là nhìn cột `kho_quet`. Có lượt quét =
+hàng thật = đi xuất thêm file sàn, đừng đi sửa Sapo.
 
 ---
 

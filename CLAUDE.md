@@ -121,6 +121,9 @@ Nó báo mọi wiki-link và mọi link trỏ tới file không tồn tại. Ph�
 - `size-consultation` — trả lời tin nhắn khách: tư vấn size, chào chung, hỏi tồn
   kho, đóng hội thoại đã xong (đọc kỹ ngữ cảnh chat trước khi đóng).
 - `daily-warehouse-report` — báo cáo kho/đối chiếu sàn hàng ngày, gửi Telegram.
+- `daily-chat-digest` — tổng hợp cuối ngày các chat TikTok ĐÃ trả lời (tên khách,
+  câu hỏi, câu shop rep) + đề xuất case/quy trình học được, gửi Telegram. Chạy
+  chung lượt tối với task "tổng hợp tin chưa trả lời" trên PC (chốt 31/10/2026).
 - `check-koc`, `tiktok-koc-flashsale`, `tiktok-live-flashsale`,
   `shopee-promotion-product-management`, `resend-missing-item`,
   `return-item-not-shop-product`, `review-return-check`, `thang-moi`.
