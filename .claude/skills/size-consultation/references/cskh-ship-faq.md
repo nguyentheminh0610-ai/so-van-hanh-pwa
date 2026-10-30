@@ -195,12 +195,15 @@ shop để đặt lại); khách ngại kẹt ví sàn → Cách 2 (shop qua l�
 size mới; lỗi khách ~15k/15k, lỗi shop shop chịu cả 2 chiều). Hết size muốn đổi →
 hướng trả hàng hoàn tiền + gợi ý mẫu/màu khác.
 
-### 11. Khách yêu cầu không in tên SP/giá tiền trên hộp (chốt 30/10/2026)
-Shop KHÔNG đáp ứng được yêu cầu này. Từ chối khéo, không để khách mất lòng:
-> "Dạ shop xin lỗi bạn nha, hiện bên mình chưa hỗ trợ được việc bỏ tên sản
-> phẩm/giá tiền trên hộp đâu ạ, mong bạn thông cảm giúp shop nha."
+### 11. Khách yêu cầu không in tên SP/giá tiền trên hộp (chốt 30/10/2026, sửa lại 30/10)
+Shop KHÔNG đáp ứng được yêu cầu này. Từ chối khéo, nêu rõ lý do vận hành
+(shipper cần thấy giá để thu đúng tiền, kho cần thấy tên SP để đóng đúng
+hàng) — không chỉ nói "không hỗ trợ được" suông:
+> "Dạ mình xin lỗi bạn nha, cái này bên mình không bỏ được ạ, vì bên shipper
+> cần nhìn giá để thu đúng tiền, còn bên kho cũng cần ghi tên sản phẩm để
+> kiểm hàng khi đóng gói cho chuẩn, nên mong bạn thông cảm giúp shop nha."
 
-### 12. Khách đặt NHẦM SIZE, xin đổi TRƯỚC KHI đóng gói (chốt 30/10/2026)
+### 12. Khách đặt NHẦM SIZE, xin đổi TRƯỚC KHI đóng gói (chốt 30/10/2026, sửa lại 30/10)
 **Phải tra đúng trạng thái đơn trước khi trả lời, không đoán:**
 1. Mở đơn, kiểm tra trạng thái:
    - **TikTok**: đã bấm "Chuẩn bị hàng" / đơn đã chuyển **"Chờ vận chuyển"**?
@@ -211,31 +214,36 @@ Shop KHÔNG đáp ứng được yêu cầu này. Từ chối khéo, không đ�
    > "Dạ shop xin lỗi bạn, đơn này đã được chuẩn bị xong nên không kịp đổi
    > trước lúc gửi được ạ, mong bạn thông cảm giúp shop. Bạn cứ nhận hàng về,
    > nếu không vừa thì shop hỗ trợ đổi cho bạn sau nhé."
-3. **Nếu CHƯA xử lý** (còn sửa được) → hỏi khách có mục ghi chú đơn hàng
-   không, nhờ khách tự ghi size đúng vào đó; nếu sàn/đơn không có mục ghi chú
-   thì nhờ khách đặt lại đơn mới đúng size (đơn cũ sẽ tự xử lý theo luồng đổi
-   trả sau khi nhận). Luôn nhắc trước là ghi chú có thể bị sót/nhầm:
-   > "Dạ đơn bạn chưa gửi đi nên vẫn kịp đổi ạ. Bạn vào đơn hàng xem có mục
-   > ghi chú không, ghi giúp shop đúng size {size_dung} vào đó nha. Nếu không
-   > có mục ghi chú thì bạn đặt lại giúp shop 1 đơn mới đúng size nhé, lưu ý
-   > ghi chú cũng dễ bị sót nên bạn thông cảm nếu có sai sót giúp shop nha."
+3. **Nếu CHƯA xử lý** (còn sửa được) → **ưu tiên khuyến khích khách đặt lại
+   đơn mới**, chỉ coi ghi chú là phương án phụ và phải nói rõ ghi chú RẤT dễ
+   rủi ro (sót/nhầm lúc đóng gói), không trình bày 2 cách ngang hàng nhau:
+   > "Dạ đơn bạn chưa gửi đi nên vẫn kịp đổi ạ. Cách chắc ăn nhất là bạn đặt
+   > lại giúp shop 1 đơn mới đúng size nha. Nếu bạn muốn ghi chú vào đơn cũ
+   > thì shop vẫn hỗ trợ được, nhưng cách này rủi ro khá cao, dễ bị sót hoặc
+   > nhầm lúc đóng gói, nên shop khuyến khích bạn đặt lại đơn mới cho chắc
+   > ăn hơn nha."
 
-### 13. Khách báo "chưa nhận được hàng" / shipper báo giao không thành công (chốt 30/10/2026)
-Bước đầu, chưa vội báo là lỗi giao hàng — hướng khách tự kiểm tra trước vì
-nhiều trường hợp người nhà đã nhận hoặc có cuộc gọi nhỡ khách không để ý:
+### 13. Khách báo "chưa nhận được hàng" / shipper báo giao không thành công (chốt 30/10/2026, sửa lại 30/10)
+Bước đầu, chưa vội báo là lỗi giao hàng — hướng khách tự kiểm tra trước, và
+**luôn kèm câu cuối hẹn khách quay lại nếu vẫn không thấy hàng** để shop chủ
+động hỗ trợ tìm/khiếu nại lên sàn, không để khách tự bơi:
 > "Dạ bạn kiểm tra kỹ lại giúp shop xem có cuộc gọi nhỡ nào từ shipper không,
 > hoặc người nhà/người ở nhà mình đã nhận giúp chưa nha. Nếu chưa thấy gì thì
 > bạn chủ động gọi lại cho bưu cục/shipper khu vực mình trước giúp shop nha,
 > vì bên vận chuyển không cung cấp số shipper cho shop nên mình nhờ bạn chủ
-> động liên hệ trước ạ."
+> động liên hệ trước ạ. Nếu kiểm tra xong vẫn không thấy đâu thì bạn nhắn lại
+> cho shop nha, shop sẽ hỗ trợ tìm kiếm và khiếu nại lên sàn giúp bạn."
 (Khớp quy tắc cũ: shop không có SĐT shipper, luôn nhờ khách chủ động liên hệ
-trước khi shop can thiệp sâu hơn.)
+trước khi shop can thiệp sâu hơn — nhưng phải cam kết bước tiếp theo, không
+bỏ lửng.)
 
-### 14. Khách báo đã huỷ đơn / đặt lại ở sàn khác, không phải khiếu nại (chốt 30/10/2026)
+### 14. Khách tự giải quyết xong (huỷ đơn/đặt lại sàn khác), không phải lỗi sản phẩm (chốt 30/10/2026, sửa lại 30/10)
 Case: shop chủ động nhắn hỏi lý do trả hàng (theo luồng review-return-check),
-khách trả lời đã huỷ đơn này và đặt lại đúng hàng ở sàn khác rồi → không có
-vấn đề gì, xác nhận và đóng hội thoại, không cần hỗ trợ thêm:
-> "Dạ shop hiểu rồi ạ, cảm ơn bạn đã phản hồi nha. Chúc bạn mua sắm vui vẻ ạ."
+khách trả lời đã huỷ đơn này và tự đặt lại ở sàn khác rồi — **không phải
+khiếu nại về sản phẩm/shop**, nên không dùng sticker như case CSKH thường
+(mục "Đóng hội thoại đã xong" ở SKILL.md). Trả lời ngắn gọn, kết bằng "Dạ
+vâng ạ", không dài dòng:
+> "Dạ vâng ạ."
 
 ## CHƯA train (để trống chờ chủ shop)
 
