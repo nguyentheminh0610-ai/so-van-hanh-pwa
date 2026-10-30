@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v44'; // v44: Zone2 KOC bo checklist, chia 2 bang Video/LIVE gon
+const CACHE_NAME = 'vanhanh-shop-v45'; // v45: fix curly quotes in Zone2 buildChiPhiHtml breaking CSS
 const ASSETS = [
   './',
   './index.html',
