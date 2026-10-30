@@ -700,62 +700,15 @@ function buildInventoryHtml(res){
     rateSrc = 'chưa có dữ liệu tốc độ bán';
   }
 
-  // Gom theo MẪU (đặt xưởng cắt may theo mẫu, không theo từng size lẻ)
-  const mau = {};
+  // Tổng tồn kho (tất cả sản phẩm) cho KPI chung
   let tongTon = 0, tongGiaTri = 0, giaTriThieu = 0;
   for (const [sku, tonRaw] of Object.entries(invData.inventory)){
-    const v = variantsByNorm[normKey(sku)];
-    const name = v ? v.name : sku;
-    const size = (v && v.size) ? v.size : '(1 size)';
-    const baseSku = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
-    if (!mau[name]) mau[name] = { name, baseSku, sizes: {} };
-    if (!mau[name].sizes[size]) mau[name].sizes[size] = { ton: 0 };
-    mau[name].sizes[size].ton += tonRaw;
-  }
-  const rows = [];
-  for (const m of Object.values(mau)){
-    let ton = 0, banNgay = 0, matNgay = 0;
-    const goiY = [], thieuSize = [];
-    const giaTB = giaTBMau[m.name] || null;
-    for (const [size, d] of Object.entries(m.sizes)){
-      const tonD = Math.max(0, d.ton);
-      let r = rate[m.name + '|' + size] || 0;
-      if (!r && size === '(1 size)') r = rate[m.name + '|(không rõ size)'] || 0;
-      ton += tonD; banNgay += r;
-      if (tonD <= 0 && r > 0){
-        thieuSize.push(size);
-        if (giaTB) matNgay += r * giaTB;
-      }
-      // gợi ý SL đặt: đủ bán tới lúc hàng về + phủ thêm COVER ngày
-      const can = Math.ceil(r * (LEAD + BUFFER + COVER) - tonD);
-      if (can > 0 && r > 0) goiY.push({ size, can });
-    }
-    const unitCost = costOf(m.baseSku);
-    const giaTri = unitCost !== null ? ton * unitCost : null;
+    const ton = Math.max(0, tonRaw);
     tongTon += ton;
-    if (giaTri !== null) tongGiaTri += giaTri; else if (ton > 0) giaTriThieu += ton;
-    const ngayCon = banNgay > 0 ? ton / banNgay : null;
-    let nhom, nhomOrder;
-    if (banNgay <= 0 && ton > 0){ nhom = 'TỒN ĐỌNG'; nhomOrder = 4; }
-    else if (banNgay <= 0){ continue; } // không tồn, không bán — bỏ
-    else if (ngayCon <= LEAD){ nhom = 'ĐẶT NGAY'; nhomOrder = 1; }          // đặt hôm nay hàng về vẫn kịp sát nút/đã trễ
-    else if (ngayCon <= LEAD + BUFFER + 7){ nhom = 'ĐẶT TUẦN NÀY'; nhomOrder = 2; }
-    else { nhom = 'ỔN'; nhomOrder = 3; }
-    rows.push({ ...m, ton, banNgay, ngayCon, giaTri, matNgay, thieuSize, goiY, nhom, nhomOrder,
-      treNgay: ngayCon !== null ? Math.ceil(LEAD - ngayCon) : null });
+    const bk = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
+    const uc = costOf(bk);
+    if (uc !== null) tongGiaTri += ton * uc; else if (ton > 0) giaTriThieu += ton;
   }
-  rows.sort((a, b) => (a.nhomOrder - b.nhomOrder) || (b.matNgay - a.matNgay) || ((a.ngayCon ?? 1e9) - (b.ngayCon ?? 1e9)));
-
-  const datNgay = rows.filter(r => r.nhomOrder === 1);
-  const datTuan = rows.filter(r => r.nhomOrder === 2);
-  const onDinh = rows.filter(r => r.nhomOrder === 3);
-  const tonDong = rows.filter(r => r.nhomOrder === 4);
-  const matNgayTong = rows.reduce((s, r) => s + r.matNgay, 0);
-  // Vòng quay kho (công thức ghi ngay trên UI): giá vốn hàng bán 1 ngày của kỳ
-  // đang xem = COGS kỳ / số ngày kỳ; số ngày quay hết kho = giá trị tồn / COGS-ngày.
-  // Giá vốn bán ra mỗi ngày: ưu tiên tính từ chính tốc độ bán 28 ngày (cùng kỳ
-  // với tồn hiện tại) — nếu so tồn HÔM NAY với COGS của tháng cũ thì lệch kỳ,
-  // vòng quay ra sai hẳn. Thiếu velocity mới rơi về COGS của kỳ đang xem.
   let cogsNgay = null;
   if (vel && vel.sold && vel.days){
     let cogs28 = 0;
@@ -770,27 +723,81 @@ function buildInventoryHtml(res){
     cogsNgay = (cogsKy && periodDays) ? cogsKy / periodDays : null;
   }
   const ngayQuayHet = (cogsNgay && tongGiaTri) ? tongGiaTri / cogsNgay : null;
-  const vongNam = ngayQuayHet ? 365 / ngayQuayHet : null;
 
-  const nhomMau = { 'ĐẶT NGAY': 'inv-do', 'ĐẶT TUẦN NÀY': 'inv-vang', 'ỔN': 'inv-xanh', 'TỒN ĐỌNG': 'inv-xam' };
-  const rowHtml = (r) => `<tr>
-    <td><b>${esc(r.name)}</b>${r.thieuSize.length ? '<br><span class="inv-thieu">hết size: ' + r.thieuSize.map(esc).join(', ') + '</span>' : ''}</td>
+  // === QUẦN LÔNG: tính PER-SIZE (không gom theo mẫu) ===
+  const _sizeOrd = { S: 1, M: 2, L: 3, XL: 4, XXL: 5, '2XL': 5, XXXL: 6, '3XL': 6 };
+  const clMap = new Map();
+  for (const [sku, tonRaw] of Object.entries(invData.inventory)){
+    const bk = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
+    if (!/^CL\d/i.test(bk)) continue;
+    const nk = normKey(sku), v = variantsByNorm[nk];
+    clMap.set(nk, { baseSku: bk, name: v ? v.name : sku, size: (v && v.size) || '?', ton: Math.max(0, tonRaw) });
+  }
+  if (vel && vel.sold) for (const sku of Object.keys(vel.sold)){
+    const bk = sku.replace(/-(XXXL|3XL|2XL|XXL|XL|S|M|L)$/i, '');
+    if (!/^CL\d/i.test(bk)) continue;
+    const nk = normKey(sku);
+    if (clMap.has(nk)) continue;
+    const v = variantsByNorm[nk];
+    clMap.set(nk, { baseSku: bk, name: v ? v.name : sku, size: (v && v.size) || '?', ton: 0 });
+  }
+  const clRows = [];
+  let clMatNgay = 0;
+  for (const d of clMap.values()){
+    let r = rate[d.name + '|' + d.size] || 0;
+    if (!r) r = rate[d.name + '|(1 size)'] || rate[d.name + '|(không rõ size)'] || 0;
+    const ngayCon = r > 0 ? d.ton / r : null;
+    const uc = costOf(d.baseSku);
+    const giaTri = uc !== null ? d.ton * uc : null;
+    const giaTB = giaTBMau[d.name] || null;
+    const matNgay = (d.ton <= 0 && r > 0 && giaTB) ? r * giaTB : 0;
+    clMatNgay += matNgay;
+    const can = r > 0 ? Math.max(0, Math.ceil(r * (LEAD + BUFFER + COVER) - d.ton)) : 0;
+    let nhom, nhomOrder;
+    if (r <= 0 && d.ton > 0){ nhom = 'TỒN ĐỌNG'; nhomOrder = 4; }
+    else if (r <= 0){ continue; }
+    else if (ngayCon <= LEAD){ nhom = 'ĐẶT NGAY'; nhomOrder = 1; }
+    else if (ngayCon <= LEAD + BUFFER + 7){ nhom = 'ĐẶT TUẦN NÀY'; nhomOrder = 2; }
+    else { nhom = 'ỔN'; nhomOrder = 3; }
+    const conNgay = ngayCon !== null ? ngayCon - LEAD : null;
+    clRows.push({ ...d, banNgay: r, ngayCon, giaTri, matNgay, goiY: can, nhom, nhomOrder, conNgay });
+  }
+  clRows.sort((a, b) => (a.nhomOrder - b.nhomOrder)
+    || (b.matNgay - a.matNgay)
+    || ((a.ngayCon ?? 1e9) - (b.ngayCon ?? 1e9))
+    || a.baseSku.localeCompare(b.baseSku)
+    || ((_sizeOrd[a.size] || 9) - (_sizeOrd[b.size] || 9)));
+  const clDatNgay = clRows.filter(r => r.nhomOrder === 1);
+  const clDatTuan = clRows.filter(r => r.nhomOrder === 2);
+  const clOn = clRows.filter(r => r.nhomOrder === 3);
+  const clTonDong = clRows.filter(r => r.nhomOrder === 4);
+
+  const nhomCls = { 'ĐẶT NGAY': 'inv-do', 'ĐẶT TUẦN NÀY': 'inv-vang', 'ỔN': 'inv-xanh', 'TỒN ĐỌNG': 'inv-xam' };
+  const urgTxt = (r) => {
+    if (r.nhom === 'ĐẶT NGAY') return r.conNgay !== null && r.conNgay < 0 ? ' (trễ ' + fmtInt(Math.abs(Math.ceil(r.conNgay))) + 'ng)' : '';
+    if (r.nhom === 'ĐẶT TUẦN NÀY') return r.conNgay !== null ? ' (còn ' + fmtInt(Math.ceil(r.conNgay)) + 'ng)' : '';
+    return '';
+  };
+  const clRowHtml = (r, i, arr) => {
+    const showMa = i === 0 || arr[i - 1].baseSku !== r.baseSku;
+    return `<tr class="${showMa && i > 0 ? 'inv-group-start' : ''}">
+    <td>${showMa ? '<b>' + esc(r.baseSku) + '</b><br><span class="inv-mname">' + esc(r.name) + '</span>' : ''}</td>
+    <td><b>${esc(r.size)}</b></td>
     <td class="num">${fmtInt(r.ton)}</td>
     <td class="num">${r.banNgay.toLocaleString('vi-VN', { maximumFractionDigits: 1 })}</td>
     <td class="num"><b>${r.ngayCon === null ? '—' : (r.ngayCon >= 365 ? '365+' : fmtInt(Math.floor(r.ngayCon)))}</b></td>
-    <td class="num">${r.matNgay ? '<b class="inv-mat">' + fmtVND(Math.round(r.matNgay)) + '</b>' : '—'}</td>
-    <td>${r.goiY.length ? r.goiY.map(g => '<span class="inv-goiy">' + esc(g.size) + ' ×' + fmtInt(g.can) + '</span>').join(' ') : '—'}</td>
-    <td class="num">${r.giaTri === null ? '—' : fmtVND(r.giaTri)}</td>
-    <td><span class="inv-badge ${nhomMau[r.nhom]}">${r.nhom}${r.nhom === 'ĐẶT NGAY' && r.treNgay > 0 ? ' (trễ ' + fmtInt(r.treNgay) + ' ng)' : ''}</span></td></tr>`;
-  const thead = '<thead><tr><th>Mẫu</th><th style="text-align:right">Tồn</th><th style="text-align:right">Bán/ngày</th><th style="text-align:right">Còn bán được (ngày)</th><th style="text-align:right">Mất ~đ/ngày vì hết size</th><th>Gợi ý đặt (đủ tới khi hàng về + ' + fmtInt(COVER) + ' ngày nữa)</th><th style="text-align:right">Giá trị tồn</th><th>Tình trạng</th></tr></thead>';
-  const tbl = (list) => `<table class="dtable">${thead}<tbody>${list.map(rowHtml).join('')}</tbody></table>`;
+    <td class="num">${r.goiY > 0 ? '<b>' + fmtInt(r.goiY) + '</b>' : '—'}</td>
+    <td><span class="inv-badge ${nhomCls[r.nhom]}">${r.nhom}${urgTxt(r)}</span></td></tr>`;
+  };
+  const clThead = '<thead><tr><th>Mã</th><th>Size</th><th style="text-align:right">Tồn</th><th style="text-align:right">Bán/ngày</th><th style="text-align:right">Còn (ngày)</th><th style="text-align:right">SL đặt</th><th>Trạng thái</th></tr></thead>';
+  const clTbl = (list) => list.length ? `<table class="dtable">${clThead}<tbody>${list.map(clRowHtml).join('')}</tbody></table>` : '';
 
   return `${zoneHead}
   <div class="kpi-row">
     <div class="kpi-tile"><div class="k-label">Tồn kho hiện tại</div><div class="k-value">${fmtInt(tongTon)}</div><div class="k-sub">cái · ${fmtCompact(tongGiaTri)} giá vốn${giaTriThieu ? ' (+' + fmtInt(giaTriThieu) + ' cái chưa có giá vốn)' : ''} — Sapo lúc ${esc(invData.generatedAt || '?')}</div></div>
-    <div class="kpi-tile"><div class="k-label">Vòng quay tồn kho</div><div class="k-value">${ngayQuayHet === null ? '—' : (30 / ngayQuayHet).toLocaleString('vi-VN', { maximumFractionDigits: 2 }) + ' vòng/tháng'}</div><div class="k-sub">${ngayQuayHet === null ? 'cần giá vốn + kỳ có bán hàng' : 'quay hết 1 vòng ≈ ' + fmtInt(ngayQuayHet) + ' ngày (giá vốn bán ra mỗi ngày ÷ giá trị tồn; dùng tồn HIỆN TẠI thay tồn bình quân — nâng cấp khi có snapshot theo ngày)'}</div></div>
-    <div class="kpi-tile"><div class="k-label">Đang mất vì hết size</div><div class="k-value">${matNgayTong ? '~' + fmtCompact(matNgayTong * 30) : '0'}</div><div class="k-sub">${matNgayTong ? fmtVND(Math.round(matNgayTong)) + '/ngày nếu cứ để hết (×30 ngày)' : 'không mẫu nào đang hết size bán chạy'}</div></div>
-    <div class="kpi-tile"><div class="k-label">Phải đặt hàng NGAY</div><div class="k-value">${fmtInt(datNgay.length)}</div><div class="k-sub">mẫu (tồn không đủ bán tới lúc hàng mới về) · +${fmtInt(datTuan.length)} mẫu đặt trong tuần</div></div>
+    <div class="kpi-tile"><div class="k-label">Vòng quay tồn kho</div><div class="k-value">${ngayQuayHet === null ? '—' : (30 / ngayQuayHet).toLocaleString('vi-VN', { maximumFractionDigits: 2 }) + ' vòng/tháng'}</div><div class="k-sub">${ngayQuayHet === null ? 'cần giá vốn + kỳ có bán hàng' : 'quay hết 1 vòng ≈ ' + fmtInt(ngayQuayHet) + ' ngày'}</div></div>
+    <div class="kpi-tile"><div class="k-label">Mất vì hết hàng</div><div class="k-value">${clMatNgay ? '~' + fmtCompact(clMatNgay * 30) : '0'}</div><div class="k-sub">${clMatNgay ? fmtVND(Math.round(clMatNgay)) + '/ngày · size hết hàng nhưng vẫn có khách mua' : 'không size nào đang hết hàng'}</div></div>
+    <div class="kpi-tile"><div class="k-label">Cần đặt (quần lông)</div><div class="k-value">${fmtInt(clDatNgay.length)} size</div><div class="k-sub">ĐẶT NGAY · +${fmtInt(clDatTuan.length)} size đặt tuần này · tổng ${fmtInt(clRows.length)} size</div></div>
   </div>
   <div class="card" style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
     <span style="font-size:12.5px; font-weight:600;">Thông số đặt hàng:</span>
@@ -798,13 +805,13 @@ function buildInventoryHtml(res){
     <label class="inv-cfg">+ dự phòng <input type="number" id="inv-buffer" min="0" max="30" value="${BUFFER}"> ngày</label>
     <label class="inv-cfg">đặt đủ bán thêm <input type="number" id="inv-cover" min="7" max="120" value="${COVER}"> ngày</label>
     <button class="btn-primary" id="inv-apply" style="padding:7px 14px;">Áp dụng</button>
-    <span style="font-size:11.5px;color:var(--ink-faint);">"ĐẶT NGAY" = tồn không đủ bán trong ${fmtInt(LEAD)} ngày chờ hàng về. Tốc độ bán: ${rateSrc}. Gợi ý đặt CHƯA nhân hệ số mùa (chưa đủ 12 tháng dữ liệu) và CHƯA trừ hàng đang về (sheet SX chưa có cột ngày về). Cập nhật số tồn: nhắn Claude "cập nhật tồn kho".</span>
+    <span style="font-size:11.5px;color:var(--ink-faint);">"ĐẶT NGAY" = tồn < ${fmtInt(LEAD)} ngày bán. Tốc độ: ${rateSrc}.</span>
   </div>
-  ${datNgay.length || datTuan.length
-    ? `<div class="sub-label">Cần đặt hàng <span style="text-transform:none;font-weight:400;">— chỉ quần lông, xếp theo tiền đang mất mỗi ngày</span></div>${tbl([...datNgay, ...datTuan].filter(r => /^CL\d/i.test(r.baseSku)))}`
-    : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không mẫu nào tới điểm đặt hàng theo thông số hiện tại.</p></div>'}
-  ${onDinh.length ? `<details class="inv-details"><summary>Đủ hàng (${onDinh.length} mẫu)</summary>${tbl(onDinh)}</details>` : ''}
-  ${tonDong.length ? `<details class="inv-details"><summary>Tồn đọng — kỳ này không bán được cái nào (${tonDong.length} mẫu, ${fmtVND(tonDong.reduce((s2, r) => s2 + (r.giaTri || 0), 0))} vốn nằm im)</summary>${tbl(tonDong)}</details>` : ''}`;
+  ${clDatNgay.length || clDatTuan.length
+    ? `<div class="sub-label">Cần đặt hàng <span style="text-transform:none;font-weight:400;">— ${fmtInt(clDatNgay.length + clDatTuan.length)} size quần lông</span></div>${clTbl([...clDatNgay, ...clDatTuan])}`
+    : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không size quần lông nào tới điểm đặt hàng.</p></div>'}
+  ${clOn.length ? `<details class="inv-details"><summary>Đủ hàng (${clOn.length} size quần lông)</summary>${clTbl(clOn)}</details>` : ''}
+  ${clTonDong.length ? `<details class="inv-details"><summary>Tồn đọng — không bán được (${clTonDong.length} size, ${fmtVND(clTonDong.reduce((s2, r) => s2 + (r.giaTri || 0), 0))} vốn nằm im)</summary>${clTbl(clTonDong)}</details>` : ''}`;
 }
 
 // ---------- Card "Gói hoàn phí vận chuyển — nên đăng ký không?" (21/10/2026) ----------
