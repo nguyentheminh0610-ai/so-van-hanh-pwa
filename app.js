@@ -244,7 +244,9 @@ function buildSkuPerformanceHtml(res){
   // 3 tầng — thanh tỷ trọng size nằm luôn trong ô, bỏ legend rời (đã có nhãn
   // trong lát + tooltip), thêm cột "size bán chạy" để nhìn là ra quyết định.
   const dayNote = sp.periodDays ? `SL bán trung bình/ngày (chia cho ${sp.periodDays} ngày của kỳ đang xem) và tỷ trọng theo size:` : 'SL bán trung bình/ngày và tỷ trọng theo size:';
-  const rowsHtml = sp.items.map(item => {
+  const qlItems = sp.items.filter(item => /chất lông/i.test(item.ten));
+  if (!qlItems.length) return '<p style="font-size:12px;color:var(--ink-faint);">Không có mẫu quần lông trong kỳ này.</p>';
+  const rowsHtml = qlItems.map(item => {
     const barHtml = item.sizes.map(s => {
       const showLabel = s.pct >= 0.12; // lát quá hẹp thì bỏ chữ, tránh đè lên nhau
       return `<div class="sku-size-seg" style="width:${(s.pct * 100).toFixed(2)}%; background:${skuSizeColor(s.size)};" title="${esc(s.size)}: ${fmtInt(s.sl)} sp (${fmtPct(s.pct, 0)})">${showLabel ? `<span>${esc(s.size)} ${fmtPct(s.pct, 0)}</span>` : ''}</div>`;
@@ -756,7 +758,7 @@ function buildInventoryHtml(res){
     <span style="font-size:11.5px;color:var(--ink-faint);">"ĐẶT NGAY" = tồn không đủ bán trong ${fmtInt(LEAD)} ngày chờ hàng về. Tốc độ bán: ${rateSrc}. Gợi ý đặt CHƯA nhân hệ số mùa (chưa đủ 12 tháng dữ liệu) và CHƯA trừ hàng đang về (sheet SX chưa có cột ngày về). Cập nhật số tồn: nhắn Claude "cập nhật tồn kho".</span>
   </div>
   ${datNgay.length || datTuan.length
-    ? `<div class="sub-label">Cần đặt hàng <span style="text-transform:none;font-weight:400;">— xếp theo tiền đang mất mỗi ngày</span></div>${tbl([...datNgay, ...datTuan])}`
+    ? `<div class="sub-label">Cần đặt hàng <span style="text-transform:none;font-weight:400;">— chỉ quần lông, xếp theo tiền đang mất mỗi ngày</span></div>${tbl([...datNgay, ...datTuan].filter(r => /^CL\d/i.test(r.baseSku)))}`
     : '<div class="card"><p style="margin:0;font-size:12.5px;color:var(--good);">✓ Không mẫu nào tới điểm đặt hàng theo thông số hiện tại.</p></div>'}
   ${onDinh.length ? `<details class="inv-details"><summary>Đủ hàng (${onDinh.length} mẫu)</summary>${tbl(onDinh)}</details>` : ''}
   ${tonDong.length ? `<details class="inv-details"><summary>Tồn đọng — kỳ này không bán được cái nào (${tonDong.length} mẫu, ${fmtVND(tonDong.reduce((s2, r) => s2 + (r.giaTri || 0), 0))} vốn nằm im)</summary>${tbl(tonDong)}</details>` : ''}`;
