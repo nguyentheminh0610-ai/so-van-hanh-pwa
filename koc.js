@@ -180,46 +180,57 @@ function kocActionHtml(scores){
   return html;
 }
 
-/* --------------------------- 2. KOC làm việc hiệu quả --------------------*/
-// Tập KOC thuộc top 40% số nội dung của 1 kênh (cửa "chịu khó")
-function kocTop40Set(rows){
-  const sorted = rows.filter(r => (r.so_noi_dung || 0) > 0)
-                     .sort((a, b) => (b.so_noi_dung || 0) - (a.so_noi_dung || 0));
-  const n = Math.ceil(sorted.length * 0.4);
-  return new Set(sorted.slice(0, n).map(r => r.koc_username));
-}
-
-// Zone 2 — danh sách KOC cần đưa vào VIP ở 1 kênh, kèm việc phải làm cho từng
-// người. gmvThangMap: GMV cả 2 kênh quy về tháng (để xét mốc hoa hồng 10%).
-function kocVipKenhHtml(channels, kenh, nguongVip, gmvThangMap){
-  const rows = channels.filter(c => c.kenh === kenh);
-  const top40 = kocTop40Set(rows);
-  const ds = rows.filter(r => (r.gmv || 0) >= nguongVip || top40.has(r.koc_username))
-                 .sort((a, b) => (b.gmv || 0) - (a.gmv || 0));
-  const donVi = kenh === 'live' ? 'buổi' : 'video';
+/* --------------------------- 2. KOC cần đưa vào VIP ----------------------
+   Xét theo TỔNG cả 2 kênh (chốt 30/10) — KHÔNG tách kênh để xét, vì tách ra
+   thì 1 kênh yếu (vd LIVE 0 đơn) làm người bán Video giỏi bị nhìn nhầm thành
+   kém. Mỗi KOC chỉ hiện 1 lần, gắn nhãn kênh họ thật sự làm + số tách riêng
+   từng kênh để thấy rõ kênh nào mạnh/yếu. gmvThangMap: GMV tổng quy về tháng. */
+function kocVipListHtml(channels, nguongVip, gmvThangMap){
+  const m = new Map();
+  channels.forEach(c => {
+    const k = m.get(c.koc_username) ||
+      { koc: c.koc_username, tGmv: 0, tDon: 0, tnd: 0,
+        v: { n: 0, gmv: 0, don: 0 }, l: { n: 0, gmv: 0, don: 0 } };
+    k.tGmv += c.gmv || 0; k.tDon += c.so_don || 0; k.tnd += c.so_noi_dung || 0;
+    const ch = c.kenh === 'live' ? k.l : k.v;
+    ch.n += c.so_noi_dung || 0; ch.gmv += c.gmv || 0; ch.don += c.so_don || 0;
+    m.set(c.koc_username, k);
+  });
+  const all = [...m.values()];
+  // cửa "chăm đăng": top 40% theo TỔNG nội dung, trong nhóm đã có >=1 đơn
+  const coDon = all.filter(k => k.tnd > 0 && k.tDon > 0).sort((a, b) => b.tnd - a.tnd);
+  const top40 = new Set(coDon.slice(0, Math.ceil(coDon.length * 0.4)).map(k => k.koc));
+  // vào VIP: có >=1 đơn VÀ (GMV tổng >= ngưỡng HOẶC chăm đăng)
+  const ds = all.filter(k => k.tDon > 0 && (k.tGmv >= nguongVip || top40.has(k.koc)))
+                .sort((a, b) => b.tGmv - a.tGmv);
   if (!ds.length){
-    return '<p class="cskh-quiet">Chưa có KOC nào đạt ngưỡng VIP ở kênh này trong kỳ.</p>';
+    return '<p class="cskh-quiet">Chưa có KOC nào đạt ngưỡng VIP trong kỳ.</p>';
   }
-  return '<div class="feed">' + ds.map(r => {
-    const koc = r.koc_username;
-    const datTien = (r.gmv || 0) >= nguongVip;
-    const lyDo = datTien ? ('GMV ' + fmtVND(r.gmv || 0))
-                         : ('Chăm đăng · ' + fmtInt(r.so_noi_dung || 0) + ' ' + donVi);
-    const hhCao = (gmvThangMap.get(koc) || 0) >= NGUONG_HH_THANG;
+  return '<div class="feed">' + ds.map(k => {
+    const hasV = k.v.n > 0, hasL = k.l.n > 0;
+    const kenhTag = (hasV && hasL) ? 'Cả Video + LIVE' : hasV ? 'Chỉ Video' : 'Chỉ LIVE';
+    const datTien = k.tGmv >= nguongVip;
+    const lyDo = datTien ? ('GMV ' + fmtVND(k.tGmv))
+                         : ('Chăm đăng · ' + fmtInt(k.tnd) + ' nội dung');
+    const hhCao = (gmvThangMap.get(k.koc) || 0) >= NGUONG_HH_THANG;
+    const bd = [];
+    if (hasV) bd.push('Video ' + fmtVND(k.v.gmv) + ' · ' + fmtInt(k.v.don) + ' đơn / ' + fmtInt(k.v.n) + ' video');
+    if (hasL) bd.push('LIVE ' + fmtVND(k.l.gmv) + ' · ' + fmtInt(k.l.don) + ' đơn / ' + fmtInt(k.l.n) + ' buổi');
     const viec = [];
     if (hhCao) viec.push('Mời Cộng tác mục tiêu → tăng hoa hồng lên <b>10%</b>');
-    if (kenh === 'live'){
+    if (hasL){
       viec.push('Cấp mã giảm giá riêng cho LIVE');
       viec.push('Thêm vào Flash Sale LIVE');
     }
     viec.push('Ưu tiên gửi mẫu mới + thêm mẫu');
     return `<div class="fi">
       <div class="fi-head">
-        <b>${esc(koc)}</b>
+        <b>${esc(k.koc)}</b>
         <span class="tag why" style="background:var(--accent-soft);color:var(--accent)">${esc(lyDo)}</span>
+        <span class="tag" style="background:var(--surface-2);color:var(--ink-soft)">${esc(kenhTag)}</span>
         ${hhCao ? '<span class="tag" style="background:var(--good-soft);color:var(--good)">&gt;30tr/tháng</span>' : ''}
-        <span>${fmtInt(r.so_noi_dung || 0)} ${donVi} · ${fmtInt(r.so_don || 0)} đơn</span>
       </div>
+      <div class="fi-body" style="font-size:12px;color:var(--ink-faint)">${bd.join(' · ')}</div>
       <ul class="viec">${viec.map(v => '<li>' + v + '</li>').join('')}</ul>
     </div>`;
   }).join('') + '</div>';
@@ -304,11 +315,8 @@ function kocRender(){
     ${kocHangSheetHtml(scores)}
     <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đã nhận mẫu mà chưa đăng bài</span></div>
     ${kocActionHtml(scores)}
-    <div class="zone"><span class="z-num">2</span><span class="z-title">KOC cần đưa vào VIP</span><span class="z-note">đạt ngưỡng kỳ này · việc cần làm theo từng người</span></div>
-    <div class="sub-label">🎬 Kênh Video</div>
-    ${kocVipKenhHtml(channels, 'video', nguongVip, gmvThangMap)}
-    <div class="sub-label">🔴 Kênh LIVE</div>
-    ${kocVipKenhHtml(channels, 'live', nguongVip, gmvThangMap)}
+    <div class="zone"><span class="z-num">2</span><span class="z-title">KOC cần đưa vào VIP</span><span class="z-note">xét theo tổng cả 2 kênh · việc cần làm theo từng người</span></div>
+    ${kocVipListHtml(channels, nguongVip, gmvThangMap)}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Mới lên bài (${KOC_MOI_DANG_NGAY} ngày gần nhất)</span><span class="z-note">video hoặc LIVE</span></div>
     ${kocRecentHtml(contents)}
     <div class="zone"><span class="z-num">4</span><span class="z-title">KOC gắn link trên VIDEO</span><span class="z-note">xếp theo GMV</span></div>

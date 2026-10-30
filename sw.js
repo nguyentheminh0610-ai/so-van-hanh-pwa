@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v40'; // v40: Zone2 tab KOC -> KOC can dua vao VIP + viec can lam theo kenh
+const CACHE_NAME = 'vanhanh-shop-v41'; // v41: Zone2 KOC xet theo tong 2 kenh + nhan kenh, bo tach doi
 const ASSETS = [
   './',
   './index.html',
