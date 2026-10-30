@@ -540,6 +540,46 @@ function buildChiPhiHtml(res, opts){
     <div class="stacked-legend">${leg}</div>`;
   }
 
+  // --- ② Donut: phân bổ chi phí tách 2 sàn ---
+  let donutHtml = '';
+  if (tong > 0) {
+    const donutItems = [
+      { name: 'Phí sàn Shopee', v: phiSp, c: 'var(--p1)' },
+      { name: 'Phí sàn TikTok', v: phiTt, c: 'var(--p5)' },
+      { name: 'Quảng cáo', v: tongAds, c: 'var(--p2)' },
+      { name: 'Lương', v: luong, c: 'var(--p3)' },
+      { name: 'Vật tư', v: vatTu, c: 'var(--p4)' },
+      { name: 'Khác', v: khac, c: 'var(--p6)' },
+    ].filter(x => x.v > 0);
+    const R = 70, CX = 100, CY = 100, SW = 40;
+    const CIRC = 2 * Math.PI * R;
+    let cum = 0;
+    const arcs = donutItems.map(x => {
+      const segLen = (x.v / tong) * CIRC;
+      const off = cum;
+      cum += segLen;
+      return `<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="${x.c}" stroke-width="${SW}" stroke-dasharray="${segLen.toFixed(2)} ${(CIRC - segLen).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}"/>`;
+    }).join('');
+    const donutLeg = donutItems.map(x =>
+      `<div style="display:flex;align-items:center;gap:4px;"><i style="display:inline-block;width:10px;height:10px;border-radius:2px;background:${x.c};flex-shrink:0;"></i><span>${esc(x.name)} — ${fmtPct(x.v / tong, 0)}</span></div>`
+    ).join('');
+    donutHtml = `<div class="sub-label" style="margin-top:16px;">Phân bổ chi phí — tách 2 sàn <span style="text-transform:none;font-weight:400;">— tổng chi phí = 100%</span></div>
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;justify-content:center;margin:8px 0;">
+      <svg viewBox="0 0 200 200" width="170" height="170" style="flex-shrink:0;">
+        <g transform="rotate(-90 ${CX} ${CY})">${arcs}</g>
+        <text x="${CX}" y="${CY}" text-anchor="middle" dominant-baseline="central" style="font-size:18px;font-weight:700;fill:var(--ink);">${fmtCompact(tong)}</text>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">${donutLeg}</div>
+    </div>`;
+  }
+
+  // --- ③ Thanh phí sàn chi tiết (visible, không ẩn trong details) ---
+  const platBarsHtml = (spTotal || ttTotal)
+    ? `<div class="sub-label" style="margin-top:16px;">Phí sàn chi tiết — mỗi sàn 1 thanh <span style="text-transform:none;font-weight:400;">— % trên tổng phí từng sàn</span></div>
+       ${stackBar(spItems, spTotal, 'shopee')}
+       ${stackBar(ttItems, ttTotal, 'tiktok')}`
+    : '';
+
   const thieu = [];
   if (!luong) thieu.push('lương nhân viên');
   if (!vatTu) thieu.push('vật tư đóng gói');
@@ -562,14 +602,14 @@ function buildChiPhiHtml(res, opts){
 
   ${dtBarHtml}
 
+  ${donutHtml}
+
+  ${platBarsHtml}
+
   ${canhBao}
 
-  <details style="margin-top:10px;"><summary style="font-size:12px;color:var(--ink-faint);cursor:pointer;">📊 Chi tiết phí từng sàn · bảng số VNĐ</summary>
+  <details style="margin-top:10px;"><summary style="font-size:12px;color:var(--ink-faint);cursor:pointer;">📊 Bảng số chi tiết (VNĐ)</summary>
   <div style="margin-top:8px;">
-  <div class="sub-label">Chi phí từng sàn gồm gì? <span style="text-transform:none;font-weight:400;">— % trên tổng chi phí thuộc sàn đó</span></div>
-  ${stackBar(spItems, spTotal, 'shopee')}
-  ${stackBar(ttItems, ttTotal, 'tiktok')}
-
   ${buildPhiSanChiTietHtml(res)}
 
   <div class="sub-label" style="margin-top:12px;">Bảng tổng hợp</div>
