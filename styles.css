@@ -554,5 +554,15 @@
   .viec{ list-style:none; margin:9px 0 0; padding:0; display:flex; flex-direction:column; gap:5px; }
   .viec li{ font-size:12.5px; color:var(--ink); padding-left:22px; position:relative; line-height:1.45; }
   .viec li::before{ content:"\2610"; position:absolute; left:0; top:-1px; color:var(--accent); font-size:15px; }
+  .koc-vip-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; margin-bottom:6px; }
+  .koc-scroll{ max-height:330px; overflow-y:auto; border:1px solid var(--line); border-radius:10px; background:var(--surface); }
+  .koc-scroll table{ width:100%; }
+  .koc-scroll thead th{ position:sticky; top:0; z-index:1; background:var(--surface-2); }
+  .koc-scroll .koc-done{ opacity:.5; }
+  .btn-them{ font-family:inherit; font-size:11.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+    border:1px solid var(--line-strong); background:var(--surface); color:var(--ink-soft); border-radius:7px; padding:4px 9px; }
+  .btn-them:hover{ border-color:var(--accent); color:var(--accent); }
+  .btn-them.on{ background:var(--good-soft); color:var(--good); border-color:var(--good); }
+  @media (max-width: 760px){ .koc-vip-grid{ grid-template-columns:1fr; } }
   @media (max-width: 860px){ .koc-kpi4{ grid-template-columns:repeat(2,1fr); }
     .koc-sheetrow .ngn{ margin-left:0; } } }
