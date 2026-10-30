@@ -154,6 +154,31 @@ deviceId TikTok, KHÔNG dùng built-in browser:
 but haven't been walked through yet in this skill; same hard rules apply
 when you do.
 
+> ⚠️ **TODO (chốt 30/10/2026) — DỰNG LUỒNG NHẮN KHÁCH TRẢ HÀNG SHOPEE.**
+> Hiện skill mới chỉ **nhắn được first-contact cho đơn trả hàng bên
+> TikTok**. Đơn trả hàng Shopee vẫn được phát hiện và lên thẻ gợi ý "ghi
+> Sổ Kho" trên tab "Đánh giá & Trả hàng" (cơ chế commit `940b41b`
+> 29/10), **nhưng bước gửi tin nhắn tự động cho khách thì chưa có** cho
+> Shopee. Cần một phiên **trên PC Windows** đi qua luồng thật trên
+> `banhang.shopee.vn` để bổ sung vào mục "2. Trả hàng/hoàn tiền" bên dưới:
+> - Tìm hàng chờ: URL/tab queue "trả hàng/hoàn tiền" bên Kênh Người Bán
+>   (tương đương tab "Đang chờ bạn" của TikTok), đọc được lý do + ngày +
+>   số tiền + auto-approved hay chưa.
+> - Cách mở đúng thread chat gắn với từng đơn trả hàng (tương đương nút
+>   chat-bubble cạnh username bên TikTok), và cách nhận biết thread
+>   "untouched" (Hard rule 3) trên Shopee.
+> - Dòng mẫu đã có sẵn theo sàn: row 25 (không phải lỗi shop), row 36
+>   (lỗi shop — Shopee, mời đổi lý do sang "Hàng nguyên vẹn nhưng không
+>   còn nhu cầu"). Chỉ thiếu phần thao tác UI.
+>
+> **Lý do ghi TODO này:** 30/10/2026 đơn Shopee `261024FPGSQXVJ` (khách
+> antm057) lên thẻ gợi ý "giao nhầm" nhưng khách **chưa được bộ phận trả
+> hàng nhắn** — truy ra đúng vì luồng Shopee chưa dựng. Lưu ý kèm theo:
+> lý do trả hàng khách chọn trên sàn ("người bán gửi sai hàng") có thể
+> **không khớp thực tế** (khách chỉ muốn đổi size) → khi dựng xong, vẫn
+> phải đọc chat thật trước khi phân loại lỗi shop / ghi Sổ Kho, đừng tin
+> lý do hiển thị trên thẻ trả hàng (đúng tinh thần mục 4 + mục 5 ở trên).
+
 ## Steps
 
 ### 1. Reviews
