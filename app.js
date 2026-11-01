@@ -615,12 +615,11 @@ function buildChiPhiHtml(res, opts){
     ${group('Hoa hồng affiliate', affSp, affTt)}
     ${group('Quảng cáo', adsSp, adsTt)}
     ${group('Phí vận chuyển trả hàng', vcTraSp, vcTraTt)}
-    <div style="border-top:1.5px solid var(--line);padding:10px 0 0;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
-      <span style="font-size:13px;font-weight:500;">Tổng 4 khoản / DT sàn đó</span>
-      <div style="display:flex;gap:20px;font-size:13px;">
-        <span class="cmp-pct cmp-sp" style="font-weight:500;">Shopee: <b>${pSan(tongSp, dtSp)}</b> <span style="font-size:11px;color:var(--ink-faint);">(${fmtCompact(tongSp)} / ${fmtCompact(dtSp)})</span></span>
-        <span class="cmp-pct cmp-tt" style="font-weight:500;">TikTok: <b>${pSan(tongTt, dtTt)}</b> <span style="font-size:11px;color:var(--ink-faint);">(${fmtCompact(tongTt)} / ${fmtCompact(dtTt)})</span></span>
-      </div>
+    <div style="border-top:1.5px solid var(--line);padding:12px 0 0;">
+      <div style="font-size:13px;font-weight:600;margin:0 0 8px;">Tổng 4 khoản / DT sàn đó</div>
+      ${barLine('Shopee', 'cmp-sp', tongSp, dtSp)}
+      <div style="height:4px;"></div>
+      ${barLine('TikTok', 'cmp-tt', tongTt, dtTt)}
     </div>`;
   }
 
