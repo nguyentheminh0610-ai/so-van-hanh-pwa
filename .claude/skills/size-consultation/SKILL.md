@@ -205,6 +205,18 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
   ở trên), rồi mới vào kiểm tra tồn kho thật (Sapo/trang sản phẩm) đúng
   phân loại đó, rồi mới báo đúng các size hiện còn. Không kiểm tra/trả lời
   khi chưa biết chắc đúng phân loại nào.
+- **Khách gửi ảnh/video mẫu (từ affiliate, KOC, shop khác) rồi hỏi còn không**
+  (chốt 2026-11-02, sau case `saocungdcxyzzz` ngày 01/11): **nhìn kỹ hoạ tiết
+  trong ảnh và đối chiếu với danh mục phân loại thật**
+  ([sku_names.json](../../shared/sku_names.json), hoặc trang sản phẩm/Sapo)
+  trước khi trả lời. **KHÔNG tin chữ khách gõ** ("mẫu Shin"...) thay cho ảnh,
+  và không đoán hoạ tiết từ caption video. Chỉ báo "còn" khi ảnh khớp rõ ràng
+  1 phân loại và đã tra tồn kho đúng phân loại đó. Không khớp / không chắc →
+  KHÔNG báo còn, trả "Dạ bạn chờ mình kiểm tra rồi báo ngay ạ" + gửi Telegram
+  báo chủ shop. Không khớp hẳn danh mục thì nói thẳng mẫu đó shop không có.
+  *Lý do:* khách gửi ảnh quần hoa rằn ri ("Mặc sao cũng xinh"), bị đọc nhầm
+  thành mẫu Shin/hoạ tiết hoạt hình → shop trả "còn đủ size S–XXXL", 30 phút
+  sau lại phải đính chính "màu này shop không có".
 - **Khách hỏi ngày dự kiến hàng về** (hàng đang hết): KHÔNG tự đoán ngày.
   Trả lời khách **"bạn chờ xíu mình kiểm tra rồi báo ngay ạ"**, đồng thời
   gửi Telegram báo chủ shop (token + chat ID + lệnh curl:
