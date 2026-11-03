@@ -14,13 +14,31 @@ TikTok" (gặp thật 22/10).
 | Browser | deviceId | Máy | Dùng cho | Shortcut trên desktop PC |
 |---|---|---|---|---|
 | Browser 2 | `40800ac7-074b-4077-be62-257ed7e08ef7` | Windows (PC trực) | **TikTok Shop Seller + Sapo** | "Minh - Chrome" (icon xanh, chữ M) |
-| — | `14db4f42-cf48-4668-9bbb-633ede2a6d7f` | Windows (PC trực) | **Shopee Seller (banhang.shopee.vn)** — dùng cái này từ 29/10/2026 | "SOMETIME Chrome (2)"? (icon vàng) |
+| — | `14db4f42-cf48-4668-9bbb-633ede2a6d7f` | Windows (PC trực) | **Shopee Seller (banhang.shopee.vn)** — dùng cái này từ 29/10/2026. Đã đăng nhập Shopee. Hiện tên "DESKTOP-N7T8LNP" trong `list_connected_browsers` | "Minh (SOMETIME) - Chrome" (icon vàng) = `--profile-directory="Profile 1"` (xác nhận 03/11/2026) |
 | Browser 3 | `81a996d1-12b5-4382-98bf-5f4cad64cb1d` | Windows (PC trực) | Shopee — **29/10/2026 không còn kết nối**, trước đó bị chặn domain | "SOMETIME Chrome" (icon vàng) |
 | Browser 1 | `af1ae8fc-e64d-4535-8f38-2c363921db7d` | macOS (máy Mac) | Chỉ có quyền `banhang.shopee.vn` — **không vào được TikTok** | — |
 
 Chủ shop còn 1 Chrome thứ 3 trên PC ("SOMETIME Chrome (2)", cũng icon vàng, cũng
 là Shopee) nhưng lúc xác minh **không thấy kết nối** — nếu sau này
 `list_connected_browsers` trả về 4 browser thì cái mới là nó.
+
+## ⚠️ Chrome vàng đóng / extension rớt = task KHÔNG thấy Shopee (sự cố 03/11/2026)
+
+Chrome vàng "Minh (SOMETIME)" (Profile 1) mà **đóng cửa sổ, hoặc extension Claude
+trong đó rớt kết nối** thì `14db4f42…` biến khỏi `list_connected_browsers`
+(`select_browser` báo "No connected browser"). Trước đây task CSKH không ghi rõ
+deviceId nên dễ rơi về Chrome Minh (TikTok, chưa đăng nhập Shopee) → thấy trang
+login → báo nhầm "Shopee đăng xuất". Các ghi chú "Shopee đăng xuất" 29/10–03/11
+nhiều khả năng là lỗi này.
+
+**Cách khôi phục (làm thật 03/11/2026):** mở Chrome vàng → mở tab
+`banhang.shopee.vn` → bấm icon extension **Claude** (có dấu chấm than cam = chưa
+kết nối) → đăng nhập/kết nối trong panel. Quyền site phải là "Trên mọi trang web".
+Chỉ mở cửa sổ Chrome là CHƯA đủ, extension phải được kích hoạt bằng tay.
+
+Hai task `cskh-inbox-day` / `cskh-inbox-night` đã có bước 0 ghi rõ: Shopee chỉ dùng
+`14db4f42…`, cấm mở Shopee trên Chrome Minh, không kết nối được thì bỏ qua Shopee
+và báo "Chrome vàng chưa mở / extension mất kết nối" (không phải đăng xuất).
 
 ## Cách dùng
 
