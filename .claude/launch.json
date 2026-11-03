@@ -57,10 +57,9 @@
     },
     {
       "name": "sovanhanh-local",
-      "runtimeExecutable": "bash",
+      "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "-c",
-        "cd '/Users/apple/Documents/App của Minh/so-van-hanh-pwa' && exec python3 -m http.server 8870"
+        "-m", "http.server", "8870", "-d", "/Users/apple/Documents/App của Minh/so-van-hanh-pwa"
       ],
       "port": 8870
     },

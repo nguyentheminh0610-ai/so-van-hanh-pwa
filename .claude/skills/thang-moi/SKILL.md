@@ -9,6 +9,16 @@ description: Tải bộ file báo cáo tháng từ Shopee Seller + TikTok Shop S
 
 Mỗi tháng Sổ Vận Hành cần 6 file bắt buộc + 5 file tuỳ chọn tải từ 2 seller center. Skill này làm trọn: tải → kiểm → upload → tính → lưu → báo cáo. Mục tiêu của chủ shop là **mỗi tháng chỉ việc vào xem dashboard**, không phải đụng tay.
 
+## CÓ BẢN TỰ ĐỘNG 0 TOKEN (chốt 31/10/2026)
+
+Bộ file tháng giờ có thể **tải + xếp Drive + upload + Tính + tự Lưu** hoàn toàn
+tự động trên PC trực, xem [reference_tai_file_tu_dong.md](../../shared/reference_tai_file_tu_dong.md)
+(`tools/chay_tai_file.py --lich thang`). Nó dùng CHÍNH `check_month_files.py` +
+`calc.js` của sổ nên không lệch số, và có 3 lớp chặn (qua ngày 20 + kiểm file +
+quét cảnh báo) mới tự Lưu. Skill này (chạy qua Claude) vẫn dùng khi: cần làm tay,
+cần đọc/giải thích cảnh báo, hoặc bản tự động báo Telegram có cảnh báo cần soi.
+File gốc lưu Drive theo `Dashboard Vận Hành - Data/Tháng {M}-{YYYY}/{sàn}/`.
+
 ## CHẠY KHI NÀO — quan trọng, đừng bỏ qua
 
 **Chỉ chạy sau ngày 20 của tháng kế tiếp.** Đây không phải quy ước cho đẹp mà là lỗi đã đo được thật:

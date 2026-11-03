@@ -63,5 +63,11 @@ không phải `<a href>`; link cũ `export_task/list` hết chữ ký thì trả
   profile script). Bản này gọi API nội bộ qua trang (mượn chữ ký phiên) thay
   vì tải file — cùng nguyên tắc 0-token-trên-PC; nếu API đổi thì chuyển sang
   bấm Export tải file.
-- **Gợi ý mở rộng:** báo cáo tháng Shopee/TikTok (skill `thang-moi` vốn đã tải
-  file tay), đối chiếu đơn hoàn, bất cứ số liệu sàn nào có nút Export.
+- **Báo cáo tháng + tuần Shopee/TikTok → Drive + Sổ Vận Hành:** ĐÃ dựng xong bộ
+  tải file (31/10), xem [reference_tai_file_tu_dong.md](reference_tai_file_tu_dong.md)
+  — `tools/chay_tai_file.py` (orchestrator) + `tai_file_san.py` (Playwright tải) +
+  `xep_file_vao_drive.py` (xếp lên ổ Drive for Desktop, 0 API) + `up_so_van_hanh.py`
+  (tự upload+Tính+Lưu bộ tháng) + `scripts/setup-tai-file-task.ps1`. Thêm file mới
+  = thêm 1 mục vào `tools/registry_tai_file.json`. CÒN chờ chốt trên PC: đăng nhập
+  profile 1 lần + hoàn thiện thao tác chọn lịch/nút Xuất theo giao diện thật.
+- **Gợi ý mở rộng tiếp:** đối chiếu đơn hoàn, bất cứ số liệu sàn nào có nút Export.

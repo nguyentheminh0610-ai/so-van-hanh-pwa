@@ -1,0 +1,173 @@
+{
+  "_doc": "REGISTRY khai báo mọi file sàn cần tải tự động cho Sổ Vận Hành. Chốt 31/10/2026. Xem .claude/shared/reference_tai_file_tu_dong.md. THÊM FILE MỚI = thêm 1 mục vào mảng 'files' + điền 'export' (cách bấm nút Xuất của file đó). KHÔNG cần sửa code.",
+  "_fields": {
+    "id": "mã nội bộ, duy nhất",
+    "mo_ta": "tên dễ đọc để báo cáo/log",
+    "san": "tiktok | shopee — quyết định thư mục con (TikTok Shop / Shopee) và profile Chrome",
+    "role": "KHỚP với role trong .claude/skills/thang-moi/scripts/check_month_files.py (nhận diện file theo nội dung). Để trống nếu file chưa có trong bộ nhận diện.",
+    "lich": "thang | tuan — thuộc lượt chạy nào",
+    "bat_buoc": "true = thiếu file này thì báo lỗi; false = tuỳ chọn",
+    "export": {
+      "url": "trang chứa nút Xuất/Export",
+      "nut_text": "danh sách chữ trên nút cần bấm, thử theo thứ tự (bấm bằng CHỮ bền hơn CSS selector)",
+      "chon_ky": "mô tả cách chọn khoảng ngày trước khi bấm Xuất (người dựng trên PC chốt thao tác thật)",
+      "ghi_chu": "bẫy/lưu ý khi tải file này"
+    }
+  },
+
+  "drive": {
+    "goc": "Dashboard Vận Hành - Data",
+    "thu_muc_thang": "Tháng {thang}-{nam}",
+    "thu_muc_tuan_cha": "Theo tuần",
+    "thu_muc_tuan": "Tuần {tuan}-{nam}",
+    "thu_muc_san": { "tiktok": "TikTok Shop", "shopee": "Shopee" },
+    "_ghi_chu": "Giữ NGUYÊN tên file gốc do sàn đặt. Tên thư mục tháng theo đúng cái Drive đang có (vd 'Tháng 9-2026', không zero-pad). Tuần dùng số tuần ISO."
+  },
+
+  "files": [
+    {
+      "id": "shopee_don_hang_thang",
+      "mo_ta": "Shopee — Đơn hàng (Order.all) — THÁNG",
+      "san": "shopee", "role": "shopeeOrders", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://banhang.shopee.vn/portal/sale/order",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 01 → hết tháng của kỳ đang chốt",
+        "ghi_chu": "Order.all. File .xls của Shopee thực chất là xlsx đặt sai đuôi — bộ xếp file đã xử."
+      }
+    },
+    {
+      "id": "shopee_tra_hoan_thang",
+      "mo_ta": "Shopee — Trả/Hoàn (Order.return_refund) — THÁNG",
+      "san": "shopee", "role": "shopeeReturnRefund", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://banhang.shopee.vn/portal/sale/returnlist",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 01 → hết tháng",
+        "ghi_chu": "Nhận diện bằng cột 'Mã số khiếu nại' (Order.all cũng có cột trả hàng nên phải ưu tiên file này)."
+      }
+    },
+    {
+      "id": "shopee_income_thang",
+      "mo_ta": "Shopee — Tài chính (Income) — THÁNG",
+      "san": "shopee", "role": "income", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://banhang.shopee.vn/portal/settings/finance/income",
+        "nut_text": ["Xuất", "Export", "Tải"],
+        "chon_ky": "Tài Chính → Doanh Thu → chọn kỳ 01 → hết tháng",
+        "ghi_chu": "⚠ Shopee bật hộp NHẬP MẬT KHẨU ở mục Tài Chính. Script KHÔNG được nhập mật khẩu — nếu gặp màn này thì dừng + Telegram báo chủ shop tự mở khoá rồi chạy lại."
+      }
+    },
+    {
+      "id": "tiktok_don_hang_thang",
+      "mo_ta": "TikTok — Tất cả đơn hàng — THÁNG",
+      "san": "tiktok", "role": "tiktokOrders", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/order",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn kỳ theo ngày đặt đơn, 01 → hết tháng",
+        "ghi_chu": "File có sheet 'OrderSKUList'."
+      }
+    },
+    {
+      "id": "tiktok_tra_hang_thang",
+      "mo_ta": "TikTok — Đơn trả hàng/hoàn tiền — THÁNG",
+      "san": "tiktok", "role": "tiktokReturns", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/order/return",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn kỳ 01 → hết tháng",
+        "ghi_chu": "Nhận diện bằng cột 'Return status'/'Return order id'."
+      }
+    },
+    {
+      "id": "tiktok_tai_chinh_thang",
+      "mo_ta": "TikTok — Tài chính (income_...) — THÁNG",
+      "san": "tiktok", "role": "tiktokFinance", "lich": "thang", "bat_buoc": true,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/finance/statement",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "⚠ LỌC THEO NGÀY QUYẾT TOÁN, không phải ngày đặt đơn — chọn đúng kỳ, đừng để mặc định.",
+        "ghi_chu": "File có sheet 'Chi tiết đơn hàng', cột 'Tổng số tiền quyết toán'."
+      }
+    },
+    {
+      "id": "shopee_shop_stats_thang",
+      "mo_ta": "Shopee — Shop Stats — THÁNG (tuỳ chọn)",
+      "san": "shopee", "role": "shopStats", "lich": "thang", "bat_buoc": false,
+      "export": {
+        "url": "https://banhang.shopee.vn/datacenter/dashboard",
+        "nut_text": ["Xuất", "Export", "Tải"],
+        "chon_ky": "chọn kỳ 01 → hết tháng",
+        "ghi_chu": "Nhận diện bằng sheet có chữ 'đơn đã thanh toán'."
+      }
+    },
+    {
+      "id": "tiktok_creator_list_thang",
+      "mo_ta": "TikTok — Creator List — THÁNG (tuỳ chọn)",
+      "san": "tiktok", "role": "tiktokCreatorList", "lich": "thang", "bat_buoc": false,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/compass/creator-management",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn kỳ 01 → hết tháng",
+        "ghi_chu": "Transaction_Analysis_Creator_List."
+      }
+    },
+
+    {
+      "id": "shopee_don_hang_tuan",
+      "mo_ta": "Shopee — Đơn hàng (Order.all) — TUẦN",
+      "san": "shopee", "role": "shopeeOrders", "lich": "tuan", "bat_buoc": true,
+      "export": {
+        "url": "https://banhang.shopee.vn/portal/sale/order",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 7 ngày của tuần đang chạy (Thứ 2 → Chủ nhật)",
+        "ghi_chu": "Cùng loại file với bản tháng, chỉ khác khoảng ngày."
+      }
+    },
+    {
+      "id": "tiktok_don_hang_tuan",
+      "mo_ta": "TikTok — Tất cả đơn hàng — TUẦN",
+      "san": "tiktok", "role": "tiktokOrders", "lich": "tuan", "bat_buoc": true,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/order",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 7 ngày của tuần",
+        "ghi_chu": ""
+      }
+    },
+    {
+      "id": "shopee_tra_hoan_tuan",
+      "mo_ta": "Shopee — Trả/Hoàn — TUẦN",
+      "san": "shopee", "role": "shopeeReturnRefund", "lich": "tuan", "bat_buoc": true,
+      "export": {
+        "url": "https://banhang.shopee.vn/portal/sale/returnlist",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 7 ngày của tuần",
+        "ghi_chu": ""
+      }
+    },
+    {
+      "id": "tiktok_tra_hang_tuan",
+      "mo_ta": "TikTok — Đơn trả hàng/hoàn tiền — TUẦN",
+      "san": "tiktok", "role": "tiktokReturns", "lich": "tuan", "bat_buoc": true,
+      "export": {
+        "url": "https://seller-vn.tiktok.com/order/return",
+        "nut_text": ["Xuất", "Export"],
+        "chon_ky": "chọn 7 ngày của tuần",
+        "ghi_chu": ""
+      }
+    },
+    {
+      "id": "shopee_shop_stats_tuan",
+      "mo_ta": "Shopee — Shop Stats / số liệu bán — TUẦN",
+      "san": "shopee", "role": "shopStats", "lich": "tuan", "bat_buoc": false,
+      "export": {
+        "url": "https://banhang.shopee.vn/datacenter/dashboard",
+        "nut_text": ["Xuất", "Export", "Tải"],
+        "chon_ky": "chọn 7 ngày của tuần",
+        "ghi_chu": ""
+      }
+    }
+  ]
+}
