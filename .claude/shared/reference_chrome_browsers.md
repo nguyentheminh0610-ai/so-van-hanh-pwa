@@ -40,6 +40,17 @@ Hai task `cskh-inbox-day` / `cskh-inbox-night` đã có bước 0 ghi rõ: Shope
 `14db4f42…`, cấm mở Shopee trên Chrome Minh, không kết nối được thì bỏ qua Shopee
 và báo "Chrome vàng chưa mở / extension mất kết nối" (không phải đăng xuất).
 
+## ⚠️ `navigate` không kèm tabId sẽ mở Shopee ở Chrome Minh (sự cố 04/11/2026)
+
+Lượt CSKH 10:50 ngày 04/11: đã `select_browser` 14db4f42 (vàng) nhưng `navigate`
+Shopee **không kèm tabId** lại chạy trên đúng tab TikTok đang có sẵn (cùng tabId)
+bên Chrome Minh → Shopee mở ở Chrome xanh, ra trang login, dễ báo nhầm "đăng xuất".
+Các lượt khác cùng ngày (6/7 lượt đo được) vẫn tạo tab mới ở Chrome vàng đúng —
+nên lỗi chập chờn. Cách làm chắc: `select_browser` → `tabs_context_mcp
+{createIfEmpty:true}` → `navigate` **kèm tabId** lấy từ đó; tabId trùng tab TikTok
+thì là nhầm Chrome. Tên "Browser N" trả về không đáng tin. Đã ghi vào bước 0 của
+các task `cskh-inbox-*`.
+
 ## Cách dùng
 
 ```
