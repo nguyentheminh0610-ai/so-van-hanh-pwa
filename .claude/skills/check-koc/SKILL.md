@@ -121,7 +121,7 @@ Fields to pull:
 
 | Sheet col | Field | Rule |
 |---|---|---|
-| D | Cộng tác ≥80% | `Có` if Tần suất đăng bài ≥ 80%, else `Không`. If TikTok shows `--` (no data), treat as `Không` — can't confirm it. |
+| D | Cộng tác ≥80% | `Có` if Tần suất đăng bài ≥ 80%, else `Không`. If TikTok shows `--` (no data), treat as `Không` — can't confirm it. **`Không` does NOT raise the approval bar** (chốt 2026-11-05, thay cho quy tắc cũ "cộng tác <80% thì phải >80 điểm"): the DUYỆT threshold is `K>60` for everyone, and a low-cộng-tác KOC who passes simply gets the "cf sẽ lên bài" reminder (inbox row 3) on top. D only drives that reminder now. |
 | E | Có SP liên quan | `Có` if the category is menswear/womenswear & underwear or clearly adjacent (general fashion/outfit review). `Không` only when the category is clearly unrelated to the shop's loungewear line (beauty, electronics, automotive, generic home goods, sports/outdoor, etc) — when in doubt, lean `Có` (lenient default, established precedent). |
 | F | Số đơn bán | raw number from "Số món bán ra" |
 | G | GPM (nghìn VNĐ/đơn) | the ₫ figure **divided by 1000** (column is in thousands) |

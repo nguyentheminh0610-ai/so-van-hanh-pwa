@@ -36,12 +36,20 @@ Row 1 is the header. **STT `N` lives at spreadsheet row `N+1`.**
 ### Column L formula (per row `r`)
 
 ```
-=IF(Cr="";"";IF(Jr<>"";Jr;IF(Er<>"Có";"KHÔNG DUYỆT";IF(Dr="Có";IF(Kr>60;"DUYỆT";"KHÔNG DUYỆT");IF(Kr>80;"DUYỆT";"KHÔNG DUYỆT")))))
+=IF(Cr="";"";IF(Jr<>"";Jr;IF(Er<>"Có";"KHÔNG DUYỆT";IF(Kr>60;"DUYỆT";"KHÔNG DUYỆT"))))
 ```
 
-(If cộng tác ≥80% the DUYỆT threshold is `K>60`; if cộng tác <80% the bar
-is higher, `K>80` — a lower-cộng-tác KOC needs to be stronger everywhere
-else to pass.)
+**Ngưỡng duyệt là `K>60` cho MỌI KOC — cộng tác <80% không còn bị nâng
+ngưỡng nữa (chốt 2026-11-05, thay cho quy tắc cũ "D=Không thì phải
+K>80").**
+
+Lý do chủ shop đổi: KOC `maingoccao68` được 80 điểm, hồ sơ tốt
+(GPM 683k, phù hợp nhiều) nhưng cộng tác <80% nên công thức cũ trả
+KHÔNG DUYỆT (80 không > 80) → phải ghi đè tay cột J. Chủ shop chốt:
+cộng tác thấp **không phải lý do từ chối**, chỉ cần **nhắn nhắc bạn đó
+nhớ lên bài** (dòng 3 tab `inbox` — "cf sẽ lên bài") rồi duyệt bình
+thường như mọi KOC khác. Cột D vẫn giữ để cột O biết có cần gửi tin
+nhắc lên bài hay không.
 
 ### Column O formula (per row `r`)
 
