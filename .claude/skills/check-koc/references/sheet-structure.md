@@ -51,6 +51,21 @@ nhớ lên bài** (dòng 3 tab `inbox` — "cf sẽ lên bài") rồi duyệt b�
 thường như mọi KOC khác. Cột D vẫn giữ để cột O biết có cần gửi tin
 nhắc lên bài hay không.
 
+⚠️ **Công thức mới chỉ nằm từ dòng 128 (STT127) trở xuống.** Các dòng
+2–127 vẫn giữ công thức cũ (có nhánh `K>80`) — **cố ý, đừng "sửa cho
+đồng bộ"**. Chủ shop chốt 2026-11-05 chỉ áp dụng từ nay, vì nếu đổi cả
+cột thì 6 KOC cũ (STT 7, 63, 73, 92, 105, 107 — đều 65–75 điểm, cộng tác
+<80%) sẽ lật từ KHÔNG DUYỆT sang DUYỆT, chen vào giữa dãy RANK (cột P) →
+RANK của mọi KOC sau đó nhích 1–6 bậc, mà tab Book có cột B/C/D chạy
+theo RANK còn E/F/G điền tay thì đứng im → ~80 dòng book bị gán lệch
+người. 6 bạn đó đã nhắn từ chối từ lâu, giữ nguyên.
+
+Mốc vẫn là **strictly `>60`**: KOC đúng 60 điểm vẫn KHÔNG DUYỆT (chủ shop
+xác nhận lại 2026-11-05).
+
+Khi thêm dòng mới vẫn copy công thức L từ **dòng ngay trên** như quy
+trình cũ — làm vậy là tự có công thức mới.
+
 ### Column O formula (per row `r`)
 
 ```
