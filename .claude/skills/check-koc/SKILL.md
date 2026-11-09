@@ -195,7 +195,15 @@ asked:
    immediately above (same sheet, `sheetId` 1952146322), destination =
    the new row(s), columns A–W (index 0–23 — **mở rộng từ A–P sau khi gộp
    khối hiệu quả KOC vào Book ngày 2026-10-28**):
-   - `pasteType: "PASTE_FORMAT"` first — carries borders, background,
+   - `pasteType: "PASTE_NORMAL"` on **columns A–D (index 0–3)** as a
+     *third* request — **PASTE_FORMAT does NOT copy formulas**, and
+     columns A/B/C/D in the Book tab are formula-driven (ROW()-1 lookup
+     into 2.Nhập KOC via RANK). Without this step, A/B/C/D remain empty
+     and the KOC name won't show up. Confirmed real sự cố 2026-11-09:
+     dòng 83–93 missing formulas, fixed manually by copyPaste PASTE_NORMAL
+     cols 0–3 from row above. Add PASTE_NORMAL for col H (index 7–8) too
+     for the "Điền vào sổ kho" formula.
+   - `pasteType: "PASTE_FORMAT"` next — carries borders, background,
      font, alignment, and (usually) the plain-list dropdown on column G.
    - `pasteType: "PASTE_DATA_VALIDATION"` on **columns E–F specifically**
      (index 4–6) as a *second*, separate request — `PASTE_FORMAT` alone
