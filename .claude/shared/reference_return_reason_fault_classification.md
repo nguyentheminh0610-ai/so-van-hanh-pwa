@@ -1,7 +1,7 @@
 ---
-Chốt 30/10/2026 — tra từ chính sách công khai của TikTok Shop University (seller-vn.tiktok.com)
-và Shopee Trung tâm Trợ giúp Người bán. Dùng chung cho mọi skill cần phân loại
-"case trả hàng này có tính lỗi shop không" (hiện tại: review-return-check).
+Chốt 30/10/2026, cập nhật 12/11/2026 — tra từ chính sách công khai của TikTok
+Shop University và Shopee Trung tâm Trợ giúp Người bán. Dùng chung cho mọi skill
+cần phân loại "case trả hàng này có tính lỗi shop không" (hiện tại: review-return-check).
 ---
 
 # Lý do trả hàng nào tính là lỗi shop (từng sàn)
@@ -12,32 +12,53 @@ và Shopee Trung tâm Trợ giúp Người bán. Dùng chung cho mọi skill c�
 mục 4.1) đã phân loại lỗi shop theo **nội dung thật** (đọc chat/mô tả, không đoán).
 File này bổ sung thêm: lý do nào **sàn tự tính vào chỉ số lỗi/hiệu suất shop**
 (SFRR của TikTok, NFR của Shopee) — dùng để quyết định có cần nhắn khách mời đổi
-lý do hiển thị trên sàn hay không (xem mục "Nhắn khách đổi lý do trả hàng" trong
-SKILL.md của review-return-check).
+lý do hiển thị trên sàn hay không.
 
 **Hai việc tách biệt, đừng nhầm:**
 - `shop_error_kind` = lỗi gì **thật**, dùng để ghi Sổ Kho + insight nội bộ. KHÔNG đổi.
 - Lý do hiển thị **trên sàn** = cái ảnh hưởng chỉ số, có thể mời khách đổi nếu
   khách đồng ý — không ảnh hưởng tới việc ghi nhận nội bộ phía trên.
 
-## Bảng phân loại
+## Cách nhận diện nhanh theo từng sàn (chốt 12/11/2026)
 
-| Nhóm lý do (ý nghĩa) | TikTok Shop — tính lỗi shop (SFRR)? | Shopee — tính lỗi shop (NFR)? |
-|---|---|---|
-| Giao sai sản phẩm/sai mẫu/sai size/sai màu so với đơn đặt | ⚠️ Có | ⚠️ Có |
-| Thiếu hàng/thiếu phụ kiện trong đơn | ⚠️ Có | ⚠️ Có |
-| Hàng lỗi/hỏng/bẩn/tuột chỉ/không hoạt động/hết hạn sử dụng | ⚠️ Có | ⚠️ Có |
-| Nghi hàng giả/không chính hãng | ⚠️ Có | ⚠️ Có |
-| Không đúng mô tả (sai chất liệu/màu/kích cỡ so với listing) | ⚠️ Có | ⚠️ Có |
-| Hư hỏng nặng/mất hàng khi vận chuyển | ⚠️ Có — **trừ khi** xác định lỗi đơn vị vận chuyển (J&T/SPX), lúc đó không tính | ⚠️ Tương tự |
-| Đổi ý / không còn nhu cầu (hàng còn nguyên, chưa dùng) | ✅ Không tính | ✅ Không tính |
-| Rộng/chật, không vừa (size/fit tự chọn sai) | ✅ Không tính | Thường rơi vào nhóm "đổi ý" ở trên |
+**TikTok Shop — dùng badge (nhanh hơn, không cần tra bảng):**
+Mỗi thẻ trả hàng trên tab "Đang chờ bạn" hiển thị badge trực tiếp:
+- Có badge **"Không phải lỗi người bán"** (checkmark xanh lá) → không phải lỗi shop → gửi 1 tin (row 25).
+- Không có badge đó → lỗi shop → gửi 2 tin (row 35 + row 25).
 
-→ **Quy tắc dùng:** case nào `shop_error_kind` ở mục 4.1 ra `giao_nham` /
-`giao_thieu` / `san_pham_loi` (= dòng có ⚠️ trong bảng) → **đây là case cần mời
-khách đổi lý do hiển thị trên sàn**. Case `shop_error_kind = null` (đổi ý, tự
-chọn sai size...) → sàn vốn đã không tính lỗi shop, mời cũng không có lợi gì,
-bỏ qua.
+Khi `get_page_text` trang trả hàng TikTok: kiểm tra mỗi thẻ có chứa chuỗi
+`"Không phải lỗi người bán"` không — đơn giản, không cần tra bảng.
+
+**Shopee — đọc tên lý do, tra bảng bên dưới:**
+Shopee không có badge tương đương → phải đọc text lý do rồi đối chiếu bảng.
+
+## Bảng lý do chính xác từng sàn (dùng cho Shopee, tham khảo cho TikTok)
+
+### TikTok Shop
+
+| Tên lý do hiển thị trên sàn | Lỗi shop (SFRR)? |
+|---|---|
+| Sản phẩm bị lỗi/không hoạt động | ⚠️ Có |
+| Hàng không đúng mô tả | ⚠️ Có |
+| Nhận sai hàng | ⚠️ Có |
+| Nhận thiếu hàng/phụ kiện | ⚠️ Có |
+| Hàng bị hỏng/vỡ trong vận chuyển | ⚠️ Có |
+| Nghi hàng giả/không chính hãng | ⚠️ Có |
+| Đổi ý | ✅ Không |
+| Size quá rộng/chật | ✅ Không |
+| Đặt nhầm size | ✅ Không |
+
+### Shopee
+
+| Tên lý do hiển thị trên sàn | Lỗi shop (NFR)? |
+|---|---|
+| Hàng bị lỗi, vỡ, hư hại trong quá trình vận chuyển | ⚠️ Có |
+| Hàng giao sai, khác mô tả | ⚠️ Có |
+| Nhận thiếu hàng | ⚠️ Có |
+| Hàng nguyên vẹn nhưng không còn nhu cầu | ✅ Không |
+
+→ **Quy tắc:** dòng ⚠️ → lỗi shop → gửi 2 tin (row 36 + row 25).
+Dòng ✅ → không phải lỗi shop → gửi 1 tin (row 25).
 
 ## Tên lý do CHÍNH XÁC để mời khách đổi qua (khác tên theo từng sàn — đừng nhầm)
 

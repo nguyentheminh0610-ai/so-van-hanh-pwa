@@ -228,11 +228,13 @@ Mỗi lần chạy, với mỗi đánh giá 1–2★ đã có dòng trong `cskh_
 ### 2. Trả hàng / hoàn tiền
 
 1. Open the return-management "Đang chờ bạn" list, `get_page_text` it.
-2. For each case within the date window: note mã đơn, buyer handle, lý do,
-   ngày. **Tra lý do này vào bảng**
-   [reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
-   ngay ở bước này → xác định case lỗi shop hay không (xem mục "Khuyến khích
-   đổi lý do trả hàng" ở trên) — quyết định template nào sẽ gửi ở bước 3.
+2. For each case within the date window: note mã đơn, buyer handle, lý do, ngày.
+   Xác định lỗi shop hay không theo từng sàn — quyết định template gửi ở bước 3:
+   - **TikTok:** kiểm tra thẻ có chứa text **"Không phải lỗi người bán"** không
+     (badge xanh lá). Có → không phải lỗi shop. Không có → lỗi shop.
+   - **Shopee:** đọc tên lý do, tra bảng
+     [reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
+     mục "Bảng lý do chính xác từng sàn — Shopee".
 3. Open its chat thread (bubble icon). If untouched (Hard rule 3), send:
    - **Lỗi shop** → gửi **2 tin liên tiếp trong cùng lượt mở thread**:
      - Tin 1: row 35 (TikTok) hoặc row 36 (Shopee) — nhờ đổi lý do.
