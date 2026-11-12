@@ -198,3 +198,14 @@ Cách làm đúng:
   ở đầu khung chat ngay trước khi gõ/gửi.
 - Gửi tin xác minh có SĐT khách → TikTok hiện hộp "Giữ thông tin bí mật của bạn an toàn"
   (Vẫn gửi / Hủy). Chủ shop đã duyệt bấm "Vẫn gửi" cho tin xác minh gửi bù (12/11/2026).
+
+## SPX Express (spx.vn) đăng nhập ở CHROME VÀNG "Sometime", không phải Chrome Minh (xác nhận 12/11/2026)
+
+Gửi bù trên SPX phải dùng deviceId `14db4f42-cf48-4668-9bbb-633ede2a6d7f` (Chrome vàng, profile
+"Sometime"). Chrome Minh (`40800ac7…`) hiện trang đăng nhập SPX — đừng bắt chủ shop đăng nhập lại,
+chỉ cần `select_browser` sang Chrome vàng. Quy trình gửi bù mỗi bước dùng 1 Chrome:
+- Chat TikTok (đọc ảnh ghi chú, gửi tin xác minh): Chrome Minh `40800ac7…`
+- Tạo đơn SPX + tải nhãn PDF: Chrome vàng `14db4f42…`
+Mỗi lần đổi Chrome phải `select_browser` rồi `tabs_context_mcp` (không createIfEmpty khi đã có tab).
+Trong form SPX: ô "Giá trị bưu gửi" tự điền theo giá sản phẩm — đừng gõ thêm (từng thành "163.708.163.708").
+Ô "Thời gian lấy hàng" mặc định có thể là ngày hôm qua — mở dropdown chọn ngày hôm nay.
