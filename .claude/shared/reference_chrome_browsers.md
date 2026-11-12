@@ -177,3 +177,24 @@ xét **theo cặp (phiên × domain)**, không theo Chrome.
 Trang nhạy cảm (vd Hồ Sơ Shop của Shopee) sẽ bật hộp "nhập mật khẩu Shopee để
 xác nhận" — **không bao giờ nhập mật khẩu**, thoát ra và đi đường khác, hoặc
 báo chủ shop tự thao tác.
+
+## ⚠️ KHÔNG tạo tab mới bằng `tabs_context_mcp {createIfEmpty:true}` khi đã có tab đăng nhập (sự cố 12/11/2026)
+
+Lúc làm gửi bù trên TikTok (Chrome Minh, deviceId `40800ac7…`), tab đầu tiên vào được
+inbox bình thường. Sau đó 1 lệnh `screenshot` bị `Script injection timed out`, nhóm tab
+của phiên "biến mất" (`tabs_context_mcp` báo "no tab group"). Phiên làm sai: gọi
+`createIfEmpty:true` rồi `navigate` → tab mới này luôn hiện **"登录过期，请重新登录"**
+(đăng nhập hết hạn) dù tab cũ của chủ shop vẫn đăng nhập bình thường. Tab mới không dùng
+chung phiên đăng nhập với tab Minh → tưởng là hết phiên TikTok, báo nhầm cho chủ shop.
+
+Cách làm đúng:
+- Gặp "not in Claude's tab group" → chỉ gọi lại `tabs_context_mcp` (không createIfEmpty),
+  thường vài giây sau tab cũ hiện lại. Dùng tabId cũ, **không mở tab mới**.
+- Dồn các thao tác liên tiếp (click + screenshot) vào 1 `browser_batch` để khỏi bị văng giữa chừng.
+- Chỉ kết luận "TikTok hết phiên" khi tab ĐÃ ĐĂNG NHẬP trước đó cũng ra trang login.
+- Click vào ô nhập chat ngay sau khi đóng lightbox ảnh có thể không focus → click lần 2 rồi
+  chụp ảnh kiểm tra "0/2000" trước khi gõ tiếp.
+- Danh sách chat TikTok đổi thứ tự liên tục khi có tin mới: luôn chụp ảnh xác nhận tên khách
+  ở đầu khung chat ngay trước khi gõ/gửi.
+- Gửi tin xác minh có SĐT khách → TikTok hiện hộp "Giữ thông tin bí mật của bạn an toàn"
+  (Vẫn gửi / Hủy). Chủ shop đã duyệt bấm "Vẫn gửi" cho tin xác minh gửi bù (12/11/2026).
