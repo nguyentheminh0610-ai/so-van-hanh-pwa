@@ -25,7 +25,7 @@ if (-not (Test-Path $RunFile)) { Write-Host "[LOI] Khong thay $RunFile"; exit 1 
 if (-not (Test-Path (Join-Path $RepoDir ".git"))) { Write-Host "[LOI] $RepoDir khong phai git repo."; exit 1 }
 $cred = Join-Path $HOME ".config\sapo\credentials.json"
 if (-not (Test-Path $cred)) {
-    Write-Host "[CANH BAO] Chua thay $cred — task van tao nhung se loi khi chay."
+    Write-Host "[CANH BAO] Chua thay $cred - task van tao nhung se loi khi chay."
     Write-Host "           Copy credentials.json (store/api_key/api_secret) tu may Mac sang day truoc."
 }
 
