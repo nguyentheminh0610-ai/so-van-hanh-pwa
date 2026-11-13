@@ -30,9 +30,12 @@ SIZE_RE = re.compile(r'^(.*?)-?(XXXL|XXL|XL|S|M|L)$', re.I)
 
 
 def api(store, key, sec, path):
+    # encoding='utf-8' bat buoc: Windows mac dinh doc stdout bang cp1252 -> loi
+    # UnicodeDecodeError voi ten SP tieng Viet (UTF-8). errors='replace' cho an toan.
     r = subprocess.run(['curl', '-sf', '-u', f'{key}:{sec}',
                         '-H', f'User-Agent: {UA}', '-H', 'Accept: application/json',
-                        f'https://{store}{path}'], capture_output=True, text=True, timeout=180)
+                        f'https://{store}{path}'], capture_output=True, text=True,
+                       encoding='utf-8', errors='replace', timeout=180)
     if r.returncode != 0:
         raise RuntimeError(f'curl lỗi {r.returncode} cho {path}')
     return json.loads(r.stdout)
