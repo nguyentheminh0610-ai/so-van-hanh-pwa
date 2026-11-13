@@ -174,6 +174,7 @@ function buildTabsHTML(){
     <button class="tab-btn" data-tab="library">Tải file &amp; lịch sử</button>
     <button class="tab-btn" data-tab="cskh">Đánh giá &amp; Trả hàng</button>
     <button class="tab-btn" data-tab="koc">Chấm điểm KOC</button>
+    <button class="tab-btn" data-tab="skuperf">Hiệu suất SKU</button>
   </div>`;
 }
 
@@ -183,9 +184,11 @@ function switchToTab(tab){
   document.getElementById('screen-library').classList.toggle('active', tab === 'library');
   document.getElementById('screen-cskh').classList.toggle('active', tab === 'cskh');
   document.getElementById('screen-koc').classList.toggle('active', tab === 'koc');
+  document.getElementById('screen-skuperf').classList.toggle('active', tab === 'skuperf');
   if (tab === 'library') refreshLibrary();
   if (tab === 'cskh') refreshCskh(); // tải lười: chỉ gọi Supabase khi mở tab
   if (tab === 'koc') refreshKoc();
+  if (tab === 'skuperf') refreshSkuPerf(); // tải lười: chỉ fetch JSON khi mở tab
 }
 
 function refreshDashboardEmptyState(){
@@ -1398,10 +1401,12 @@ function init(){
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
     `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>` +
     `<div class="screen" id="screen-cskh">${buildCskhScreenHTML()}</div>` +
-    `<div class="screen" id="screen-koc">${buildKocScreenHTML()}</div>`;
+    `<div class="screen" id="screen-koc">${buildKocScreenHTML()}</div>` +
+    `<div class="screen" id="screen-skuperf">${buildSkuPerfScreenHTML()}</div>`;
   wireInstallHint();
   wireUpload();
   wireTabs();
+  wireSkuPerf();
   wireCskh();
   wireKoc();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);

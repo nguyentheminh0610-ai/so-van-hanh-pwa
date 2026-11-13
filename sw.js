@@ -1,6 +1,6 @@
 /* Service worker đơn giản: cache các file tĩnh của app để mở nhanh/offline-first
    phần giao diện (dữ liệu tính toán/lưu lịch sử vẫn cần mạng để gọi Supabase). */
-const CACHE_NAME = 'vanhanh-shop-v59'; // v59: tong 4 khoan hien thanh bar co % ro rang
+const CACHE_NAME = 'vanhanh-shop-v60'; // v60: them tab "Hieu suat SKU" (skuperf.js)
 const ASSETS = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS = [
   './app.js',
   './cskh.js',
   './koc.js',
+  './skuperf.js',
   './init.js',
   './manifest.json',
   './icon-192.png',
