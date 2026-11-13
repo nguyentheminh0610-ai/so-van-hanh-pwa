@@ -1,5 +1,5 @@
 {
-"generatedAt": "2026-11-13 12:41",
+"generatedAt": "2026-11-13 13:57",
 "tz": "local",
 "periods": {
 "7": {
@@ -7,78 +7,78 @@
 {
 "base": "CL01",
 "model": "Chất Lông-Shin",
-"perday": 165.3,
-"prev": 33.6,
-"chg": 392,
+"perday": 167.7,
+"prev": 34.0,
+"chg": 393,
 "sizes": {
-"S": 99,
-"M": 250,
-"L": 264,
+"S": 102,
+"M": 255,
+"L": 266,
 "XL": 279,
-"XXL": 162,
-"XXXL": 103
+"XXL": 166,
+"XXXL": 106
 }
 },
 {
 "base": "CL06",
 "model": "Chất Lông-Shin 02",
-"perday": 78.3,
+"perday": 82.6,
 "prev": 16.1,
-"chg": 385,
+"chg": 412,
 "sizes": {
-"S": 6,
-"M": 92,
-"L": 176,
-"XL": 151,
-"XXL": 84,
+"S": 8,
+"M": 96,
+"L": 192,
+"XL": 157,
+"XXL": 86,
 "XXXL": 39
 }
 },
 {
 "base": "CL07",
 "model": "Chất Lông-Shin 03",
-"perday": 14.6,
+"perday": 15.4,
 "prev": 2.1,
-"chg": 580,
+"chg": 620,
 "sizes": {
-"M": 25,
-"L": 38,
-"XL": 39
+"M": 27,
+"L": 40,
+"XL": 41
 }
 },
 {
 "base": "CL05",
 "model": "Chất Lông-Kuromi",
-"perday": 11.1,
+"perday": 11.7,
 "prev": 2.3,
-"chg": 388,
+"chg": 412,
 "sizes": {
 "M": 21,
-"L": 30,
+"L": 34,
 "XL": 27
 }
 },
 {
 "base": "CL08",
 "model": "Chất Lông-Patrick Star",
-"perday": 7.4,
+"perday": 7.9,
 "prev": 0.6,
-"chg": 1200,
+"chg": 1275,
 "sizes": {
-"M": 21,
+"M": 23,
 "L": 19,
-"XL": 12
+"XL": 13
 }
 },
 {
 "base": "CL12",
 "model": "Chất Lông-Caro Xanh",
-"perday": 6.1,
+"perday": 6.4,
 "prev": 0.7,
-"chg": 760,
+"chg": 800,
 "sizes": {
 "M": 12,
-"L": 9,
+"L": 11,
 "XL": 21,
 "XXL": 1
 }
@@ -86,23 +86,23 @@
 {
 "base": "CL03",
 "model": "Chất Lông-Vịt Xanh",
-"perday": 6.1,
+"perday": 6.4,
 "prev": 1.1,
-"chg": 438,
+"chg": 463,
 "sizes": {
 "M": 1,
-"L": 27,
-"XL": 15
+"L": 28,
+"XL": 16
 }
 },
 {
 "base": "CL11",
 "model": "Chất Lông-Caro Hồng",
-"perday": 5.9,
+"perday": 6.0,
 "prev": 1.3,
-"chg": 356,
+"chg": 367,
 "sizes": {
-"M": 17,
+"M": 18,
 "L": 16,
 "XL": 8
 }
@@ -110,33 +110,33 @@
 {
 "base": "CL04",
 "model": "Chất Lông-Lợn Hồng",
-"perday": 5.7,
+"perday": 6.0,
 "prev": 1.0,
-"chg": 471,
+"chg": 500,
 "sizes": {
-"L": 13,
+"L": 15,
 "XL": 27
 }
 },
 {
 "base": "CL02",
 "model": "Chất Lông-Hello Kitty",
-"perday": 4.3,
-"prev": 1.6,
-"chg": 173,
+"perday": 4.7,
+"prev": 1.7,
+"chg": 175,
 "sizes": {
-"L": 11,
-"XL": 19
+"L": 12,
+"XL": 21
 }
 },
 {
 "base": "DO02",
 "model": "Đỏ 02",
-"perday": 3.0,
+"perday": 3.1,
 "prev": 0.6,
-"chg": 425,
+"chg": 450,
 "sizes": {
-"M": 7,
+"M": 8,
 "L": 9,
 "XL": 3,
 "XXL": 2
@@ -145,11 +145,11 @@
 {
 "base": "CL10",
 "model": "Chất Lông-Thỏ Nơ",
-"perday": 2.1,
+"perday": 2.3,
 "prev": 0.6,
-"chg": 275,
+"chg": 300,
 "sizes": {
-"M": 7,
+"M": 8,
 "L": 1,
 "XL": 7
 }
@@ -157,13 +157,13 @@
 {
 "base": "DO04",
 "model": "Đỏ 04",
-"perday": 1.7,
+"perday": 2.0,
 "prev": 0.3,
-"chg": 500,
+"chg": 600,
 "sizes": {
 "M": 5,
 "L": 2,
-"XL": 5
+"XL": 7
 }
 },
 {
@@ -179,29 +179,41 @@
 }
 },
 {
+"base": "DADO",
+"model": "Chất Dạ Đỏ Cao Cấp",
+"perday": 1.6,
+"prev": 0.3,
+"chg": 450,
+"sizes": {
+"M": 2,
+"L": 3,
+"XL": 5,
+"XXL": 1
+}
+},
+{
 "base": "DADEN",
 "model": "Chất Dạ Đen Cao Cấp",
-"perday": 1.4,
+"perday": 1.6,
 "prev": 2.1,
-"chg": -33,
+"chg": -27,
 "sizes": {
 "M": 1,
 "L": 5,
-"XL": 1,
+"XL": 2,
 "XXL": 3
 }
 },
 {
-"base": "DADO",
-"model": "Chất Dạ Đỏ Cao Cấp",
-"perday": 1.1,
-"prev": 0.3,
-"chg": 300,
+"base": "XANHLA02",
+"model": "Xanh Lá 02",
+"perday": 1.3,
+"prev": 0.4,
+"chg": 200,
 "sizes": {
 "M": 2,
 "L": 2,
-"XL": 3,
-"XXL": 1
+"XL": 5
 }
 },
 {
@@ -215,18 +227,6 @@
 "L": 3,
 "XL": 2,
 "XXL": 2
-}
-},
-{
-"base": "XANHLA02",
-"model": "Xanh Lá 02",
-"perday": 1.0,
-"prev": 0.4,
-"chg": 133,
-"sizes": {
-"M": 1,
-"L": 2,
-"XL": 4
 }
 },
 {
@@ -350,21 +350,21 @@
 }
 ],
 "basket": {
-"n": 1976,
-"totqty": 2257,
-"spdon": 1.14,
-"pct2": 12.8,
+"n": 2040,
+"totqty": 2337,
+"spdon": 1.15,
+"pct2": 12.9,
 "dist": {
-"1": 1723,
-"2": 236,
-"3": 11,
-"4": 5,
+"1": 1776,
+"2": 243,
+"3": 14,
+"4": 6,
 "5+": 1
 },
 "prev": {
 "spdon": 1.23,
-"pct2": 16.4,
-"n": 391
+"pct2": 16.5,
+"n": 394
 }
 }
 },
@@ -373,67 +373,92 @@
 {
 "base": "CL01",
 "model": "Chất Lông-Shin",
-"perday": 99.4,
-"prev": 26.1,
-"chg": 281,
+"perday": 100.9,
+"prev": 25.9,
+"chg": 289,
 "sizes": {
-"S": 128,
-"M": 285,
-"L": 345,
-"XL": 326,
-"XXL": 191,
-"XXXL": 117
+"S": 131,
+"M": 290,
+"L": 348,
+"XL": 328,
+"XXL": 195,
+"XXXL": 120
 }
 },
 {
 "base": "CL06",
 "model": "Chất Lông-Shin 02",
-"perday": 47.2,
+"perday": 49.4,
 "prev": 13.6,
-"chg": 246,
+"chg": 262,
 "sizes": {
-"S": 6,
-"M": 125,
-"L": 212,
-"XL": 184,
-"XXL": 95,
+"S": 8,
+"M": 129,
+"L": 228,
+"XL": 190,
+"XXL": 97,
 "XXXL": 39
 }
 },
 {
 "base": "CL07",
 "model": "Chất Lông-Shin 03",
-"perday": 8.4,
+"perday": 8.8,
 "prev": 3.3,
-"chg": 154,
+"chg": 167,
 "sizes": {
-"M": 28,
-"L": 43,
-"XL": 46
+"M": 30,
+"L": 45,
+"XL": 48
 }
 },
 {
 "base": "CL05",
 "model": "Chất Lông-Kuromi",
-"perday": 6.7,
+"perday": 7.0,
 "prev": 1.7,
-"chg": 292,
+"chg": 308,
 "sizes": {
 "M": 27,
-"L": 36,
+"L": 40,
 "XL": 31
 }
 },
 {
 "base": "CL08",
 "model": "Chất Lông-Patrick Star",
-"perday": 4.0,
+"perday": 4.2,
 "prev": 1.6,
-"chg": 143,
+"chg": 157,
 "sizes": {
-"M": 25,
+"M": 27,
 "L": 19,
-"XL": 12
+"XL": 13
+}
+},
+{
+"base": "CL03",
+"model": "Chất Lông-Vịt Xanh",
+"perday": 3.8,
+"prev": 1.5,
+"chg": 152,
+"sizes": {
+"M": 1,
+"L": 32,
+"XL": 20
+}
+},
+{
+"base": "CL12",
+"model": "Chất Lông-Caro Xanh",
+"perday": 3.6,
+"prev": 1.0,
+"chg": 257,
+"sizes": {
+"M": 12,
+"L": 12,
+"XL": 25,
+"XXL": 1
 }
 },
 {
@@ -441,81 +466,56 @@
 "model": "Chất Lông-Caro Hồng",
 "perday": 3.6,
 "prev": 0.7,
-"chg": 400,
+"chg": 410,
 "sizes": {
-"M": 18,
+"M": 19,
 "L": 20,
 "XL": 12
 }
 },
 {
-"base": "CL03",
-"model": "Chất Lông-Vịt Xanh",
-"perday": 3.6,
-"prev": 1.6,
-"chg": 132,
-"sizes": {
-"M": 1,
-"L": 31,
-"XL": 19
-}
-},
-{
-"base": "CL12",
-"model": "Chất Lông-Caro Xanh",
-"perday": 3.4,
-"prev": 1.0,
-"chg": 243,
-"sizes": {
-"M": 12,
-"L": 10,
-"XL": 25,
-"XXL": 1
-}
-},
-{
 "base": "CL04",
 "model": "Chất Lông-Lợn Hồng",
-"perday": 3.4,
+"perday": 3.5,
 "prev": 0.4,
-"chg": 683,
+"chg": 717,
 "sizes": {
-"L": 17,
+"L": 19,
 "XL": 30
 }
 },
 {
 "base": "CL02",
 "model": "Chất Lông-Hello Kitty",
-"perday": 2.9,
+"perday": 3.2,
 "prev": 1.4,
-"chg": 116,
+"chg": 137,
 "sizes": {
-"L": 17,
-"XL": 24
+"L": 19,
+"XL": 26
 }
 },
 {
 "base": "DADEN",
 "model": "Chất Dạ Đen Cao Cấp",
-"perday": 1.8,
+"perday": 1.9,
 "prev": 0.4,
-"chg": 317,
+"chg": 333,
 "sizes": {
 "M": 2,
 "L": 13,
-"XL": 3,
+"XL": 4,
 "XXL": 7
 }
 },
 {
 "base": "DO02",
 "model": "Đỏ 02",
-"perday": 1.8,
+"perday": 1.9,
 "prev": 0.6,
-"chg": 178,
+"chg": 189,
 "sizes": {
-"M": 10,
+"M": 11,
 "L": 10,
 "XL": 3,
 "XXL": 2
@@ -526,9 +526,9 @@
 "model": "Chất Lông-Thỏ Nơ",
 "perday": 1.4,
 "prev": 0.4,
-"chg": 217,
+"chg": 233,
 "sizes": {
-"M": 10,
+"M": 11,
 "L": 2,
 "XL": 7
 }
@@ -549,11 +549,36 @@
 {
 "base": "DO04",
 "model": "Đỏ 04",
-"perday": 1.0,
+"perday": 1.1,
 "prev": 0.6,
-"chg": 56,
+"chg": 78,
 "sizes": {
 "M": 6,
+"L": 2,
+"XL": 8
+}
+},
+{
+"base": "DADO",
+"model": "Chất Dạ Đỏ Cao Cấp",
+"perday": 0.9,
+"prev": 0.1,
+"chg": 1200,
+"sizes": {
+"M": 3,
+"L": 3,
+"XL": 5,
+"XXL": 2
+}
+},
+{
+"base": "XANHLA02",
+"model": "Xanh Lá 02",
+"perday": 0.9,
+"prev": 0.3,
+"chg": 200,
+"sizes": {
+"M": 4,
 "L": 2,
 "XL": 6
 }
@@ -569,31 +594,6 @@
 "L": 6,
 "XL": 2,
 "XXL": 3
-}
-},
-{
-"base": "DADO",
-"model": "Chất Dạ Đỏ Cao Cấp",
-"perday": 0.7,
-"prev": 0.1,
-"chg": 900,
-"sizes": {
-"M": 3,
-"L": 2,
-"XL": 3,
-"XXL": 2
-}
-},
-{
-"base": "XANHLA02",
-"model": "Xanh Lá 02",
-"perday": 0.7,
-"prev": 0.3,
-"chg": 150,
-"sizes": {
-"M": 3,
-"L": 2,
-"XL": 5
 }
 },
 {
@@ -750,21 +750,21 @@
 }
 ],
 "basket": {
-"n": 2367,
-"totqty": 2736,
+"n": 2434,
+"totqty": 2820,
 "spdon": 1.16,
-"pct2": 13.4,
+"pct2": 13.5,
 "dist": {
-"1": 2050,
-"2": 290,
-"3": 19,
-"4": 5,
+"1": 2105,
+"2": 298,
+"3": 22,
+"4": 6,
 "5+": 3
 },
 "prev": {
 "spdon": 1.21,
-"pct2": 15.6,
-"n": 665
+"pct2": 15.7,
+"n": 662
 }
 }
 },
@@ -773,67 +773,67 @@
 {
 "base": "CL01",
 "model": "Chất Lông-Shin",
-"perday": 62.8,
+"perday": 63.4,
 "prev": 38.2,
-"chg": 64,
+"chg": 66,
 "sizes": {
-"S": 154,
-"M": 354,
-"L": 458,
-"XL": 414,
-"XXL": 238,
-"XXXL": 139
+"S": 157,
+"M": 358,
+"L": 460,
+"XL": 416,
+"XXL": 242,
+"XXXL": 142
 }
 },
 {
 "base": "CL06",
 "model": "Chất Lông-Shin 02",
-"perday": 30.4,
+"perday": 31.5,
 "prev": 10.7,
-"chg": 184,
+"chg": 194,
 "sizes": {
-"S": 6,
-"M": 176,
-"L": 266,
-"XL": 240,
-"XXL": 125,
+"S": 8,
+"M": 180,
+"L": 282,
+"XL": 246,
+"XXL": 127,
 "XXXL": 39
 }
 },
 {
 "base": "CL07",
 "model": "Chất Lông-Shin 03",
-"perday": 5.8,
+"perday": 6.0,
 "prev": 4.9,
-"chg": 19,
+"chg": 23,
 "sizes": {
-"M": 44,
-"L": 57,
-"XL": 62
+"M": 46,
+"L": 59,
+"XL": 64
 }
 },
 {
 "base": "CL05",
 "model": "Chất Lông-Kuromi",
-"perday": 4.2,
+"perday": 4.4,
 "prev": 2.1,
-"chg": 100,
+"chg": 107,
 "sizes": {
 "M": 32,
-"L": 43,
+"L": 47,
 "XL": 43
 }
 },
 {
 "base": "CL08",
 "model": "Chất Lông-Patrick Star",
-"perday": 2.8,
+"perday": 2.9,
 "prev": 1.2,
-"chg": 126,
+"chg": 134,
 "sizes": {
-"M": 32,
+"M": 34,
 "L": 26,
-"XL": 16,
+"XL": 17,
 "XXL": 5
 }
 },
@@ -846,18 +846,18 @@
 "sizes": {
 "M": 1,
 "L": 43,
-"XL": 29
+"XL": 30
 }
 },
 {
 "base": "CL12",
 "model": "Chất Lông-Caro Xanh",
-"perday": 2.2,
+"perday": 2.3,
 "prev": 1.5,
-"chg": 44,
+"chg": 49,
 "sizes": {
 "M": 15,
-"L": 18,
+"L": 20,
 "XL": 27,
 "XXL": 1,
 "XXXL": 1
@@ -866,22 +866,22 @@
 {
 "base": "CL02",
 "model": "Chất Lông-Hello Kitty",
-"perday": 2.1,
+"perday": 2.3,
 "prev": 2.1,
-"chg": 2,
+"chg": 8,
 "sizes": {
-"L": 30,
-"XL": 30
+"L": 32,
+"XL": 32
 }
 },
 {
 "base": "CL11",
 "model": "Chất Lông-Caro Hồng",
-"perday": 2.1,
+"perday": 2.2,
 "prev": 1.2,
-"chg": 71,
+"chg": 74,
 "sizes": {
-"M": 22,
+"M": 23,
 "L": 26,
 "XL": 12
 }
@@ -889,11 +889,11 @@
 {
 "base": "CL04",
 "model": "Chất Lông-Lợn Hồng",
-"perday": 1.9,
+"perday": 2.0,
 "prev": 1.7,
-"chg": 13,
+"chg": 17,
 "sizes": {
-"L": 17,
+"L": 19,
 "XL": 36
 }
 },
@@ -902,9 +902,9 @@
 "model": "Đỏ 02",
 "perday": 1.2,
 "prev": 1.1,
-"chg": 6,
+"chg": 9,
 "sizes": {
-"M": 12,
+"M": 13,
 "L": 13,
 "XL": 7,
 "XXL": 2
@@ -915,12 +915,24 @@
 "model": "Chất Dạ Đen Cao Cấp",
 "perday": 1.1,
 "prev": 0.2,
-"chg": 417,
+"chg": 433,
 "sizes": {
 "M": 2,
 "L": 17,
-"XL": 3,
+"XL": 4,
 "XXL": 9
+}
+},
+{
+"base": "DO04",
+"model": "Đỏ 04",
+"perday": 0.9,
+"prev": 0.3,
+"chg": 178,
+"sizes": {
+"M": 11,
+"L": 2,
+"XL": 12
 }
 },
 {
@@ -928,23 +940,11 @@
 "model": "Chất Lông-Thỏ Nơ",
 "perday": 0.9,
 "prev": 0.5,
-"chg": 92,
+"chg": 100,
 "sizes": {
-"M": 13,
+"M": 14,
 "L": 3,
 "XL": 9
-}
-},
-{
-"base": "DO04",
-"model": "Đỏ 04",
-"perday": 0.8,
-"prev": 0.3,
-"chg": 156,
-"sizes": {
-"M": 11,
-"L": 2,
-"XL": 10
 }
 },
 {
@@ -976,25 +976,25 @@
 {
 "base": "XANHLA02",
 "model": "Xanh Lá 02",
-"perday": 0.5,
+"perday": 0.6,
 "prev": 0.3,
-"chg": 75,
+"chg": 100,
 "sizes": {
-"M": 6,
+"M": 7,
 "L": 3,
-"XL": 5
+"XL": 6
 }
 },
 {
 "base": "DADO",
 "model": "Chất Dạ Đỏ Cao Cấp",
-"perday": 0.4,
+"perday": 0.5,
 "prev": 0.2,
-"chg": 83,
+"chg": 133,
 "sizes": {
 "M": 3,
-"L": 3,
-"XL": 3,
+"L": 4,
+"XL": 5,
 "XXL": 2
 }
 },
@@ -1039,7 +1039,7 @@
 "model": "Chất Lông-Hello Kitty Hồng",
 "perday": 0.3,
 "prev": 1.1,
-"chg": -72,
+"chg": -71,
 "sizes": {
 "M": 4,
 "L": 5
@@ -1248,15 +1248,15 @@
 }
 ],
 "basket": {
-"n": 3032,
-"totqty": 3539,
+"n": 3096,
+"totqty": 3620,
 "spdon": 1.17,
-"pct2": 13.9,
+"pct2": 14.0,
 "dist": {
-"1": 2611,
-"2": 382,
-"3": 23,
-"4": 9,
+"1": 2663,
+"2": 390,
+"3": 26,
+"4": 10,
 "5+": 7
 },
 "prev": {
