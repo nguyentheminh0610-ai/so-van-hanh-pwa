@@ -18,6 +18,14 @@ chặn UA lạ -> giả UA Chrome. Lịch tự chạy 2 ngày/lần: scripts/set
 """
 import json, subprocess, os, sys, datetime, re, collections
 
+# Windows in stdout/stderr mac dinh bang cp1252 -> print tieng Viet (ten SP) bi
+# UnicodeEncodeError, lam script chet TRUOC buoc push. Ep UTF-8 cho an toan.
+try:
+    sys.stdout.reconfigure(encoding='utf-8')
+    sys.stderr.reconfigure(encoding='utf-8')
+except Exception:
+    pass
+
 CRED = os.path.expanduser('~/.config/sapo/credentials.json')
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 OUT  = os.path.join(REPO, 'sku-performance.json')
@@ -27,6 +35,17 @@ PERIODS = [7, 14, 28]
 MAX_DAYS = max(PERIODS) * 2            # 56 ngày: đủ kỳ 28 + kỳ liền trước 28
 SIZES = ['S', 'M', 'L', 'XL', 'XXL', 'XXXL']
 SIZE_RE = re.compile(r'^(.*?)-?(XXXL|XXL|XL|S|M|L)$', re.I)
+
+
+def log(msg):
+    """In log khong bao gio lam chet script (phong console Windows ky quac)."""
+    try:
+        print(msg)
+    except Exception:
+        try:
+            print(str(msg).encode('ascii', 'replace').decode('ascii'))
+        except Exception:
+            pass
 
 
 def api(store, key, sec, path):
@@ -149,7 +168,7 @@ def main():
     push = '--push' in sys.argv
     cred = json.load(open(CRED))
     store, key, sec = cred['store'], cred['api_key'], cred['api_secret']
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime.now(datetime.timezone.utc)
     dmin = (now - datetime.timedelta(days=MAX_DAYS)).strftime('%Y-%m-%dT%H:%M:%SZ')
     orders = fetch_orders(store, key, sec, dmin)
 
@@ -161,13 +180,13 @@ def main():
     with open(OUT, 'w', encoding='utf-8') as fh:
         json.dump(out, fh, ensure_ascii=False, indent=0)
     p7 = out['periods']['7']['basket']
-    print(f"OK -> sku-performance.json | {len(orders)} đơn/56 ngày | "
-          f"kỳ 7 ngày: {p7['n']} đơn, {len(out['periods']['7']['model_rows'])} mẫu, "
-          f"SP/đơn {p7['spdon']}, đơn>=2 {p7['pct2']}%")
+    log(f"OK -> sku-performance.json | {len(orders)} don/56 ngay | "
+        f"ky 7 ngay: {p7['n']} don, {len(out['periods']['7']['model_rows'])} mau, "
+        f"SP/don {p7['spdon']}, don>=2 {p7['pct2']}%")
 
     if push:
         if subprocess.run(['git', '-C', REPO, 'diff', '--quiet', '--', 'sku-performance.json']).returncode == 0:
-            print('Không có thay đổi — bỏ qua push.')
+            log('Khong co thay doi - bo qua push.')
             return
         subprocess.run(['git', '-C', REPO, 'add', 'sku-performance.json'], check=True)
         subprocess.run(['git', '-C', REPO, '-c', 'user.name=sync-bot',
@@ -175,7 +194,7 @@ def main():
                         'commit', '-m', f"Dong bo hieu suat SKU {out['generatedAt']} (tu dong)",
                         '--quiet'], check=True)
         subprocess.run(['git', '-C', REPO, 'push', 'origin', 'main', '--quiet'], check=True)
-        print('Đã push — Vercel sẽ tự deploy.')
+        log('Da push - Vercel se tu deploy.')
 
 
 if __name__ == '__main__':
