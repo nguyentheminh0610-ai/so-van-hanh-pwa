@@ -53,10 +53,13 @@ Kho in đơn lần cuối **16h**, nên bước 4-6 phải xong trước 16h.
 
 - Khách xác nhận **trước 14h** -> dùng Tin 2a (đi trong ngày).
 - Khách xác nhận **sau 14h** -> dùng Tin 2b (đi ngày mai).
-- Phiên tạo đơn: **mục tiêu chiều ~14-15h**. **CÒN MỞ:** chủ shop viết "khoảng
-  2h chiều" trong Tin 2a, trong khi phiên thiết kế là 15h. Cần chốt 1 giờ rồi
-  sửa cho khớp tin nhắn (nếu 14h thì giờ chốt khách và hạn duyệt lần 1 phải sớm
-  hơn).
+- Phiên tạo đơn: **15h** (chủ shop chốt 17/11/2026). Chủ shop duyệt lần 1 xong
+  trước 15h (tối thiểu còn ~40 phút kể từ lúc task ping, vì task CSKH chạy 20
+  phút/lần); Telegram nhắc lại lúc 14h30 và 14h50. Quá 15h chưa duyệt thì case
+  trượt sang phiên ngày mai, cần tin xin lỗi ngắn gửi khách (chủ shop duyệt câu
+  chữ trước). Nếu 40 phút là sát thì dời giờ chốt khách xuống 13h30.
+  Tin 2a ghi "khoảng 3h chiều nay" cho khớp (chủ shop đã chốt 3h, thay cho "2h"
+  trong bản nháp đầu).
 
 ## Mẫu tin nhắn khách (chủ shop chốt 17/11/2026)
 
@@ -84,7 +87,7 @@ Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn x
 **Tin 2a** (khách xác nhận trước 14h):
 
 ```
-Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, khoảng 2h chiều nay shop sẽ tạo đơn và cho hàng đi trong ngày, có mã vận đơn shop gửi bạn liền nhé ạ.
+Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, khoảng 3h chiều nay shop sẽ tạo đơn và cho hàng đi trong ngày, có mã vận đơn shop gửi bạn liền nhé ạ.
 ```
 
 **Tin 2b** (khách xác nhận sau 14h):
