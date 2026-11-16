@@ -65,3 +65,13 @@ tooltip tên đầy đủ) → "Xác nhận". Tìm sản phẩm bằng `?query=<
 - "Liên kết tự động" an toàn bỏ qua SKU trùng giữa nhiều sản phẩm sàn (Sapo báo ~32 biến thể trùng SKU) →
   với mã dùng chung nhiều sản phẩm (DADO/DADEN…) phải nối thủ công. Danh sách kết quả trong ô tìm của icon
   "liên kết thủ công" thay đổi vị trí theo dòng; luôn chụp ảnh trước khi bấm Xác nhận.
+- Kiểm toàn bộ 17/11/2026 (xuất lại bảng liên kết TikTok 02:09 + Shopee 01:46, đọc thành phần thật 221 combo `CB-…` qua
+  `/admin/combos/<id>.json`): 0 liên kết sai ở quần lông/caro/Dài+Short, mọi combo đúng thành phần theo mã. TikTok Dài+Short
+  (9 biến thể M/L/XL của Shin 01/02/04) từng có SKU mà CHƯA nối → đã "Cập nhật ngay" kênh TikTok rồi chủ shop nối (An toàn),
+  kiểm lại: 9/9 nối đúng, không dòng khác đổi. Bài học: tạo combo mới xong phải nối CẢ HAI sàn, không chỉ Shopee.
+- Cách kiểm đơn thật (đủ nhanh): trong tab Sapo đã đăng nhập `fetch('/admin/orders.json?limit=250&created_on_min=..&created_on_max=..')`
+  chia cửa sổ 12 giờ (phân trang quá trang 1 hay lỗi 500); dòng đơn sàn không có `variant_id` = KHÔNG trừ kho. Đơn Dài+Short
+  trước 16/11 (TikTok 5/11 CT08-M, Shopee 12/11 CT08-L, 15/11 CT09-L) chưa trừ kho → chủ shop trừ tay thành phần.
+- Dài+Short chỉ có M/L/XL: SKU `CT08/09/10-S|XXL|XXXL` và `QS-CT-0x-S` KHÔNG tồn tại trên Sapo (không có hàng) — biến thể sàn
+  tương ứng để không nối, không phải lỗi.
+
