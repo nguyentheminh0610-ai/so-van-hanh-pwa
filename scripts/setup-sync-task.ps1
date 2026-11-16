@@ -29,9 +29,12 @@ Write-Host "Script sync: $SyncFile"
 Write-Host "Ten task   : $TaskName"
 Write-Host ""
 
+# Qua wscript //B (run-hidden.vbs) thay vi powershell -WindowStyle Hidden: cach cu
+# van nhay 1 cua so console, lam game fullscreen bi day ra (chot 31/10/2026).
+$HiddenVbs = Join-Path $PSScriptRoot "run-hidden.vbs"
 $action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$SyncFile`"" `
+    -Execute "wscript.exe" `
+    -Argument "//B //Nologo `"$HiddenVbs`" `"$SyncFile`"" `
     -WorkingDirectory $RepoDir
 
 # Chay ngay, sau do lap lai moi 15 phut, keo dai 10 nam (coi nhu vinh vien).
