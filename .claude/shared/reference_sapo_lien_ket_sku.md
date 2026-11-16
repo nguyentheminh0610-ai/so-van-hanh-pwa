@@ -28,7 +28,12 @@ tooltip tên đầy đủ) → "Xác nhận". Tìm sản phẩm bằng `?query=<
 - Lỗi hay gặp: SKU người bán trên sàn bị chép/lệch size (vd. mọi size đều `DADEN-M`). Sửa liên kết ở Sapo
   vẫn cần sửa luôn SKU người bán trên sàn (Excel chỉnh sửa hàng loạt) để tự động liên kết sau này không quay lại sai.
 
-## Đã sửa 16/11/2026 (TikTok)
-`Chất Dạ Đen Cao Cấp` L/XL/XXL (từng nối DADEN-M), `Xanh Lá 03` XXL, `Đỏ 04` L/XL — đã nối đúng mã.
-Còn: TikTok Thỏ Nơ L/XL/XXL (đang lệch lên 1 size), Shopee "Chất Dạ Đỏ/Đen Cao Cấp" (sản phẩm 26965417538,
-nghi đảo màu — chờ chủ shop xác nhận hướng), Caro 2XL chưa có combo trên Sapo.
+## Đã sửa 16/11/2026
+- TikTok: `Chất Dạ Đen Cao Cấp` L/XL/XXL (từng nối DADEN-M), `Xanh Lá 03` XXL, `Đỏ 04` L/XL — đã nối đúng mã.
+- Shopee sản phẩm 26965417538 ("Chất Dạ Đỏ/Đen Cao Cấp", chủ shop xác nhận "Đỏ" là quần đỏ): SKU trên Shopee
+  đã đổi lại (Đỏ→DADO-*, Đen→DADEN-*) và 8 biến thể đã nối lại đúng trong Sapo. Trước đó đảo màu, nên các đơn
+  "Đỏ" đã trừ nhầm kho "Đen" (Shopee đang giữ 12/11/10 đơn Đỏ XXL/XL/L trong khi kho DADO chỉ còn 4/10/8).
+- Chưa làm: TikTok Thỏ Nơ L/XL/XXL (đang lệch lên 1 size), sửa SKU người bán ghi sai trên TikTok, Caro 2XL chưa có combo.
+- "Liên kết tự động" an toàn bỏ qua SKU trùng giữa nhiều sản phẩm sàn (Sapo báo ~32 biến thể trùng SKU) →
+  với mã dùng chung nhiều sản phẩm (DADO/DADEN…) phải nối thủ công. Danh sách kết quả trong ô tìm của icon
+  "liên kết thủ công" thay đổi vị trí theo dòng; luôn chụp ảnh trước khi bấm Xác nhận.
