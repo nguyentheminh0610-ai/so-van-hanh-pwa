@@ -1,5 +1,6 @@
 # Runner cho task "Claude - Don chua lay" (goi boi scripts\setup-don-chua-lay-task.ps1).
-# Chi DOC Sapo -> liet ke don tao truoc 16:00 ma hang van chuyen chua lay -> gui Telegram.
+# Chi DOC Sapo -> liet ke don tao truoc 16:00 ma hang van chuyen chua lay -> ghi log.
+# Chot 17/11/2026: KHONG gui bao cao hang ngay len Telegram, chi bao khi script LOI.
 # Khong ghi gi len Sapo/Supabase, khong commit/push. Log: logs\don-chua-lay.log
 $ErrorActionPreference = "Continue"
 $Repo = Split-Path -Parent $PSScriptRoot
@@ -16,4 +17,4 @@ $Log = Join-Path $LogDir "don-chua-lay.log"
 
 # Ghi log qua cmd de giu nguyen byte UTF-8 (PowerShell 5.1 pipe se lam vo dau tieng Viet).
 $pyExe = $py.Source
-cmd /c "echo ===== $(Get-Date -Format 'yyyy-MM-dd HH:mm') ===== >> `"$Log`" & `"$pyExe`" tools\check_don_chua_lay.py --telegram >> `"$Log`" 2>&1"
+cmd /c "echo ===== $(Get-Date -Format 'yyyy-MM-dd HH:mm') ===== >> `"$Log`" & `"$pyExe`" tools\check_don_chua_lay.py --telegram-loi >> `"$Log`" 2>&1"

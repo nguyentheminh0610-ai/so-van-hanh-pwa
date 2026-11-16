@@ -77,9 +77,15 @@ trên Seller Center (`seller-vn.tiktok.com/order/detail?order_no=<mã>`):
 - Chủ shop chốt 20:00 thay cho 19:00 ban đầu "cho chắc chắn": bù độ trễ Sapo
   (tối đa đo được ~1,5 giờ) so với lượt shipper cuối ~16:30–18:00.
 - Phạm vi: đơn Shopee + TikTok tạo trước 16:00 hôm đó, lùi 10 ngày, ~17 request.
+- **Chốt 17/11/2026 (thay cho ý định ban đầu "gửi danh sách lên Telegram mỗi
+  tối"):** chủ shop KHÔNG cần báo cáo hằng ngày — "bao giờ cần thì a bảo e làm,
+  nếu có lỗi thì mới cần báo". Vì vậy task 20:00 chạy `--telegram-loi`: danh
+  sách chỉ ghi vào log, Telegram chỉ nhận tin khi script LỖI. Khi chủ shop hỏi
+  "đơn nào chưa lấy" thì chạy tay `python tools/check_don_chua_lay.py` rồi trả
+  lời trong chat. Đừng tự bật lại báo cáo hằng ngày.
 - Telegram: script đọc `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` hoặc file cục bộ
-  `~/.config/telegram/credentials.json` (ngoài repo). Ngày 16/11 PC CHƯA có cả
-  hai nên task mới chỉ ghi log, chưa gửi được.
+  `~/.config/telegram/credentials.json` (ngoài repo). Ngày 17/11 PC CHƯA có cả
+  hai nên kể cả tin báo lỗi cũng mới chỉ nằm trong log.
 
 ## Còn thiếu
 

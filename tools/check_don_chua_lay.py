@@ -15,6 +15,9 @@ Cách xác định (kiểm thật 16/11/2026, xem
 
 Chạy tay (chỉ in ra màn hình):   python tools/check_don_chua_lay.py
 Gửi Telegram:                    python tools/check_don_chua_lay.py --telegram
+Chỉ báo Telegram khi LỖI:        python tools/check_don_chua_lay.py --telegram-loi
+  (task 20:00 dùng kiểu này — chủ shop chốt 17/11/2026: không cần báo cáo hằng
+   ngày, khi nào cần thì bảo chạy; chỉ báo khi có lỗi.)
   (cần biến môi trường TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID; khoá Sapo đọc từ
    ~/.config/sapo/credentials.json — không để trong repo.)
 """
@@ -133,7 +136,7 @@ def main():
     except Exception as e:  # lỗi thì vẫn phải báo, không im lặng coi như "không có đơn"
         msg = '⚠ Check đơn chưa lấy (Sapo) LỖI lúc %s: %s' % (now.strftime('%d/%m %H:%M'), e)
         print(msg)
-        if '--telegram' in sys.argv:
+        if '--telegram' in sys.argv or '--telegram-loi' in sys.argv:
             gui_telegram(msg)
         sys.exit(1)
     print(msg)
