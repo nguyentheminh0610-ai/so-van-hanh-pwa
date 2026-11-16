@@ -1,11 +1,12 @@
 # Luồng gửi bù mới: duyệt 2 lần + tạo đơn gom 1 phiên/ngày (chốt 17/11/2026)
 
-**Trạng thái (17/11/2026): ĐÃ CHỐT THIẾT KẾ + MẪU TIN; ĐÃ VIẾT** SQL bảng
-`resend_cases` (`scripts/resend-tables.sql`) và tab "Gửi bù" trong Sổ Vận Hành
-(`resend.js`) — **CHƯA** viết phần task/skill ghi vào bảng, và chủ shop cần chạy
-file SQL trên Supabase trước khi tab đọc được. Cho tới khi task/skill được sửa
-xong, luồng cũ trong SKILL.md (hỏi chủ shop "ok" rồi mới bấm Tạo đơn) vẫn là
-luồng đang chạy. Chỉ dùng **mẫu tin dưới đây** ngay được.
+**Trạng thái (17/11/2026): ĐÃ TRIỂN KHAI, CHƯA CHẠY THẬT CASE NÀO.** Có: SQL
+`scripts/resend-tables.sql` (chủ shop đã chạy trên Supabase), tab "Gửi bù"
+(`resend.js`), quy trình [resend-collect-verify.md](resend-collect-verify.md) (4 task
+CSKH đã trỏ vào), [resend-run-1500.md](resend-run-1500.md) (task `resend-create-1500`
+cron 15:00 & 15:20, `resend-finalize-1545` cron 15:45 & 18:45). Task nằm ở
+`C:\Users\Admin\.claude\scheduled-tasks\` (ngoài git). Chưa thử đủ vòng với khách thật:
+chưa rõ task chạy nền xử lý được hộp "Giữ thông tin bí mật" của TikTok khi gửi tin có SĐT.
 
 Lý do làm: hôm 16/11/2026 chủ shop và Claude làm tay 2 case (`q.a.n.h_`,
 `_phuonganh1811`), chủ shop muốn có cơ chế phát hiện + duyệt tập trung, ổn
@@ -102,12 +103,9 @@ Lý do chọn câu "đơn vị vận chuyển đã qua giờ lấy hàng" cho 2b
 đổ lỗi cho ai, không nhắc tới kho. Tin 2b lúc quá 0h thì đổi "ngày mai" thành
 "hôm nay (ngày ...)".
 
-## Đã bàn nhưng chưa làm
+## Chưa làm / cần theo dõi
 
-- Sửa skill/task CSKH để ghi `resend_cases` (phát hiện, chốt dữ liệu, ping
-  Telegram) + task phiên 15h tạo đơn. Bảng và tab web đã có (17/11/2026).
-  Quy ước ghi: xem chú thích trạng thái trong `scripts/resend-tables.sql`.
-- Sửa `scripts/order_to_tracking.sh` (`python3` trên Windows trả về stub
-  WindowsApps nên báo sai "không tìm thấy trong Sapo").
-- Bucket `notices-pdf` đang public mà tem có tên/SĐT/địa chỉ khách (rủi ro có
-  sẵn, chủ shop chưa quyết).
+- Chạy thử toàn vòng với 1 case thật rồi chỉnh quy trình theo thực tế.
+- Tin xin lỗi khi case trượt qua 15h (chưa có câu chữ chốt nên task không tự gửi).
+- Bucket `notices-pdf` đang public mà tem có tên/SĐT/địa chỉ khách (chủ shop chưa quyết).
+- Sapo không tự trừ tồn khi gửi bù trực tiếp qua SPX (chưa kiểm).
