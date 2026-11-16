@@ -13,12 +13,20 @@
 set -u
 CRED="$HOME/.config/sapo/credentials.json"
 [ -f "$CRED" ] || { echo "Thiếu $CRED"; exit 1; }
+# Chọn python chạy được (17/11/2026): trên Windows "python3" trong Git Bash hay là
+# stub WindowsApps (không chạy được → script báo sai "KHÔNG TÌM THẤY TRONG SAPO"),
+# và python Windows không đọc được đường dẫn kiểu /c/Users/... nên đổi sang C:/...
+PY=python3
+$PY -c "import sys" >/dev/null 2>&1 || PY=python
+$PY -c "import sys" >/dev/null 2>&1 || { echo "Không có python chạy được"; exit 1; }
+CREDPY="$CRED"
+command -v cygpath >/dev/null 2>&1 && CREDPY=$(cygpath -m "$CRED")
 
 # BẪY: trường "store" ĐÃ gồm đuôi .mysapo.net — đừng nối thêm.
-STORE=$(python3 -c "import json;print(json.load(open('$CRED'))['store'])")
-AUTH=$(python3 -c "
+STORE=$($PY -c "import json;print(json.load(open('$CREDPY'))['store'])")
+AUTH=$($PY -c "
 import json,base64
-c=json.load(open('$CRED'))
+c=json.load(open('$CREDPY'))
 print(base64.b64encode((c['api_key']+':'+c['api_secret']).encode()).decode())")
 # BẪY: Cloudflare chặn nếu không giả User-Agent Chrome; urllib bị SSL
 # handshake failure trên máy này nên phải dùng curl.
@@ -34,7 +42,7 @@ for CODE in "$@"; do
   TRACK=$(curl -s --max-time 60 \
       -H "Authorization: Basic $AUTH" -H "User-Agent: $UA" -H "Accept: application/json" \
       "https://$STORE/admin/orders.json?query=$CODE&limit=5" \
-    | python3 -c "
+    | $PY -c "
 import sys,json
 try: orders=json.load(sys.stdin).get('orders',[])
 except Exception: orders=[]
@@ -55,7 +63,7 @@ print(','.join(dict.fromkeys(out)))")
     for T in ${TRACK//,/ }; do
       W=$(curl -s -H "apikey: $KEY" -H "Authorization: Bearer $KEY" \
             "$SB/warehouse_outbound_checks?code=eq.$T&select=staff,scan_date" \
-          | python3 -c "
+          | $PY -c "
 import sys,json
 r=json.load(sys.stdin)
 print(f\"{r[0]['staff']} ({r[0]['scan_date']})\" if r else '')")

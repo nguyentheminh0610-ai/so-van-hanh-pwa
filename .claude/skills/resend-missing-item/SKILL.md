@@ -29,7 +29,29 @@ Trigger:
   pastes an order screenshot with a missing-item context, or says "gửi bù"
   for an order.
 
-## Hard rule: confirm before clicking "Tạo đơn" on SPX
+## ✅ LUỒNG HIỆN HÀNH (từ 17/11/2026) — đọc trước, thay cho phần "Hard rule" và Step 0 dưới đây
+
+Chủ shop chốt: **duyệt 2 lần trên tab "Gửi bù" của Sổ Vận Hành** (bảng Supabase
+`resend_cases`) và **tạo đơn SPX gom 1 phiên/ngày lúc 15h**. Chi tiết:
+
+| Việc | Ai làm | Tài liệu |
+|---|---|---|
+| Phát hiện, hỏi thông tin, gửi tin xác minh, chốt dữ liệu, ping Telegram | task **CSKH inbox** (4 task) | [resend-collect-verify.md](references/resend-collect-verify.md) |
+| Tạo đơn SPX, tải PDF, tự đối chiếu (15h, thử lại 15h20) | task `resend-create-1500` | [resend-run-1500.md](references/resend-run-1500.md) pha A |
+| Ghi Sổ Kho + nhắn khách sau khi chủ shop duyệt lần 2 (15h45, 18h45) | task `resend-finalize-1545` | [resend-run-1500.md](references/resend-run-1500.md) pha B |
+| Tổng quan, mẫu tin khách, quy tắc chống trùng | — | [resend-flow-batch-2026-11-17.md](references/resend-flow-batch-2026-11-17.md) |
+
+Hệ quả cần nhớ:
+- **Task CSKH KHÔNG tạo đơn SPX**, không xin "ok" qua Telegram/PushNotification nữa
+  (cơ chế "ok <mã đơn>" cũ bị bỏ). Sự đồng ý của chủ shop = nút Duyệt trên web.
+- Các Step 1b/2/2b/3/4/5 bên dưới vẫn là **hướng dẫn thao tác chi tiết** (tìm đơn,
+  ghép SĐT, form SPX, Sổ Kho, ảnh chụp đơn), nhưng mẫu tin xin thông tin / xác minh
+  / sau xác nhận lấy ở file flow-batch (đã đổi giọng văn 17/11/2026).
+- Dùng tay khi chủ shop nhờ trực tiếp trong chat ("gửi bù cho khách X"): vẫn làm
+  như hôm 16/11 được, nhưng **nên mở dòng `resend_cases`** để tab web và chống trùng
+  thấy case này.
+
+## (CŨ — đã thay bằng luồng hiện hành ở trên) Hard rule: confirm before clicking "Tạo đơn" on SPX
 
 Creating the SPX shipment submits the customer's personal data (phone,
 address) and is a real shipment the shop pays for. Fill in the whole form,
