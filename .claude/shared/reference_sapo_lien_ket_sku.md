@@ -52,8 +52,16 @@ tooltip tên đầy đủ) → "Xác nhận". Tìm sản phẩm bằng `?query=<
 - Shopee: "Liên kết tự động" không có lựa chọn an toàn/rủi ro như TikTok, và chế độ "sản phẩm trên trang này" có thể trả 0
   thành công dù SKU khớp. Phải chọn "Sản phẩm trên gian hàng" (hệ thống hiện cảnh báo SKU trùng, giữ mặc định "Chỉ liên kết
   SKU duy nhất (An toàn)"). Combo mới tạo cần "Cập nhật ngay" (kênh Shopee) trước khi nối.
-- Shopee còn biến thể trống SKU (16/11/2026): Combo Caro Hồng+Xanh M/L/XL/2XL, Kuromi S, 3XL của Kuromi/Kitty/Vịt Xanh/Lợn Hồng,
-  Kitty S. Sản phẩm đặt trước 42574064538 và các mặt hàng ngừng bán: chủ shop bảo bỏ qua.
+- Shopee biến thể từng trống SKU (16/11/2026) — ĐÃ ĐIỀN SKU cùng ngày: Combo Caro Hồng+Xanh M/L/XL/2XL
+  (`CB-CL11CL12-M-M/-L-L/-XL-XL/-XXL-XXL`, sp 47569488977), `CL05-S`/`CL05-XXXL` (Kuromi), `CL02-XXXL` (Kitty),
+  `CL03-XXXL` (Vịt Xanh), `CL04-XXXL` (Lợn Hồng), `CL02-S` (Kitty, sp 40377466450). Đã "Cập nhật ngay" bên Sapo;
+  còn chờ chủ shop bấm "Liên kết tự động" (Sản phẩm trên gian hàng, An toàn) để nối. Sản phẩm đặt trước 42574064538 và
+  12 biến thể ngừng bán (Flannel Đen 01, "5 Tất"…): chủ shop bảo bỏ qua, KHÔNG sửa.
+- Tồn bất thường đã giải thích (16/11/2026, chủ shop xác nhận): 56 combo `CBHH…` biến mất do chủ shop tự xoá; tồn âm
+  (CL01-S, CL06-L) do chủ shop tự chỉnh kho rồi đơn trừ tiếp — KHÔNG phải lỗi liên kết.
+- Nghi nhập kho trùng: `REI00102` (9/11) và `REI00103` (10/11), cùng nhà cung cấp, cùng CL06-XXXL ×20 + CL06-XXL ×23
+  → có thể tồn CL06-3XL/2XL thừa 20/23. Chủ shop tự đối chiếu phiếu giao hàng (Sapo → Kho → Nhập hàng). `REI00099` là
+  hợp lệ (số lượng khác nhau từng size), không trùng.
 - "Liên kết tự động" an toàn bỏ qua SKU trùng giữa nhiều sản phẩm sàn (Sapo báo ~32 biến thể trùng SKU) →
   với mã dùng chung nhiều sản phẩm (DADO/DADEN…) phải nối thủ công. Danh sách kết quả trong ô tìm của icon
   "liên kết thủ công" thay đổi vị trí theo dòng; luôn chụp ảnh trước khi bấm Xác nhận.
