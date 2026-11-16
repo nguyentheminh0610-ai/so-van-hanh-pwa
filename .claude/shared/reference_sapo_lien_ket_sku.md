@@ -40,7 +40,20 @@ tooltip tên đầy đủ) → "Xác nhận". Tìm sản phẩm bằng `?query=<
   duyệt điền "Quốc gia xuất xứ" = Việt Nam; "Tên tổ chức chịu trách nhiệm hàng hóa" + "Địa chỉ…" = "Sometime"
   (đúng giá trị các sản phẩm khác của shop đang dùng). Sau đó upload thành công, SKU L/XL/XXL = DADEN-L/XL/XXL,
   khớp liên kết Sapo (4/4).
-- Chưa làm: Caro 2XL chưa có combo trên Sapo (61 combo thiếu).
+- Combo mới tạo trên Sapo 16/11/2026 (đã kiểm đủ thành phần): 61 combo Caro 2XL / Shin 02 (2XL–3XL) / Shin 03 (S–3XL)
+  / Shin 01+02+03+Patrick ghép size mới, và 9 combo Dài+Short `CB-CT08QS01`, `CB-CT09QS02`, `CB-CT10QS04` (M/L/XL).
+  Ghép thành phần: CT08↔`QS-CT-01`, CT09↔`QS-CT-02`, CT10↔`QS-CT-04` (mã short `QS-CT-0x-<size>` CÓ sẵn trên Sapo).
+  Dài+Short chỉ có M/L/XL; S/XXL/3XL trên Shopee để trống vì không có hàng.
+- Cách tạo combo hàng loạt: trong tab Sapo đã đăng nhập, `fetch` cùng miền: POST `/admin/products.json` (1 biến thể, SKU = mã combo,
+  `type:'normal'`, `inventory_management:'bizweb'`) rồi POST `/admin/combos.json` với
+  `{combo:{variant_id, combo_items:[{inventory_item_id, variant_id, sku, quantity}]}}`. Cùng size → 1 thành phần quantity 2.
+  Giá = 338.000 nếu có CL01/06/07/08, 310.000 các mã khác (giá so sánh 420.000); Dài+Short = 168.000. Tạo 1 cái thử, kiểm
+  `/admin/combos/<variantId>.json` rồi mới chạy cả loạt.
+- Shopee: "Liên kết tự động" không có lựa chọn an toàn/rủi ro như TikTok, và chế độ "sản phẩm trên trang này" có thể trả 0
+  thành công dù SKU khớp. Phải chọn "Sản phẩm trên gian hàng" (hệ thống hiện cảnh báo SKU trùng, giữ mặc định "Chỉ liên kết
+  SKU duy nhất (An toàn)"). Combo mới tạo cần "Cập nhật ngay" (kênh Shopee) trước khi nối.
+- Shopee còn biến thể trống SKU (16/11/2026): Combo Caro Hồng+Xanh M/L/XL/2XL, Kuromi S, 3XL của Kuromi/Kitty/Vịt Xanh/Lợn Hồng,
+  Kitty S. Sản phẩm đặt trước 42574064538 và các mặt hàng ngừng bán: chủ shop bảo bỏ qua.
 - "Liên kết tự động" an toàn bỏ qua SKU trùng giữa nhiều sản phẩm sàn (Sapo báo ~32 biến thể trùng SKU) →
   với mã dùng chung nhiều sản phẩm (DADO/DADEN…) phải nối thủ công. Danh sách kết quả trong ô tìm của icon
   "liên kết thủ công" thay đổi vị trí theo dòng; luôn chụp ảnh trước khi bấm Xác nhận.
