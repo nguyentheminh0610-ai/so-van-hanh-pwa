@@ -58,11 +58,31 @@ trong `warehouse_outbound_checks` của Sổ Kho); giờ ĐVVC lấy ≈ `issued
   1–1,7 giờ. Tối đa 101 phút. Không đơn nào Sapo ghi TRƯỚC khi SPX lấy.
 - Các đơn trễ hơn 1 giờ dồn vào ngày sale 11/11.
 
-**TikTok / J&T:** mới 1 đơn (trễ ~11 phút). Chưa đo hàng loạt — trang tra cứu
-J&T đòi số điện thoại người nhận, Sapo chỉ có số đã che.
+**TikTok / J&T — 32 đơn (4 đơn/ngày, 9–16/11)**, so `issued_on` với dòng "Đơn
+vị vận chuyển đã tiếp nhận kiện hàng" trong "Thông tin kho vận" của từng đơn
+trên Seller Center (`seller-vn.tiktok.com/order/detail?order_no=<mã>`):
+- Trễ 7–13 phút ở 27/32 đơn; trung vị 11 phút, trung bình 17 phút.
+- 5 đơn trễ hơn: 19, 28, 52, 90, 93 phút — 4/5 đơn là ngày sale 11/11.
+- Không đơn nào Sapo ghi TRƯỚC khi J&T nhận.
+- Trang tra cứu công khai của J&T đòi SĐT người nhận (Sapo chỉ có số đã che)
+  nên phải đọc qua Seller Center. Lưu ý khi đọc bằng script: sau dấu phẩy
+  trong "16:30:40, 16/11/2026" là ký tự NBSP (mã 160), không phải dấu cách.
+
+## Job chạy thật (chốt 16/11/2026)
+
+- Script: `tools/check_don_chua_lay.py` (chỉ đọc Sapo; `--telegram` để gửi).
+- Lịch: Windows Task Scheduler **"Claude - Don chua lay"**, **20:00 hằng ngày**
+  trên PC trực (cài bằng `scripts/setup-don-chua-lay-task.ps1`, runner
+  `scripts/run-don-chua-lay.ps1`, log `logs/don-chua-lay.log`).
+- Chủ shop chốt 20:00 thay cho 19:00 ban đầu "cho chắc chắn": bù độ trễ Sapo
+  (tối đa đo được ~1,5 giờ) so với lượt shipper cuối ~16:30–18:00.
+- Phạm vi: đơn Shopee + TikTok tạo trước 16:00 hôm đó, lùi 10 ngày, ~17 request.
+- Telegram: script đọc `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` hoặc file cục bộ
+  `~/.config/telegram/credentials.json` (ngoài repo). Ngày 16/11 PC CHƯA có cả
+  hai nên task mới chỉ ghi log, chưa gửi được.
 
 ## Còn thiếu
 
-- Chưa đối chiếu 3 ngày lúc 19:00 với Seller Center (độ trễ có ổn định không,
-  có ngày nào Sapo đồng bộ chậm hàng giờ không).
-- Chưa viết job 19:00, chưa nối vào Sổ Kho.
+- Chưa đối chiếu danh sách đủ 3 ngày với Seller Center (mới kiểm 3 đơn "chờ
+  lấy" ngày 16/11 + đo độ trễ 111 đơn).
+- Chưa nối vào Sổ Kho.
