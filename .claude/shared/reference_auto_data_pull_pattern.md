@@ -63,6 +63,13 @@ không phải `<a href>`; link cũ `export_task/list` hết chữ ký thì trả
   profile script). Bản này gọi API nội bộ qua trang (mượn chữ ký phiên) thay
   vì tải file — cùng nguyên tắc 0-token-trên-PC; nếu API đổi thì chuyển sang
   bấm Export tải file.
+  **Cập nhật 17/11/2026 — vì sao mục "Cần anh xử lý" từng đứng yên:** nó đọc
+  `koc_scores.trang_thai_mau`, cột chỉ được ghi 1 lần lúc seed chép tay 29/10, và
+  task Scheduler của KOC chưa từng được tạo (Playwright cũng chưa cài). Đã sửa:
+  `koc_auto_sync.py` giờ kéo thêm hàng mẫu đang mở (API `sample/group/list`, tab
+  20/30 = đang giao, 40 = đã nhận chưa đăng) → bảng `koc_sample_requests`
+  (`scripts/koc-sample-requests.sql`, chạy 1 lần trên Supabase). Task
+  `Claude - Dong bo KOC` chạy 09:00 + 16:00 hằng ngày, 0 token.
 - **Báo cáo tháng + tuần Shopee/TikTok → Drive + Sổ Vận Hành:** ĐÃ dựng xong bộ
   tải file (31/10), xem [reference_tai_file_tu_dong.md](reference_tai_file_tu_dong.md)
   — `tools/chay_tai_file.py` (orchestrator) + `tai_file_san.py` (Playwright tải) +
