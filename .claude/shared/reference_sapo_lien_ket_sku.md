@@ -55,7 +55,7 @@ tooltip tên đầy đủ) → "Xác nhận". Tìm sản phẩm bằng `?query=<
 - Shopee biến thể từng trống SKU (16/11/2026) — ĐÃ ĐIỀN SKU cùng ngày: Combo Caro Hồng+Xanh M/L/XL/2XL
   (`CB-CL11CL12-M-M/-L-L/-XL-XL/-XXL-XXL`, sp 47569488977), `CL05-S`/`CL05-XXXL` (Kuromi), `CL02-XXXL` (Kitty),
   `CL03-XXXL` (Vịt Xanh), `CL04-XXXL` (Lợn Hồng), `CL02-S` (Kitty, sp 40377466450). Đã "Cập nhật ngay" bên Sapo;
-  còn chờ chủ shop bấm "Liên kết tự động" (Sản phẩm trên gian hàng, An toàn) để nối. Sản phẩm đặt trước 42574064538 và
+  chủ shop bấm "Liên kết tự động" (Sản phẩm trên gian hàng, An toàn) và đã NỐI + kiểm file xuất 17/11/2026 01:46: 10/10 nối đúng mã, 749→759 dòng, các dòng khác không đổi. Còn lại không nối: Quần Dài thun CT08/09/10 S, 2XL, 3XL (SKU không có trên Sapo, không có hàng) và hàng ngừng bán. Sản phẩm đặt trước 42574064538 và
   12 biến thể ngừng bán (Flannel Đen 01, "5 Tất"…): chủ shop bảo bỏ qua, KHÔNG sửa.
 - Tồn bất thường đã giải thích (16/11/2026, chủ shop xác nhận): 56 combo `CBHH…` biến mất do chủ shop tự xoá; tồn âm
   (CL01-S, CL06-L) do chủ shop tự chỉnh kho rồi đơn trừ tiếp — KHÔNG phải lỗi liên kết.
