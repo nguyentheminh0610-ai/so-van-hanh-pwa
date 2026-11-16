@@ -49,6 +49,18 @@ Trường dùng: sàn = `source_name` (`tiktokshop` | `shopee`); mã đơn sàn 
 `source_identifier`; mã vận đơn = `fulfillments[].tracking_number` (khớp `code`
 trong `warehouse_outbound_checks` của Sổ Kho); giờ ĐVVC lấy ≈ `issued_on`.
 
+## Độ trễ Sapo so với hãng (đo 16/11/2026)
+
+**Shopee / SPX — 79 đơn ngẫu nhiên 9–16/11**, so `issued_on` với mốc SPX
+`F100 Pickup From Domestic Seller` (tra công khai:
+`https://spx.vn/shipment/order/open/order/get_order_info?spx_tn=<mã>&language_code=vi`):
+- 60/79 đơn trễ dưới 15 phút (trung vị 0 phút), 7 đơn 15–60 phút, 12 đơn
+  1–1,7 giờ. Tối đa 101 phút. Không đơn nào Sapo ghi TRƯỚC khi SPX lấy.
+- Các đơn trễ hơn 1 giờ dồn vào ngày sale 11/11.
+
+**TikTok / J&T:** mới 1 đơn (trễ ~11 phút). Chưa đo hàng loạt — trang tra cứu
+J&T đòi số điện thoại người nhận, Sapo chỉ có số đã che.
+
 ## Còn thiếu
 
 - Chưa đối chiếu 3 ngày lúc 19:00 với Seller Center (độ trễ có ổn định không,
