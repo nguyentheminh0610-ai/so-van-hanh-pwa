@@ -124,12 +124,17 @@ Nhập KOC).
 
 ### Conditional formatting (don't need to touch, just context)
 
-- Yellow "cần xử lý": `=AND($E2<>"";OR($G2="";$G2="Chưa bấm duyệt mẫu"))`
-- Green "Đã duyệt": `=$G2="Đã duyệt"`
-- Gray "Đã từ chối": `=$G2="Đã từ chối"`
-- Search highlight: `=AND(TRIM($P$1)<>"";TRIM($B2)=TRIM($P$1))` — uses
-  `TRIM()` specifically because `$P$1` has held a stray space character
-  before, which broke a naive `<>""` check (matched every blank row).
+**Chốt 2026-11-16:** cả 2 tab đã dựng sẵn format + dropdown + công thức đến
+**dòng 3000**, luật tô màu phủ hết tab (không giới hạn dòng). Task chỉ ghi
+giá trị, xem SKILL.md Step 6 mục 5.
+
+- Book — Green "Đã duyệt": `=$G2="Đã duyệt"`; mọi trạng thái khác = trắng
+  (đã XOÁ luật vàng "cần xử lý" và xám "Đã từ chối" cũ cho đỡ lộn xộn).
+- Book — Search highlight (ưu tiên cao nhất): `=AND(TRIM($W$1)<>"";TRIM($B2)=TRIM($W$1))`
+  tô đỏ; ô W1 xanh nếu tìm thấy, hồng nếu không. Dùng `TRIM()` vì ô tìm từng
+  có ký tự khoảng trắng thừa làm `<>""` khớp mọi dòng trống.
+- Nhập KOC — Q1/R1 làm tương tự trên cột C; tô tím tên KOC trùng.
+- Công thức trong luật dùng dải mở `$C$2:$C` / `$B$2:$B` (không chặn ở dòng cố định).
 
 ## SKU dropdown source — tab "0.Danh mục SKU", column F (rows 2-45)
 

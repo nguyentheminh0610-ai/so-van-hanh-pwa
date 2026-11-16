@@ -183,7 +183,37 @@ asked:
    which case use `Chờ KOC phản hồi thêm mẫu` instead (see Step 5 table).
    **Never leave G blank** — the shop owner wants an explicit value they
    can scan for, not an implied "blank = pending".
-5. **Copy the whole row's formatting from the row directly above it** —
+5. **(CHỐT 2026-11-16 — thay cho quy tắc copy-format bên dưới) KHÔNG cần copy
+   format nữa; chỉ ghi GIÁ TRỊ vào đúng ô nhập.** Cả 2 tab đã được dựng sẵn
+   (format + dropdown + công thức + luật tô màu) từ dòng 2 đến **dòng 3000**,
+   nên dòng mới tự đúng format. Lý do: nhiều lần task chạy bỏ sót/làm hỏng
+   bước copyPaste (9/11 dòng 83–93 mất công thức; 11/11 các dòng 147+ của
+   Nhập KOC và 83+ của Book mất format/dropdown) → chủ shop phải nhờ sửa tay.
+   Quy tắc ghi sau này:
+   - **Nhập KOC**: chỉ ghi vào A (STT), B (ngày), C–I (số liệu). TUYỆT ĐỐI
+     không ghi/đè K, L, O, P (công thức đã có sẵn đến dòng 3000). Tìm "dòng
+     trống tiếp theo" theo **cột C**, KHÔNG theo K/L/O/P (các cột đó luôn có
+     công thức nên không bao giờ "trống"). KHÔNG dùng `append_values`/
+     `appendCells`/`insertDimension` (chèn dòng sẽ làm lệch/phá format) —
+     dùng `update_values` với range cụ thể.
+   - **Book**: chỉ ghi vào E, F, G (và I–P, R như mô tả ở koc-post-tracking).
+     Không ghi vào A–D, Q, S, T (công thức).
+   - Ghi bằng `update_values` thì số/ngày phải đúng kiểu: ngày ghi dạng
+     `DD/MM/YYYY`, % ghi dạng số thập phân (0.824) — format ô đã có sẵn.
+   - **Sau khi ghi, kiểm 1 lần**: đọc lại dòng vừa ghi bằng `get_spreadsheet`
+     (`includeGridData`, fields `dataValidation` + `userEnteredFormat.numberFormat`)
+     — E/F/G của Book phải có dropdown, cột H của Nhập KOC phải có
+     `0.0%`. Nếu thiếu: chạy lại copyPaste như mô tả cũ ở dưới (PASTE_FORMAT +
+     PASTE_DATA_VALIDATION + PASTE_FORMULA) từ 1 dòng "chuẩn" phía trên.
+   - **Gần hết chỗ dựng sẵn**: nếu dòng cần ghi > 2900, DỪNG và báo chủ shop
+     để dựng thêm (copy dòng 3000 xuống tiếp) — đừng tự ghi vào vùng chưa có format.
+   - **Tuyệt đối không xoá/chèn dòng, không "Clear formatting" trên 2 tab này.**
+   - Màu Book (chốt 2026-11-16): `Hành động = "Đã duyệt"` → cả dòng xanh lá;
+     mọi trạng thái khác → trắng, không tô. Đừng thêm luật tô vàng/xám lại.
+
+   *(Phần dưới đây là cách sửa cũ — chỉ dùng khi bước kiểm ở trên phát hiện thiếu.)*
+
+   **Copy the whole row's formatting from the row directly above it** —
    a plain value-write into a fresh row does NOT inherit the sheet's
    borders, background, font, or dropdowns, and leaves the row looking
    visibly broken (no grid lines, "Đã duyệt" rendered as plain black text
