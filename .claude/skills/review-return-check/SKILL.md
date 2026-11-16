@@ -73,6 +73,72 @@ version) but go reconcile the doc, the shop owner corrects this often.
    a live dispute. Don't reply to it yourself; flag it to the shop owner in
    the report instead.
 
+## ⭐ CƠ CHẾ CHUẨN (chốt 17/11/2026 — ĐỌC TRƯỚC, thắng mọi đoạn cũ bên dưới nếu mâu thuẫn)
+
+Chủ shop làm lại cơ chế vì Sổ Vận Hành báo "Hôm nay 0" trong khi job đã chết từ
+10/11 (xem "Chỉ chạy ở MỘT nơi" cuối mục này). Mục tiêu 2 việc:
+
+### A. Trả hàng — quét TẤT CẢ yêu cầu trả hàng, chia 2 nhóm
+
+Với mỗi yêu cầu **trả hàng/hoàn tiền** (cả TikTok lẫn Shopee) trong cửa sổ:
+
+| Nhóm | Là gì | Nhắn khách |
+|---|---|---|
+| **1 — lý do ẢNH HƯỞNG shop** | TikTok: thẻ KHÔNG có badge "Không phải lỗi người bán". Shopee: lý do ⚠️ trong [bảng phân loại](../../shared/reference_return_reason_fault_classification.md) | **2 tin liên tiếp:** (1) dòng 35/36 nhờ đổi lý do sang lý do có lợi shop; (2) dòng 25 hỏi lý do thật để shop cải thiện |
+| **2 — lý do KHÔNG ảnh hưởng shop** | TikTok: có badge xanh. Shopee: lý do ✅ | **1 tin:** dòng 25 (hỏi lý do để cải thiện) |
+
+- Đơn **huỷ trước khi lấy hàng / giao không thành công / hoàn do không giao được**
+  không phải khách yêu cầu trả hàng → chỉ ghi sổ, không nhắn, không báo.
+- Hard rule 3 giữ nguyên (thread đã có người nhắn → không nhắn thêm), nhưng
+  **việc BÁO SỔ bên dưới vẫn làm đủ**, không phụ thuộc có nhắn hay không.
+
+**Báo lên Sổ Vận Hành** (`needs_action = true`, luôn kèm `order_code` + `action_note`
+1 câu nêu lý do + chi tiết khách nói) cho 2 loại:
+1. Nhóm 1 → `action_type = 'tra_hang_anh_huong_shop'`.
+2. Nhóm 2 nhưng **lý do chi tiết** (ô "Nhận xét của khách hàng", lý do phụ, hoặc
+   nội dung chat nếu đã có sẵn) nói tới **sản phẩm** (lỗi, tuột chỉ, vải, màu/mẫu
+   không giống hình, form lệch...) hoặc **dịch vụ kho vận** (giao chậm, đóng gói
+   móp/ướt, giao nhầm/thiếu, shipper) → `action_type = 'tra_hang_noi_dung_sp_kho'`.
+Một case thuộc cả hai → dùng loại 1, ghi phần chi tiết sản phẩm/kho vận vào
+`action_note`. Nhóm 2 thuần "đổi ý / đặt sai size / không thích" → KHÔNG báo.
+Mục 4 (đề xuất ghi Sổ Kho `shop_error_kind`) vẫn làm cho mọi case như cũ.
+
+### B. Đánh giá — mọi sao đều đọc, báo theo 2 trường hợp
+
+Quét **tất cả** đánh giá mới trong cửa sổ (không chỉ hàng chờ 1–3★), mọi dòng ghi
+`cskh_reviews`, **bắt buộc có `order_code`** (mở chi tiết đánh giá để lấy mã đơn):
+1. **1–3★** → nhắn mẫu dòng 24 trong chat riêng (nếu thread untouched, KHÔNG phản
+   hồi công khai) và **báo sổ ngay**: `needs_action = true`,
+   `action_type = 'danh_gia_xau'`, `action_note` = ý chính khách phàn nàn.
+   **Không còn đợi mốc 12h** (chốt 17/11, thay cho quy tắc 29/10 "qua 12h khách
+   im mới báo") — chủ shop muốn thấy mọi đánh giá 1–3★ kèm mã đơn để tự xử lý.
+2. **4–5★ nhưng nội dung nói về vấn đề sản phẩm hoặc kho vận** (kể cả khen kèm
+   chê: "đẹp nhưng chỉ thừa", "giao hơi lâu", "đóng gói sơ sài") → `needs_action = true`,
+   `action_type = 'danh_gia_van_de'`, không nhắn khách. Chỉ bấm sao / khen thuần
+   → không báo.
+
+### C. Chạy 2 lần/ngày sao cho rẻ + bền
+
+1. **Bước đầu duy nhất trước khi mở sàn:** 1 lệnh curl lấy `cskh_returns` +
+   `cskh_reviews` 3 ngày gần nhất (`dedup_key,messaged_at,needs_action,acked_at`).
+   Case đã có dòng và đã xử lý thì **không mở lại thread, không đọc lại** —
+   khoản tiết kiệm token lớn nhất.
+2. Đọc danh sách bằng `get_page_text` 1 lần/trang, dừng ngay khi gặp case quá cửa sổ.
+3. **Bỏ hẳn bước "mở lại thread sau 12h để đọc"** (mục cũ bên dưới đã gạch).
+4. Telegram chỉ khi có `needs_action` mới hoặc khi bị chặn (xem "Sending the report").
+5. Bị chặn (Chrome mất đăng nhập, captcha, hết quyền) → vẫn ghi những gì đọc
+   được và Telegram 1 dòng nói bị chặn ở đâu, anh cần làm gì.
+
+### ⚠️ Chỉ chạy ở MỘT nơi (chốt 17/11/2026)
+
+Nguồn chạy duy nhất: **task của app Claude Desktop `review-return-check-twice-daily`**
+(08:00 & 20:00). **Windows Task Scheduler `Claude - Check danh gia tra hang`
+(gọi `claude -p` qua `run-job.ps1`) phải TẮT** — nó chết liên tục: 5–6/11 "org đã
+tắt quyền subscription cho Claude Code", 7/11 Chrome Shopee mất đăng nhập, 9/11
+hết quota tuần, **10–16/11 "OAuth session expired" 14/14 lượt thất bại**, Sổ Vận
+Hành không có dữ liệu mới từ 9/11. Bật cả hai cùng lúc = khách bị nhắn 2 lần.
+`scripts/setup-review-return-task.ps1` đã vô hiệu (không tạo lại task đó).
+
 ## Quick reference
 
 **Message templates** — Google Sheet "Chính sách xử lý lỗi SP, DV"
@@ -182,8 +248,10 @@ when you do.
 1. Open the reviews pending-reply queues (negative + neutral, both links
    above).
 2. For each, check the date — skip anything outside the window (default:
-   last 2 days). Positive reviews aren't checked (no pending-reply queue
-   for them).
+   last 2 days). **Từ 17/11/2026 đọc cả đánh giá 4–5★** (xem mục B ở đầu file):
+   dùng danh sách đánh giá chung của sàn (TikTok: trang rating, tab tất cả/đã
+   trả lời; Shopee: Đánh giá shop) chứ không chỉ hàng chờ trả lời. Nếu sàn không
+   cho xem được mục nào thì ghi rõ trong Telegram, đừng bỏ qua im lặng.
 3. Với mỗi đánh giá xấu mới: **vào phần TIN NHẮN (chat) với khách đó và
    nhắn mẫu dòng 24** (chủ shop chốt 2026-10-13). **TUYỆT ĐỐI KHÔNG bấm
    "Phản hồi"/"Trả lời" công khai dưới đánh giá** — phản hồi công khai là
@@ -193,37 +261,12 @@ when you do.
    breakdown + full verbatim text of negative ones and any positive ones
    with real insight (not just a star rating).
 
-#### Theo dõi 12h cho đánh giá xấu (chốt 29/10/2026)
+#### ~~Theo dõi 12h cho đánh giá xấu~~ — ĐÃ BỎ (17/11/2026)
 
-Chủ shop muốn: đánh giá xấu em nhắn mẫu dòng 24 xong, **nếu qua 12 tiếng khách
-vẫn chưa trả lời thì mới báo anh** lên Sổ Vận Hành để anh tự tìm tên khách trên
-TikTok nhắn hỗ trợ; **khách trả lời rồi thì thôi, không hiện gì.** Vì skill chạy
-08:00 & 20:00 (đúng 12h/lần) nên lượt sau chính là mốc kiểm.
-
-Mỗi lần chạy, với mỗi đánh giá 1–2★ đã có dòng trong `cskh_reviews`:
-
-- **`messaged_at` còn trống** (lần đầu gặp): nhắn mẫu dòng 24 như bước 3, ghi
-  `messaged_at` = giờ nhắn. **Chưa flag** — `needs_action = false`,
-  `action_type` null. Đang trong 12h chờ.
-- **`messaged_at` đã có, chưa flag, và `now >= messaged_at + 12h`**: **mở lại
-  đúng thread chat đó, CHỈ ĐỌC** (xem ngoại lệ Hard rule 1 bên dưới) — đừng
-  nhắn lại gì:
-  - Khách **chưa trả lời** → `needs_action = true`,
-    `action_type = 'lien_he_khach'`, `action_note` kiểu nêu trên. Cập nhật
-    `message_note` = "đã nhắn mẫu dòng 24 <giờ>, qua 12h khách chưa trả lời".
-  - Khách **đã trả lời nhưng còn bức xúc/đòi xử lý** → `needs_action = true`,
-    `action_type = 'tranh_chap'` (Hard rule 4).
-  - Khách **trả lời xã giao** ("ok", "cảm ơn", "dạ") → để nguyên
-    `needs_action = false`, `action_type` null. Ghi `message_note` = "khách
-    đã trả lời, ổn". Không flag.
-- **Đã flag rồi** (`needs_action = true` từ lượt trước): giữ nguyên, việc này
-  chờ chủ shop, đừng tự hạ cờ.
-- **Thread đã có người (chủ shop/NV) nhắn trước, khách chưa trả lời** — tức
-  mình gặp đánh giá xấu mà chat đã có tin của shop rồi (Hard rule 3: không
-  nhắn lại): coi như first-contact đã xong từ trước, **flag luôn không cần
-  đợi 12h** — `needs_action = true`, `action_type = 'lien_he_khach'`,
-  `message_note = "chủ shop/NV đã nhắn trước, khách chưa trả lời"`. Đây đúng
-  là tình huống đơn 586593929059403539 (chủ shop tự nhắn, khách im).
+Quy tắc cũ (29/10): nhắn mẫu 24 rồi chờ 12h, khách im mới báo. **Thay bằng:**
+1–3★ báo sổ ngay (`danh_gia_xau`), không mở lại thread để đọc. Hard rule 1 không
+còn cần ngoại lệ "mở lại thread để ĐỌC". Dòng cũ `lien_he_khach` còn trong DB vẫn
+hiển thị bình thường trên web.
 
 ### 2. Trả hàng / hoàn tiền
 
@@ -273,21 +316,16 @@ hợp tuần/tháng cần đủ số. Lưu ý từng cột:
 - `dedup_key`: `platform|order_code|ngày|40 ký tự đầu nội dung` (trả hàng:
   `platform|order_code|ngày`). Chạy lại 20:00 gặp đúng case của 08:00 thì ghi
   đè chính dòng đó, không nhân đôi.
-- `needs_action` + `action_type` + `action_note` (quy tắc mới chốt 29/10/2026,
-  thay cho quy tắc cũ "1–2★ luôn bật `needs_action` để anh phản hồi công khai"):
-  bật `true` cho đúng 2 nhóm, mỗi nhóm có `action_type` riêng để web tách:
-  - **`action_type = 'lien_he_khach'`** — đánh giá xấu (1–2★) mà **đã nhắn
-    mẫu dòng 24 nhưng qua 12 tiếng khách vẫn chưa trả lời** (xem mục "Theo
-    dõi 12h" trong bước Reviews). `action_note` kiểu "Đánh giá 1★, đã nhắn 12h khách chưa trả lời —
-    anh tìm tên khách trên TikTok nhắn hỗ trợ + phản hồi công khai".
-  - **`action_type = 'tranh_chap'`** — khách đang tranh chấp/khiếu nại (Hard
-    rule 4), kể cả khi đó là khách trả lời lại tin nhắn đánh giá xấu mà vẫn
-    còn bức xúc. `action_note` nêu ngắn khách đang đòi gì.
-  - Mọi trường hợp khác để `needs_action = false`, `action_type` null. Cụ
-    thể: đánh giá xấu **vừa nhắn xong, chưa tới mốc 12h** (chờ, chưa flag);
-    và đánh giá xấu mà **khách đã trả lời xã giao** ("ok", "cảm ơn", "dạ") —
-    chủ shop chốt 29/10: khách đã trả lời rồi thì KHÔNG hiện thông báo gì,
-    coi như hội thoại đang sống, để chủ shop/nhân viên tự theo trong chat.
+- `needs_action` + `action_type` + `action_note` (chốt lại 17/11/2026, thay cho
+  quy tắc 29/10). Bật `true` cho các loại sau — **luôn kèm `order_code`**:
+  - `danh_gia_xau` — đánh giá 1–3★ (báo ngay, xem mục B).
+  - `danh_gia_van_de` — đánh giá 4–5★ có nói về sản phẩm/kho vận (mục B).
+  - `tra_hang_anh_huong_shop` — trả hàng nhóm 1 (mục A).
+  - `tra_hang_noi_dung_sp_kho` — trả hàng nhóm 2 nhưng chi tiết nói sản phẩm/kho vận (mục A).
+  - `tranh_chap` — khách đang tranh chấp/khiếu nại (Hard rule 4); `action_note` nêu khách đòi gì.
+  - (`lien_he_khach` là loại cũ, không tạo mới nữa.)
+  - Mọi trường hợp khác để `needs_action = false`, `action_type` null.
+  - **Chạy lại gặp dòng cũ:** đã `acked_at` hoặc đã flag thì giữ nguyên, không hạ cờ, không bật lại.
 - `insight_tag` + `insight_note`: **phần giá trị nhất, đừng bỏ.** Đọc nội dung
   rồi tự gắn 1 chủ đề dạng slug (`tuot-chi-cap`, `size-m-chat`,
   `giao-cham-cuoi-tuan`) cho những gì nói về chất lượng sản phẩm hoặc dịch vụ
@@ -413,8 +451,8 @@ thay cho khung 3+3 dòng cũ — khung cũ giờ là nội dung của tab trên 
 Lưu ý: <gộp mọi thứ cần chủ shop biết, bỏ hẳn dòng này nếu không có gì>
 ```
 
-- **Không có đánh giá ≤3★, không có case tranh chấp, không có lỗi → KHÔNG gửi
-  gì cả.** Im lặng = mọi thứ đã xử lý xong, xem web khi nào rảnh.
+- **Không có dòng `needs_action` mới (đánh giá 1–3★, 4–5★ có vấn đề, trả hàng
+  ảnh hưởng shop/nội dung sản phẩm-kho vận, tranh chấp) → KHÔNG gửi gì cả.** Im lặng = mọi thứ đã xử lý xong, xem web khi nào rảnh.
 - Không khung, không tiêu đề, không emoji, không liệt kê từng đơn — chi tiết
   đã nằm trên web rồi.
 - Lỗi không check được gì: chỉ 1 dòng

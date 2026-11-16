@@ -111,8 +111,8 @@ function cskhActionCardHtml(row, kind){
   const stars = row.stars ? '<span class="stars">' + '★'.repeat(row.stars) + '☆'.repeat(5 - row.stars) + '</span>' : '';
   const tag = kind === 'return' && row.reason ? '<span class="tag why">' + esc(row.reason) + '</span>' : '';
   const snippet = kind === 'return'
-    ? (row.customer_note ? 'Khách ghi: “' + esc(row.customer_note) + '”' : (row.amount ? fmtVND(row.amount) : ''))
-    : esc(row.content || '(chỉ bấm sao, không viết)');
+    ? (row.action_note ? esc(row.action_note) : row.customer_note ? 'Khách ghi: “' + esc(row.customer_note) + '”' : (row.amount ? fmtVND(row.amount) : ''))
+    : esc(row.content || row.action_note || '(chỉ bấm sao, không viết)');
   const when = kind === 'return' ? row.request_date : row.review_date;
   const ackLabel = kind === 'return' ? 'Đã xem' : 'Đã xử lý';
   const ackBtn = `<button class="btn-ack" data-tbl="${kind === 'return' ? 'cskh_returns' : 'cskh_reviews'}" data-id="${esc(String(row.id))}">${esc(ackLabel)}</button>`;
@@ -127,7 +127,14 @@ function cskhActionCardHtml(row, kind){
 
 // Nhóm con trong "Cần anh xử lý" theo action_type (chốt 29/10/2026). Thứ tự ưu
 // tiên: anh tự nhắn khách trước, rồi tranh chấp, rồi phần còn lại không gắn loại.
+// 17/11/2026: thêm 4 nhóm mới theo cơ chế chuẩn (đánh giá 1–3★ báo ngay, 4–5★ có
+// vấn đề, trả hàng ảnh hưởng shop, trả hàng nói sản phẩm/kho vận). lien_he_khach
+// giữ lại để hiển thị dòng cũ.
 const CSKH_ACTION_GROUPS = [
+  { type: 'danh_gia_xau', title: 'Đánh giá 1–3★', note: 'anh xử lý theo mã đơn — em đã nhắn khách theo mẫu' },
+  { type: 'tra_hang_anh_huong_shop', title: 'Trả hàng — lý do ảnh hưởng shop', note: 'em đã nhờ khách đổi lý do + hỏi lý do thật (Shopee: chưa nhắn được, anh nhắn tay)' },
+  { type: 'tra_hang_noi_dung_sp_kho', title: 'Trả hàng — nói về sản phẩm / kho vận', note: 'lý do không ảnh hưởng chỉ số nhưng chi tiết khách nêu vấn đề đáng xem' },
+  { type: 'danh_gia_van_de', title: 'Đánh giá 4–5★ có nhắc vấn đề', note: 'khách chấm cao nhưng nói về sản phẩm / giao hàng' },
   { type: 'lien_he_khach', title: 'Anh tự nhắn khách', note: 'đánh giá xấu đã nhắn 12h khách chưa trả lời — tìm tên khách trên TikTok, nhắn hỗ trợ' },
   { type: 'tranh_chap',    title: 'Tranh chấp / khiếu nại', note: 'khách đang đòi xử lý — chờ anh quyết' },
   { type: null,            title: 'Khác cần anh xem', note: '' },
@@ -153,7 +160,7 @@ function cskhActionHtml(allReviews, allReturns){
   if (!items.length){
     return `<p class="cskh-quiet">Không có gì cần anh xử lý — kể cả những việc phát sinh ngoài giờ, không phụ thuộc kỳ đang chọn ở trên.</p>${quiet}`;
   }
-  const known = new Set(['lien_he_khach', 'tranh_chap']);
+  const known = new Set(CSKH_ACTION_GROUPS.map(g => g.type).filter(Boolean));
   const html = CSKH_ACTION_GROUPS.map(g => {
     const rows = g.type
       ? items.filter(i => i.row.action_type === g.type)
