@@ -536,6 +536,31 @@
     .cskh-kpi{ grid-template-columns:1fr; }
   }
 
+  /* ---------- Tab "Gửi bù" (resend.js, 17/11/2026) ---------- */
+  .rs-card{ padding:11px 13px; }
+  .rs-card.rs-late{ border-color:var(--warn); background:var(--warn-soft); }
+  .rs-body{ margin-top:5px; }
+  .rs-item{ font-size:13px; }
+  .rs-sub{ font-size:12px; color:var(--ink-soft); margin-top:3px; line-height:1.45; }
+  .rs-faint{ color:var(--ink-faint); }
+  .rs-conf{ font-size:11px; font-weight:700; border-radius:5px; padding:1px 7px; }
+  .rs-conf.ok{ background:var(--good-soft, #e3f5ea); color:var(--good); }
+  .rs-conf.mid{ background:var(--proc-soft); color:var(--proc); }
+  .rs-conf.low{ background:var(--warn-soft); color:var(--warn); }
+  .rs-check{ margin-top:5px; font-size:12px; line-height:1.5; }
+  .rs-good{ color:var(--good); }
+  .rs-bad{ color:var(--warn); font-weight:700; }
+  .rs-state-line{ margin-top:6px; font-size:11.5px; color:var(--ink-faint); }
+  .rs-state{ font-weight:700; color:var(--ink-soft); }
+  .rs-dl{ color:var(--ink-soft); font-weight:600; }
+  .rs-dl.late{ color:var(--warn); font-weight:700; }
+  .btn-rs{ font-family:inherit; font-size:12px; font-weight:700; border-radius:7px; padding:6px 13px; cursor:pointer;
+    border:1px solid var(--line-strong); background:var(--bg); color:var(--ink-soft); }
+  .btn-rs.ok{ background:var(--good); border-color:var(--good); color:#fff; }
+  .btn-rs.stop{ color:var(--warn); }
+  .btn-rs:hover{ filter:brightness(.94); }
+  .btn-rs:disabled{ opacity:.6; cursor:default; }
+
   /* ---------- Tab "Chấm điểm KOC" (koc.js) ---------- */
   /* Thanh phan bo Video/LIVE: --p1 xanh = Video, --p2 cam = LIVE (thu tu co
      dinh). Khe 2px giua 2 doan + bo tron 4px theo chuan mark cua bo dataviz. */

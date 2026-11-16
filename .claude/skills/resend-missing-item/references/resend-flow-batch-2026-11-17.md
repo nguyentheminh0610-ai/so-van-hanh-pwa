@@ -1,7 +1,9 @@
 # Luồng gửi bù mới: duyệt 2 lần + tạo đơn gom 1 phiên/ngày (chốt 17/11/2026)
 
-**Trạng thái: ĐÃ CHỐT THIẾT KẾ + MẪU TIN, CHƯA TRIỂN KHAI** (chưa có bảng
-`resend_cases`, chưa có tab "Gửi bù" trong Sổ Vận Hành). Cho tới khi triển khai
+**Trạng thái (17/11/2026): ĐÃ CHỐT THIẾT KẾ + MẪU TIN; ĐÃ VIẾT** SQL bảng
+`resend_cases` (`scripts/resend-tables.sql`) và tab "Gửi bù" trong Sổ Vận Hành
+(`resend.js`) — **CHƯA** viết phần task/skill ghi vào bảng, và chủ shop cần chạy
+file SQL trên Supabase trước khi tab đọc được. Cho tới khi task/skill được sửa
 xong, luồng cũ trong SKILL.md (hỏi chủ shop "ok" rồi mới bấm Tạo đơn) vẫn là
 luồng đang chạy. Chỉ dùng **mẫu tin dưới đây** ngay được.
 
@@ -102,8 +104,9 @@ Lý do chọn câu "đơn vị vận chuyển đã qua giờ lấy hàng" cho 2b
 
 ## Đã bàn nhưng chưa làm
 
-- Bảng `resend_cases` + tab "Gửi bù" (nút Duyệt / Sửa / Dừng, theo mẫu nút
-  "Xác nhận ghi Sổ Kho" của `cskh.js`).
+- Sửa skill/task CSKH để ghi `resend_cases` (phát hiện, chốt dữ liệu, ping
+  Telegram) + task phiên 15h tạo đơn. Bảng và tab web đã có (17/11/2026).
+  Quy ước ghi: xem chú thích trạng thái trong `scripts/resend-tables.sql`.
 - Sửa `scripts/order_to_tracking.sh` (`python3` trên Windows trả về stub
   WindowsApps nên báo sai "không tìm thấy trong Sapo").
 - Bucket `notices-pdf` đang public mà tem có tên/SĐT/địa chỉ khách (rủi ro có
