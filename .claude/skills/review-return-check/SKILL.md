@@ -455,6 +455,13 @@ và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
    đã là `written`/`dup`/`owned_resend` thì **giữ nguyên**, đừng hạ về
    `suggest` (không dựng lại nút chủ shop đã xử lý).
 
+### 4.2b Nguồn thứ 3: CHAT (chốt 17/11/2026)
+
+Ngoài trả hàng + đánh giá (do skill này ghi), lỗi còn được nhận diện **qua chat khách** bởi lượt CSKH
+inbox → bảng `cskh_chat_errors` (xem mục 9 trong `size-consultation/references/cskh-faq-17-11.md`). Cùng
+mô hình: chỉ đề xuất, hiện chung khối "Ghi lỗi vào Sổ Kho" (thẻ có nhãn "Nguồn: Chat" + khách nói gì + ảnh +
+link chat), chủ shop bấm xác nhận hoặc "Không phải lỗi shop". Dò trùng theo mã vận đơn nên 3 nguồn không ghi 2 lần.
+
 ### 4.3 Nút nằm ở đâu
 
 Tab "Đánh giá & Trả hàng" → Khối "Cần anh xử lý" → mục **"Ghi lỗi vào Sổ Kho"**

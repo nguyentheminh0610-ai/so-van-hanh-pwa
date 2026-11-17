@@ -149,6 +149,26 @@ rồi **báo Telegram**, KHÔNG tự đề xuất số tiền/hướng xử lý 
 6. Không hứa hoàn tiền/đổi/gửi lại, không nêu % hay số tiền, không tự ghi Sổ Kho.
 7. Giao thiếu vẫn theo `resend-missing-item` (thu thập → duyệt lần 1/2) như cũ.
 8. Vẫn ghi nhật ký `cskh-log` (category khieu_nai) kèm "context" ghi rõ đã nhắn tin đầu.
+9. **Ghi đề xuất lỗi để chủ shop DUYỆT trên web (chốt 17/11/2026 — nguồn thứ 3 cho Sổ Kho, cùng
+   cơ chế với trả hàng/đánh giá).** Khi khách báo **giao nhầm** (sai size/màu/mẫu) hoặc **hàng lỗi**
+   (rách/bẩn/ố/in hỏng/tuột chỉ) và nội dung chat + ảnh cho thấy đó là lỗi shop/NCC → POST 1 dòng
+   vào bảng Supabase **`cskh_chat_errors`** (upsert `?on_conflict=dedup_key`, URL/key như
+   `scripts/sync_returns_feed.py`, schema ở `scripts/cskh-tables.sql`):
+   - `dedup_key` = `platform|order_code|YYYY-MM-DD|kind`; `chat_date`, `customer`, `order_code`;
+   - `evidence` = khách nói gì (rút gọn ≤300 ký tự, không bịa), `has_photo` = khách đã gửi ảnh/video chưa,
+     `chat_url` = link hội thoại;
+   - `shop_error_kind` = `giao_nham` | `san_pham_loi` (giao thiếu → `giao_thieu`, đặt `errlog_status =
+     'owned_resend'`, vì skill gửi bù tự ghi Sổ Kho — KHÔNG mở nút);
+   - `errlog_code` = **mã vận đơn gốc** (tra bằng `.claude/skills/resend-missing-item/scripts/order_to_tracking.sh`
+     từ mã đơn); dò trùng `GET warehouse_error_log?code=eq.<mã>&select=id&limit=1` — có rồi →
+     `errlog_status = 'dup'` + `errlog_id`; chưa có → `errlog_status = 'suggest'`, `errlog_reason` 1 câu ngắn.
+   - Chưa chắc là lỗi shop (khách chưa gửi ảnh, mô tả mơ hồ) → vẫn ghi `suggest` nhưng nói rõ
+     "chưa có ảnh" trong `evidence`/`has_photo=false` để chủ shop cân nhắc; KHÔNG tự kết luận.
+   - **TUYỆT ĐỐI không insert `warehouse_error_log`** — chỉ chủ shop bấm "Xác nhận ghi Sổ Kho" trên
+     tab Đánh giá & Trả hàng mới ghi (công bằng cho nhân viên). Dòng đã `written`/`dup`/`dismissed`
+     thì giữ nguyên khi gặp lại (đừng hạ về `suggest`).
+   - Cùng đơn đã có dòng ở `cskh_returns`/`cskh_reviews` (trùng mã vận đơn) → dò trùng ở bước trên sẽ bắt;
+     còn trùng chưa ghi thì vẫn ghi, anh duyệt 1 lần rồi dòng kia tự hiện `dup`.
 
 ## CHƯA train (rà 17/11/2026, chờ chủ shop trả lời — CS vẫn bỏ qua, để chủ shop)
 

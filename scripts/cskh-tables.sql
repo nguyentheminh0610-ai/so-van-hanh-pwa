@@ -151,3 +151,33 @@ end $$;
 -- để nút "Mở đơn" trên web mở đúng case. errlog_status thêm giá trị 'dismissed'
 -- (chủ shop bấm "Không phải lỗi shop — bỏ qua").
 alter table public.cskh_returns add column if not exists detail_ref text;
+
+-- ------------------------------------- lỗi nhận diện qua CHAT (17/11/2026) ---
+-- Nguồn thứ 3 cho khối "Ghi lỗi vào Sổ Kho" (2 nguồn kia: cskh_returns, cskh_reviews).
+-- Lượt CSKH inbox ghi 1 dòng khi khách báo giao nhầm / hàng lỗi trong chat. CHỈ ĐỀ XUẤT:
+-- anh xem bằng chứng trên web rồi bấm "Xác nhận ghi Sổ Kho" hoặc "Không phải lỗi shop".
+create table if not exists public.cskh_chat_errors (
+  id              bigserial primary key,
+  dedup_key       text not null unique,   -- platform|order_code|chat_date|kind
+  platform        text not null,          -- 'tiktok' | 'shopee'
+  chat_date       date not null,
+  customer        text,
+  order_code      text,
+  evidence        text,                   -- khách nói gì (nguyên văn rút gọn, ≤300 ký tự)
+  has_photo       boolean default false,  -- khách đã gửi ảnh/video bằng chứng chưa
+  chat_url        text,                   -- link hội thoại để anh mở lại
+  shop_error_kind text,                   -- 'giao_nham' | 'giao_thieu' | 'san_pham_loi'
+  errlog_code     text,                   -- mã vận đơn gốc
+  errlog_reason   text,
+  errlog_status   text default 'suggest', -- suggest|owned_resend|dup|written|dismissed
+  errlog_id       bigint,
+  created_at      timestamptz not null default now()
+);
+create index if not exists cskh_chat_errors_date_idx on public.cskh_chat_errors (chat_date desc);
+alter table public.cskh_chat_errors enable row level security;
+do $$
+begin
+  if not exists (select 1 from pg_policies where tablename = 'cskh_chat_errors' and policyname = 'anon all') then
+    create policy "anon all" on public.cskh_chat_errors for all using (true) with check (true);
+  end if;
+end $$;

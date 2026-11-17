@@ -14,7 +14,7 @@
 ============================================================================ */
 
 const CSKH_LOOKBACK_DAYS = 45; // đủ cho kỳ "tháng này", tải 1 lần rồi lọc tại chỗ
-let cskhRows = null;           // {reviews: [], returns: []} — cache sau lần tải đầu
+let cskhRows = null;           // {reviews: [], returns: [], chats: []} — cache sau lần tải đầu
 
 const CSKH_ORDER_URL = {
   tiktok: (o) => 'https://seller-vn.tiktok.com/order/detail?order_no=' + encodeURIComponent(o),
@@ -75,11 +75,13 @@ async function cskhLoadRows(){
   if (cskhRows) return cskhRows;
   const from = new Date(cskhToday()); from.setDate(from.getDate() - CSKH_LOOKBACK_DAYS);
   const since = cskhDateKey(from);
+  // Nguồn thứ 3 (17/11/2026): lỗi nhận diện qua CHAT — bảng chưa tạo thì coi như rỗng.
+  const chatsP = sbFetch('cskh_chat_errors?select=*&chat_date=gte.' + since + '&order=chat_date.desc&limit=2000').catch(() => []);
   const [reviews, returns] = await Promise.all([
     sbFetch('cskh_reviews?select=*&review_date=gte.' + since + '&order=review_date.desc&limit=2000'),
     sbFetch('cskh_returns?select=*&request_date=gte.' + since + '&order=request_date.desc&limit=2000'),
   ]);
-  cskhRows = { reviews: reviews || [], returns: returns || [] };
+  cskhRows = { reviews: reviews || [], returns: returns || [], chats: (await chatsP) || [] };
   return cskhRows;
 }
 
@@ -193,8 +195,12 @@ const CSKH_ERRKIND = {
   san_pham_loi: { etype: 'san_pham', dreason: 'san_pham_loi', label: 'lỗi sản phẩm (NCC)' },
 };
 
-function cskhErrlogRows(reviews, returns){
+const CSKH_TBL_LIST = { cskh_returns: 'returns', cskh_reviews: 'reviews', cskh_chat_errors: 'chats' };
+const CSKH_SRC_LABEL = { cskh_returns: 'Trả hàng', cskh_reviews: 'Đánh giá', cskh_chat_errors: 'Chat' };
+
+function cskhErrlogRows(reviews, returns, chats){
   return [
+    ...(chats || []).map(r => ({ row: r, kind: 'chat', tbl: 'cskh_chat_errors', d: r.chat_date })),
     ...reviews.map(r => ({ row: r, kind: 'review', tbl: 'cskh_reviews', d: r.review_date })),
     ...returns.map(r => ({ row: r, kind: 'return', tbl: 'cskh_returns', d: r.request_date })),
   ].filter(i => i.row.errlog_status && i.row.errlog_status !== 'none' && i.row.errlog_status !== 'dismissed')
@@ -206,10 +212,16 @@ function cskhErrlogCardHtml(i){
   const plat = cskhPlatName(r.platform);
   const kind = CSKH_ERRKIND[r.shop_error_kind];
   const meta = `<span class="tag ${r.platform === 'shopee' ? 'shopee' : 'tiktok'}">${plat}</span>`
+    + `<span class="tag why">Nguồn: ${esc(CSKH_SRC_LABEL[i.tbl] || '')}</span>`
     + (r.order_code ? '<span class="code">' + esc(r.order_code) + '</span>' : '')
     + (r.errlog_code ? '<span class="code" title="mã vận đơn">VĐ ' + esc(r.errlog_code) + '</span>' : '')
     + (r.customer ? '<span class="cust">Khách <b>' + esc(r.customer) + '</b></span>' : '');
   const why = esc(r.errlog_reason || r.reason || r.content || '');
+  // Bằng chứng để anh duyệt (nguồn chat): khách nói gì + đã có ảnh chưa + link hội thoại.
+  const evid = i.tbl === 'cskh_chat_errors'
+    ? `<div class="fi-line2"><span class="snippet" title="${esc(r.evidence || '')}">Khách nói: ${esc(r.evidence || '(không ghi)')}${r.has_photo ? ' · 📷 đã có ảnh' : ' · chưa có ảnh'}</span>`
+      + (r.chat_url ? `<a class="lnk" href="${esc(r.chat_url)}" target="_blank" rel="noopener">↗ Mở chat</a>` : '') + '</div>'
+    : '';
   let ctrl;
   if (r.errlog_status === 'written'){
     ctrl = `<span class="err-done">✓ đã ghi Sổ Kho${r.errlog_id ? ' (#' + esc(String(r.errlog_id)) + ')' : ''}</span>`;
@@ -226,12 +238,12 @@ function cskhErrlogCardHtml(i){
     ctrl = `<span class="err-skip">Nghi lỗi shop nhưng chưa đủ dữ liệu (thiếu mã vận đơn/loại lỗi) — anh kiểm tay</span>`;
   } else { ctrl = ''; }
   return `<div class="fi compact err"><div class="fi-line1">${meta}</div>`
-    + `<div class="fi-line2"><span class="snippet" title="${why}">${why}</span></div>`
+    + `<div class="fi-line2"><span class="snippet" title="${why}">${why}</span></div>` + evid
     + `<div class="err-foot">${ctrl}</div></div>`;
 }
 
-function cskhErrlogHtml(reviews, returns){
-  const rows = cskhErrlogRows(reviews, returns);
+function cskhErrlogHtml(reviews, returns, chats){
+  const rows = cskhErrlogRows(reviews, returns, chats);
   if (!rows.length) return '';
   const pending = rows.filter(i => i.row.errlog_status === 'suggest' && CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code).length;
   const head = `<div class="sub-label">Ghi lỗi vào Sổ Kho${pending ? ' · ' + fmtInt(pending) + ' chờ anh xác nhận' : ''}</div>`;
@@ -262,7 +274,7 @@ async function cskhWriteErrlog(btn){
       { method: 'PATCH', headers: { Prefer: 'return=minimal' },
         body: JSON.stringify({ errlog_status: 'written', errlog_id: errId || null }) });
     // cập nhật cache cục bộ để lọc kỳ không dựng lại nút
-    const list = (btn.dataset.tbl === 'cskh_returns' ? cskhRows.returns : cskhRows.reviews);
+    const list = cskhRows[CSKH_TBL_LIST[btn.dataset.tbl]] || [];
     const rec = list.find(x => String(x.id) === btn.dataset.id);
     if (rec){ rec.errlog_status = 'written'; rec.errlog_id = errId; }
     btn.outerHTML = '<span class="err-done">✓ đã ghi Sổ Kho' + (errId ? ' (#' + errId + ')' : '') + '</span>';
@@ -281,7 +293,7 @@ async function cskhSkipErrlog(btn){
   try {
     await sbFetch(btn.dataset.tbl + '?id=eq.' + encodeURIComponent(btn.dataset.id),
       { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ errlog_status: 'dismissed' }) });
-    const list = (btn.dataset.tbl === 'cskh_returns' ? cskhRows.returns : cskhRows.reviews);
+    const list = cskhRows[CSKH_TBL_LIST[btn.dataset.tbl]] || [];
     const rec = list.find(x => String(x.id) === btn.dataset.id);
     if (rec) rec.errlog_status = 'dismissed';
     const card = btn.closest('.fi'); if (card) card.remove();
@@ -400,7 +412,7 @@ function cskhRender(period){
     ${cskhKpiHtml(reviews, returns, pendingAction)}
     <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">anh tự nhắn khách (đánh giá xấu đã nhắn 12h khách im) · tranh chấp · ghi lỗi Sổ Kho — luôn hiện đủ, không phụ thuộc kỳ đang chọn</span></div>
     ${cskhActionHtml(cskhRows.reviews, cskhRows.returns)}
-    ${cskhErrlogHtml(cskhRows.reviews, cskhRows.returns)}
+    ${cskhErrlogHtml(cskhRows.reviews, cskhRows.returns, cskhRows.chats)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">Insight để cải thiện</span><span class="z-note">vấn đề lặp lại về sản phẩm / dịch vụ</span></div>
     ${cskhInsightHtml(reviews, returns, CSKH_PERIOD_LABEL[period])}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Số liệu kỳ</span><span class="z-note">xu hướng · lý do trả hàng</span></div>
