@@ -130,8 +130,25 @@ Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35
 - Tin đầu theo "Mau tin nhan": xác nhận lỗi + xin lỗi, rồi "Deal khách"/"Đưa ra
   hướng xử lý" (đổi hàng/trả hàng hoàn tiền theo từng sàn). Khách nói rõ yêu cầu
   thì làm đúng yêu cầu đó.
-- Lưu ý: tác vụ CSKH tự động (cskh-inbox-*) hiện vẫn xếp "khiếu nại" vào nhóm KHÔNG
-  trả lời, nên các case này bị ghi vào nhật ký "bỏ qua" dù có sẵn hướng dẫn.
+
+### Phạm vi mở cho CSKH tự động (chốt 17/11/2026, thay quy tắc cũ "khiếu nại → bỏ qua")
+
+Khách phàn nàn **giao sai size/màu/mẫu, hàng lỗi/bẩn/ố/rách/in hỏng** → CS **nhắn TIN ĐẦU**
+rồi **báo Telegram**, KHÔNG tự đề xuất số tiền/hướng xử lý (anh quyết):
+1. Đã có nhân viên trả lời sau tin cuối khách (vd CS7682 đang xử lý) → bỏ qua như cũ.
+2. **Chưa có ảnh/bằng chứng** → tin xin lỗi + xin ảnh: "Dạ shop xin lỗi bạn về sự bất
+   tiện này ạ. Bạn gửi giúp shop ảnh (hoặc video mở hàng) phần bị lỗi/bị nhầm và ảnh
+   tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ."
+3. **Đã có ảnh, đối chiếu thấy rõ lỗi shop** (đơn đặt khác hàng nhận) → dùng câu xác nhận
+   lỗi trong "Mau tin nhan" (giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi =
+   "lỗi chưa kiểm tra kĩ trước khi giao hàng") nhưng thay đoạn cuối "đề xuất hướng xử lý
+   như sau" bằng "shop sẽ báo hướng xử lý cho bạn ngay ạ". Không rõ ràng → chỉ dùng tin ở mục 2.
+4. Đánh giá mức lỗi theo bảng (Nhẹ/Vừa/Nặng) chỉ để GHI vào tin Telegram, không nói với khách.
+5. **Telegram** (kiểm cờ `escalated-<ngày>.flag` trước để không báo trùng): sàn, tên
+   khách, mã đơn, loại lỗi + mức đề xuất, đã gửi tin gì, ảnh đã có chưa, link hội thoại.
+6. Không hứa hoàn tiền/đổi/gửi lại, không nêu % hay số tiền, không tự ghi Sổ Kho.
+7. Giao thiếu vẫn theo `resend-missing-item` (thu thập → duyệt lần 1/2) như cũ.
+8. Vẫn ghi nhật ký `cskh-log` (category khieu_nai) kèm "context" ghi rõ đã nhắn tin đầu.
 
 ## CHƯA train (rà 17/11/2026, chờ chủ shop trả lời — CS vẫn bỏ qua, để chủ shop)
 
