@@ -335,6 +335,12 @@ Headers: apikey, Authorization: Bearer <anon key>, Content-Type: application/jso
          Prefer: resolution=merge-duplicates,return=minimal
 ```
 
+**Hai lỗi đã gặp khi chạy thử 17/11/2026:** (1) khi POST nhiều dòng một lúc, mọi
+dòng phải có CÙNG bộ khóa JSON (thiếu khóa → `PGRST102 All object keys must match`,
+ghi 0 dòng) — điền `null` cho khóa không dùng; (2) trên PC Windows đừng đưa tiếng
+Việt trực tiếp vào `curl -d '...'`, ghi JSON ra file UTF-8 rồi `--data-binary @file`
+(không thì có thể bị 400).
+
 Ghi **mọi** đánh giá/case gặp trong kỳ, không chỉ cái cần xử lý — phần tổng
 hợp tuần/tháng cần đủ số. Lưu ý từng cột:
 
