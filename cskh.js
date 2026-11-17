@@ -407,10 +407,19 @@ async function refreshCskh(){
   if (cskhRows){ cskhRender(document.getElementById('cskh-period').value); return; }
   try {
     await cskhLoadRows();
-    const all = [...cskhRows.reviews.map(r => r.created_at), ...cskhRows.returns.map(r => r.created_at)].filter(Boolean).sort();
-    const last = all.length ? new Date(all[all.length - 1]) : null;
+    // Giờ cập nhật = lượt chạy gần nhất trong cskh_run_log (kể cả lượt không có case mới).
+    // Bảng chưa tạo → lùi về max(created_at) như trước.
+    let last = null, blocked = '';
+    try {
+      const run = await sbFetch('cskh_run_log?select=ran_at,status,note&order=ran_at.desc&limit=1');
+      if (run && run[0]){ last = new Date(run[0].ran_at); if (run[0].status !== 'ok') blocked = run[0].note || 'lượt gần nhất bị chặn'; }
+    } catch (e){ /* chưa có bảng */ }
+    if (!last){
+      const all = [...cskhRows.reviews.map(r => r.created_at), ...cskhRows.returns.map(r => r.created_at)].filter(Boolean).sort();
+      last = all.length ? new Date(all[all.length - 1]) : null;
+    }
     statusEl.textContent = last
-      ? 'Cập nhật ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) + ' · tự chạy 08:00 & 20:00'
+      ? 'Cập nhật ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' }) + ' · tự chạy 08:00 & 20:00' + (blocked ? ' · ⚠ ' + blocked : '')
       : 'Chưa có dữ liệu · skill tự chạy 08:00 & 20:00 trên PC trực';
     cskhRender(document.getElementById('cskh-period').value);
   } catch (err){

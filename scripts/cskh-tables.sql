@@ -125,3 +125,24 @@ begin
     create policy "anon all" on public.cskh_returns for all using (true) with check (true);
   end if;
 end $$;
+
+-- --------------------------------------------- nhật ký lượt chạy (17/11/2026) --
+-- Mỗi lượt chạy 08:00/20:00 ghi 1 dòng, KỂ CẢ khi không có case mới, để web hiện
+-- đúng "Cập nhật lúc …" (trước đây lấy max(created_at) của đánh giá/case nên lượt
+-- chạy trống không làm giờ nhích, nhìn như job chết). status: 'ok' | 'blocked'.
+create table if not exists public.cskh_run_log (
+  id         bigserial primary key,
+  ran_at     timestamptz not null default now(),
+  status     text not null default 'ok',
+  note       text,          -- vd 'TikTok ok, Shopee bị chặn: Chrome mất đăng nhập'
+  n_reviews  int,
+  n_returns  int,
+  n_flagged  int
+);
+alter table public.cskh_run_log enable row level security;
+do $$
+begin
+  if not exists (select 1 from pg_policies where tablename = 'cskh_run_log' and policyname = 'anon all') then
+    create policy "anon all" on public.cskh_run_log for all using (true) with check (true);
+  end if;
+end $$;

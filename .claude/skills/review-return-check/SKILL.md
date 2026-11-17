@@ -37,7 +37,7 @@ version) but go reconcile the doc, the shop owner corrects this often.
 - **Lịch chạy: 2 lần/ngày, cách nhau 12 tiếng — 08:00 và 20:00** (chốt
   2026-10-13, thay cho quy tắc "chỉ chạy khi được gọi" trước đây). Shop
   owner vẫn có thể gọi tay thêm bất kỳ lúc nào. Khi chạy theo lịch (không
-  có ai đang chat), gửi báo cáo qua Telegram (xem [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md),
+  có ai đang chat), KHÔNG gửi Telegram (chốt 17/11/2026, xem mục 6 ở CƠ CHẾ CHUẨN; cũ: Telegram qua [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md),
   cùng bot với [daily-warehouse-report](../daily-warehouse-report/SKILL.md)).
 - Inbox: ngoài phạm vi skill này. Riêng case khách báo **giao thiếu hàng**
   trong inbox do [resend-missing-item](../resend-missing-item/SKILL.md) quét 15 phút/lần, không phải skill
@@ -125,9 +125,18 @@ Quét **tất cả** đánh giá mới trong cửa sổ (không chỉ hàng ch�
    khoản tiết kiệm token lớn nhất.
 2. Đọc danh sách bằng `get_page_text` 1 lần/trang, dừng ngay khi gặp case quá cửa sổ.
 3. **Bỏ hẳn bước "mở lại thread sau 12h để đọc"** (mục cũ bên dưới đã gạch).
-4. Telegram chỉ khi có `needs_action` mới hoặc khi bị chặn (xem "Sending the report").
+4. ~~Telegram~~ đã bỏ (xem mục 6 ngay dưới).
 5. Bị chặn (Chrome mất đăng nhập, captcha, hết quyền) → vẫn ghi những gì đọc
-   được và Telegram 1 dòng nói bị chặn ở đâu, anh cần làm gì.
+   được, rồi ghi `status=blocked` + lý do vào nhật ký lượt chạy (mục 7).
+
+6. **KHÔNG gửi Telegram nữa** (chủ shop chốt 17/11/2026: "không cần báo cáo tele").
+   Mọi thứ nằm trên Sổ Vận Hành. Bị chặn thì ghi vào dòng nhật ký bên dưới, không nhắn Telegram.
+7. **Dòng nhật ký lượt chạy — BẮT BUỘC, làm ở bước cuối mọi lượt (kể cả không có
+   gì mới, kể cả bị chặn):** POST 1 dòng vào `cskh_run_log` (cùng URL/key Supabase
+   như mục 3) để web hiện "Cập nhật lúc …":
+   `{"status":"ok"|"blocked","note":"<ngắn, vd Shopee bị chặn: Chrome mất đăng nhập>","n_reviews":N,"n_returns":M,"n_flagged":K}`
+   (`ran_at` tự điền). `blocked` khi có sàn không đọc được. POST lỗi (bảng chưa
+   tạo) thì bỏ qua, không dừng lượt chạy.
 
 ### ⚠️ Chỉ chạy ở MỘT nơi (chốt 17/11/2026)
 
@@ -251,7 +260,7 @@ when you do.
    last 2 days). **Từ 17/11/2026 đọc cả đánh giá 4–5★** (xem mục B ở đầu file):
    dùng danh sách đánh giá chung của sàn (TikTok: trang rating, tab tất cả/đã
    trả lời; Shopee: Đánh giá shop) chứ không chỉ hàng chờ trả lời. Nếu sàn không
-   cho xem được mục nào thì ghi rõ trong Telegram, đừng bỏ qua im lặng.
+   cho xem được mục nào thì ghi `status=blocked` + lý do vào cskh_run_log, đừng bỏ qua im lặng.
 3. Với mỗi đánh giá xấu mới: **vào phần TIN NHẮN (chat) với khách đó và
    nhắn mẫu dòng 24** (chủ shop chốt 2026-10-13). **TUYỆT ĐỐI KHÔNG bấm
    "Phản hồi"/"Trả lời" công khai dưới đánh giá** — phản hồi công khai là
@@ -442,6 +451,9 @@ xong web tự insert `warehouse_error_log` + set dòng cskh sang `written` +
 `errlog_id`. Mình (skill) không làm bước insert này.
 
 ## Sending the report
+
+> **17/11/2026: BỎ Telegram cho skill này** — đoạn dưới chỉ còn dùng khi chủ shop gọi tay
+> trong chat (trả lời ngay trong chat), KHÔNG gửi Telegram khi chạy theo lịch.
 
 Chạy theo lịch (08:00 / 20:00) → gửi Telegram **1–2 dòng** (chốt 2026-10-28,
 thay cho khung 3+3 dòng cũ — khung cũ giờ là nội dung của tab trên web):
