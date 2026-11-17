@@ -604,3 +604,6 @@
   @media (max-width: 760px){ .koc-vip-grid{ grid-template-columns:1fr; } }
   @media (max-width: 860px){ .koc-kpi4{ grid-template-columns:repeat(2,1fr); }
     .koc-sheetrow .ngn{ margin-left:0; } } }
+.btn-errskip{ font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-faint,#9aa); background:transparent;
+  border:1px solid var(--line,#333); border-radius:6px; padding:5px 10px; cursor:pointer; margin-left:6px; }
+.btn-errskip:hover{ filter:brightness(1.2); }

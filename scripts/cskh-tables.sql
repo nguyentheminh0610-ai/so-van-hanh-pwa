@@ -146,3 +146,8 @@ begin
     create policy "anon all" on public.cskh_run_log for all using (true) with check (true);
   end if;
 end $$;
+
+-- 17/11/2026: id số của trang chi tiết trả hàng Shopee (banhang.shopee.vn/portal/sale/return/<id>)
+-- để nút "Mở đơn" trên web mở đúng case. errlog_status thêm giá trị 'dismissed'
+-- (chủ shop bấm "Không phải lỗi shop — bỏ qua").
+alter table public.cskh_returns add column if not exists detail_ref text;

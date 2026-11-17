@@ -48,7 +48,20 @@ Shopee không có badge tương đương → phải đọc text lý do rồi đ�
 | Size quá rộng/chật | ✅ Không |
 | Đặt nhầm size | ✅ Không |
 
-### Shopee
+### Shopee — tên lý do THẬT trên giao diện (đọc trực tiếp 17/11/2026)
+
+| Lý do hiển thị | Lỗi shop? |
+|---|---|
+| Người bán gửi sai hàng | ⚠️ Có |
+| Khác với mô tả | ⚠️ Có |
+| Hàng lỗi, không hoạt động | ⚠️ Có |
+| Thiếu hàng | ⚠️ Có |
+| Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì) | ✅ Không |
+| Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) / Lý do khác / lý do hủy đơn | ✅ Không (thường là đơn hủy, không phải trả hàng) |
+
+Bảng "chính sách công khai" bên dưới là bản cũ; khi lệch với bảng thật này thì tin bảng thật.
+
+### Shopee (theo chính sách công khai, bản cũ)
 
 | Tên lý do hiển thị trên sàn | Lỗi shop (NFR)? |
 |---|---|

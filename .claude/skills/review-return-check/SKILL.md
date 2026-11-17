@@ -225,30 +225,41 @@ deviceId TikTok, KHÔNG dùng built-in browser:
 but haven't been walked through yet in this skill; same hard rules apply
 when you do.
 
-> ⚠️ **TODO (chốt 30/10/2026) — DỰNG LUỒNG NHẮN KHÁCH TRẢ HÀNG SHOPEE.**
-> Hiện skill mới chỉ **nhắn được first-contact cho đơn trả hàng bên
-> TikTok**. Đơn trả hàng Shopee vẫn được phát hiện và lên thẻ gợi ý "ghi
-> Sổ Kho" trên tab "Đánh giá & Trả hàng" (cơ chế commit `940b41b`
-> 29/10), **nhưng bước gửi tin nhắn tự động cho khách thì chưa có** cho
-> Shopee. Cần một phiên **trên PC Windows** đi qua luồng thật trên
-> `banhang.shopee.vn` để bổ sung vào mục "2. Trả hàng/hoàn tiền" bên dưới:
-> - Tìm hàng chờ: URL/tab queue "trả hàng/hoàn tiền" bên Kênh Người Bán
->   (tương đương tab "Đang chờ bạn" của TikTok), đọc được lý do + ngày +
->   số tiền + auto-approved hay chưa.
-> - Cách mở đúng thread chat gắn với từng đơn trả hàng (tương đương nút
->   chat-bubble cạnh username bên TikTok), và cách nhận biết thread
->   "untouched" (Hard rule 3) trên Shopee.
-> - Dòng mẫu đã có sẵn theo sàn: row 25 (không phải lỗi shop), row 36
->   (lỗi shop — Shopee, mời đổi lý do sang "Hàng nguyên vẹn nhưng không
->   còn nhu cầu"). Chỉ thiếu phần thao tác UI.
->
-> **Lý do ghi TODO này:** 30/10/2026 đơn Shopee `261024FPGSQXVJ` (khách
-> antm057) lên thẻ gợi ý "giao nhầm" nhưng khách **chưa được bộ phận trả
-> hàng nhắn** — truy ra đúng vì luồng Shopee chưa dựng. Lưu ý kèm theo:
-> lý do trả hàng khách chọn trên sàn ("người bán gửi sai hàng") có thể
-> **không khớp thực tế** (khách chỉ muốn đổi size) → khi dựng xong, vẫn
-> phải đọc chat thật trước khi phân loại lỗi shop / ghi Sổ Kho, đừng tin
-> lý do hiển thị trên thẻ trả hàng (đúng tinh thần mục 4 + mục 5 ở trên).
+### Shopee — luồng trả hàng ĐÃ DỰNG (chốt 17/11/2026, kiểm trên Chrome thật)
+
+Thay cho TODO 30/10. Dùng Chrome Shopee (deviceId trong
+[reference_chrome_browsers](../../shared/reference_chrome_browsers.md)), KHÔNG built-in browser.
+
+1. **Danh sách:** `https://banhang.shopee.vn/portal/sale/returnrefundcancel` → bấm
+   tab **"Đơn Trả hàng Hoàn tiền (N)"** (3 tab kia là Tất cả / Đơn Hủy / Giao không
+   thành công — hủy & giao không thành công KHÔNG phải yêu cầu trả hàng, chỉ ghi
+   sổ). Đọc bằng `javascript_tool` (get_page_text chỉ trả 1 phần): mỗi dòng có
+   buyer, **Mã đơn hàng**, **Mã yêu cầu trả hàng**, số tiền, **Lý do**, Trạng thái.
+   Đếm "1749 yêu cầu" ở đầu là tổng cả bộ lọc — chỉ lấy các dòng đầu trong cửa sổ ngày.
+2. **Id số của case:** mỗi dòng là 1 link `…/portal/sale/return/<id số>` →
+   lưu `id số` vào cột **`detail_ref`** của `cskh_returns` (web dùng để mở đúng case).
+   ⚠ `/portal/sale/order/<mã chữ>` KHÔNG hoạt động (404) — đừng dùng.
+3. **Mở chi tiết** (`…/portal/sale/return/<id>`): đọc lý do, **ảnh/ghi chú khách gửi kèm**,
+   trạng thái vận chuyển hàng hoàn. Chi tiết này là bằng chứng để xếp nhóm
+   (đừng chỉ tin tên lý do).
+4. **Mở chat:** bấm nút **"Chat với người mua"** trên trang chi tiết → cửa sổ chat nổi
+   gắn đúng đơn trả hàng. **Thread "untouched" (Hard rule 3)** = chỉ có dòng hệ thống
+   "sometimeofficial:main đã tham gia cuộc trò chuyện" + thẻ đơn hàng, chưa có tin
+   của người (shop hay khách). Có tin người thật → bỏ qua nhắn (vẫn báo sổ).
+5. **Gửi:** gõ vào ô "Nhập nội dung tin nhắn" rồi gửi, **đúng 2 tin (nhóm 1: dòng 36
+   rồi 25) hoặc 1 tin (nhóm 2: dòng 25)**. Xong đóng cửa sổ chat.
+6. **Tên lý do thật trên giao diện Shopee (đọc 17/11/2026):**
+   | Lý do hiển thị | Nhóm |
+   |---|---|
+   | Người bán gửi sai hàng · Khác với mô tả · Hàng lỗi, không hoạt động · Thiếu hàng | **1 — ảnh hưởng shop** |
+   | Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì) | 2 |
+   | Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) · Lý do khác · các lý do hủy đơn | 2 / không phải trả hàng |
+   Lý do "đích" khi nhờ khách đổi (dòng 36) trên UI hiện tên **"Đổi ý (Sản phẩm còn nguyên
+   tem, nhãn mác, bao bì)"** — kiểm lại nguyên văn dòng 36 trong Sheet "Mau tin nhan" cho
+   khớp tên này (bảng cũ ghi "Hàng nguyên vẹn nhưng không còn nhu cầu"; chưa sửa Sheet,
+   việc của chủ shop).
+7. Cột trạng thái: "Chờ bạn xác nhận hàng trả về" là case còn mở, có hạn phản hồi —
+   **không bấm Khiếu nại / Hoàn tiền** (Hard rule 2).
 
 ## Steps
 
@@ -438,7 +449,10 @@ và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
    - Chưa có → `errlog_status = 'suggest'`, `errlog_reason` = 1 câu mô tả
      ngắn (khách đặt gì / lỗi gì), đúng kiểu dòng `reason` mẫu đang có trong
      bảng (không dấu cũng được, ngắn gọn).
-3. **Chỉ ghi 1 lần:** lượt chạy sau gặp lại dòng (dedup_key) mà `errlog_status`
+3. **Chủ shop có thể bấm "Không phải lỗi shop — bỏ qua" (17/11/2026)** → `errlog_status = 'dismissed'`.
+   Giữ nguyên `dismissed` y như `written`/`dup` — KHÔNG dựng lại nút. Đây là bước công bằng cho nhân viên/NCC:
+   chỉ ghi Sổ Kho khi anh đã xem bằng chứng và xác nhận.
+4. **Chỉ ghi 1 lần:** lượt chạy sau gặp lại dòng (dedup_key) mà `errlog_status`
    đã là `written`/`dup`/`owned_resend` thì **giữ nguyên**, đừng hạ về
    `suggest` (không dựng lại nút chủ shop đã xử lý).
 

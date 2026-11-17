@@ -18,7 +18,12 @@ let cskhRows = null;           // {reviews: [], returns: []} — cache sau lần
 
 const CSKH_ORDER_URL = {
   tiktok: (o) => 'https://seller-vn.tiktok.com/order/detail?order_no=' + encodeURIComponent(o),
-  shopee: (o) => 'https://banhang.shopee.vn/portal/sale/order/' + encodeURIComponent(o),
+  // Shopee không mở được đơn theo mã chữ (/portal/sale/order/<mã> trả 404 — kiểm 17/11/2026):
+  // chi tiết trả hàng cần id số do skill lưu ở cột detail_ref; không có thì mở trang
+  // Trả hàng/Hoàn tiền/Hủy (mã đơn vẫn hiện trên thẻ để anh tìm).
+  shopee: (o, row) => row && row.detail_ref
+    ? 'https://banhang.shopee.vn/portal/sale/return/' + encodeURIComponent(row.detail_ref)
+    : 'https://banhang.shopee.vn/portal/sale/returnrefundcancel',
 };
 const CSKH_REVIEW_URL = {
   tiktok: 'https://seller-vn.tiktok.com/product/rating?shop_region=VN',
@@ -105,9 +110,14 @@ function cskhKpiHtml(reviews, returns, pendingAction){
 // dòng nội dung cắt gọn 1 dòng (hover xem đủ) kèm link mở.
 function cskhActionCardHtml(row, kind){
   const plat = cskhPlatName(row.platform);
-  const link = kind === 'return' && row.order_code
-    ? `<a class="lnk" href="${CSKH_ORDER_URL[row.platform] ? CSKH_ORDER_URL[row.platform](row.order_code) : '#'}" target="_blank" rel="noopener">↗ Mở đơn</a>`
-    : `<a class="lnk" href="${CSKH_REVIEW_URL[row.platform] || CSKH_REVIEW_URL.tiktok}" target="_blank" rel="noopener">↗ Đánh giá</a>`;
+  // 17/11/2026: đánh giá giờ cũng có order_code → luôn có nút "Mở đơn" để anh vào xử lý
+  // tiếp; đánh giá thêm nút "Đánh giá" (sàn không có link riêng từng đánh giá nên chỉ
+  // mở trang đánh giá chung — tìm theo tên khách/mã đơn).
+  const orderLink = row.order_code && CSKH_ORDER_URL[row.platform]
+    ? `<a class="lnk" href="${CSKH_ORDER_URL[row.platform](row.order_code, row)}" target="_blank" rel="noopener">↗ Mở đơn</a>` : '';
+  const reviewLink = kind === 'review'
+    ? `<a class="lnk" href="${CSKH_REVIEW_URL[row.platform] || CSKH_REVIEW_URL.tiktok}" target="_blank" rel="noopener">↗ Đánh giá</a>` : '';
+  const link = orderLink + reviewLink;
   const stars = row.stars ? '<span class="stars">' + '★'.repeat(row.stars) + '☆'.repeat(5 - row.stars) + '</span>' : '';
   const tag = kind === 'return' && row.reason ? '<span class="tag why">' + esc(row.reason) + '</span>' : '';
   const snippet = kind === 'return'
@@ -132,7 +142,7 @@ function cskhActionCardHtml(row, kind){
 // giữ lại để hiển thị dòng cũ.
 const CSKH_ACTION_GROUPS = [
   { type: 'danh_gia_xau', title: 'Đánh giá 1–3★', note: 'anh xử lý theo mã đơn — em đã nhắn khách theo mẫu' },
-  { type: 'tra_hang_anh_huong_shop', title: 'Trả hàng — lý do ảnh hưởng shop', note: 'em đã nhờ khách đổi lý do + hỏi lý do thật (Shopee: chưa nhắn được, anh nhắn tay)' },
+  { type: 'tra_hang_anh_huong_shop', title: 'Trả hàng — lý do ảnh hưởng shop', note: 'em đã nhờ khách đổi lý do + hỏi lý do thật' },
   { type: 'tra_hang_noi_dung_sp_kho', title: 'Trả hàng — nói về sản phẩm / kho vận', note: 'lý do không ảnh hưởng chỉ số nhưng chi tiết khách nêu vấn đề đáng xem' },
   { type: 'danh_gia_van_de', title: 'Đánh giá 4–5★ có nhắc vấn đề', note: 'khách chấm cao nhưng nói về sản phẩm / giao hàng' },
   { type: 'lien_he_khach', title: 'Anh tự nhắn khách', note: 'đánh giá xấu đã nhắn 12h khách chưa trả lời — tìm tên khách trên TikTok, nhắn hỗ trợ' },
@@ -187,7 +197,7 @@ function cskhErrlogRows(reviews, returns){
   return [
     ...reviews.map(r => ({ row: r, kind: 'review', tbl: 'cskh_reviews', d: r.review_date })),
     ...returns.map(r => ({ row: r, kind: 'return', tbl: 'cskh_returns', d: r.request_date })),
-  ].filter(i => i.row.errlog_status && i.row.errlog_status !== 'none')
+  ].filter(i => i.row.errlog_status && i.row.errlog_status !== 'none' && i.row.errlog_status !== 'dismissed')
    .sort((a, b) => (b.d || '').localeCompare(a.d || ''));
 }
 
@@ -210,7 +220,8 @@ function cskhErrlogCardHtml(i){
   } else if (r.errlog_status === 'suggest' && kind && r.errlog_code){
     ctrl = `<button class="btn-errlog" data-tbl="${esc(i.tbl)}" data-id="${esc(String(r.id))}"`
       + ` data-code="${esc(r.errlog_code)}" data-etype="${kind.etype}" data-dreason="${kind.dreason}"`
-      + ` data-reason="${esc(r.errlog_reason || '')}">Xác nhận ghi Sổ Kho: ${esc(kind.label)}</button>`;
+      + ` data-reason="${esc(r.errlog_reason || '')}">Xác nhận ghi Sổ Kho: ${esc(kind.label)}</button>`
+      + ` <button class="btn-errskip" data-tbl="${esc(i.tbl)}" data-id="${esc(String(r.id))}">Không phải lỗi shop — bỏ qua</button>`;
   } else if (r.errlog_status === 'suggest'){
     ctrl = `<span class="err-skip">Nghi lỗi shop nhưng chưa đủ dữ liệu (thiếu mã vận đơn/loại lỗi) — anh kiểm tay</span>`;
   } else { ctrl = ''; }
@@ -261,6 +272,22 @@ async function cskhWriteErrlog(btn){
   }
 }
 
+// Nút "Không phải lỗi shop — bỏ qua": chủ shop xem bằng chứng rồi quyết định KHÔNG ghi
+// (công bằng cho nhân viên/NCC). Đặt errlog_status='none' → thẻ biến khỏi khối này,
+// skill lượt sau không dựng lại (mục 4.2.3: chỉ ghi đè khi đang 'suggest' từ chính nó).
+async function cskhSkipErrlog(btn){
+  if (!confirm('Xác nhận đây KHÔNG phải lỗi của shop/kho/NCC? Dòng sẽ không được ghi vào Sổ Kho.')) return;
+  btn.disabled = true;
+  try {
+    await sbFetch(btn.dataset.tbl + '?id=eq.' + encodeURIComponent(btn.dataset.id),
+      { method: 'PATCH', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ errlog_status: 'dismissed' }) });
+    const list = (btn.dataset.tbl === 'cskh_returns' ? cskhRows.returns : cskhRows.reviews);
+    const rec = list.find(x => String(x.id) === btn.dataset.id);
+    if (rec) rec.errlog_status = 'dismissed';
+    const card = btn.closest('.fi'); if (card) card.remove();
+  } catch (err){ btn.disabled = false; alert('Chưa lưu được: ' + err.message); }
+}
+
 // ---------------------------------------------------------- khối insight ---
 function cskhInsightHtml(reviews, returns, periodLabel){
   const groups = new Map();
@@ -288,7 +315,7 @@ function cskhInsightHtml(reviews, returns, periodLabel){
     }).join('');
     const latest = items.find(i => i.row.order_code);
     const link = latest
-      ? `<div class="fi-foot"><a class="lnk" href="${CSKH_ORDER_URL[latest.row.platform] ? CSKH_ORDER_URL[latest.row.platform](latest.row.order_code) : '#'}" target="_blank" rel="noopener">↗ Mở đơn gần nhất</a><span class="code">${esc(latest.row.order_code)}</span></div>`
+      ? `<div class="fi-foot"><a class="lnk" href="${CSKH_ORDER_URL[latest.row.platform] ? CSKH_ORDER_URL[latest.row.platform](latest.row.order_code, latest.row) : '#'}" target="_blank" rel="noopener">↗ Mở đơn gần nhất</a><span class="code">${esc(latest.row.order_code)}</span></div>`
       : '';
     const title = g.note || tag;
     // dòng phụ: nguồn của con số (mấy đánh giá, mấy case) + sản phẩm hay bị nhắc
@@ -455,6 +482,8 @@ function wireCskh(){
   // render lại mỗi lần đổi kỳ hoặc sau khi ack).
   const body = document.getElementById('cskh-body');
   if (body) body.addEventListener('click', (e) => {
+    const skipBtn = e.target.closest('.btn-errskip');
+    if (skipBtn){ cskhSkipErrlog(skipBtn); return; }
     const errBtn = e.target.closest('.btn-errlog');
     if (errBtn){ cskhWriteErrlog(errBtn); return; }
     const ackBtn = e.target.closest('.btn-ack');
