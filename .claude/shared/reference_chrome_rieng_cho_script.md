@@ -17,7 +17,7 @@ Chrome điều khiển. Chủ shop đã đăng nhập TikTok Affiliate vào đâ
 - **Việc sau này cần script lấy data sàn** (xem [reference_auto_data_pull_pattern.md](reference_auto_data_pull_pattern.md))
   cứ dùng chung profile này; cần sàn khác thì đăng nhập sàn đó vào đây 1 lần.
   Hai script không chạy CÙNG LÚC (Chrome khoá profile), nên xếp lịch lệch giờ.
-- Mất phiên (vài tuần/lần): script dừng và báo Telegram nếu đã đặt
-  `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` ở cấp Máy; chưa đặt thì mục KOC chỉ
-  hiện dữ liệu cũ cho tới khi đăng nhập lại.
+- Mất phiên (vài tuần/lần): script dừng và báo Telegram. Đã đặt 2 biến môi trường
+  `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID` ở cấp User trên PC (17/11/2026, giá trị
+  thật chỉ ở PC/memory, KHÔNG commit). Script mới nào cần báo Telegram cứ đọc 2 biến này.
 - Task đang dùng: `Claude - Dong bo KOC`, 2 ngày/lần lúc 9:00.
