@@ -34,10 +34,14 @@ Việc nhờ khách đổi (dòng 35): đổi sang **"Đổi ý"**.
 | **Thiếu hàng** | **1 — ảnh hưởng** |
 | Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) · Tôi muốn cập nhật địa chỉ/sđt · Thay đổi đơn hàng/mã giảm giá · Lý do khác · Giao hàng không thành công | không phải trả hàng — là **đơn huỷ/hoàn tiền ngay trước khi giao** → chỉ ghi sổ, không nhắn |
 
-Việc nhờ khách đổi (dòng 36): đổi sang lý do an toàn của Shopee. **Tên trên giao diện
-người bán hiện là "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"**, còn Sheet
-"Mau tin nhan" dòng 36 đang ghi "Hàng nguyên vẹn nhưng không còn nhu cầu" (tên người
-mua thấy, chưa xác minh trùng) — chủ shop cần xác nhận/sửa dòng 36 cho khách đọc là hiểu.
+Việc nhờ khách đổi (dòng 36): đổi sang **"Hàng nguyên vẹn nhưng không còn nhu cầu"** —
+**chủ shop xác nhận 17/11/2026 đây là lý do không ảnh hưởng đúng của Shopee** (không phải
+"Đổi ý"). Trên danh sách người bán, lý do này hiện nhãn "Đổi ý (Sản phẩm còn nguyên tem,
+nhãn mác, bao bì)" — coi là CÙNG một lý do (suy luận từ nhãn; chưa có tài liệu Shopee nói
+thẳng). Cột **"Lý do điều chỉnh bởi Shopee"** trên danh sách: nếu có giá trị thì lý do
+được điều chỉnh đó mới là lý do tính chỉ số, ưu tiên hơn lý do khách chọn (17/11 toàn bộ đang "-").
+Điều kiện: Shopee giới hạn lý do này cho khách Kim Cương/Vàng/ShopeeVIP.
+Mẫu tin 2 sàn: [mau-tin-nhan-tra-hang.md](mau-tin-nhan-tra-hang.md).
 
 ### Hệ quả cho cách xếp nhóm
 - **Size:** TikTok "Đặt sai kích cỡ" → nhóm 2 (hỏi lý do thật, dòng 25). Shopee chê size mà
