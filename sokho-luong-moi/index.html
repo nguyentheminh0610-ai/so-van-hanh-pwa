@@ -630,17 +630,13 @@
       <div class="kpi"><span class="lbl">Số đơn khiếu nại</span><span class="val">—</span><span class="foot">Đang tải dữ liệu…</span></div>
     </div>
     <div class="card" id="cut-card">
-      <div class="card-head">
-        <h2>Đơn trước 16h</h2>
-        <div style="display:flex;gap:6px;align-items:center;">
-          <button type="button" class="btn ghost small" id="cut-prev" aria-label="Ngày trước" style="width:auto;margin-top:0;">‹</button>
-          <input type="date" id="cut-date" style="max-width:150px;" />
-          <button type="button" class="btn ghost small" id="cut-next" aria-label="Ngày sau" style="width:auto;margin-top:0;">›</button>
-        </div>
+      <div class="card-head"><h2>Đơn trước 16h</h2></div>
+      <p class="hint" id="cut-note" style="margin:0 0 8px;">Đang tải…</p>
+      <div class="kpi-grid" id="cut-people"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <button type="button" class="btn ghost small" id="cut-yday" style="width:auto;margin-top:0;">Xem đơn trễ hôm qua</button>
+        <button type="button" class="btn ghost small" id="cut-30" style="width:auto;margin-top:0;">Xem đơn trễ 30 ngày qua</button>
       </div>
-      <div class="kpi-grid" id="cut-kpi"><div class="kpi"><span class="lbl">Tỷ lệ đơn trễ</span><span class="val">—</span><span class="foot">Đang tải…</span></div></div>
-      <p class="hint" id="cut-note" style="margin:8px 0 0;"></p>
-      <button type="button" class="btn ghost small" id="cut-more" style="margin-top:8px;" hidden>Xem thêm — các đơn trễ</button>
       <div id="cut-detail" hidden style="margin-top:10px;"></div>
     </div>
     <div class="card" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
@@ -3043,25 +3039,24 @@
   var PN_START_MONTH = "2026-12";   // lương cách mới chạy từ tháng này; các tháng trước vẫn hiện cách cũ
   function payNewEra(m){ return m >= PN_START_MONTH; }
   var payNewLast = null;
-  function loadPayrollNew(){
-    if(!state.connected) return;
-    var monthEl = $("payroll-month");
-    if(!monthEl.value) monthEl.value = thisMonthStr();
-    var m = monthEl.value, range = monthRange(m), parts = m.split("-"), year = +parts[0], mon = +parts[1];
+  // Gom số liệu 1 tháng cho lương cách mới + thẻ "Đơn trước 16h" (dùng chung 1 chỗ tính để 2 nơi không lệch số).
+  // withErrors = false: bỏ bước tra lỗi Kho vận (nặng) — thẻ ở Tổng quan chỉ cần tử/mẫu theo từng bạn.
+  // includeToday = true: tính cả ngày hôm nay (thẻ Tổng quan); lương thì chỉ tới hôm qua.
+  function payNewBuild(m, withErrors, includeToday){
+    var range = monthRange(m), parts = m.split("-"), year = +parts[0], mon = +parts[1];
     var D = new Date(year, mon, 0).getDate();
     var isCurrentMonth = (m === thisMonthStr()), isFutureMonth = (m > thisMonthStr());
-    $("paynew-people").innerHTML = '<div class="empty-state">Đang tính…</div>';
-    $("paynew-kpi").innerHTML = ""; $("paynew-rates").innerHTML = "";
-    Promise.all([
+    return Promise.all([
       sbGetAll(T_OUTBOUND+"?scan_date=gte."+range.start+"&scan_date=lte."+range.end+"&select=code,staff,co_staff,scan_date&order=id.asc"),
       sbGetAll(T_RETURNS+"?scan_date=gte."+range.start+"&scan_date=lte."+range.end+"&select=staff,scan_date,return_type&order=id.asc"),
-      sbGetAll(T_ERRLOG+"?created_at=gte."+range.start+"T00:00:00&created_at=lte."+range.end+"T23:59:59&select=code,error_type&order=id.asc"),
+      withErrors ? sbGetAll(T_ERRLOG+"?created_at=gte."+range.start+"T00:00:00&created_at=lte."+range.end+"T23:59:59&select=code,error_type&order=id.asc") : Promise.resolve([]),
       payScannedNames(payShiftMonth(year, mon, -1)),
       (isCurrentMonth || isFutureMonth) ? Promise.resolve({}) : payScannedNames(payShiftMonth(year, mon, 1)),
       sbGetAll(T_SPECIAL+"?ngay=gte."+range.start+"&ngay=lte."+range.end+"&select=ngay,loai,ghi_chu&order=ngay.asc").catch(function(){ return null; }),
       sbGetAll(T_CUTOFF+"?ngay=gte."+range.start+"&ngay=lte."+range.end+"&select=ngay,san,mau_so,tu_so,trang_thai&order=id.asc").catch(function(){ return null; })
     ]).then(function(res){
       var khoVan = (res[2] || []).filter(function(e){ return e.error_type === "kho_van"; });
+      if(!withErrors) return { res: res, khoVan: khoVan, info: {} };
       return fetchPackerInfoByCodes(khoVan.map(function(e){ return e.code; })).then(function(info){ return { res: res, khoVan: khoVan, info: info }; });
     }).then(function(d){
       var outRows = d.res[0] || [], retRows = d.res[1] || [], special = d.res[5], cutRows = d.res[6];
@@ -3109,16 +3104,29 @@
         b.n++; if(r.trang_thai === "ok"){ b.ok++; b.mau += +r.mau_so || 0; b.tu += +r.tu_so || 0; }
       });
       Object.keys(byDayCut).forEach(function(k){ var b = byDayCut[k]; if(b.ok === b.n) cutoffMap[k] = { mau: b.mau, tu: b.tu }; });   // chỉ nhận ngày mà mọi sàn đều "ok"
-      var lastDay = isCurrentMonth ? Math.max(0, new Date().getDate() - 1) : (isFutureMonth ? 0 : D);
+      var todayN = new Date().getDate();
+      var lastDay = isCurrentMonth ? Math.max(0, includeToday ? todayN : todayN - 1) : (isFutureMonth ? 0 : D);
       var specialFlags = {}; Object.keys(specialMap).forEach(function(k){ specialFlags[k] = true; });
       var out = payNewCompute({
         D: D, high: payIsHighSeason(mon), ym: m, lastDay: lastDay, isCurrentMonth: isCurrentMonth,
         special: specialFlags, cutoff: cutoffMap, people: people
       });
-      payNewLast = { m: m, mon: mon, D: D, out: out, pairs: pairs, untraced: untraced, isCurrentMonth: isCurrentMonth,
-                     specialRows: Object.keys(specialMap).sort().map(function(k){ return specialMap[k]; }),
-                     tablesMissing: (special === null || cutRows === null) };
-      payNewRender(payNewLast);
+      return { m: m, mon: mon, D: D, out: out, pairs: pairs, untraced: untraced, isCurrentMonth: isCurrentMonth, lastDay: lastDay,
+               cutoffMap: cutoffMap, specialFlags: specialFlags,
+               specialRows: Object.keys(specialMap).sort().map(function(k){ return specialMap[k]; }),
+               tablesMissing: (special === null || cutRows === null) };
+    });
+  }
+  function loadPayrollNew(){
+    if(!state.connected) return;
+    var monthEl = $("payroll-month");
+    if(!monthEl.value) monthEl.value = thisMonthStr();
+    var m = monthEl.value;
+    $("paynew-people").innerHTML = '<div class="empty-state">Đang tính…</div>';
+    $("paynew-kpi").innerHTML = ""; $("paynew-rates").innerHTML = "";
+    payNewBuild(m, true, false).then(function(S){
+      payNewLast = S;
+      payNewRender(S);
     }).catch(function(err){
       console.error("payroll-new load error", err);
       $("paynew-people").innerHTML = '<div class="card"><div class="empty-state">Không tính được lương: '+escapeHtml(err.message || err)+'</div></div>';
@@ -3232,66 +3240,57 @@
      và warehouse_cutoff_orders (từng đơn trễ, tự xoá sau 40 ngày). Đơn đến hạn của ngày D = đơn tạo từ 16:00 hôm
      trước đến 16:00 ngày D; trễ = hãng vận chuyển chưa lấy lúc 20:00. */
   var CUT_KEEP_DAYS = 40;
-  var cutDetailOpen = false;
+  var cutView = "";           // "" | "y" (hôm qua) | "30" (30 ngày qua)
   function cutShift(dateIso, delta){
     var p = dateIso.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2] + delta);
     return dateStr(d);
   }
   function loadCutoffCard(){
     if(!state.connected) return;
-    var inp = $("cut-date");
-    var start = inp.value ? Promise.resolve(inp.value) :
-      sbGet(T_CUTOFF+"?select=ngay&order=ngay.desc&limit=1").then(function(r){ return r.length ? r[0].ngay : todayStr(); });
-    start.then(function(day){
-      inp.value = day;
-      return Promise.all([
-        sbGet(T_CUTOFF+"?ngay=eq."+day+"&select=san,mau_so,tu_so,trang_thai,ghi_chu&order=san.asc"),
-        sbGet(T_CUTOFF_ORDERS+"?ngay=eq."+day+"&select=san,ma_don,ma_van_don,tao_luc,tinh_trang&order=tao_luc.asc&limit=1000").catch(function(){ return []; })
-      ]).then(function(r){ renderCutoffCard(day, r[0] || [], r[1] || []); });
-    }).catch(function(err){
+    payNewBuild(thisMonthStr(), false, true).then(function(S){ renderCutoffPeople(S); }).catch(function(err){
       console.error(err);
-      $("cut-kpi").innerHTML = '<div class="kpi"><span class="lbl">Tỷ lệ đơn trễ</span><span class="val">—</span><span class="foot">Chưa đọc được (chạy file SQL mục 3-4 chưa?)</span></div>';
-      $("cut-more").hidden = true; $("cut-detail").hidden = true; $("cut-note").textContent = "";
+      $("cut-people").innerHTML = "";
+      $("cut-note").textContent = "Chưa đọc được số liệu (chạy file SQL mục 3-4 chưa?).";
     });
+    if(cutView) loadCutoffDetail();
   }
-  function renderCutoffCard(day, daily, orders){
-    var PL = { tiktok: "TikTok", shopee: "Shopee" };
-    var special = daily.some(function(r){ return r.trang_thai === "dac_biet"; });
-    var mau = 0, tu = 0;
-    daily.forEach(function(r){ if(r.trang_thai !== "dac_biet"){ mau += +r.mau_so || 0; tu += +r.tu_so || 0; } });
-    var rate = mau ? tu / mau : null;
-    var cls = rate === null ? "" : (rate < 0.1 ? "good" : "crit");
-    var per = daily.filter(function(r){ return r.trang_thai !== "dac_biet"; }).map(function(r){
-      return (PL[r.san] || r.san)+": "+r.tu_so+"/"+r.mau_so;
-    }).join(" · ");
-    $("cut-kpi").innerHTML =
-      '<div class="kpi"><span class="lbl">Tỷ lệ đơn trễ ngày '+fmtDate(day)+'</span><span class="val tabular '+cls+'">'+(rate === null ? "—" : (rate*100).toFixed(1).replace(".", ",")+"%")+'</span>' +
-        '<span class="foot">'+(daily.length ? (special ? "ngày đặc biệt — không tính thưởng" : tu+" trễ / "+mau+" đơn đến hạn"+(per ? " ("+per+")" : "")) : "Chưa có số liệu ngày này")+'</span></div>' +
-      '<div class="kpi"><span class="lbl">Ngưỡng thưởng 16h</span><span class="val tabular">dưới 10%</span><span class="foot">tính cả tháng, riêng từng bạn</span></div>';
-    var oldest = cutShift(todayStr(), -CUT_KEEP_DAYS);
-    $("cut-note").textContent = daily.length
-      ? "Đơn đến hạn = đơn tạo từ 16:00 hôm trước đến 16:00 hôm nay. Trễ = hãng vận chuyển chưa lấy lúc 20:00 (nguồn Sapo)."
-      : "Chưa có dòng nào — job 20:00 trên PC chưa ghi ngày này, hoặc ngày chưa tới.";
-    var more = $("cut-more");
-    more.hidden = !(tu > 0 || orders.length);
-    more.textContent = cutDetailOpen ? "Ẩn danh sách" : "Xem thêm — các đơn trễ ("+(orders.length || tu)+")";
-    var det = $("cut-detail");
-    det.hidden = !cutDetailOpen;
-    if(cutDetailOpen){
-      det.innerHTML = day < oldest
-        ? '<p class="hint">Chi tiết từng đơn chỉ lưu '+CUT_KEEP_DAYS+' ngày, ngày này đã được xoá. Con số tổng hợp ở trên vẫn giữ.</p>'
-        : (orders.length
-          ? '<div class="twrap"><table><thead><tr><th>Mã đơn</th><th>Sàn</th><th>Tạo lúc</th><th>Tình trạng</th><th>Mã vận đơn</th></tr></thead><tbody>' +
-            orders.map(function(o){
-              return '<tr><td class="mono">'+escapeHtml(o.ma_don)+'</td><td>'+escapeHtml(PL[o.san] || o.san)+'</td><td class="tabular">'+fmtTime(o.tao_luc)+' '+fmtDate(dateStr(new Date(o.tao_luc))).slice(0,5)+'</td><td>'+escapeHtml(o.tinh_trang || "—")+'</td><td class="mono">'+escapeHtml(o.ma_van_don || "—")+'</td></tr>';
-            }).join("") + '</tbody></table></div><p class="hint" style="margin:8px 0 0;">Chi tiết đơn lưu '+CUT_KEEP_DAYS+' ngày rồi tự xoá.</p>'
-          : '<p class="hint">Ngày này không có đơn trễ nào.</p>');
-    }
+  function renderCutoffPeople(S){
+    var out = S.out, list = out.people;
+    var Y = out.Y, have = out.Y - out.X;
+    $("cut-note").textContent = Y === 0 ? "Tháng này chưa có ngày nào để tính."
+      : "Tỷ lệ đơn trễ của từng bạn, cộng dồn từ đầu tháng đến nay (đã có số liệu " + have + "/" + Y + " ngày). Dưới 10% là đạt thưởng 16h. Trễ = hãng vận chuyển chưa lấy lúc 20:00.";
+    $("cut-people").innerHTML = list.map(function(p){
+      var h = p.h16, rate = h.rate;
+      var cls = rate === null ? "" : (h.pass ? "good" : "crit");
+      var pct = rate === null ? "—" : (rate * 100).toFixed(1).replace(".", ",") + "%";
+      var foot = h.mau > 0 ? (Math.round(h.tu * 10) / 10 + " đơn trễ / " + Math.round(h.mau * 10) / 10 + " đơn đến hạn · " + (h.pass ? "đang đạt" : "đang không đạt")) : "chưa có số liệu";
+      return '<div class="kpi"><span class="lbl">' + escapeHtml(p.name) + '</span><span class="val tabular ' + cls + '">' + pct + '</span><span class="foot">' + foot + '</span></div>';
+    }).join("") || '<div class="empty-state">Chưa có bạn nào có quét trong tháng.</div>';
   }
-  $("cut-date").addEventListener("change", loadCutoffCard);
-  $("cut-prev").addEventListener("click", function(){ var i = $("cut-date"); if(i.value){ i.value = cutShift(i.value, -1); loadCutoffCard(); } });
-  $("cut-next").addEventListener("click", function(){ var i = $("cut-date"); if(i.value){ i.value = cutShift(i.value, 1); loadCutoffCard(); } });
-  $("cut-more").addEventListener("click", function(){ cutDetailOpen = !cutDetailOpen; loadCutoffCard(); });
+  function loadCutoffDetail(){
+    var det = $("cut-detail"), PL = { tiktok: "TikTok", shopee: "Shopee" };
+    var today = todayStr(), from = cutView === "y" ? cutShift(today, -1) : cutShift(today, -30), to = cutView === "y" ? cutShift(today, -1) : today;
+    det.hidden = false;
+    det.innerHTML = '<p class="hint">Đang tải…</p>';
+    sbGetAll(T_CUTOFF_ORDERS + "?ngay=gte." + from + "&ngay=lte." + to + "&select=ngay,san,ma_don,ma_van_don,tao_luc,tinh_trang&order=ngay.desc,tao_luc.asc").then(function(rows){
+      var title = cutView === "y" ? "Đơn trễ hôm qua (" + fmtDate(from) + ")" : "Đơn trễ 30 ngày qua";
+      if(!rows.length){
+        det.innerHTML = '<p class="hint"><b>' + title + ':</b> không có đơn nào' + (cutView === "y" ? " (hoặc job 20:00 chưa ghi ngày này)." : ".") + '</p>';
+        return;
+      }
+      det.innerHTML = '<p class="hint" style="margin:0 0 6px;"><b>' + title + ':</b> ' + rows.length + ' đơn</p>' +
+        '<div class="twrap"><table><thead><tr><th>Mã đơn</th><th>Ngày</th><th>Sàn</th><th>Tình trạng</th><th>Mã vận đơn</th></tr></thead><tbody>' +
+        rows.map(function(o){
+          return '<tr><td class="mono">' + escapeHtml(o.ma_don) + '</td><td class="tabular">' + fmtDate(o.ngay).slice(0, 5) + '</td><td>' + escapeHtml(PL[o.san] || o.san) + '</td><td>' + escapeHtml(o.tinh_trang || "—") + '</td><td class="mono">' + escapeHtml(o.ma_van_don || "—") + '</td></tr>';
+        }).join("") + '</tbody></table></div><p class="hint" style="margin:8px 0 0;">Chi tiết đơn lưu ' + CUT_KEEP_DAYS + ' ngày rồi tự xoá. Đơn trễ tính chung cả kho, rồi chia cho các bạn có quét hôm đó.</p>';
+    }).catch(function(err){ console.error(err); det.innerHTML = '<p class="hint">Không đọc được danh sách đơn trễ.</p>'; });
+  }
+  function cutToggle(v){
+    if(cutView === v){ cutView = ""; $("cut-detail").hidden = true; return; }
+    cutView = v; loadCutoffDetail();
+  }
+  $("cut-yday").addEventListener("click", function(){ cutToggle("y"); });
+  $("cut-30").addEventListener("click", function(){ cutToggle("30"); });
 
   function runManualReconcile(){
     var btn = $("dash-reconcile-btn");
