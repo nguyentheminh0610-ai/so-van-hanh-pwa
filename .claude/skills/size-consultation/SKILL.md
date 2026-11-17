@@ -130,8 +130,9 @@ Sapo/sàn trước**, xem bước 2 dưới.
   khách xin bảng size/số đo chi tiết, hoặc khách đang phân vân / sợ rộng
   chật — gửi ảnh bảng size của đúng dòng quần (ảnh "Bảng kích cỡ" trên tin
   đăng) kèm câu "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình
-  nha." Lưu ý: ảnh bảng size trên tin đăng hiện CHƯA khớp đặc tả (chủ shop
-  đang sửa) — khi tư vấn vẫn theo số liệu đặc tả.
+  nha." Từ 17/11/2026 ảnh nằm sẵn trong `assets/` (bang-size-hoat-hinh.jpg,
+  bang-size-caro.jpg). Không kèm câu "ngắn hơn 1-2cm" trừ khi khách hỏi vì
+  sao bảng ngắn hơn số đo tư vấn — xem references/cskh-faq-17-11.md mục 3.
 - **Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02)**: KHÔNG khuyên lên size (chốt
   15/10/2026) — tư vấn như caro thường.
 - **Mốc dài quần**: chạm gót = gấu quần chạm gót chân (che qua mắt cá);
@@ -217,11 +218,22 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
   *Lý do:* khách gửi ảnh quần hoa rằn ri ("Mặc sao cũng xinh"), bị đọc nhầm
   thành mẫu Shin/hoạ tiết hoạt hình → shop trả "còn đủ size S–XXXL", 30 phút
   sau lại phải đính chính "màu này shop không có".
+- **Trước khi báo "hết hàng":** tra dải size cột I Google Sheet "Sku" — size
+  ngoài dải là KHÔNG SẢN XUẤT, trong dải mà kho=0 mới là tạm hết (chốt
+  17/11/2026, xem [references/cskh-faq-17-11.md](references/cskh-faq-17-11.md) mục 1).
 - **Khách hỏi ngày dự kiến hàng về** (hàng đang hết): KHÔNG tự đoán ngày.
   Trả lời khách **"bạn chờ xíu mình kiểm tra rồi báo ngay ạ"**, đồng thời
   gửi Telegram báo chủ shop (token + chat ID + lệnh curl:
   `../daily-warehouse-report/references/reference_telegram_bot.md`) để chủ
   shop tự vào xử lý tiếp.
+
+## Câu hỏi lặp lại đã có đáp án (chốt 17/11/2026)
+
+Giặt máy / xù / rụng lông / giặt chung (mỗi câu hỏi trả 1 câu riêng), gửi bảng
+size (ảnh trong `assets/`), lo dài-rộng, lo đùi to, hộp quà, shop ở đâu, hết
+hàng vs không sản xuất — mẫu câu chuẩn ở
+[references/cskh-faq-17-11.md](references/cskh-faq-17-11.md). Mục "CHƯA train"
+cuối file đó liệt kê những nhóm vẫn để chủ shop.
 
 ## Vận chuyển & CSKH khác (chốt 28/10/2026)
 
