@@ -36,8 +36,12 @@ Khách hỏi gì chỉ trả đúng điều đó, không gộp.
   tâm nha."
 - **Giặt chung được không:** "Dạ bạn hạn chế giặt chung với đồ khác màu nha, nhất
   là đồ trắng, vì dễ dính màu khác vào làm xỉn màu ạ."
-- ⏳ Chưa rõ: "xù" chỉ đúng với Quần Lông hay cả Caro — nếu khách hỏi Caro, chờ
-  chủ shop xác nhận (báo Telegram).
+- **Hỏi về phai màu:** (chốt 17/11/2026) quần KHÔNG phai màu. "Dạ quần bên mình
+  không bị phai màu đâu ạ, bạn yên tâm nha." (Vẫn nhắc hạn chế giặt chung đồ
+  trắng nếu khách hỏi giặt chung — đó là chuyện dính màu từ đồ khác, không phải
+  quần phai.)
+- **Phạm vi câu "xù" (chốt 17/11/2026): chỉ áp dụng Quần Lông** (Chất Lông-...).
+  Khách hỏi xù cho Caro/Chất Thun/bộ → không dùng câu này, báo Telegram chủ shop.
 
 ## 3. Bảng size (chốt 17/11/2026)
 
@@ -114,9 +118,24 @@ Chọn đủ rồi vào giỏ hàng, tích chọn hết các phân loại và b�
 bạn không đặt được thì do tài khoản của bạn, bạn thử đổi sang tài khoản khác là
 mua được nhé."
 
+## 13. Giao sai / hàng lỗi / bẩn / rách — ĐÃ CÓ hướng dẫn, dùng chính sách này (ghi chú 17/11/2026)
+
+Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`
+— tab **"Chinh sach xu ly loi"** (mức lỗi, % hoàn, mã giảm) + tab **"Mau tin nhan"**
+(câu chuẩn). Đọc dòng thật trong Sheet, không chép lại từ trí nhớ.
+- Sản phẩm: Nhẹ (chỉ thừa) / Vừa (lem màu nhẹ, may lệch, rách nhỏ tự vá) / Nặng
+  (sai mẫu/màu, lỗi vải diện rộng, rách lớn) → hoàn 10-15% / 15-20% / đổi hoặc trả.
+- Dịch vụ: giao thiếu → gửi bù (skill resend-missing-item); giao sai phân loại/size
+  → hoàn 30% giữ hàng hoặc đổi; giao sai sang SP khác hoàn toàn → đổi.
+- Tin đầu theo "Mau tin nhan": xác nhận lỗi + xin lỗi, rồi "Deal khách"/"Đưa ra
+  hướng xử lý" (đổi hàng/trả hàng hoàn tiền theo từng sàn). Khách nói rõ yêu cầu
+  thì làm đúng yêu cầu đó.
+- Lưu ý: tác vụ CSKH tự động (cskh-inbox-*) hiện vẫn xếp "khiếu nại" vào nhóm KHÔNG
+  trả lời, nên các case này bị ghi vào nhật ký "bỏ qua" dù có sẵn hướng dẫn.
+
 ## CHƯA train (rà 17/11/2026, chờ chủ shop trả lời — CS vẫn bỏ qua, để chủ shop)
 
-Giao sai size/màu/thiếu hàng; hàng lỗi/bẩn/rách; hoàn tiền bị trừ phí; khách ví
+Hoàn tiền bị trừ phí; khách ví
 chưa đủ tuổi không rút được; khách xin số tài khoản chuyển ngoài sàn; đặt sai
 địa chỉ; xin Zalo; khách thật hỏi mua sỉ quần; bản quyền khi quay affiliate; KOC "mẫu phải
 trả tiền trước"; booking/agency xin hợp tác live.
