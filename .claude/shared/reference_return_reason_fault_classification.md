@@ -6,6 +6,52 @@ cần phân loại "case trả hàng này có tính lỗi shop không" (hiện t
 
 # Lý do trả hàng nào tính là lỗi shop (từng sàn)
 
+## ⭐ BẢNG CHỐT 17/11/2026 — đối chiếu trực tiếp trên 2 sàn, THẮNG mọi bảng bên dưới
+
+Hai sàn có **bộ lý do KHÁC NHAU** — đừng áp lý do của sàn này sang sàn kia. Điểm
+dễ nhầm nhất: **TikTok có lý do "Đặt sai kích cỡ" an toàn, Shopee không có lý do
+tương đương** → khách Shopee chê size thường chọn "Khác với mô tả" (tính lỗi shop).
+
+### TikTok — nhận diện bằng badge, đã đối chiếu 90 thẻ "Đang chờ bạn" ngày 17/11
+Thẻ có badge **"Không phải lỗi người bán"** = KHÔNG ảnh hưởng shop. Không có badge = ảnh hưởng.
+
+| Lý do hiển thị | Badge | Nhóm |
+|---|---|---|
+| **Đổi ý** | có | 2 — không ảnh hưởng |
+| **Đặt sai kích cỡ** | có | 2 — không ảnh hưởng |
+| **Chất lượng kém** (lý do phụ: Rách/có lỗ/hư hỏng khác, Bẩn hoặc có vết ố…) | KHÔNG | **1 — ảnh hưởng** |
+| Sản phẩm không khớp với mô tả · Gửi sai sản phẩm · Nhận thiếu hàng (đã gặp trong sổ) | KHÔNG | **1 — ảnh hưởng** |
+
+Việc nhờ khách đổi (dòng 35): đổi sang **"Đổi ý"**.
+
+### Shopee — KHÔNG có badge, phải tra tên lý do (đọc trực tiếp danh sách trả hàng 17/11)
+| Lý do hiển thị | Nhóm |
+|---|---|
+| **Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)** | 2 — không ảnh hưởng |
+| **Người bán gửi sai hàng** | **1 — ảnh hưởng** |
+| **Khác với mô tả** (kể cả khi thực chất khách chê size/form) | **1 — ảnh hưởng** |
+| **Hàng lỗi, không hoạt động** | **1 — ảnh hưởng** |
+| **Thiếu hàng** | **1 — ảnh hưởng** |
+| Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) · Tôi muốn cập nhật địa chỉ/sđt · Thay đổi đơn hàng/mã giảm giá · Lý do khác · Giao hàng không thành công | không phải trả hàng — là **đơn huỷ/hoàn tiền ngay trước khi giao** → chỉ ghi sổ, không nhắn |
+
+Việc nhờ khách đổi (dòng 36): đổi sang lý do an toàn của Shopee. **Tên trên giao diện
+người bán hiện là "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"**, còn Sheet
+"Mau tin nhan" dòng 36 đang ghi "Hàng nguyên vẹn nhưng không còn nhu cầu" (tên người
+mua thấy, chưa xác minh trùng) — chủ shop cần xác nhận/sửa dòng 36 cho khách đọc là hiểu.
+
+### Hệ quả cho cách xếp nhóm
+- **Size:** TikTok "Đặt sai kích cỡ" → nhóm 2 (hỏi lý do thật, dòng 25). Shopee chê size mà
+  chọn "Khác với mô tả" → vẫn **nhóm 1** (mời đổi sang "Đổi ý" + hỏi lý do thật).
+- Shopee: nhận diện nhóm 1 **chỉ bằng bảng trên**; lý do mới chưa có trong bảng → coi là
+  nhóm 1 (an toàn cho shop) và ghi sổ để chủ shop bổ sung bảng.
+- Detail trang chi tiết trả hàng Shopee không có cờ "lỗi người bán" (đã kiểm) nên không thể
+  xác minh lại bằng giao diện — bảng này là nguồn duy nhất.
+- Nhận xét của khách trên TikTok đôi khi mâu thuẫn lý do (vd "Đổi ý" nhưng ghi "túi rách,
+  quần không đủ nhãn mác", 15/11) → sàn vẫn tính "Không phải lỗi người bán", nhưng báo sổ
+  `tra_hang_noi_dung_sp_kho` vì chi tiết nhắc sản phẩm.
+
+---
+
 ## Vì sao cần file này
 
 `shop_error_kind` (xem [review-return-check/SKILL.md](../skills/review-return-check/SKILL.md)

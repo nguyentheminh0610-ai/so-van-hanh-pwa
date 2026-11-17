@@ -192,7 +192,8 @@ cần chờ khách trả lời giữa 2 tin.
    - Gửi tin 1: dòng 35 (TikTok) hoặc 36 (Shopee) — nhờ đổi lý do. Tên lý do
      **khác nhau theo sàn**, đọc nguyên văn từ Sheet:
      - TikTok Shop: mời đổi sang **"Đổi ý"**.
-     - Shopee: mời đổi sang **"Hàng nguyên vẹn nhưng không còn nhu cầu"**.
+     - Shopee: mời đổi sang lý do an toàn của Shopee (tên đúng ghi ở dòng 36 Sheet; trên giao diện
+       người bán hiện là "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)").
    - Gửi tin 2 (ngay sau): dòng 25 — hỏi lý do thật để shop cải thiện.
 3. **Không phải lỗi shop** → gửi **1 tin duy nhất**: dòng 25 (hỏi lý do, trung
    lập, không mời đổi gì).
@@ -248,16 +249,14 @@ Thay cho TODO 30/10. Dùng Chrome Shopee (deviceId trong
    của người (shop hay khách). Có tin người thật → bỏ qua nhắn (vẫn báo sổ).
 5. **Gửi:** gõ vào ô "Nhập nội dung tin nhắn" rồi gửi, **đúng 2 tin (nhóm 1: dòng 36
    rồi 25) hoặc 1 tin (nhóm 2: dòng 25)**. Xong đóng cửa sổ chat.
-6. **Tên lý do thật trên giao diện Shopee (đọc 17/11/2026):**
-   | Lý do hiển thị | Nhóm |
-   |---|---|
-   | Người bán gửi sai hàng · Khác với mô tả · Hàng lỗi, không hoạt động · Thiếu hàng | **1 — ảnh hưởng shop** |
-   | Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì) | 2 |
-   | Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) · Lý do khác · các lý do hủy đơn | 2 / không phải trả hàng |
-   Lý do "đích" khi nhờ khách đổi (dòng 36) trên UI hiện tên **"Đổi ý (Sản phẩm còn nguyên
-   tem, nhãn mác, bao bì)"** — kiểm lại nguyên văn dòng 36 trong Sheet "Mau tin nhan" cho
-   khớp tên này (bảng cũ ghi "Hàng nguyên vẹn nhưng không còn nhu cầu"; chưa sửa Sheet,
-   việc của chủ shop).
+6. **Phân nhóm lý do:** theo bảng chốt 17/11 trong
+   [reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
+   (mục "BẢNG CHỐT"). **Hai sàn khác nhau:** TikTok dùng badge "Không phải lỗi người bán"
+   (không ảnh hưởng: "Đổi ý", "Đặt sai kích cỡ"); Shopee không có badge, chỉ "Đổi ý
+   (Sản phẩm còn nguyên tem…)" là không ảnh hưởng, còn "Khác với mô tả" / "Người bán gửi sai hàng" /
+   "Hàng lỗi" / "Thiếu hàng" là nhóm 1 — kể cả khi khách thực ra chỉ chê size. Lý do Shopee
+   chưa có trong bảng → coi nhóm 1 và ghi sổ để chủ shop bổ sung. Tên lý do đích dòng 36
+   phải khớp chữ trên giao diện — nếu Sheet ghi khác, nhắn đúng chữ Sheet nhưng báo chủ shop sửa.
 7. Cột trạng thái: "Chờ bạn xác nhận hàng trả về" là case còn mở, có hạn phản hồi —
    **không bấm Khiếu nại / Hoàn tiền** (Hard rule 2).
 
