@@ -14,14 +14,16 @@ tab Sheet8), **cột I "Size"** = dải size mà mã SKU đó CÓ SẢN XUẤT.
   trong dải, không có size khách hỏi; gợi ý size gần nhất trong dải hoặc mẫu khác
   có size đó (vd Shin CL01/CL06/CL07 có S-3XL). Không hứa "sẽ về".
 - Size **nằm trong** dải nhưng **tồn kho = 0** (kiểm Sapo/trang sản phẩm) →
-  **tạm hết**. Không tự đoán ngày về; trả "Dạ mẫu này size đó đang tạm hết ạ,
-  bạn chờ mình kiểm tra rồi báo ngay nhé" + báo Telegram chủ shop (như quy tắc
-  cũ ở SKILL.md). **Chủ shop không có ngày cụ thể** — CS không được nêu ngày.
+  **tạm hết**. **Chủ shop không có ngày cụ thể** — CS không được nêu ngày.
+  Khách hỏi "bao giờ có lại" → (chốt 17/11/2026, thay quy tắc cũ "chờ kiểm tra
+  rồi báo ngay") báo khách **theo dõi (follow) shop và theo dõi các buổi live**
+  để biết khi hàng về, VÀ **gửi Telegram báo chủ shop** để chủ shop vào trả lời
+  nếu rảnh. Câu mẫu: "Dạ mẫu này size đó hiện đang tạm hết ạ, shop chưa có ngày
+  về cụ thể. Bạn theo dõi (follow) shop và theo dõi các buổi live của shop để
+  biết ngay khi hàng về nhé ạ." Không hẹn "kiểm tra rồi báo" nữa.
 - Lý do train: ~35 khách hỏi "bao giờ có lại" (Shin, Lợn Hồng 3XL, Caro xanh
   2XL...), CS hẹn "kiểm tra" rồi không ai báo lại; một phần là size vốn không
   sản xuất nên phải nói thẳng thay vì để khách chờ.
-- ⏳ Chưa chốt: câu cho "tạm hết" khi shop không có ngày (hứa báo lại bằng cách
-  nào; có gợi ý mẫu thay thế không). Tạm dùng câu ở trên cho tới khi chủ shop chốt.
 
 ## 2. Giặt & chất liệu — mỗi câu hỏi trả lời MỘT câu riêng (chốt 17/11/2026)
 
@@ -72,10 +74,49 @@ mình cũng không bán nữa ạ."
 thêm cho đơn hàng không ạ?" — Khách nói cần hỏa tốc → không tự quyết, báo
 Telegram chủ shop. Không đưa địa chỉ cụ thể.
 
+## 8. Giá lệch so với lúc đặt (chốt 17/11/2026)
+
+Có nhiều lý do, CS giải thích theo lý do hợp với ngữ cảnh đơn của khách (không
+khẳng định bừa — không chắc lý do nào thì nêu các khả năng):
+- Hôm đó **sàn trợ giá / chạy khuyến mãi**, nay hết nên giá về bình thường.
+- Khách mua **qua live** nên được giá live thấp hơn.
+- Khách thấy giá của **phân loại rẻ hơn**, còn phân loại khách mua là phân loại
+  giá cao hơn (vd cùng sản phẩm nhưng size/mẫu khác giá).
+Câu mẫu gợi ý: "Dạ giá có thể chênh vì hôm đó sàn có trợ giá, hoặc bạn mua qua
+live nên được giá ưu đãi hơn, hoặc phân loại bạn đặt khác phân loại bạn thấy
+giá thấp ạ. Bạn gửi mình xem đơn để mình kiểm tra cụ thể nhé."
+Khiếu nại bức xúc / đòi hoàn chênh lệch → vẫn để chủ shop quyết.
+
+## 9. Hỏi "mua sỉ" / "tên shop" từ shop giấy đóng hàng (chốt 17/11/2026)
+
+Tin kiểu "Gửi mình thông tin mua sỉ", "Tên shop ạ" từ tài khoản `baobivietbach_2`
+KHÔNG phải khách mua quần: đó là **bên bán giấy đóng đơn**, chủ shop là người đi
+hỏi mua. → CS **bỏ qua, không trả lời, không báo Telegram**. Chung quy tắc:
+nhận ra nhà cung cấp/vật tư (bán giấy, hộp, tem...) thì không tư vấn như khách.
+(Chưa có quy tắc cho khách thật hỏi mua sỉ quần — gặp thì báo Telegram chủ shop.)
+
+## 10. Cắt ngắn ống quần (chốt 17/11/2026)
+
+"Dạ hiện shop không nhận cắt ngắn ống quần ạ. Bạn mua về nếu thấy dài thì mang
+ra tiệm cắt, giá rẻ và tiện lắm ạ, cắt ở tiệm cũng đảm bảo đẹp và không bị mất
+form đâu, bạn yên tâm nha."
+
+## 11. Mua 2 cái cùng mẫu / nhiều phân loại — hướng dẫn thêm giỏ hàng (chốt 17/11/2026)
+
+"Dạ bạn bấm nút 'Thêm vào giỏ hàng' cạnh nút 'Mua ngay', chọn phân loại mình
+cần rồi bấm thêm vào giỏ hàng. Bạn làm tương tự với các phân loại khác cần mua.
+Chọn đủ rồi vào giỏ hàng, tích chọn hết các phân loại và bấm thanh toán là được
+ạ." (Dùng khi khách không đặt được 2 cái cùng mẫu / nhiều phân loại một lần.)
+
+## 12. COD / thanh toán sau không đặt được (chốt 17/11/2026)
+
+"Dạ hiện bên mình vẫn bán COD (thanh toán khi nhận hàng) như bình thường ạ. Nếu
+bạn không đặt được thì do tài khoản của bạn, bạn thử đổi sang tài khoản khác là
+mua được nhé."
+
 ## CHƯA train (rà 17/11/2026, chờ chủ shop trả lời — CS vẫn bỏ qua, để chủ shop)
 
 Giao sai size/màu/thiếu hàng; hàng lỗi/bẩn/rách; hoàn tiền bị trừ phí; khách ví
 chưa đủ tuổi không rút được; khách xin số tài khoản chuyển ngoài sàn; đặt sai
-địa chỉ; xin Zalo; giá lệch so với lúc đặt; mua sỉ; cắt ngắn ống quần; đặt 2
-cái cùng mẫu; COD/thanh toán sau; bản quyền khi quay affiliate; KOC "mẫu phải
+địa chỉ; xin Zalo; khách thật hỏi mua sỉ quần; bản quyền khi quay affiliate; KOC "mẫu phải
 trả tiền trước"; booking/agency xin hợp tác live.

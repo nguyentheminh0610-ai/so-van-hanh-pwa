@@ -222,7 +222,9 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
   ngoài dải là KHÔNG SẢN XUẤT, trong dải mà kho=0 mới là tạm hết (chốt
   17/11/2026, xem [references/cskh-faq-17-11.md](references/cskh-faq-17-11.md) mục 1).
 - **Khách hỏi ngày dự kiến hàng về** (hàng đang hết): KHÔNG tự đoán ngày.
-  Trả lời khách **"bạn chờ xíu mình kiểm tra rồi báo ngay ạ"**, đồng thời
+  **Chốt 17/11/2026, thay câu cũ "chờ xíu kiểm tra rồi báo ngay":** báo khách
+  theo dõi (follow) shop và theo dõi các buổi live để biết khi hàng về (câu mẫu
+  ở references/cskh-faq-17-11.md mục 1), đồng thời
   gửi Telegram báo chủ shop (token + chat ID + lệnh curl:
   `../daily-warehouse-report/references/reference_telegram_bot.md`) để chủ
   shop tự vào xử lý tiếp.
@@ -231,7 +233,7 @@ nhất**, quan trọng hơn việc khớp mẫu tin nhắn cuối.
 
 Giặt máy / xù / rụng lông / giặt chung (mỗi câu hỏi trả 1 câu riêng), gửi bảng
 size (ảnh trong `assets/`), lo dài-rộng, lo đùi to, hộp quà, shop ở đâu, hết
-hàng vs không sản xuất — mẫu câu chuẩn ở
+hàng vs không sản xuất, giá lệch, cắt ống quần, thêm giỏ hàng, COD, shop giấy đóng hàng (bỏ qua) — mẫu câu chuẩn ở
 [references/cskh-faq-17-11.md](references/cskh-faq-17-11.md). Mục "CHƯA train"
 cuối file đó liệt kê những nhóm vẫn để chủ shop.
 
