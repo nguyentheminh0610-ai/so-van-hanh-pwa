@@ -37,7 +37,7 @@ version) but go reconcile the doc, the shop owner corrects this often.
 - **Lịch chạy: 2 lần/ngày, cách nhau 12 tiếng — 08:00 và 20:00** (chốt
   2026-10-13, thay cho quy tắc "chỉ chạy khi được gọi" trước đây). Shop
   owner vẫn có thể gọi tay thêm bất kỳ lúc nào. Khi chạy theo lịch (không
-  có ai đang chat), KHÔNG gửi Telegram (chốt 17/11/2026, xem mục 6 ở CƠ CHẾ CHUẨN; cũ: Telegram qua [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md),
+  có ai đang chat), chỉ gửi 1 dòng Telegram khi có case mới (chốt 17/11/2026, mục 6 ở CƠ CHẾ CHUẨN; khung cũ dài: Telegram qua [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md),
   cùng bot với [daily-warehouse-report](../daily-warehouse-report/SKILL.md)).
 - Inbox: ngoài phạm vi skill này. Riêng case khách báo **giao thiếu hàng**
   trong inbox do [resend-missing-item](../resend-missing-item/SKILL.md) quét 15 phút/lần, không phải skill
@@ -125,12 +125,18 @@ Quét **tất cả** đánh giá mới trong cửa sổ (không chỉ hàng ch�
    khoản tiết kiệm token lớn nhất.
 2. Đọc danh sách bằng `get_page_text` 1 lần/trang, dừng ngay khi gặp case quá cửa sổ.
 3. **Bỏ hẳn bước "mở lại thread sau 12h để đọc"** (mục cũ bên dưới đã gạch).
-4. ~~Telegram~~ đã bỏ (xem mục 6 ngay dưới).
+4. Telegram chỉ 1 dòng khi có case mới (xem mục 6 ngay dưới).
 5. Bị chặn (Chrome mất đăng nhập, captcha, hết quyền) → vẫn ghi những gì đọc
    được, rồi ghi `status=blocked` + lý do vào nhật ký lượt chạy (mục 7).
 
-6. **KHÔNG gửi Telegram nữa** (chủ shop chốt 17/11/2026: "không cần báo cáo tele").
-   Mọi thứ nằm trên Sổ Vận Hành. Bị chặn thì ghi vào dòng nhật ký bên dưới, không nhắn Telegram.
+6. **Telegram ĐƠN GIẢN (chốt 17/11/2026, thay cho "bỏ hẳn Telegram" cùng ngày):** chủ shop chỉ cần
+   biết **có case mới**, chi tiết xem trên Sổ Vận Hành. Cuối lượt, nếu có dòng **MỚI bật
+   `needs_action = true` trong lượt này** (không tính dòng đã flag từ trước) → gửi **đúng 1 tin 1 dòng**:
+   `Có <K> case mới cần anh xem trên Sổ Vận Hành.`
+   K = số dòng mới flag (trả hàng + đánh giá). Không liệt kê đơn, không tiêu đề, không emoji,
+   không báo số liệu. **K = 0 → KHÔNG gửi gì.** Bị chặn (mất đăng nhập/captcha) → chỉ ghi
+   `status=blocked` vào nhật ký (mục 7), không Telegram. Bot/chat_id:
+   [reference_telegram_bot](../daily-warehouse-report/references/reference_telegram_bot.md).
 7. **Dòng nhật ký lượt chạy — BẮT BUỘC, làm ở bước cuối mọi lượt (kể cả không có
    gì mới, kể cả bị chặn):** POST 1 dòng vào `cskh_run_log` (cùng URL/key Supabase
    như mục 3) để web hiện "Cập nhật lúc …":
@@ -472,8 +478,8 @@ xong web tự insert `warehouse_error_log` + set dòng cskh sang `written` +
 
 ## Sending the report
 
-> **17/11/2026: BỎ Telegram cho skill này** — đoạn dưới chỉ còn dùng khi chủ shop gọi tay
-> trong chat (trả lời ngay trong chat), KHÔNG gửi Telegram khi chạy theo lịch.
+> **17/11/2026: Telegram khi chạy theo lịch chỉ còn 1 dòng "Có K case mới…" (mục 6 ở CƠ CHẾ CHUẨN)** —
+> khung dài dưới đây chỉ dùng khi chủ shop gọi tay trong chat (trả lời ngay trong chat).
 
 Chạy theo lịch (08:00 / 20:00) → gửi Telegram **1–2 dòng** (chốt 2026-10-28,
 thay cho khung 3+3 dòng cũ — khung cũ giờ là nội dung của tab trên web):
