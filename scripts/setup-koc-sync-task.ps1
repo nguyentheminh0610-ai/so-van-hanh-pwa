@@ -46,8 +46,9 @@ $action = New-ScheduledTaskAction `
     -Argument "`"$PyFile`"" `
     -WorkingDirectory $RepoDir
 
-# Chay moi tuan, luc 05:00 sang Thu Hai (gio PC it viec). Doi lich tuy y.
-$trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 5:00AM
+# Chay moi ngay luc 09:00 va 16:00 (chot 17/11/2026). Muc "Can anh xu ly" doi theo
+# hang mau TikTok nen can cap nhat hang ngay; moi lan ~1 phut, 0 token.
+$trigger = New-ScheduledTaskTrigger -Daily -DaysInterval 2 -At 9:00AM
 
 $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `

@@ -37,12 +37,14 @@ function kocDateKey(d){
 
 async function kocLoadRows(){
   if (kocRows) return kocRows;
-  const [scores, contents, channels] = await Promise.all([
+  const [scores, contents, channels, samples] = await Promise.all([
     sbFetch('koc_scores?select=*&order=stt.asc&limit=2000'),
     sbFetch('koc_contents?select=*&order=ngay_dang.desc&limit=5000'),
     sbFetch('koc_channel_stats?select=*&order=gmv.desc&limit=2000').catch(() => []),
+    // yêu cầu hàng mẫu đang mở (tools/koc_auto_sync.py) — null nếu bảng chưa tạo
+    sbFetch('koc_sample_requests?select=*&order=ngay_tao.asc&limit=1000').catch(() => null),
   ]);
-  kocRows = { scores: scores || [], contents: contents || [], channels: channels || [] };
+  kocRows = { scores: scores || [], contents: contents || [], channels: channels || [], samples };
   return kocRows;
 }
 
@@ -136,11 +138,13 @@ function kocCardSanHtml(channels){
 }
 
 /* --------------------- hàng nhỏ: số từ SHEET chấm điểm --------------------*/
-function kocHangSheetHtml(scores){
+function kocHangSheetHtml(scores, samples){
   const duyet = scores.filter(r => r.ket_qua === 'DUYỆT');
   const pct = scores.length ? duyet.length / scores.length * 100 : 0;
   const daLen = duyet.filter(r => r.trang_thai_mau === 'da_dang').length;
-  const canGiuc = duyet.filter(r => r.trang_thai_mau === 'da_nhan_chua_dang').length;
+  const canGiuc = samples
+    ? samples.filter(r => r.trang_thai === 'chua_dang').length
+    : duyet.filter(r => r.trang_thai_mau === 'da_nhan_chua_dang').length;
   return `<div class="koc-sheetrow">
     <span><b>${fmtRatio(pct)}%</b> duyệt <i>(${duyet.length}/${scores.length} KOC đã chấm)</i></span>
     <span><b>${daLen}/${duyet.length}</b> đã lên bài</span>
@@ -152,7 +156,34 @@ function kocHangSheetHtml(scores){
 /* ------------------- 1. Cần xử lý — bảng dày, 1 dòng/KOC ------------------*/
 const KOC_LINK_HANGMAU = 'https://affiliate.tiktok.com/affiliate/sample/sample-request?shop_region=VN&shop_id=7494594978743617682';
 
-function kocActionHtml(scores){
+// Nguồn chính (17/11): koc_sample_requests do job tự động kéo từ TikTok. Bảng chưa
+// có (samples === null) mới lùi về koc_scores (số liệu chép tay 29/10, có thể cũ).
+function kocActionSamplesHtml(samples){
+  const chuaDang = samples.filter(r => r.trang_thai === 'chua_dang');
+  const dangGiao = samples.filter(r => r.trang_thai === 'dang_giao');
+  const ngayCho = r => r.ngay_tao ? Math.max(0, Math.floor((Date.now() - new Date(r.ngay_tao)) / 864e5)) : null;
+  let html = '';
+  if (!chuaDang.length){
+    html += '<p class="cskh-quiet">Không có KOC nào đã nhận mẫu mà chưa đăng bài.</p>';
+  } else {
+    html += `<div class="card"><table class="dtable">
+      <thead><tr><th>KOC</th><th>Mẫu nhận</th><th>Tình trạng</th><th></th></tr></thead>
+      <tbody>${chuaDang.map(r => `<tr>
+        <td><b>${esc(r.koc_username)}</b></td>
+        <td>${esc(r.sku_desc || '—')}</td>
+        <td style="color:var(--warn);font-weight:700">Đã nhận mẫu · chưa đăng${ngayCho(r) !== null ? ' · xin mẫu ' + ngayCho(r) + ' ngày trước' : ''}</td>
+        <td style="text-align:right"><a class="lnk" href="${KOC_LINK_HANGMAU}" target="_blank" rel="noopener">↗ Xử lý</a></td>
+      </tr>`).join('')}</tbody></table></div>`;
+  }
+  if (dangGiao.length){
+    html += `<p class="cskh-quiet"><b>${fmtInt(dangGiao.length)} KOC hàng đang trên đường</b>
+      (${dangGiao.map(r => esc(r.koc_username)).join(', ')}) — <b>chưa giục</b>, họ chưa nhận được mẫu.</p>`;
+  }
+  return html;
+}
+
+function kocActionHtml(scores, samples){
+  if (samples) return kocActionSamplesHtml(samples);
   const chuaDang = scores.filter(r => r.trang_thai_mau === 'da_nhan_chua_dang');
   const dangGiao = scores.filter(r => r.trang_thai_mau === 'dang_giao');
   const chuaRo = scores.filter(r => r.ket_qua === 'DUYỆT' && !r.trang_thai_mau);
@@ -325,7 +356,7 @@ function kocBangKenhHtml(channels, kenh, von, tieuDe, ghiChu){
 function kocRender(){
   const bodyEl = document.getElementById('koc-body');
   if (!bodyEl || !kocRows) return;
-  const { scores, contents, channels } = kocRows;
+  const { scores, contents, channels, samples } = kocRows;
   const von = kocVonMap(scores);
 
   const kyNgay = channels.length ? (channels[0].ky_ngay || 30) : 30;
@@ -339,9 +370,9 @@ function kocRender(){
 
   bodyEl.innerHTML = `
     ${kocCardSanHtml(channels)}
-    ${kocHangSheetHtml(scores)}
+    ${kocHangSheetHtml(scores, samples)}
     <div class="zone"><span class="z-num">1</span><span class="z-title">Cần anh xử lý</span><span class="z-note">đã nhận mẫu mà chưa đăng bài</span></div>
-    ${kocActionHtml(scores)}
+    ${kocActionHtml(scores, samples)}
     <div class="zone"><span class="z-num">2</span><span class="z-title">KOC cần đưa vào VIP</span><span class="z-note">xét theo tổng cả 2 kênh · chia theo kênh bán mạnh hơn</span></div>
     ${kocVipSplitHtml(channels, nguongVip, gmvThangMap)}
     <div class="zone"><span class="z-num">3</span><span class="z-title">Mới lên bài (${KOC_MOI_DANG_NGAY} ngày gần nhất)</span><span class="z-note">video hoặc LIVE</span></div>
@@ -372,7 +403,7 @@ async function refreshKoc(){
   if (kocRows){ kocRender(); return; }
   try {
     await kocLoadRows();
-    const all = [...kocRows.channels, ...kocRows.scores].map(r => r.synced_at).filter(Boolean).sort();
+    const all = [...kocRows.channels, ...(kocRows.samples || []), ...kocRows.scores].map(r => r.synced_at).filter(Boolean).sort();
     const last = all.length ? new Date(all[all.length - 1]) : null;
     statusEl.textContent = last
       ? 'Cập nhật ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })

@@ -162,11 +162,95 @@ def upsert_supabase(agg):
     return len(rows)
 
 
+SAMPLE_URL = ("https://affiliate.tiktok.com/affiliate/sample/sample-request"
+              "?shop_region=VN&shop_id=" + SHOP_ID)
+# Mã tab của API sample/group/list (đo thật 17/11/2026):
+#   10 Chờ xem xét · 20 Sẵn sàng vận chuyển · 30 Đã vận chuyển
+#   40 Đang tiến hành (đã nhận mẫu, chờ đăng) · 50 Đã hoàn thành · 60 Đã huỷ
+SAMPLE_TABS = {20: "dang_giao", 30: "dang_giao", 40: "chua_dang"}
+
+# Chạy TRONG trang: dùng lại URL đã ký của chính trang (đổi body theo tab).
+JS_SAMPLES = r"""
+async ({url, tab}) => {
+  const out = [];
+  for (let page = 1; page <= 10; page++) {
+    const r = await fetch(url, { method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tab, cur_page: page, page_size: 50,
+        search_params: [{ search_key: 3, search_type: 2, value: '' }], order_params: [] }) });
+    const j = await r.json();
+    if (j.code !== 0) return { error: 'code ' + j.code + ' ' + (j.message || '') };
+    (j.agg_info || []).forEach(a => {
+      const d = a.apply_deatil || {}, i = d.apply_info || {}, c = d.creator_info || {};
+      out.push({ apply_id: String(i.apply_id), koc: c.name, sku: i.sku_desc || '',
+                 ts: i.create_time ? +i.create_time : null });
+    });
+    if (!j.has_more) break;
+  }
+  return { rows: out };
+}
+"""
+
+
+def sb_request(path, method="GET", body=None, prefer=None):
+    headers = {"apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY,
+               "Content-Type": "application/json"}
+    if prefer:
+        headers["Prefer"] = prefer
+    data = json.dumps(body, ensure_ascii=False).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(SB_URL + "/rest/v1/" + path, data=data, method=method, headers=headers)
+    with urllib.request.urlopen(req, timeout=60) as r:
+        return r.status
+
+
+def keo_hang_mau(page):
+    """Kéo yêu cầu hàng mẫu ĐANG MỞ -> koc_sample_requests; xoá dòng không còn."""
+    import datetime
+    signed = {}
+    def on_req(req):
+        if "sample/group/list" in req.url and req.method == "POST" and "url" not in signed:
+            signed["url"] = req.url
+    page.on("request", on_req)
+    page.goto(SAMPLE_URL, timeout=60000)
+    page.wait_for_timeout(6000)
+    page.remove_listener("request", on_req)
+    if "url" not in signed:
+        raise RuntimeError("không bắt được request sample/group/list (có thể chưa đăng nhập hoặc TikTok đổi API)")
+
+    bay_gio = datetime.datetime.now(datetime.timezone.utc)
+    rows, seen = [], set()
+    for tab, tt in SAMPLE_TABS.items():
+        res = page.evaluate(JS_SAMPLES, {"url": signed["url"], "tab": tab})
+        if res.get("error"):
+            raise RuntimeError("tab %d: %s" % (tab, res["error"]))
+        for r in res["rows"]:
+            if not r["koc"] or r["apply_id"] in seen:
+                continue
+            seen.add(r["apply_id"])
+            rows.append({
+                "apply_id": r["apply_id"], "koc_username": r["koc"],
+                "sku_desc": r["sku"], "trang_thai": tt,
+                "ngay_tao": (datetime.datetime.fromtimestamp(r["ts"] / 1000, datetime.timezone.utc).isoformat()
+                             if r["ts"] else None),
+                "synced_at": bay_gio.isoformat(),
+            })
+    print("  hàng mẫu đang mở: %d (đang giao %d · chờ đăng %d)" % (
+        len(rows), sum(1 for r in rows if r["trang_thai"] == "dang_giao"),
+        sum(1 for r in rows if r["trang_thai"] == "chua_dang")))
+    if rows:
+        st = sb_request("koc_sample_requests?on_conflict=apply_id", "POST", rows,
+                        "resolution=merge-duplicates,return=minimal")
+        print("  koc_sample_requests: HTTP %d" % st)
+    # Dọn dòng cũ (đã đăng / huỷ) — chỉ khi ghi xong, tránh xoá nhầm lúc kéo lỗi.
+    sb_request("koc_sample_requests?synced_at=lt." + urllib.parse.quote(bay_gio.isoformat()),
+               "DELETE", None, "return=minimal")
+
+
 def chay(login_only=False):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         ctx = p.chromium.launch_persistent_context(
-            PROFILE_DIR, headless=(not login_only),
+            PROFILE_DIR, headless=(not login_only), channel="chrome",  # Chrome cài sẵn (Chromium của Playwright bị chặn spawn trên PC này, 17/11)
             args=["--disable-blink-features=AutomationControlled"])
         page = ctx.pages[0] if ctx.pages else ctx.new_page()
 
@@ -187,10 +271,27 @@ def chay(login_only=False):
                 except Exception: pass
         page.on("request", on_request)
 
+        def mat_dang_nhap():
+            return LOGIN_HINT in page.url or "/login" in page.url or "accounts.tiktok" in page.url
+
+        # --- Giai đoạn 1: hàng mẫu đang mở -> mục "Cần anh xử lý" (chạy TRƯỚC vì gấp nhất)
+        try:
+            keo_hang_mau(page)
+        except Exception as e:
+            if mat_dang_nhap():
+                bao_telegram("⚠️ KOC auto-sync: Chrome đã BỊ ĐĂNG XUẤT TikTok. "
+                             "Chạy lại `py tools\\koc_auto_sync.py --login` để đăng nhập.")
+                print("CHƯA ĐĂNG NHẬP. Đã báo Telegram. Thoát.")
+                ctx.close(); sys.exit(2)
+            print("  Lỗi kéo hàng mẫu:", e)
+            bao_telegram("⚠️ KOC auto-sync: lỗi kéo hàng mẫu (%s). "
+                         "Mục 'Cần anh xử lý' trên Sổ Vận Hành có thể đang cũ." % str(e)[:150])
+
+        # --- Giai đoạn 2: số liệu kênh Video/LIVE (kỳ 30 ngày)
         page.goto(ANALYSIS_URL, timeout=60000)
         page.wait_for_timeout(6000)
 
-        if LOGIN_HINT in page.url or "/login" in page.url or "accounts.tiktok" in page.url:
+        if mat_dang_nhap():
             bao_telegram("⚠️ KOC auto-sync: Chrome đã BỊ ĐĂNG XUẤT TikTok. "
                          "Chạy lại `py tools\\koc_auto_sync.py --login` để đăng nhập.")
             print("CHƯA ĐĂNG NHẬP. Đã báo Telegram. Thoát.")
