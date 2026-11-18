@@ -10,8 +10,8 @@
    nằm trong repo public) — bản đầy đủ anh xem ở tin Telegram.
 ============================================================================ */
 
-const RESEND_RUN_HOUR = 15;      // phiên tạo đơn lúc 15h
-const RESEND_CHECK2_MIN = 40;    // duyệt lần 2 trước 15h40 (kho in đơn lần cuối 16h)
+const RESEND_RUN_HOUR = 15;      // mốc kho: PDF vào Sổ Kho trước 15h30 (chốt 18/11/2026)
+const RESEND_CHECK2_MIN = 10;    // duyệt lần 2 trước 15h10 để kịp 15h30 (kho đóng hàng muộn nhất 16h)
 const RESEND_LOOKBACK_DAYS = 14; // case đã xong chỉ hiện trong 14 ngày
 let resendRows = null;
 
