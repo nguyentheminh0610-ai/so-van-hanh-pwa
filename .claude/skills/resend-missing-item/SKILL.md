@@ -140,7 +140,8 @@ time.
 
 ## Step 1b: hỏi khách ảnh đơn hàng + thông tin gửi bù
 
-Cần đủ 4 thứ: (a) ảnh vỏ đơn hàng (tem/mã vận đơn), (b) sản phẩm thiếu
+Cần đủ 4 thứ: (a) ảnh bằng chứng — ảnh vỏ đơn hàng (tem/mã vận đơn) HOẶC ảnh
+sản phẩm/gói hàng khách nhận được (chốt 18/11/2026), (b) sản phẩm thiếu
 (mẫu, size, số lượng), (c) họ tên + SĐT, (d) địa chỉ nhận hàng gửi bù.
 
 Dùng **đúng nguyên văn 2 tin nhắn chủ shop đã soạn** (chốt 2026-10-13),
@@ -151,7 +152,9 @@ không tự diễn đạt lại. Thiếu mục nào thì chỉ gửi tin của m
 Bạn cho shop xin họ tên, số điện thoại và địa chỉ nhận hàng để shop gửi bù sản phẩm thiếu nhé ạ. Bạn có thể viết vào ghi chú điện thoại rồi chụp màn hình gửi shop, để shop tạo đơn gửi bù cho chuẩn ạ.
 ```
 
-**Tin 2 (xin ảnh vỏ đơn)** — khi chưa có ảnh tem/mã vận đơn:
+**Tin 2 (xin ảnh vỏ đơn)** — CHỈ khi khách chưa gửi ảnh nào. Khách đã gửi ảnh
+sản phẩm/gói hàng nhận được thì KHÔNG gửi tin này (chốt 18/11/2026, xem
+references/resend-collect-verify.md mục 2):
 ```
 Để shop kiểm tra và hỗ trợ gửi bù sản phẩm còn thiếu cho bạn nhanh nhất, bạn chụp giúp shop 1 tấm ảnh phần vỏ đơn hàng (tem/mã vận đơn dán bên ngoài túi/hộp) gửi qua đây giúp shop nhé ạ.
 ```

@@ -32,7 +32,7 @@ trước khi phân loại** (chốt 18/11/2026). Khách hay gọi "2 đơn" khi 
 1 đơn số lượng 2. Mở tab Đơn hàng của khách (khung bên phải webchat Shopee /
 chi tiết đơn TikTok):
 - Có 1 đơn SL ≥ 2 (hoặc nhiều món) mà khách nói chỉ nhận 1 → **giao thiếu**,
-  làm theo file này (mở case, xin ảnh vỏ đơn + thông tin).
+  làm theo file này (mở case, xin thông tin; chỉ xin ảnh vỏ đơn nếu khách chưa gửi ảnh nào).
 - Thật sự có 2 đơn riêng, 1 đơn chưa giao tới → mới là vận chuyển (để chủ shop).
 - Không chắc → xem ảnh khách gửi; vẫn không chắc thì báo Telegram, đừng tự xếp
   vào "vận chuyển" rồi bỏ qua.
@@ -74,16 +74,24 @@ là thiếu / giao sai không, rồi mới duyệt. Không có ảnh = chủ sho
 làm rơi mất mẫu xin ảnh (lệch giữa các file) — không được lặp lại, kể cả khi đơn Shopee
 tự tra được món/mã vận đơn.
 
-- Case mới → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
+- **Đọc lại cả hội thoại TRƯỚC khi xin ảnh** (chốt 18/11/2026 tối): khách ĐÃ gửi ảnh
+  sản phẩm/gói hàng nhận được (thấy được là thiếu/sai), hoặc ảnh vỏ đơn → **KHÔNG gửi
+  Tin xin ảnh vỏ đơn nữa**, ảnh đó đã đủ làm bằng chứng cho chủ shop duyệt; chỉ gửi tin
+  xin họ tên/SĐT/địa chỉ, và đặt `msg_photo_at` = giờ khách gửi ảnh (để lượt sau không xin).
+  Ảnh tem KHÔNG bắt buộc riêng — mã đơn/mã vận đơn tự tra được (khung đơn hàng webchat
+  Shopee, `order_to_tracking.sh`). *Lý do:* case `obe9hvmo5o` 18/11 — khách đã gửi ảnh túi
+  hàng chỉ có 1 quần lúc 22:26, vẫn bị xin "ảnh vỏ đơn" lúc 23:29; chủ shop: "khách đã gửi
+  ảnh sp rồi mà sao còn hỏi lại" → bỏ.
+- Chưa có ảnh nào → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
   TRƯỚC, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
 - **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `verifying`,
   KHÔNG ping chủ shop duyệt.** Giữ `collecting`; quá 24h nhắc như mục 5.
   Cột `msg_photo_at` chưa có trên DB (chủ shop chưa chạy SQL) thì kiểm lịch sử chat
   xem đã xin ảnh chưa, đừng xin lại.
-- Khi khách gửi ảnh: ghi vào `item_evidence` "khách gửi ảnh vỏ đơn lúc HH:MM", và ở
+- Khi khách gửi ảnh: ghi vào `item_evidence` "khách gửi ảnh vỏ đơn/ảnh sản phẩm nhận được lúc HH:MM", và ở
   Telegram duyệt lần 1 phải ghi rõ **tên khách + sàn + "mở chat xem ảnh khách gửi rồi duyệt"**.
 
-Cần đủ: ảnh vỏ đơn, món thiếu (mẫu, size, SL), họ tên + SĐT, địa chỉ. Thiếu mục nào hỏi mục đó
+Cần đủ: ảnh bằng chứng (ảnh vỏ đơn HOẶC ảnh sản phẩm/gói hàng nhận được), món thiếu (mẫu, size, SL), họ tên + SĐT, địa chỉ. Thiếu mục nào hỏi mục đó
 (mẫu: Tin xin ảnh vỏ đơn, Tin xin họ tên/SĐT/địa chỉ ở file flow-batch). Món thiếu
 chưa rõ → không tự hỏi, báo chủ shop (chưa có mẫu).
 

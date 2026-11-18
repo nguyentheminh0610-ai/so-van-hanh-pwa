@@ -72,7 +72,7 @@ dự phòng (cổng rẻ nên không tốn).
 
 ## Mẫu tin nhắn khách (chủ shop chốt 17/11/2026)
 
-**Xin ảnh vỏ đơn / ảnh bằng chứng** (BẮT BUỘC mọi case, chốt lại 18/11/2026 — xem mục "Ảnh bằng chứng" trong
+**Xin ảnh vỏ đơn / ảnh bằng chứng** (BẮT BUỘC có ảnh bằng chứng mọi case, chốt lại 18/11/2026; khách ĐÃ gửi ảnh sản phẩm/gói hàng nhận được thì KHÔNG gửi tin này — chốt 18/11/2026 tối — xem mục "Ảnh bằng chứng" trong
 [resend-collect-verify.md](resend-collect-verify.md)). Nguyên văn chủ shop soạn 13/10/2026:
 
 ```
