@@ -192,7 +192,10 @@
   .notice-board{ background:var(--warn-soft); border:1px solid var(--warn); border-radius:var(--radius); padding:14px 16px; margin-bottom:14px; }
   .retalert-board{ background:#fff2f2; border:1px solid #e5484d; }
   .retalert-board h2{ color:#c62a2f; }
-  .retalert-item{ display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; padding:7px 0; border-top:1px dashed #e5a0a3; font-size:13px; }
+  .retalert-board{ padding-top:8px; padding-bottom:8px; }
+  .retalert-hint{ margin:2px 0 4px; font-size:12px; color:#8a4a4a; }
+  .retalert-item{ display:flex; gap:8px; align-items:baseline; flex-wrap:wrap; padding:4px 0; border-top:1px dashed #e5a0a3; font-size:12.5px; }
+  .retalert-item .btn{ padding:2px 8px; font-size:11.5px; }
   .retalert-item:first-child{ border-top:none; }
   .retalert-item .code{ font-weight:700; font-family:ui-monospace,Menlo,monospace; }
   .retalert-item .days{ color:#c62a2f; font-weight:600; }
@@ -408,8 +411,12 @@
     <div class="notice-board-head">
       <h2>🔴 Hoàn về chưa nhận <span class="n" id="retalert-count">0</span></h2>
     </div>
-    <p style="margin:4px 0 2px; font-size:12.5px; color:#8a4a4a;">Sàn báo các kiện dưới đây ĐÃ TRẢ VỀ kho quá 3 ngày nhưng chưa thấy tích trong Sổ Kho — tìm kiện/hỏi bưu tá; khi quét vào "Tích đơn hoàn" dòng sẽ tự biến mất.</p>
-    <div id="retalert-list"></div>
+    <div id="retalert-body">
+      <p class="retalert-hint">Sàn báo đã về kho &gt; 3 ngày nhưng chưa tích — quét vào "Tích đơn hoàn" là tự hết.</p>
+      <div id="retalert-list"></div>
+      <button type="button" class="btn ghost small" id="retalert-more" style="width:auto;margin-top:6px;" hidden></button>
+      <div id="retalert-list-old" hidden></div>
+    </div>
     <p class="retalert-transit" id="retalert-transit" hidden></p>
   </div>
 
@@ -1365,6 +1372,7 @@
   // Bảng platform_returns_feed do job hàng ngày trên PC trực ghi (nguồn: Sapo /admin/order_returns.json).
   // Khớp mã quét với CẢ mã vận đơn chiều hoàn LẪN chiều đi (outbound_tracking có thể nhiều mã, nối bằng "+").
   var RETALERT_GRACE_DAYS = 3;
+  var RETALERT_RECENT_DAYS = 7; /* chỉ hiện đơn trễ <= 7 ngày; cũ hơn ẩn sau nút "Xem thêm" (chốt 18/11/2026) */
   function loadReturnAlerts(){
     if(!state.connected) return;
     Promise.all([
@@ -1409,8 +1417,26 @@
     $("retalert-count").textContent = overdue.length;
     if(!overdue.length && !transit){ board.hidden = true; return; }
     board.hidden = false;
-    overdue.sort(function(a,b){ return b.days - a.days; });
-    list.innerHTML = overdue.map(function(o){
+    overdue.sort(function(a,b){ return a.days - b.days; }); /* mới trễ lên trước */
+    var recent = overdue.filter(function(o){ return o.days <= RETALERT_RECENT_DAYS; });
+    var old = overdue.filter(function(o){ return o.days > RETALERT_RECENT_DAYS; });
+    $("retalert-count").textContent = recent.length;
+    var oldList = $("retalert-list-old"), moreBtn = $("retalert-more");
+    oldList.innerHTML = alertItemsHtml(old);
+    if(old.length){
+      moreBtn.hidden = false;
+      moreBtn.textContent = (oldList.hidden ? "Xem thêm " : "Ẩn bớt ") + old.length + " đơn cũ (trễ > " + RETALERT_RECENT_DAYS + " ngày)";
+    } else { moreBtn.hidden = true; oldList.hidden = true; }
+    list.innerHTML = recent.length ? alertItemsHtml(recent) : '<p class="retalert-hint">Không có đơn trễ trong ' + RETALERT_RECENT_DAYS + ' ngày gần đây.</p>';
+    if(transit){
+      transitEl.hidden = false;
+      transitEl.textContent = "+ " + transit + " kiện đang trên đường về (chưa quá hạn).";
+    } else {
+      transitEl.hidden = true;
+    }
+  }
+  function alertItemsHtml(items){
+    return items.map(function(o){
       var r = o.row;
       var plat = PLATFORMS[r.platform] || r.platform || "?";
       var codeShow = r.return_tracking || (String(r.outbound_tracking||"").split("+")[0]) || "?";
@@ -1418,23 +1444,22 @@
       return '<div class="retalert-item">' +
         '<span class="code">' + escapeHtml(codeShow) + '</span>' +
         '<span class="days">trễ ' + o.days + ' ngày</span>' +
-        '<span class="meta">' + escapeHtml(plat) + ' · đơn ' + escapeHtml(r.order_name || "?") + ' · sàn báo về ' + ve +
-        (r.return_type === "delivery_failed" ? ' · bom/giao thất bại' : ' · khách đổi trả') + '</span>' +
+        '<span class="meta">' + escapeHtml(plat) + ' · ' + escapeHtml(r.order_name || "?") + ' · về ' + ve +
+        (r.return_type === "delivery_failed" ? ' · bom' : ' · đổi trả') + '</span>' +
         '<button type="button" class="btn ghost small retalert-dismiss" data-id="' + r.id + '" data-code="' + escapeHtml(codeShow) + '" style="width:auto;margin-left:auto;">Đã xử lý — ẩn</button>' +
       '</div>';
     }).join("");
-    if(!overdue.length) list.innerHTML = "";
-    if(transit){
-      transitEl.hidden = false;
-      transitEl.textContent = "Ngoài ra có " + transit + " kiện hoàn đang trên đường về (chưa quá hạn) — sẽ tự theo dõi tiếp.";
-    } else {
-      transitEl.hidden = true;
-    }
   }
   // "Đã xử lý — ẩn": dùng khi kiện KHÔNG thể quét được nữa (xác định mất hàng, đã khiếu nại,
   // sàn báo sai...) — ghi lý do + người ẩn vào feed, kiện biến mất khỏi cảnh báo ở mọi nơi
   // (web này, Sổ Vận Hành, báo cáo Telegram). Kiện tìm thấy và quét bình thường thì KHÔNG cần nút này.
-  $("retalert-list").addEventListener("click", function(e){
+  $("retalert-more").addEventListener("click", function(){
+    var oldList = $("retalert-list-old");
+    oldList.hidden = !oldList.hidden;
+    var n = oldList.querySelectorAll(".retalert-item").length;
+    this.textContent = (oldList.hidden ? "Xem thêm " : "Ẩn bớt ") + n + " đơn cũ (trễ > " + RETALERT_RECENT_DAYS + " ngày)";
+  });
+  $("retalert-body").addEventListener("click", function(e){
     var btn = e.target.closest(".retalert-dismiss");
     if(!btn) return;
     var id = btn.getAttribute("data-id");
