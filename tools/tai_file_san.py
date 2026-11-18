@@ -311,7 +311,150 @@ def tt_tai_chinh(page, tu, den, downloads):
     raise RuntimeError('TikTok chưa sinh xong file Tài chính sau 240 giây')
 
 
-LUONG = {'tt_don_hang': tt_don_hang, 'tt_tra_hang': tt_tra_hang, 'tt_tai_chinh': tt_tai_chinh}
+# ---------------------------------------------------------------- SHOPEE (chốt 18/11/2026)
+SP_THANG_EN = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august',
+               'september', 'october', 'november', 'december']
+
+
+def sp_kiem_mat_khau(page):
+    """Mục Tài Chính của Shopee đòi nhập mật khẩu. KHÔNG BAO GIỜ nhập hộ — dừng và báo."""
+    try:
+        if page.get_by_text('nhập mật khẩu Shopee', exact=False).first.is_visible(timeout=1500):
+            raise RuntimeError('SHOPEE_HOI_MAT_KHAU')
+    except RuntimeError:
+        raise
+    except Exception:
+        pass
+
+
+def sp_chon_khoang_ngay(page, tu, den, o_nhap):
+    """Bộ chọn ngày Shopee (eds-daterange-picker, 2 lịch cạnh nhau). `o_nhap` = locator để
+    bấm mở. Nhãn tháng lúc tiếng Việt ("Tháng 10"), lúc tiếng Anh ("October") tuỳ trang."""
+    o_nhap.click(timeout=8000)
+    page.wait_for_timeout(1000)
+    L = '.eds-daterange-picker-panel__body-left'
+
+    def thang_hien_tai():
+        txt = ' '.join(page.locator(L + ' .eds-picker-header__label').all_inner_texts()).lower()
+        y = int(re.search(r'(20\d\d)', txt).group(1))
+        m = re.search(r'th\S*ng\s*(\d+)', txt)
+        if m:
+            return (y, int(m.group(1)))
+        for k, n in enumerate(SP_THANG_EN):
+            if n in txt:
+                return (y, k + 1)
+        raise RuntimeError('không đọc được tháng của bộ chọn ngày: ' + txt)
+
+    muc_tieu = (tu.year, tu.month)
+    for _ in range(48):
+        cur = thang_hien_tai()
+        if cur == muc_tieu:
+            break
+        nut = '.eds-picker-header__prev' if cur > muc_tieu else '.eds-picker-header__next'
+        page.locator(L + ' ' + nut).nth(1).click()   # nút thứ 2 = lùi/tiến 1 THÁNG (nút 1 = 1 năm)
+        page.wait_for_timeout(250)
+    else:
+        raise RuntimeError('không lật được bộ chọn ngày tới %s' % (muc_tieu,))
+
+    def bam_ngay(d, panel):
+        page.locator('.eds-daterange-picker-panel__body-%s .eds-date-table__cell-inner' % panel) \
+            .get_by_text(str(d.day), exact=True).first.click(timeout=5000)
+        page.wait_for_timeout(300)
+
+    bam_ngay(tu, 'left')
+    bam_ngay(den, 'left' if (den.year, den.month) == (tu.year, tu.month) else 'right')
+    page.wait_for_timeout(800)
+
+
+def sp_cho_va_tai(page, tien_to, downloads, cho_giay=300, loai_tru=None):
+    """Mở "Lịch sử Xuất Báo cáo" của Shopee, chờ hàng báo cáo MỚI có tên bắt đầu bằng
+    `tien_to` hết "Đang được xử lý" rồi bấm Tải về. Tên báo cáo có khoảng ngày nhúng trong tên
+    (vd Order.all.20261001_20261031.xlsx) nên khớp theo tiền tố đã gồm ngày."""
+    han = time.time() + cho_giay
+    nut_ds = re.compile('Lịch sử Xuất Báo cáo|Export History|Report History|Lịch sử xuất', re.I)
+    while time.time() < han:
+        page.wait_for_timeout(4000)
+        # Danh sách báo cáo là CHUNG cho mọi loại → luôn mở từ trang Đơn hàng (có nút chữ
+        # "Lịch sử Xuất Báo cáo"), tải lại mỗi vòng để thấy trạng thái mới.
+        page.goto('https://banhang.shopee.vn/portal/sale/order',
+                  wait_until='domcontentloaded', timeout=60000)
+        page.wait_for_timeout(5000)
+        try:
+            page.get_by_text(nut_ds).first.click(timeout=8000)
+        except Exception:
+            continue
+        page.wait_for_timeout(1500)
+        h = page.evaluate_handle(r"""(tt) => {
+            const re = /^Order\.[A-Za-z_]+\.\d{8}/;
+            const leaf = [...document.querySelectorAll('*')].find(e => e.children.length === 0
+                && (e.textContent||'').trim().startsWith(tt));
+            if (!leaf) return null;
+            let r = leaf;
+            while (r.parentElement) {
+                const n = (r.parentElement.textContent.match(/Order\.[a-z_]+\.\d{8}/g) || []).length;
+                if (n > 1) break;
+                r = r.parentElement;
+            }
+            return r;
+        }""", tien_to)
+        row = h.as_element()
+        if row is None:
+            continue
+        for btn in row.query_selector_all('text=/Tải về|Download/'):
+            if btn.is_visible():
+                with page.expect_download(timeout=120000) as dl:
+                    btn.click()
+                d = dl.value
+                dest = os.path.join(downloads, d.suggested_filename)
+                d.save_as(dest)
+                return dest
+        # còn "Đang được xử lý" → đóng popover, chờ vòng sau
+        page.keyboard.press('Escape')
+        page.mouse.click(700, 700)
+    raise RuntimeError('Shopee chưa sinh xong báo cáo "%s" sau %d giây' % (tien_to, cho_giay))
+
+
+def sp_don_hang(page, tu, den, downloads):
+    """Shopee — Tất cả đơn hàng: Quản Lý Đơn Hàng → Xuất → chọn khoảng ngày → Xuất →
+    Lịch sử Xuất Báo cáo → Tải về (Order.all.YYYYMMDD_YYYYMMDD.xlsx). Khoảng tối đa 31 ngày."""
+    page.goto('https://banhang.shopee.vn/portal/sale/order', wait_until='domcontentloaded',
+              timeout=60000)
+    page.wait_for_timeout(6000)
+    page.get_by_role('button', name='Xuất', exact=True).first.click(timeout=10000)
+    page.wait_for_timeout(2000)
+    o = page.locator('.eds-modal .eds-date-picker__input, .eds-date-picker__input').first
+    sp_chon_khoang_ngay(page, tu, den, o)
+    page.locator('.eds-modal').get_by_role('button', name='Xuất', exact=True).click(timeout=8000)
+    page.wait_for_timeout(2500)
+    return sp_cho_va_tai(page, 'Order.all.%s_%s' % (tu.strftime('%Y%m%d'), den.strftime('%Y%m%d')),
+                         downloads)
+
+
+def sp_tra_hang(page, tu, den, downloads):
+    """Shopee — Trả hàng/Hoàn tiền: Đơn Trả hàng/Hoàn tiền → tab "Đơn Trả hàng Hoàn tiền" →
+    Mở rộng → "Ngày yêu cầu" → Export → Tải về (Order.return_refund.<tu>_<den+1>.xls — Shopee
+    cộng thêm 1 ngày ở cuối nên chỉ khớp theo ngày bắt đầu)."""
+    page.set_viewport_size({'width': 1400, 'height': 1200})   # bộ chọn ngày xoè xuống dưới
+    page.goto('https://banhang.shopee.vn/portal/sale/returnrefundcancel',
+              wait_until='domcontentloaded', timeout=60000)
+    page.wait_for_timeout(6000)
+    b = page.get_by_text('Đã hiểu', exact=True)
+    if b.count() and b.first.is_visible():
+        b.first.click()
+        page.wait_for_timeout(800)
+    page.get_by_text('Đơn Trả hàng Hoàn tiền (').first.click(timeout=8000)
+    page.wait_for_timeout(2500)
+    page.get_by_text('Mở rộng').first.click(timeout=8000)
+    page.wait_for_timeout(1500)
+    o = page.get_by_text('Vui lòng chọn thời gian yêu cầu').first
+    sp_chon_khoang_ngay(page, tu, den, o)
+    page.get_by_role('button', name='Export').first.click(timeout=8000)
+    page.wait_for_timeout(3000)
+    return sp_cho_va_tai(page, 'Order.return_refund.%s_' % tu.strftime('%Y%m%d'), downloads)
+
+
+LUONG = {'tt_don_hang': tt_don_hang, 'tt_tra_hang': tt_tra_hang, 'tt_tai_chinh': tt_tai_chinh,
+         'sp_don_hang': sp_don_hang, 'sp_tra_hang': sp_tra_hang}
 
 
 def chon_ky(page, san, entry, tu, den):

@@ -26,7 +26,7 @@
 
   "files": [
     {
-      "id": "shopee_don_hang_thang",
+      "id": "shopee_don_hang_thang", "kieu": "sp_don_hang",
       "mo_ta": "Shopee — Đơn hàng (Order.all) — THÁNG",
       "san": "shopee", "role": "shopeeOrders", "lich": "thang", "bat_buoc": true,
       "export": {
@@ -37,7 +37,7 @@
       }
     },
     {
-      "id": "shopee_tra_hoan_thang",
+      "id": "shopee_tra_hoan_thang", "kieu": "sp_tra_hang",
       "mo_ta": "Shopee — Trả/Hoàn (Order.return_refund) — THÁNG",
       "san": "shopee", "role": "shopeeReturnRefund", "lich": "thang", "bat_buoc": true,
       "export": {
