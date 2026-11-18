@@ -13,3 +13,6 @@ doi-chieu-hoan/
 
 # File CSV trung gian sinh ra khi xu ly so lieu thang (co doanh thu/chi phi shop)
 /[0-9a-f][0-9a-f]*.csv
+
+# Python cache
+__pycache__/

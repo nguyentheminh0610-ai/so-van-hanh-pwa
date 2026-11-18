@@ -6,7 +6,10 @@ Task Scheduler chỉ cần gọi script này. Chốt 31/10/2026 — xem
 .claude/shared/reference_tai_file_tu_dong.md.
 
   --lich thang : tải bộ file THÁNG trước → xếp Drive (Tháng M-YYYY) → upload + tính
-                 + (nếu file sạch) tự Lưu lịch sử lên Sổ Vận Hành.
+                 + tự Lưu lịch sử lên Sổ Vận Hành. CHẠY 2 LẦN/KỲ (chốt 18/11/2026):
+                   lần 1 = từ ngày 1 (có số tháng trước ngay, chưa chốt),
+                   lần 2 = từ ngày 15 (tải lại, cập nhật các đơn đã hoàn thành,
+                   GHI ĐÈ cùng nhãn kỳ). Task chạy hằng ngày, marker chống trùng.
   --lich tuan  : tải bộ file TUẦN trước → xếp Drive (Theo tuần/Tuần Www-YYYY).
                  (Tuần KHÔNG đẩy lên Sổ Vận Hành — chỉ lưu trữ Drive.)
 
@@ -43,27 +46,33 @@ def ky_tuan_truoc():
     return '%d-W%02d' % (iso[0], iso[1])
 
 
-def qua_ngay_20(ky):
-    """ky='YYYY-MM'. True nếu hôm nay đã qua ngày 20 THÁNG KẾ TIẾP."""
-    nam, thang = map(int, ky.split('-'))
-    thang_ke = thang % 12 + 1
-    nam_ke = nam + (1 if thang == 12 else 0)
-    return datetime.date.today() > datetime.date(nam_ke, thang_ke, 20)
-
-
-# Marker "đã hoàn tất kỳ này" — để task tháng chạy HẰNG NGÀY nhưng chỉ làm đúng
-# 1 lần/kỳ (sau ngày 20). Để ngoài repo, không commit.
+# Marker "đã hoàn tất" theo (kỳ, lần) — task chạy HẰNG NGÀY nhưng mỗi lần chỉ làm
+# đúng 1 lượt; lỗi thì hôm sau tự thử lại. Để ngoài repo, không commit.
 STATE_DIR = os.path.join(os.path.expanduser('~'), '.svh-tai-file-state')
 
 
-def da_hoan_tat(lich, ky):
-    return os.path.exists(os.path.join(STATE_DIR, '%s-%s.done' % (lich, ky)))
+def _marker(lich, ky, lan=None):
+    ten = '%s-%s%s.done' % (lich, ky, ('-l%d' % lan) if lan else '')
+    return os.path.join(STATE_DIR, ten)
 
 
-def danh_dau_hoan_tat(lich, ky):
+def da_hoan_tat(lich, ky, lan=None):
+    return os.path.exists(_marker(lich, ky, lan))
+
+
+def danh_dau_hoan_tat(lich, ky, lan=None):
     os.makedirs(STATE_DIR, exist_ok=True)
-    with open(os.path.join(STATE_DIR, '%s-%s.done' % (lich, ky)), 'w') as f:
+    with open(_marker(lich, ky, lan), 'w') as f:
         f.write(datetime.datetime.now().isoformat())
+
+
+def chon_lan_thang(ky):
+    """Hôm nay thuộc lần nào của kỳ `ky` (tháng trước)? Trả 1, 2 hoặc None (không có
+    việc). Từ ngày 15 trở đi chỉ còn lần 2 (nếu lần 1 lỡ thì bỏ, lần 2 đã tải đủ)."""
+    today = datetime.date.today()
+    if today.day >= 15:
+        return None if da_hoan_tat('thang', ky, 2) else 2
+    return None if da_hoan_tat('thang', ky, 1) else 1
 
 
 def chay(cmd):
@@ -71,55 +80,79 @@ def chay(cmd):
     return subprocess.run(cmd).returncode
 
 
+def bao_telegram(msg):
+    token = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+    chat = os.environ.get('TELEGRAM_CHAT_ID', '')
+    print('[TELEGRAM] ' + msg)
+    if not (token and chat):
+        return
+    try:
+        import urllib.parse
+        import urllib.request
+        data = urllib.parse.urlencode({'chat_id': chat, 'text': msg}).encode()
+        urllib.request.urlopen('https://api.telegram.org/bot%s/sendMessage' % token,
+                               data=data, timeout=20)
+    except Exception as e:
+        print('  (gửi Telegram lỗi: %s)' % e)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--lich', choices=['thang', 'tuan'], required=True)
+    ap.add_argument('--lan', type=int, choices=[1, 2],
+                    help='ép chạy lần 1/2 của kỳ (test); bỏ qua marker và ngày')
     args = ap.parse_args()
 
+    lan = None
     if args.lich == 'thang':
         ky = ky_thang_truoc()
-        downloads = os.path.join(os.path.expanduser('~'), 'Downloads', 'svh-' + ky)
-        # Task tháng chạy hằng ngày nhưng chỉ làm 1 lần/kỳ, sau ngày 20.
-        if not qua_ngay_20(ky):
-            print('Kỳ %s chưa tới hạn (phải qua ngày 20 tháng kế). Bỏ qua hôm nay.' % ky)
+        lan = args.lan or chon_lan_thang(ky)
+        if lan is None:
+            print('Kỳ %s: đã xong phần việc của hôm nay. Bỏ qua.' % ky)
             return 0
-        if da_hoan_tat('thang', ky):
-            print('Kỳ %s đã hoàn tất trước đó. Bỏ qua.' % ky)
-            return 0
+        downloads = os.path.join(os.path.expanduser('~'), 'Downloads',
+                                 'svh-%s-l%d' % (ky, lan))
+        # Chạy sớm có chủ đích → bộ kiểm không coi "đơn chưa hoàn thành" là lỗi,
+        # và up_so_van_hanh.py chỉ cảnh báo chứ không chặn Lưu (chốt 18/11/2026).
+        os.environ['SVH_CHO_PHEP_CHUA_HOAN_THANH'] = '1'
     else:
         ky = ky_tuan_truoc()
         downloads = os.path.join(os.path.expanduser('~'), 'Downloads', 'svh-tuan-' + ky)
+    # thư mục sạch: không để sót file lần trước lẫn vào bộ mới
+    if os.path.isdir(downloads):
+        import shutil
+        shutil.rmtree(downloads, ignore_errors=True)
     os.makedirs(downloads, exist_ok=True)
-    print('=== Tải file Sổ Vận Hành | lịch=%s | kỳ=%s ===' % (args.lich, ky))
+    print('=== Tải file Sổ Vận Hành | lịch=%s | kỳ=%s | lần=%s ===' % (args.lich, ky, lan))
     print('Thư mục tải: %s' % downloads)
     print('Ổ Drive    : %s' % DRIVE_ROOT)
 
     t = os.path.join(REPO, 'tools')
 
-    # 1) tải file từ sàn
     rc = chay([PY, os.path.join(t, 'tai_file_san.py'),
                '--lich', args.lich, '--downloads', downloads])
     if rc != 0:
-        print('\n⚠ Bước tải file có lỗi (xem Telegram). Dừng chuỗi.')
+        print('⚠ Bước tải file có lỗi (xem Telegram). Dừng chuỗi, mai tự thử lại.')
         return rc
 
-    # 2) xếp lên Drive
     rc = chay([PY, os.path.join(t, 'xep_file_vao_drive.py'),
                '--lich', args.lich, '--ky', ky,
                '--downloads', downloads, '--drive-root', DRIVE_ROOT])
     if rc != 0:
-        print('\n⚠ Bước xếp Drive có lỗi. Dừng chuỗi.')
+        bao_telegram('⚠ Sổ Vận Hành %s: tải xong nhưng xếp file vào Drive lỗi (%s). '
+                     'Mai tự thử lại.' % (ky, DRIVE_ROOT))
         return rc
 
-    # 3) chỉ THÁNG mới đẩy lên Sổ Vận Hành
     if args.lich == 'thang':
         rc = chay([PY, os.path.join(t, 'up_so_van_hanh.py'),
-                   '--ky', ky, '--downloads', downloads])
+                   '--ky', ky, '--lan', str(lan), '--downloads', downloads])
         if rc == 0:
-            danh_dau_hoan_tat('thang', ky)  # thành công → không chạy lại kỳ này
+            danh_dau_hoan_tat('thang', ky, lan)
+            if lan == 2:
+                danh_dau_hoan_tat('thang', ky, 1)  # lần 2 đã bao lần 1
         return rc
 
-    print('\n✅ Xong lịch tuần — đã lưu trữ Drive.')
+    print('✅ Xong lịch tuần — đã lưu trữ Drive.')
     return 0
 
 

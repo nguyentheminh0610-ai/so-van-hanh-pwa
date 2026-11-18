@@ -35,6 +35,7 @@ KHÔNG fail âm thầm.
   - Nút Xuất: script thử bấm theo CHỮ trong registry.nut_text (bền hơn CSS).
 """
 import argparse
+import datetime
 import json
 import os
 import sys
@@ -46,8 +47,12 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REGISTRY = os.path.join(REPO, 'tools', 'registry_tai_file.json')
 
 # Profile Chrome riêng của script, 1 cái cho mỗi sàn (giữ phiên đăng nhập).
-PROFILE_BASE = os.environ.get(
-    'SVH_PROFILE_DIR', os.path.join(os.path.expanduser('~'), 'svh-chrome-profiles'))
+# CHỐT 18/11/2026: dùng CHUNG Chrome riêng của PC (profile koc-chrome-profile, chạy bằng
+# Google Chrome cài sẵn -- Chromium của Playwright không khởi động được trên PC này).
+# Cả TikTok lẫn Shopee đăng nhập vào cùng 1 profile; KHÔNG chạy cùng lúc với
+# task "Claude - Dong bo KOC" (Chrome khoá profile).
+PROFILE_DIR = os.environ.get(
+    'KOC_PROFILE_DIR', os.path.join(os.path.expanduser('~'), 'koc-chrome-profile'))
 
 TG_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TG_CHAT = os.environ.get('TELEGRAM_CHAT_ID', '')
@@ -77,10 +82,9 @@ def doc_registry():
         return json.load(f)
 
 
-def profile_dir(san):
-    d = os.path.join(PROFILE_BASE, san)
-    os.makedirs(d, exist_ok=True)
-    return d
+def profile_dir(san=None):
+    os.makedirs(PROFILE_DIR, exist_ok=True)
+    return PROFILE_DIR
 
 
 def la_trang_dang_nhap(url, san):
@@ -89,17 +93,133 @@ def la_trang_dang_nhap(url, san):
 
 
 # --------------------------------------------------------------------------
-#  CHỌN KỲ — PHẦN SITE-SPECIFIC, CHỐT TRÊN PC
-#  Trả True nếu đã chọn được khoảng ngày, False nếu để nguyên mặc định.
-#  'tu'/'den' là datetime.date.
+#  TIKTOK — thao tác ĐÃ KIỂM TRÊN GIAO DIỆN THẬT 18/11/2026
+#  Bộ lịch của TikTok Seller (class "p-picker-*"): mở ô "Từ", bấm mũi tên lùi tháng
+#  tới đúng tháng, bấm ngày đầu rồi ngày cuối (cùng 1 khung bên trái) → Áp dụng.
 # --------------------------------------------------------------------------
+import re
+
+
+def dong_popup(page):
+    """Tắt các bong bóng/hộp giới thiệu tính năng của TikTok (chặn click)."""
+    for _ in range(5):
+        got = False
+        for t in ('Đã hiểu', 'Bỏ qua', 'Để sau'):
+            # hộp thoại hiện ra trễ vài giây; nút không phải lúc nào cũng có role=button
+            for loc in (page.locator('.core-modal-wrapper').get_by_text(t, exact=True),
+                        page.get_by_text(t, exact=True)):
+                try:
+                    loc.first.click(timeout=1500)
+                    got = True
+                    break
+                except Exception:
+                    pass
+        if not got:
+            break
+        page.wait_for_timeout(600)
+
+
+def tt_chon_khoang_ngay(page, tu, den):
+    """Chọn khoảng ngày [tu, den] (datetime.date, CÙNG 1 THÁNG, quá khứ) trên bộ lịch
+    TikTok đang mở sẵn ô "Từ". Ném lỗi nếu không chọn được."""
+    page.locator('input[placeholder="Từ"]').first.click(timeout=8000)
+    page.wait_for_timeout(800)
+    muc_tieu = tu.year * 12 + tu.month
+    for _ in range(30):
+        hdr = page.locator('.p-picker-header-value').first.inner_text().strip()  # "10/2026"
+        m, y = [int(x) for x in re.findall(r'\d+', hdr)[:2]]
+        hien_tai = y * 12 + m
+        if hien_tai == muc_tieu:
+            break
+        icons = page.locator('.p-picker-header').first.locator(
+            '.p-picker-header-icon:not(.p-picker-header-icon-hidden)')
+        if hien_tai > muc_tieu:
+            icons.nth(1).click()          # ‹ lùi 1 tháng (icon 0 là « lùi 1 năm)
+        else:
+            raise RuntimeError('Bộ lịch đang ở tháng %s, trước tháng cần chọn' % hdr)
+        page.wait_for_timeout(300)
+    else:
+        raise RuntimeError('Không lùi được bộ lịch tới tháng %02d/%d' % (tu.month, tu.year))
+    body = page.locator('.p-picker-body').first
+    for ngay in (tu.day, den.day):
+        body.locator('.p-picker-cell-in-view .p-picker-date-value',
+                     has_text=re.compile(r'^%02d$' % ngay)).first.click(timeout=8000)
+        page.wait_for_timeout(400)
+    # xác nhận ô hiển thị đúng khoảng ngày vừa chọn
+    gia_tri = page.locator('input[placeholder="Từ"]').first.input_value()
+    if gia_tri.strip() != tu.strftime('%d/%m/%Y'):
+        raise RuntimeError('Ô "Từ" hiện "%s", mong đợi %s' % (gia_tri, tu.strftime('%d/%m/%Y')))
+
+
+def tt_ten_file_lich_su(page):
+    """Tên các file đang có trong "Lịch sử xuất dữ liệu" (để biết file nào là MỚI)."""
+    return set(page.evaluate(r"""() => [...document.querySelectorAll('*')]
+        .filter(e => e.children.length === 0 && /\.(xlsx|csv)$/i.test((e.textContent||'').trim()))
+        .map(e => e.textContent.trim())"""))
+
+
+def tt_moi_tao(ten, bat_dau):
+    """File lịch sử có giờ tạo nhúng trong tên ("...-2026-11-18-11:35.xlsx"). Chỉ nhận file
+    tạo SAU lúc bấm Xuất (trừ 2 phút) — chống tải nhầm file cũ khi danh sách lịch sử
+    chưa kịp hiện lúc chụp `truoc`. Tên không có giờ thì coi là mới (đã lọc bằng set-diff)."""
+    m = re.search(r'(\d{4})-(\d{2})-(\d{2})-(\d{2})[:_](\d{2})', ten)
+    if not m:
+        return True
+    t = datetime.datetime(*[int(x) for x in m.groups()])
+    return t >= bat_dau - datetime.timedelta(minutes=2)
+
+
+def tt_cho_va_tai(page, truoc, downloads, cho_giay=240):
+    """Chờ TikTok sinh xong file MỚI trong lịch sử xuất rồi bấm "Tải xuống".
+    `truoc` = tt_ten_file_lich_su() chụp TRƯỚC khi bấm Xuất. Trả đường dẫn file đã lưu."""
+    bat_dau = datetime.datetime.now()
+    han = time.time() + cho_giay
+    while time.time() < han:
+        page.wait_for_timeout(4000)
+        moi = [t for t in tt_ten_file_lich_su(page) - truoc if tt_moi_tao(t, bat_dau)]
+        for ten in moi:
+            hang = page.locator('tr, div').filter(has_text=ten).filter(
+                has=page.get_by_role('button', name=re.compile('Tải xuống'))).last
+            if hang.count() == 0:
+                continue
+            with page.expect_download(timeout=90000) as dl:
+                hang.get_by_role('button', name=re.compile('Tải xuống')).first.click()
+            d = dl.value
+            dest = os.path.join(downloads, d.suggested_filename)
+            d.save_as(dest)
+            return dest
+    raise RuntimeError('TikTok chưa sinh xong file sau %d giây' % cho_giay)
+
+
+def tt_don_hang(page, tu, den, downloads):
+    """TikTok — Tất cả đơn hàng: tab Tất cả → Bộ lọc Thời gian đã tạo → Xuất (Excel)."""
+    page.goto('https://seller-vn.tiktok.com/order?tab=all', wait_until='domcontentloaded',
+              timeout=60000)
+    page.wait_for_timeout(5000)
+    dong_popup(page)
+    page.wait_for_timeout(2500)
+    dong_popup(page)  # có hộp giới thiệu hiện TRỄ sau khi tải xong
+    page.get_by_role('button', name='Bộ lọc').first.click(timeout=8000)
+    page.wait_for_timeout(1500)
+    tt_chon_khoang_ngay(page, tu, den)
+    page.get_by_role('button', name='Áp dụng').first.click()
+    page.wait_for_timeout(4000)
+    page.get_by_role('button', name='Xuất', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(2000)
+    # phạm vi = "Đơn hàng đã lọc" (mặc định); định dạng Excel
+    page.get_by_text('Excel', exact=True).first.click()
+    truoc = tt_ten_file_lich_su(page)
+    page.get_by_role('button', name='Xuất', exact=True).last.click()
+    return tt_cho_va_tai(page, truoc, downloads)
+
+
+# Các luồng đã viết riêng theo từng file (khoá = trường "kieu" trong registry).
+LUONG = {'tt_don_hang': tt_don_hang}
+
+
 def chon_ky(page, san, entry, tu, den):
-    """Best-effort. Người dựng mở trang thật trên PC để hoàn thiện cho khớp
-    bộ lịch của từng sàn (xem entry['export']['chon_ky'])."""
-    # TODO(PC): điền thao tác chọn lịch thật. Hiện chỉ log hướng dẫn + để trang
-    # dùng khoảng mặc định; nhiều trang mặc định 'tháng này' nên bản tháng chạy
-    # đầu tháng kế tiếp vẫn có thể đúng. KIỂM file sau khi tải để chắc đúng kỳ.
-    print('    (chọn kỳ: %s → %s | HD: %s)'
+    """(Giữ cho tương thích) — các file đã có luồng riêng trong LUONG không dùng hàm này."""
+    print('    (chưa có luồng riêng — chọn kỳ: %s → %s | HD: %s)'
           % (tu, den, entry['export'].get('chon_ky', '')))
     return False
 
@@ -189,29 +309,38 @@ def ky_tu_lich(lich):
 
 
 def mo_dang_nhap(san):
+    """Mở Chrome riêng, vào sẵn trang sàn để chủ shop đăng nhập 1 lần. san='ca-hai'
+    mở cả TikTok lẫn Shopee ở 2 tab. Chủ shop đóng cửa sổ Chrome khi xong."""
     from playwright.sync_api import sync_playwright
     reg = doc_registry()
-    url = next((e['export']['url'] for e in reg['files'] if e['san'] == san),
-               'https://seller-vn.tiktok.com' if san == 'tiktok'
-               else 'https://banhang.shopee.vn')
-    print('Mở cửa sổ để đăng nhập %s. Đăng nhập xong thì ĐÓNG cửa sổ.' % san)
+    urls = []
+    for s_ in (['tiktok', 'shopee'] if san == 'ca-hai' else [san]):
+        urls.append(next((e['export']['url'] for e in reg['files'] if e['san'] == s_),
+                         'https://seller-vn.tiktok.com' if s_ == 'tiktok'
+                         else 'https://banhang.shopee.vn'))
+    print('Mở Chrome để đăng nhập. Đăng nhập xong thì ĐÓNG cửa sổ Chrome.')
     with sync_playwright() as p:
         ctx = p.chromium.launch_persistent_context(
-            profile_dir(san), headless=False, accept_downloads=True)
-        page = ctx.pages[0] if ctx.pages else ctx.new_page()
-        page.goto(url)
+            profile_dir(san), channel='chrome', headless=False, accept_downloads=True)
+        for i, u in enumerate(urls):
+            page = ctx.pages[0] if (i == 0 and ctx.pages) else ctx.new_page()
+            page.goto(u)
         try:
-            page.wait_for_event('close', timeout=0)
+            while ctx.pages:
+                ctx.pages[0].wait_for_event('close', timeout=0)
         except Exception:
             pass
-        ctx.close()
+        try:
+            ctx.close()
+        except Exception:
+            pass
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--lich', choices=['thang', 'tuan'])
     ap.add_argument('--downloads', help='thư mục nhận file tải')
-    ap.add_argument('--login', choices=['tiktok', 'shopee'],
+    ap.add_argument('--login', choices=['tiktok', 'shopee', 'ca-hai'],
                     help='mở cửa sổ đăng nhập 1 lần cho sàn này rồi thoát')
     ap.add_argument('--chi', help='chỉ tải đúng 1 id trong registry (để test)')
     args = ap.parse_args()
@@ -248,7 +377,8 @@ def main():
     with sync_playwright() as p:
         for san in sorted({e['san'] for e in jobs}):
             ctx = p.chromium.launch_persistent_context(
-                profile_dir(san), headless=True, accept_downloads=True)
+                profile_dir(san), channel='chrome',
+                headless=(os.environ.get('SVH_HIEN') != '1'), accept_downloads=True)
             try:
                 for entry in [e for e in jobs if e['san'] == san]:
                     print('• %s' % entry['mo_ta'])
