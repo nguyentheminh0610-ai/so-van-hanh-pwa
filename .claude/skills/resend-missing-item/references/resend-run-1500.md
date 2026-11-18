@@ -1,3 +1,9 @@
+> **Cập nhật 18/11/2026:** bước tạo đơn / hoàn tất nay do CHÍNH lượt CSKH làm ngay sau khi
+> chủ shop duyệt (đầu mỗi lượt chạy cổng rẻ bên dưới; có việc mới mở Chrome vàng). Hai
+> task 15h/15h45/18h45 giữ làm dự phòng. Thêm: sau A1 gửi **Tin "đang tạo đơn"** (cờ
+> `msg_creating_at`, không nói ngày đi); B2 thêm **dòng ngày đi** (hôm nay nếu Sổ Kho xong
+> trước 15h30, ngược lại ngày mai). Xem resend-flow-batch-2026-11-17.md.
+
 # Giai đoạn 3-6: phiên 15h tạo đơn + phiên 15h45/18h45 hoàn tất (chốt 17/11/2026)
 
 Hai task riêng trên PC, **không chạy trong lượt CSKH**:

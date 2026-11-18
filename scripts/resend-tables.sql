@@ -72,7 +72,8 @@ create table if not exists public.resend_cases (
 
   -- --- Cờ đã gửi (mỗi tin 1 cờ: gửi tin nào tick tin đó, chạy lại chỉ gửi tin chưa tick) ---
   msg_verify_at    timestamptz,          -- tin xác minh
-  msg_ack_at       timestamptz,          -- tin 2a / 2b sau khi khách xác nhận
+  msg_ack_at       timestamptz,          -- tin ghi nhận sau khi khách xác nhận
+  msg_creating_at  timestamptz,          -- tin 'đang tạo đơn' sau duyệt lần 1 (18/11/2026)
   msg_final_at     timestamptz,          -- ảnh chụp đơn + link theo dõi (3 tin cuối)
   msg_remind_at    timestamptz,          -- nhắc khách im lặng (tối đa 1 lần)
 
@@ -112,3 +113,6 @@ begin
     create policy "anon all" on public.resend_cases for all using (true) with check (true);
   end if;
 end $$;
+
+-- Bảng đã tạo từ trước: chạy dòng này 1 lần trên Supabase (18/11/2026)
+alter table public.resend_cases add column if not exists msg_creating_at timestamptz;

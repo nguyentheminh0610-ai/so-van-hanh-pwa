@@ -74,16 +74,16 @@ Khách sửa thông tin → ghi lại file, gửi tin xác minh mới, cập nh�
 
 ## 4. Khách xác nhận → `wait_approve_1`
 
-Khách trả lời đúng ("đúng rồi", "ok"...). Lấy **giờ tin đó trên sàn**:
-- Trước 14:00 → `confirm_slot=today`, `run_date` = ngày đó, gửi **Tin 2a**.
-- Từ 14:00 trở đi → `confirm_slot=tomorrow`, `run_date` = ngày hôm sau, gửi **Tin 2b**.
+Khách trả lời đúng ("đúng rồi", "ok"...). Gửi **Tin ghi nhận** (không hứa giờ, mẫu ở
+[resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md); chốt 18/11/2026,
+thay cho Tin 2a/2b theo giờ). Không còn chọn tin theo giờ khách xác nhận.
 
 PATCH `status=wait_approve_1` (điều kiện `status=eq.verifying`),
-`customer_confirmed_at`, `confirm_slot`, `run_date`, `msg_ack_at` (cờ lên trước
-khi gửi). Rồi gửi **Telegram** cho chủ shop (bot như `daily-warehouse-report`,
-chat_id của chủ shop): nguyên văn tin xác minh (có đủ SĐT/địa chỉ — chỉ chủ shop
-thấy), món thiếu + độ chắc + bằng chứng, hạn duyệt (trước 15h ngày `run_date`),
-và "Duyệt ở tab 'Gửi bù' trên Sổ Vận Hành".
+`customer_confirmed_at`, `run_date` = hôm nay, `msg_ack_at` (cờ lên trước khi gửi).
+Rồi gửi **Telegram** cho chủ shop (bot như `daily-warehouse-report`, chat_id của chủ
+shop): nguyên văn tin xác minh (có đủ SĐT/địa chỉ — chỉ chủ shop thấy), món thiếu +
+độ chắc + bằng chứng, và "Duyệt lần 1 ở tab 'Gửi bù' trên Sổ Vận Hành (trước ~14h40
+để đơn kịp đi hôm nay)".
 
 Khách trả lời mà không rõ có xác nhận không → không đoán, đọc lại cả hội thoại;
 vẫn không rõ thì hỏi lại 1 câu ngắn "Thông tin trên đã đúng chưa bạn nhỉ ạ?".
@@ -96,10 +96,9 @@ vẫn không rõ thì hỏi lại 1 câu ngắn "Thông tin trên đã đúng ch
   "Dạ bạn xác nhận giúp shop thông tin gửi bù để shop tạo đơn sớm cho bạn nhé ạ").
 - Quá 72h vẫn im → `status=stalled`, `stall_reason='Khách im > 72h'`.
   Chủ shop có thể bấm "Duyệt dù khách chưa xác nhận" trên tab.
-- Quá 14h30 ngày `run_date` mà case vẫn `wait_approve_1` → Telegram nhắc 1 lần
-  (14h50 nhắc lần 2). Qua 15h chưa duyệt → case trượt phiên ngày mai: đặt
-  `run_date` = ngày mai, Telegram báo chủ shop và đề nghị tin xin lỗi khách (chưa
-  có câu chữ chốt → không tự gửi).
+- Sau 14h30 mà case vẫn `wait_approve_1` → Telegram nhắc 1 lần (14h50 nhắc lần 2,
+  "duyệt sau 14h40 thì đơn đi ngày mai"). Duyệt muộn vẫn được, chỉ đi ngày mai; không
+  còn "trượt phiên" hay tin xin lỗi riêng (chốt 18/11/2026).
 
 ## Telegram ngoài ý muốn
 

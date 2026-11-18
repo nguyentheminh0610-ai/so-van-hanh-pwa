@@ -17,14 +17,18 @@ Lý do làm: hôm 16/11/2026 chủ shop và Claude làm tay 2 case (`q.a.n.h_`,
 | Bước | Ai | Việc |
 |---|---|---|
 | 1 | Task CSKH (sẵn có) | Phát hiện khách báo thiếu, mở dòng `resend_cases`, hỏi thông tin |
-| 2 | Task CSKH | Gửi **tin xác minh** (Step 2b). Khách xác nhận "đúng" thì **chốt dữ liệu** (tên, SĐT, địa chỉ, món, size, SL) |
-| 3 | Chủ shop | **Duyệt lần 1** (tab "Gửi bù" hoặc ping Telegram), xong trước giờ tạo đơn |
-| 4 | Claude, 1 phiên/ngày | Tạo đơn SPX cho mọi case đã duyệt, tải PDF, tự đối chiếu với dữ liệu đã chốt |
-| 5 | Chủ shop | **Duyệt lần 2**: xem PDF + kết quả đối chiếu, trước 15h40 |
-| 6 | Claude | Ghi Sổ Kho (notice + error_log + upload PDF), nhắn khách ảnh chụp + link theo dõi |
+| 2 | Task CSKH | Gửi **tin xác minh**. Khách xác nhận "đúng" thì **chốt dữ liệu**, gửi **Tin ghi nhận** (không hứa giờ), ping Telegram |
+| 3 | Chủ shop | **Duyệt lần 1**: xác nhận đơn này thiếu thật + đồng ý tạo đơn (tab "Gửi bù" hoặc Telegram) |
+| 4 | Lượt CSKH kế tiếp (kiểm `resend_cases` đầu lượt) | Gửi **Tin "đang tạo đơn"** (không nói ngày đi), tạo đơn SPX, tải PDF, tự đối chiếu với dữ liệu đã chốt, ping chủ shop |
+| 5 | Chủ shop | **Duyệt lần 2**: xem PDF + kết quả đối chiếu |
+| 6 | Lượt CSKH kế tiếp | Ghi Sổ Kho (notice + error_log + upload PDF) TRƯỚC, rồi nhắn khách ảnh chụp + mã vận đơn + **ngày đi** (hôm nay/ngày mai) |
 
 Kho đóng hàng muộn nhất **16h**, nên đơn muốn đi trong ngày phải có **PDF trong Sổ Kho
 trước 15h30** để kho kịp in (chốt 18/11/2026, thay cho mốc cũ "xong trước 16h").
+
+**Chốt 18/11/2026 — thay cho "phiên tạo đơn cố định 15h":** tạo đơn NGAY sau duyệt lần 1,
+do lượt CSKH phát hiện. Hai task `resend-create-1500` / `resend-finalize-1545` giữ làm
+dự phòng (cổng rẻ nên không tốn).
 
 ## Quy tắc đã chốt
 
@@ -53,23 +57,18 @@ trước 15h30** để kho kịp in (chốt 18/11/2026, thay cho mốc cũ "xong
 - Giờ xác nhận của khách tính theo **giờ khách nhắn trên sàn**, không phải giờ
   task đọc tin.
 
-## Mốc giờ
+## Mốc giờ (chốt 18/11/2026)
 
-- Khách xác nhận **trước 14h** -> dùng Tin 2a (đi trong ngày).
-- Khách xác nhận **sau 14h** -> dùng Tin 2b (đi ngày mai).
-- **Chốt 18/11/2026 (thay cho phiên tạo đơn cố định 15h bên dưới):** tạo đơn NGAY sau
-  khi chủ shop duyệt lần 1, do lượt CSKH phát hiện (kiểm `resend_cases` đầu mỗi lượt,
-  cách làm xem tài liệu task). Hạn cuối cả chuỗi: **PDF đã nằm trong Sổ Kho trước
-  15h30**, đơn nào kịp mốc này mới đi trong ngày. Hạn tạm tính để kịp 15h30 (chờ chủ
-  shop xác nhận): duyệt lần 1 trước ~14h40, duyệt lần 2 trước ~15h10, Sổ Kho xong
-  ~15h20. Sau mốc này Tin 2b (đi ngày mai).
-- (Cũ, 17/11/2026) Phiên tạo đơn: **15h** (chủ shop chốt 17/11/2026). Chủ shop duyệt lần 1 xong
-  trước 15h (tối thiểu còn ~40 phút kể từ lúc task ping, vì task CSKH chạy 20
-  phút/lần); Telegram nhắc lại lúc 14h30 và 14h50. Quá 15h chưa duyệt thì case
-  trượt sang phiên ngày mai, cần tin xin lỗi ngắn gửi khách (chủ shop duyệt câu
-  chữ trước). Nếu 40 phút là sát thì dời giờ chốt khách xuống 13h30.
-  Tin 2a ghi "khoảng 3h chiều nay" cho khớp (chủ shop đã chốt 3h, thay cho "2h"
-  trong bản nháp đầu).
+- Khách KHÔNG được báo ngày đi cho tới khi biết chắc: **Tin "đang tạo đơn"** (sau duyệt
+  lần 1) không nói ngày; **ngày đi chỉ báo ở tin sau duyệt lần 2**.
+- Quy tắc chọn ngày đi: ghi Sổ Kho xong (PDF đã có trong Sổ Kho) **trước 15h30** ->
+  "đơn đi hôm nay"; sau 15h30 -> "đơn đi ngày mai". Nên chủ shop duyệt lần 2 muộn vẫn
+  không sao, tin vẫn đúng sự thật; chỉ ngày đi lùi sang mai.
+- Để kịp "hôm nay", gợi ý hạn: duyệt lần 1 trước ~14h40, duyệt lần 2 trước ~15h10.
+  Telegram nhắc chủ shop lúc 14h30 / 14h50 nếu còn case chờ duyệt lần 1.
+- Khung giờ lấy hàng SPX chọn theo giờ hiện tại (không chọn khung đã qua).
+- Bỏ phân biệt Tin 2a / 2b theo giờ khách xác nhận (cũ, 17/11/2026: trước/sau 14h).
+  Cột `confirm_slot` không còn dùng để chọn tin; ngày đi do giờ ghi Sổ Kho quyết định.
 
 ## Mẫu tin nhắn khách (chủ shop chốt 17/11/2026)
 
@@ -94,24 +93,24 @@ Dạ shop xin lỗi bạn rất nhiều vì đơn hàng của bạn bị thiếu
 Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn xác nhận giúp shop để shop tạo đơn gửi bù cho bạn sớm nhất nhé ạ.
 ```
 
-**Tin 2a** (khách xác nhận trước 14h):
+**Tin ghi nhận** (ngay khi khách xác nhận thông tin, cờ `msg_ack_at`; không hứa giờ):
 
 ```
-Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, shop sẽ tạo đơn ngay bây giờ và cho hàng đi trong ngày, có mã vận đơn shop gửi bạn liền nhé ạ.
+Dạ shop đã ghi nhận ạ, shop xử lý ngay cho bạn nhé ạ.
 ```
 
-(Chốt 18/11/2026: Tin 2a báo "tạo đơn ngay", KHÔNG nhắc giờ 3h và KHÔNG nhắc chuyện
-chủ shop duyệt — khách không cần biết bước nội bộ. Thay cho bản cũ "khoảng 3h chiều nay".)
-
-**Tin 2b** (khách xác nhận sau 14h):
+**Tin "đang tạo đơn"** (sau chủ shop duyệt lần 1, cờ `msg_creating_at`; KHÔNG nói ngày đi, KHÔNG nhắc chuyện duyệt):
 
 ```
-Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, nhưng hôm nay đơn vị vận chuyển đã qua giờ lấy hàng nên shop xin phép cho đơn đi vào ngày mai ạ, có mã vận đơn shop gửi bạn liền, mong bạn thông cảm giúp shop nhé ạ.
+Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, shop đang tạo đơn cho bạn, có mã vận đơn shop gửi bạn liền nhé ạ.
 ```
 
-Lý do chọn câu "đơn vị vận chuyển đã qua giờ lấy hàng" cho 2b: có thật, không
-đổ lỗi cho ai, không nhắc tới kho. Tin 2b lúc quá 0h thì đổi "ngày mai" thành
-"hôm nay (ngày ...)".
+**Dòng ngày đi** (thêm vào tin mã vận đơn sau duyệt lần 2, chọn theo giờ ghi Sổ Kho):
+
+- Trước 15h30: `Đơn của bạn sẽ được gửi đi trong hôm nay ạ.`
+- Sau 15h30: `Hôm nay đơn vị vận chuyển đã qua giờ lấy hàng nên đơn sẽ được gửi đi vào ngày mai ạ, mong bạn thông cảm giúp shop nhé ạ.`
+  (Lúc quá 0h đổi "ngày mai" thành "hôm nay (ngày ...)". Lý do chọn câu "đã qua giờ lấy hàng":
+  có thật, không đổ lỗi ai, không nhắc tới kho.)
 
 ## Chưa làm / cần theo dõi
 
