@@ -116,3 +116,6 @@ end $$;
 
 -- Bảng đã tạo từ trước: chạy dòng này 1 lần trên Supabase (18/11/2026)
 alter table public.resend_cases add column if not exists msg_creating_at timestamptz;
+
+-- 18/11/2026: cờ tin xin ảnh vỏ đơn/ảnh bằng chứng (bắt buộc trước khi gửi tin xác minh)
+alter table public.resend_cases add column if not exists msg_photo_at timestamptz;

@@ -72,6 +72,14 @@ dự phòng (cổng rẻ nên không tốn).
 
 ## Mẫu tin nhắn khách (chủ shop chốt 17/11/2026)
 
+**Xin ảnh vỏ đơn / ảnh bằng chứng** (BẮT BUỘC mọi case, chốt lại 18/11/2026 — xem mục "Ảnh bằng chứng" trong
+[resend-collect-verify.md](resend-collect-verify.md)). Nguyên văn chủ shop soạn 13/10/2026:
+
+```
+Để shop kiểm tra và hỗ trợ gửi bù sản phẩm còn thiếu cho bạn nhanh nhất, bạn chụp giúp shop 1 tấm ảnh phần vỏ đơn hàng (tem/mã vận đơn dán bên ngoài túi/hộp) gửi qua đây giúp shop nhé ạ.
+```
+Giao sai hàng: nhờ khách chụp thêm sản phẩm nhận được (không có mẫu chốt riêng → dùng câu trên, thêm "và sản phẩm bạn nhận được" ngay sau "vỏ đơn hàng").
+
 **Hỏi thông tin nhận hàng** (thay Tin 1 cũ; vì sàn chặn SĐT/địa chỉ dạng chữ):
 
 ```

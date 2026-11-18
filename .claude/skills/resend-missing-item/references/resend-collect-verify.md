@@ -45,8 +45,25 @@ Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_orde
 
 ## 2. Hỏi thông tin (`collecting`)
 
-Cần đủ: ảnh vỏ đơn, món thiếu (mẫu, size, SL), họ tên + SĐT, địa chỉ. Dùng đúng
-mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md) (Tin xin ảnh vỏ đơn, Tin xin họ tên/SĐT/địa chỉ). Thiếu mục nào hỏi mục đó. Món thiếu
+### ⚠️ Ảnh bằng chứng — BẮT BUỘC (chủ shop chốt lại 18/11/2026)
+
+Lý do: chủ shop **duyệt lần 1 bằng cách mở chat khách, xem ảnh bằng mắt** xem có đúng
+là thiếu / giao sai không, rồi mới duyệt. Không có ảnh = chủ shop không có gì để
+đối chiếu. Hôm 17/11 case `vlbd_aivri` (Shopee) bị bỏ qua bước này vì file flow mới
+làm rơi mất mẫu xin ảnh (lệch giữa các file) — không được lặp lại, kể cả khi đơn Shopee
+tự tra được món/mã vận đơn.
+
+- Case mới → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
+  TRƯỚC, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
+- **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `verifying`,
+  KHÔNG ping chủ shop duyệt.** Giữ `collecting`; quá 24h nhắc như mục 5.
+  Cột `msg_photo_at` chưa có trên DB (chủ shop chưa chạy SQL) thì kiểm lịch sử chat
+  xem đã xin ảnh chưa, đừng xin lại.
+- Khi khách gửi ảnh: ghi vào `item_evidence` "khách gửi ảnh vỏ đơn lúc HH:MM", và ở
+  Telegram duyệt lần 1 phải ghi rõ **tên khách + sàn + "mở chat xem ảnh khách gửi rồi duyệt"**.
+
+Cần đủ: ảnh vỏ đơn, món thiếu (mẫu, size, SL), họ tên + SĐT, địa chỉ. Thiếu mục nào hỏi mục đó
+(mẫu: Tin xin ảnh vỏ đơn, Tin xin họ tên/SĐT/địa chỉ ở file flow-batch). Món thiếu
 chưa rõ → không tự hỏi, báo chủ shop (chưa có mẫu).
 
 Khi khách gửi ảnh: đọc ra tên, SĐT, địa chỉ; ghép SĐT với SĐT bị che trong đơn
