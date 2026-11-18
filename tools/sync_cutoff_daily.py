@@ -55,8 +55,8 @@ def dem(cred, now):
     fmt = lambda t: t.astimezone(datetime.timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ')
     don, page = [], 1
     while True:
+        # Bỏ &fields=... (18/11/2026: Sapo trả 400 "Can't convert value to List" với tham số này)
         rows = api(cred, '/admin/orders.json?created_on_min=%s&created_on_max=%s&limit=250&page=%d'
-                   '&fields=id,created_on,cancelled_on,source_name,source_identifier,fulfillments'
                    % (fmt(tu), fmt(chot), page)).get('orders', [])
         if not rows:
             break

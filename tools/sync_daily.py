@@ -88,8 +88,8 @@ def main():
     page = 1
     while True:
         rows = api(store, key, sec,
-                   f'/admin/orders.json?created_on_min={since}&limit=250&page={page}'
-                   '&fields=id,created_on,status,cancelled_status,line_items').get('orders', [])
+                   # Bỏ &fields=... (18/11/2026: Sapo trả 400 với tham số này)
+                   f'/admin/orders.json?created_on_min={since}&limit=250&page={page}').get('orders', [])
         if not rows: break
         for o in rows:
             if o.get('status') == 'cancelled' or o.get('cancelled_status') == 'cancelled':
