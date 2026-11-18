@@ -222,7 +222,12 @@ def main():
                 chua, conlai = i['chuaXong']
                 pct = (chua / conlai * 100) if conlai else 0
                 extra += f"  chưa hoàn thành {chua}/{conlai} đơn ({pct:.1f}%)"
-                if pct > 10:
+                if pct > 10 and os.environ.get('SVH_CHO_PHEP_CHUA_HOAN_THANH') == '1':
+                    # Chốt 18/11/2026: lịch tự động ngày 1 và 15 CỐ Ý tải sớm,
+                    # sổ tự cập nhật lại khi đơn hoàn thành -> chỉ ghi chú, không chặn.
+                    notes.append(f'{label}: {pct:.1f}% đơn chưa hoàn thành (chạy sớm có chủ đích, '
+                                 f'lần sau sẽ cập nhật lại).')
+                elif pct > 10:
                     problems.append(
                         f'{label}: {pct:.1f}% đơn chưa hoàn thành — TẢI QUÁ SỚM. '
                         f'Đợi qua ngày 20 của tháng kế tiếp rồi tải lại, nếu không lãi sẽ bị tụt giả tạo.')
