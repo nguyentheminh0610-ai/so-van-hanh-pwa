@@ -123,8 +123,15 @@ mua được nhé."
 Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`
 — tab **"Chinh sach xu ly loi"** (mức lỗi, % hoàn, mã giảm) + tab **"Mau tin nhan"**
 (câu chuẩn). Đọc dòng thật trong Sheet, không chép lại từ trí nhớ.
-- Sản phẩm: Nhẹ (chỉ thừa) / Vừa (lem màu nhẹ, may lệch, rách nhỏ tự vá) / Nặng
-  (sai mẫu/màu, lỗi vải diện rộng, rách lớn) → hoàn 10-15% / 15-20% / đổi hoặc trả.
+- Sản phẩm, % hoàn khi khách GIỮ hàng — **CHỐT 18/11/2026 (chủ shop), thay cho
+  dải cũ "10-15% / 15-20%" ở đây và dải "5-10 / 15-20 / 30-35" trong tài liệu
+  CSKH cục bộ** (hai nguồn từng lệch nhau, chủ shop chốt số cố định):
+  - **Rất nhẹ** (chỉ thừa/cắt chưa gọn, không ảnh hưởng mặc) → **10%**
+  - **Nhẹ** (lem màu nhẹ, đường may hơi lệch 1 chỗ) → **15%**
+  - **Vừa** (rách nhỏ tự vá được, thiếu phụ kiện nhỏ như dây rút/nhãn mác) → **30%**
+  - **Nặng** (sai mẫu/màu, lỗi vải diện rộng, rách lớn) → không giữ hàng, bắt buộc đổi hoặc trả.
+  Các số này CS chỉ GHI vào tin Telegram làm đề xuất mức (mục 4 bên dưới), KHÔNG nói
+  số % với khách khi chưa được chủ shop duyệt.
 - Dịch vụ: giao thiếu → gửi bù (skill resend-missing-item); giao sai phân loại/size
   → hoàn 30% giữ hàng hoặc đổi; giao sai sang SP khác hoàn toàn → đổi.
 - Tin đầu theo "Mau tin nhan": xác nhận lỗi + xin lỗi, rồi "Deal khách"/"Đưa ra
