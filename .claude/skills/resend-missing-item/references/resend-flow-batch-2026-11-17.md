@@ -23,7 +23,8 @@ Lý do làm: hôm 16/11/2026 chủ shop và Claude làm tay 2 case (`q.a.n.h_`,
 | 5 | Chủ shop | **Duyệt lần 2**: xem PDF + kết quả đối chiếu, trước 15h40 |
 | 6 | Claude | Ghi Sổ Kho (notice + error_log + upload PDF), nhắn khách ảnh chụp + link theo dõi |
 
-Kho in đơn lần cuối **16h**, nên bước 4-6 phải xong trước 16h.
+Kho đóng hàng muộn nhất **16h**, nên đơn muốn đi trong ngày phải có **PDF trong Sổ Kho
+trước 15h30** để kho kịp in (chốt 18/11/2026, thay cho mốc cũ "xong trước 16h").
 
 ## Quy tắc đã chốt
 
@@ -56,7 +57,13 @@ Kho in đơn lần cuối **16h**, nên bước 4-6 phải xong trước 16h.
 
 - Khách xác nhận **trước 14h** -> dùng Tin 2a (đi trong ngày).
 - Khách xác nhận **sau 14h** -> dùng Tin 2b (đi ngày mai).
-- Phiên tạo đơn: **15h** (chủ shop chốt 17/11/2026). Chủ shop duyệt lần 1 xong
+- **Chốt 18/11/2026 (thay cho phiên tạo đơn cố định 15h bên dưới):** tạo đơn NGAY sau
+  khi chủ shop duyệt lần 1, do lượt CSKH phát hiện (kiểm `resend_cases` đầu mỗi lượt,
+  cách làm xem tài liệu task). Hạn cuối cả chuỗi: **PDF đã nằm trong Sổ Kho trước
+  15h30**, đơn nào kịp mốc này mới đi trong ngày. Hạn tạm tính để kịp 15h30 (chờ chủ
+  shop xác nhận): duyệt lần 1 trước ~14h40, duyệt lần 2 trước ~15h10, Sổ Kho xong
+  ~15h20. Sau mốc này Tin 2b (đi ngày mai).
+- (Cũ, 17/11/2026) Phiên tạo đơn: **15h** (chủ shop chốt 17/11/2026). Chủ shop duyệt lần 1 xong
   trước 15h (tối thiểu còn ~40 phút kể từ lúc task ping, vì task CSKH chạy 20
   phút/lần); Telegram nhắc lại lúc 14h30 và 14h50. Quá 15h chưa duyệt thì case
   trượt sang phiên ngày mai, cần tin xin lỗi ngắn gửi khách (chủ shop duyệt câu
@@ -90,8 +97,11 @@ Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn x
 **Tin 2a** (khách xác nhận trước 14h):
 
 ```
-Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, khoảng 3h chiều nay shop sẽ tạo đơn và cho hàng đi trong ngày, có mã vận đơn shop gửi bạn liền nhé ạ.
+Dạ ok ạ. Bạn yên tâm các đơn gửi bù bên mình sẽ ưu tiên trước hết ạ, shop sẽ tạo đơn ngay bây giờ và cho hàng đi trong ngày, có mã vận đơn shop gửi bạn liền nhé ạ.
 ```
+
+(Chốt 18/11/2026: Tin 2a báo "tạo đơn ngay", KHÔNG nhắc giờ 3h và KHÔNG nhắc chuyện
+chủ shop duyệt — khách không cần biết bước nội bộ. Thay cho bản cũ "khoảng 3h chiều nay".)
 
 **Tin 2b** (khách xác nhận sau 14h):
 
