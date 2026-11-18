@@ -1,4 +1,32 @@
-# Hệ thống TẢI FILE tự động cho Sổ Vận Hành — lưu Drive theo tháng/tuần
+# Hệ thống TẢI FILE tự động cho Sổ Vận Hành — lưu Drive theo tháng
+
+> ## ⚠ CẬP NHẬT 18/11/2026 — LỊCH MỚI "NGÀY 1 + NGÀY 15" (thay cho "chỉ sau ngày 20")
+> Chủ shop Minh chốt (phương án A): **hoàn toàn tự động, không đụng tay**.
+> - **Ngày 1 hằng tháng** → máy tự tải bộ file THÁNG TRƯỚC, xếp Drive, upload sổ, Tính, **Lưu**.
+>   Chủ shop vào xem là có số tháng trước ngay. Số này **chưa chốt** (còn đơn chưa hoàn thành;
+>   sổ tự hiện cảnh báo "LỆCH KỲ" trong thẻ lãi lỗ — đó là dấu hiệu "số tạm").
+> - **Từ ngày 15** → máy tải LẠI cùng tháng đó, **ghi đè cùng nhãn kỳ** (`01/MM/YYYY – dd/MM/YYYY`),
+>   nên mọi đơn đã hoàn thành sau 2 tuần được cập nhật. Chi phí vận hành đã nhập tay được giữ lại.
+> - Lý do bỏ quy tắc "sau ngày 20": chủ shop muốn có số ngay đầu tháng; đổi lại chấp nhận số tạm
+>   rồi tự cập nhật. Số thật chốt hẳn vẫn đẹp nhất sau ngày 20 (TikTok cần ~3 tuần để "Đã hoàn tất").
+> - Task: `Claude - Tai file thang`, chạy **hằng ngày 05:30**; `tools/chay_tai_file.py` tự chọn lần 1/2
+>   và dùng marker `~/.svh-tai-file-state/thang-YYYY-MM-l1|l2.done` để mỗi lần chỉ làm 1 lượt; lỗi thì
+>   hôm sau tự thử lại; PC tắt đúng ngày thì bật lên chạy bù (`StartWhenAvailable`).
+> - **Chặn ghi đè số tốt bằng số hỏng:** cảnh báo `THIẾU CỘT` / `CHƯA KHỚP` → KHÔNG Lưu + Telegram.
+>   Cảnh báo mềm (`LỆCH KỲ`, thiếu giá vốn) → vẫn Lưu + Telegram ghi rõ. Lưu xong đọc lại Supabase
+>   xác nhận bản ghi cập nhật mới tính thành công.
+> - **Dùng chung Chrome riêng** `C:/Users/Admin/koc-chrome-profile` (xem
+>   [reference_chrome_rieng_cho_script.md](reference_chrome_rieng_cho_script.md)), chạy bằng Google Chrome
+>   cài sẵn (`channel="chrome"`), KHÔNG dùng Chromium của Playwright. Đăng nhập lại: bấm đúp
+>   `scripts/dang-nhap-tai-file.bat`. Task này **không được chạy cùng lúc** với `Dong bo KOC` (09:00).
+> - Giao diện TikTok đã kiểm thật 18/11 (luồng nằm trong `tools/tai_file_san.py`):
+>   Đơn hàng = tab Tất cả → Bộ lọc "Thời gian đã tạo" → Xuất (Excel) → chờ ~30s → "Tải xuống" ở Lịch sử;
+>   Trả hàng = lọc "Thời gian tạo" → icon tải xuống (nút icon thứ 3) → Excel → Xuất;
+>   Tài chính = Giao dịch → Đã quyết toán → Xuất → chọn khoảng ngày → OK → Xuất → "Lịch sử xuất dữ liệu".
+>   Có hộp giới thiệu tính năng hiện trễ chặn click → `dong_popup()` tắt. Bộ lịch lúc `p-picker-*`,
+>   lúc `core-picker-*` tuỳ trang → dùng selector `[class*="-picker-…"]`.
+> - Giữ NGUYÊN tên file gốc nên Drive có cả file lần 1 và lần 2 (khác giờ xuất) — cố ý, để đối chiếu.
+> - Phần "lịch tuần" bên dưới là bản 31/10, **chưa cài task** (chưa có luồng chọn kỳ vắt tháng).
 
 Chốt 31/10/2026 (chủ shop Minh yêu cầu: tải file phục vụ Sổ Vận Hành phải
 **miễn phí + ổn định + theo lịch**, lưu Drive theo đúng cấu trúc đang có, có mục

@@ -26,6 +26,14 @@ import os
 import subprocess
 import sys
 
+# Task Scheduler không có console → Python mặc định cp1252 sẽ chết khi in tiếng Việt.
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+os.environ.setdefault('PYTHONUTF8', '1')   # các script con kế thừa
+
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PY = sys.executable
 DRIVE_ROOT = os.environ.get('SVH_DRIVE_ROOT', r'G:\My Drive')

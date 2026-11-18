@@ -1,73 +1,52 @@
-# CAI DAT MOT LAN tren PC truc: tao 2 Task Scheduler tu dong tai file bao cao
-# sàn -> Drive (va bo thang -> So Van Hanh). Chay 0 token (khong co Claude).
-# Chot 31/10/2026 — xem .claude\shared\reference_tai_file_tu_dong.md.
+# CAI DAT MOT LAN tren PC truc: tao Task Scheduler "Claude - Tai file thang".
+# Tu dong tai bo file THANG TRUOC (TikTok + Shopee) -> Google Drive -> So Van Hanh. 0 token.
+# Chot 18/11/2026 (chu shop Minh): ngay 1 co so thang truoc (tam), tu ngay 15 cap nhat lai
+# cac don da hoan thanh (ghi de cung ky). Xem .claude\shared\reference_tai_file_tu_dong.md.
 #
-# TRUOC KHI CHAY SCRIPT NAY, lam 1 lan tren PC:
-#   py -m pip install playwright openpyxl
-#   py -m playwright install chromium
-#   cd C:\sokho\so-van-hanh-pwa
-#   py tools\tai_file_san.py --login tiktok     # dang nhap TikTok 1 lan
-#   py tools\tai_file_san.py --login shopee      # dang nhap Shopee 1 lan
-#
-# (Tuy chon) de script bao Telegram: dat bien moi truong cap May (System)
-#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
-# (Tuy chon) neu o Google Drive for Desktop KHONG phai "G:\My Drive":
-#   dat bien moi truong SVH_DRIVE_ROOT = duong dan that (vd "H:\My Drive").
-#
-# Roi tao task:
-#   powershell -ExecutionPolicy Bypass -File scripts\setup-tai-file-task.ps1
-#
-# Go bo sau nay:
-#   Unregister-ScheduledTask -TaskName "Claude - Tai file thang" -Confirm:$false
-#   Unregister-ScheduledTask -TaskName "Claude - Tai file tuan"  -Confirm:$false
+# TRUOC KHI CHAY: dang nhap TikTok + Shopee vao Chrome rieng 1 lan (bam dup scripts\dang-nhap-tai-file.bat).
+# Chay 1 lan:   powershell -ExecutionPolicy Bypass -File scripts\setup-tai-file-task.ps1
+# Chay thu ngay: Start-ScheduledTask -TaskName "Claude - Tai file thang"
+# Go bo:        Unregister-ScheduledTask -TaskName "Claude - Tai file thang" -Confirm:$false
 
 $ErrorActionPreference = "Stop"
 
-$RepoDir = Split-Path -Parent $PSScriptRoot
-$PyFile  = Join-Path $RepoDir "tools\chay_tai_file.py"
+$RepoDir  = Split-Path -Parent $PSScriptRoot
+$RunFile  = Join-Path $PSScriptRoot "run-tai-file.ps1"
+$VbsFile  = Join-Path $PSScriptRoot "run-hidden.vbs"
+$TaskName = "Claude - Tai file thang"
 
-if (-not (Test-Path $PyFile)) { Write-Host "[LOI] Khong thay $PyFile"; exit 1 }
+if (-not (Test-Path $RunFile)) { Write-Host "[LOI] Khong thay $RunFile"; exit 1 }
 
-$pyCmd = (Get-Command py -ErrorAction SilentlyContinue)
-if ($pyCmd) { $exe = "py" } else {
-    $pyCmd = (Get-Command python -ErrorAction SilentlyContinue)
-    if (-not $pyCmd) { Write-Host "[LOI] Khong tim thay Python (py/python)."; exit 1 }
-    $exe = "python"
-}
+# Dung wscript + run-hidden.vbs de KHONG nhay cua so (xem ghi chu trong run-hidden.vbs).
+$action = New-ScheduledTaskAction `
+    -Execute "wscript.exe" `
+    -Argument "//B //Nologo `"$VbsFile`" `"$RunFile`"" `
+    -WorkingDirectory $RepoDir
 
-Write-Host "Repo   : $RepoDir"
-Write-Host "Runner : $PyFile"
-Write-Host "Python : $exe`n"
+# Chay HANG NGAY 05:30: Task Scheduler khong co trigger "ngay 1 va 15"; runner tu kiem
+# ngay + marker nen thuc te chi tai DUNG 1 lan moi moc (1 va 15); cac ngay khac thoat ngay.
+# Task loi thi hom sau tu thu lai (chua co marker). Khong chay cung luc voi "Dong bo KOC" (09:00)
+# vi chung 1 profile Chrome.
+$trigger = New-ScheduledTaskTrigger -Daily -At 5:30AM
 
 $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -AllowStartIfOnBatteries `
     -DontStopIfGoingOnBatteries `
-    -ExecutionTimeLimit (New-TimeSpan -Minutes 40) `
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 60) `
     -MultipleInstances IgnoreNew
 
-# ---- Task THANG: chay HANG NGAY 05:00 ----
-# Task Scheduler (PowerShell) khong co trigger "ngay 21 hang thang" san. Cach ben:
-# chay hang ngay, runner chay_tai_file.py tu kiem "da qua ngay 20 chua" + marker
-# "da hoan tat ky nay chua" -> thuc te chi tai + luu DUNG 1 LAN moi ky, sau ngay
-# 20; cac ngay con lai thoat ngay, khong tai gi.
-$aThang = New-ScheduledTaskAction -Execute $exe `
-    -Argument "`"$PyFile`" --lich thang" -WorkingDirectory $RepoDir
-$tThang = New-ScheduledTaskTrigger -Daily -At 5:00AM
-Register-ScheduledTask -TaskName "Claude - Tai file thang" -Action $aThang `
-    -Trigger $tThang -Settings $settings -Force `
-    -Description "Tu dong tai bo file thang -> Drive -> So Van Hanh (0 token). Chay hang ngay 05:00; up_so_van_hanh.py tu chot chan 'qua ngay 20 moi upload'. Xem tools/chay_tai_file.py." | Out-Null
+Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Force `
+    -Description "Ngay 1 + 15 hang thang: tu tai file thang truoc tu TikTok/Shopee -> Drive -> So Van Hanh. 0 token. Xem tools/chay_tai_file.py." | Out-Null
 
-# ---- Task TUAN: Thu Hai 05:30, tai bo file tuan truoc -> Drive ----
-$aTuan = New-ScheduledTaskAction -Execute $exe `
-    -Argument "`"$PyFile`" --lich tuan" -WorkingDirectory $RepoDir
-$tTuan = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 5:30AM
-Register-ScheduledTask -TaskName "Claude - Tai file tuan" -Action $aTuan `
-    -Trigger $tTuan -Settings $settings -Force `
-    -Description "Tu dong tai bo file tuan truoc -> Drive (Theo tuan). 0 token. Xem tools/chay_tai_file.py." | Out-Null
+# Don task cu (ban 31/10 chua tung cai tren PC, phong khi co)
+foreach ($old in @("Claude - Tai file tuan")) {
+    if (Get-ScheduledTask -TaskName $old -ErrorAction SilentlyContinue) {
+        Unregister-ScheduledTask -TaskName $old -Confirm:$false
+    }
+}
 
-Write-Host "[XONG] Da tao 2 task:"
-Get-ScheduledTask -TaskName "Claude - Tai file thang","Claude - Tai file tuan" |
-    Select-Object TaskName, State | Format-Table -AutoSize
-Write-Host "Chay thu ngay:  Start-ScheduledTask -TaskName 'Claude - Tai file tuan'"
-Write-Host "Xem lan chay:   Get-ScheduledTaskInfo -TaskName 'Claude - Tai file thang'"
+Write-Host "[XONG] Da tao task:"
+Get-ScheduledTask -TaskName $TaskName | Select-Object TaskName, State | Format-Table -AutoSize
+Write-Host "Chay thu ngay:  Start-ScheduledTask -TaskName '$TaskName'"
+Write-Host "Xem log:        Get-Content logs\tai-file.log -Tail 50"

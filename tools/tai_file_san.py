@@ -119,20 +119,27 @@ def dong_popup(page):
         page.wait_for_timeout(600)
 
 
-def tt_chon_khoang_ngay(page, tu, den):
+def tt_chon_khoang_ngay(page, tu, den, o_nhap='input[placeholder="Từ"]'):
     """Chọn khoảng ngày [tu, den] (datetime.date, CÙNG 1 THÁNG, quá khứ) trên bộ lịch
     TikTok đang mở sẵn ô "Từ". Ném lỗi nếu không chọn được."""
-    page.locator('input[placeholder="Từ"]').first.click(timeout=8000)
-    page.wait_for_timeout(800)
+    hdr_loc = page.locator('[class*="-picker-header-value"]')
+    for lan in range(3):  # lịch có thể đã tự mở sẵn → không bấm nếu đã thấy
+        try:
+            hdr_loc.first.wait_for(state='visible', timeout=2500)
+            break
+        except Exception:
+            (o_nhap(page) if callable(o_nhap) else page.locator(o_nhap)).first.click(timeout=8000)
+            page.wait_for_timeout(800)
+    hdr_loc.first.wait_for(state='visible', timeout=8000)
     muc_tieu = tu.year * 12 + tu.month
     for _ in range(30):
-        hdr = page.locator('.p-picker-header-value').first.inner_text().strip()  # "10/2026"
+        hdr = page.locator('[class*="-picker-header-value"]').first.inner_text().strip()  # "10/2026"
         m, y = [int(x) for x in re.findall(r'\d+', hdr)[:2]]
         hien_tai = y * 12 + m
         if hien_tai == muc_tieu:
             break
-        icons = page.locator('.p-picker-header').first.locator(
-            '.p-picker-header-icon:not(.p-picker-header-icon-hidden)')
+        icons = page.locator('div[class$="-picker-header"]').first.locator(
+            '[class*="-picker-header-icon"]:not([class*="-icon-hidden"])')
         if hien_tai > muc_tieu:
             icons.nth(1).click()          # ‹ lùi 1 tháng (icon 0 là « lùi 1 năm)
         else:
@@ -140,15 +147,18 @@ def tt_chon_khoang_ngay(page, tu, den):
         page.wait_for_timeout(300)
     else:
         raise RuntimeError('Không lùi được bộ lịch tới tháng %02d/%d' % (tu.month, tu.year))
-    body = page.locator('.p-picker-body').first
+    # TikTok dùng 2 tiền tố class tuỳ trang: "p-picker-*" (đơn hàng) / "core-picker-*" (trả hàng)
+    body = page.locator('[class$="-picker-body"]').first
     for ngay in (tu.day, den.day):
-        body.locator('.p-picker-cell-in-view .p-picker-date-value',
+        body.locator('[class*="-picker-cell-in-view"] [class*="-picker-date-value"]',
                      has_text=re.compile(r'^%02d$' % ngay)).first.click(timeout=8000)
         page.wait_for_timeout(400)
-    # xác nhận ô hiển thị đúng khoảng ngày vừa chọn
-    gia_tri = page.locator('input[placeholder="Từ"]').first.input_value()
-    if gia_tri.strip() != tu.strftime('%d/%m/%Y'):
-        raise RuntimeError('Ô "Từ" hiện "%s", mong đợi %s' % (gia_tri, tu.strftime('%d/%m/%Y')))
+    # xác nhận ô hiển thị đúng ngày đầu vừa chọn
+    if callable(o_nhap):   # ô tuỳ biến (không phải <input>) — bỏ bước đọc lại giá trị
+        return
+    gia_tri = page.locator(o_nhap).first.input_value()
+    if tu.strftime('%d/%m/%Y') not in gia_tri:
+        raise RuntimeError('Ô ngày hiện "%s", mong đợi bắt đầu %s' % (gia_tri, tu.strftime('%d/%m/%Y')))
 
 
 def tt_ten_file_lich_su(page):
@@ -162,7 +172,8 @@ def tt_moi_tao(ten, bat_dau):
     """File lịch sử có giờ tạo nhúng trong tên ("...-2026-11-18-11:35.xlsx"). Chỉ nhận file
     tạo SAU lúc bấm Xuất (trừ 2 phút) — chống tải nhầm file cũ khi danh sách lịch sử
     chưa kịp hiện lúc chụp `truoc`. Tên không có giờ thì coi là mới (đã lọc bằng set-diff)."""
-    m = re.search(r'(\d{4})-(\d{2})-(\d{2})-(\d{2})[:_](\d{2})', ten)
+    m = (re.search(r'(\d{4})-(\d{2})-(\d{2})-(\d{2})[:_](\d{2})', ten)
+         or re.search(r'income_(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})\d{2}', ten))
     if not m:
         return True
     t = datetime.datetime(*[int(x) for x in m.groups()])
@@ -213,8 +224,94 @@ def tt_don_hang(page, tu, den, downloads):
     return tt_cho_va_tai(page, truoc, downloads)
 
 
+def tt_nut_icon(page, vi_tri):
+    """Trang Trả hàng của TikTok có hàng 3 nút CHỈ CÓ ICON ở thanh công cụ (lọc, sắp xếp,
+    tải xuống) — không có chữ nên bấm theo thứ tự trái→phải. vi_tri: 0=lọc, 2=tải xuống."""
+    h = page.evaluate_handle(r"""(vt) => {
+        const bs = [...document.querySelectorAll('button')].filter(b => {
+            const r = b.getBoundingClientRect();
+            return b.offsetParent && (b.innerText||'').trim().length <= 5 && b.querySelector('svg')
+                   && r.y > 250 && r.y < 460 && r.width < 80;
+        }).sort((a, b) => a.getBoundingClientRect().x - b.getBoundingClientRect().x);
+        return bs.length >= 3 ? bs[vt] : null;
+    }""", vi_tri)
+    el = h.as_element()
+    if el is None:
+        raise RuntimeError('không thấy 3 nút icon ở thanh công cụ trang trả hàng')
+    return el
+
+
+def tt_tra_hang(page, tu, den, downloads):
+    """TikTok — Đơn trả hàng/hoàn tiền: tab Tất cả → lọc Thời gian tạo → icon tải xuống
+    → Excel → Xuất."""
+    page.goto('https://seller-vn.tiktok.com/order/return', wait_until='domcontentloaded',
+              timeout=60000)
+    page.wait_for_timeout(6000)
+    dong_popup(page)
+    page.wait_for_timeout(2500)
+    dong_popup(page)
+    page.get_by_text('Tất cả', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(4000)
+    tt_nut_icon(page, 0).click()
+    page.wait_for_timeout(2000)
+    tt_chon_khoang_ngay(page, tu, den)
+    page.get_by_role('button', name='Áp dụng').first.click()
+    page.wait_for_timeout(4000)
+    tt_nut_icon(page, 2).click()
+    page.wait_for_timeout(3500)  # ngăn kéo "Xuất đơn hàng" trượt ra chậm
+    page.get_by_text('Excel', exact=True).first.click(timeout=15000)
+    truoc = tt_ten_file_lich_su(page)
+    page.get_by_role('button', name='Xuất', exact=True).last.click()
+    return tt_cho_va_tai(page, truoc, downloads)
+
+
 # Các luồng đã viết riêng theo từng file (khoá = trường "kieu" trong registry).
-LUONG = {'tt_don_hang': tt_don_hang}
+def tt_tai_chinh(page, tu, den, downloads):
+    """TikTok — Tài chính (income_...): Tài chính → Giao dịch → tab Đã quyết toán → Xuất →
+    hộp "Chọn phạm vi ngày để xuất" (tối đa 90 ngày) → OK → Xuất → nút "Lịch sử xuất dữ
+    liệu" → Tải xuống. (Khoảng ngày của hộp xuất là NGÀY QUYẾT TOÁN — đã kiểm 18/11.)"""
+    page.goto('https://seller-vn.tiktok.com/finance/transactions', wait_until='domcontentloaded',
+              timeout=60000)
+    page.wait_for_timeout(9000)
+    dong_popup(page)
+    page.wait_for_timeout(1500)
+    dong_popup(page)
+    page.get_by_text('Đã quyết toán', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(3000)
+    page.get_by_role('button', name='Xuất', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(3000)
+    tt_chon_khoang_ngay(page, tu, den,
+                        o_nhap=lambda pg: pg.get_by_text('Thời gian bắt đầu', exact=True))
+    page.get_by_role('button', name='OK', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(1000)
+    bat_dau = datetime.datetime.now()
+    page.get_by_role('button', name='Xuất', exact=True).last.click(timeout=8000)
+    # file mới nằm trong popover "Lịch sử xuất dữ liệu" — mở nó rồi chờ hàng mới
+    han = time.time() + 240
+    while time.time() < han:
+        page.wait_for_timeout(5000)
+        try:
+            page.get_by_role('button', name=re.compile('Lịch sử xuất dữ liệu')).first.click(timeout=5000)
+        except Exception:
+            continue
+        page.wait_for_timeout(2500)
+        for ten in tt_ten_file_lich_su(page):
+            if not tt_moi_tao(ten, bat_dau):
+                continue
+            hang = page.locator('tr, div').filter(has_text=ten).filter(
+                has=page.get_by_role('button', name=re.compile('Tải xuống'))).last
+            if hang.count() == 0:
+                continue
+            with page.expect_download(timeout=90000) as dl:
+                hang.get_by_role('button', name=re.compile('Tải xuống')).first.click()
+            d = dl.value
+            dest = os.path.join(downloads, d.suggested_filename)
+            d.save_as(dest)
+            return dest
+    raise RuntimeError('TikTok chưa sinh xong file Tài chính sau 240 giây')
+
+
+LUONG = {'tt_don_hang': tt_don_hang, 'tt_tra_hang': tt_tra_hang, 'tt_tai_chinh': tt_tai_chinh}
 
 
 def chon_ky(page, san, entry, tu, den):
@@ -245,44 +342,33 @@ def bam_nut_xuat(page, nut_text):
 
 
 def tai_mot_file(ctx, san, entry, downloads, tu, den, anh_loi_dir):
-    """Mở trang → chọn kỳ → bấm Xuất → bắt sự kiện download → lưu vào downloads.
-    Trả (ok, thong_bao)."""
+    """Chạy luồng riêng của file (khoá "kieu" trong registry, hàm nằm trong LUONG).
+    Trả (ok, thong_bao). File chưa có luồng: tuỳ chọn thì bỏ qua êm, bắt buộc thì báo lỗi."""
+    kieu = entry.get('kieu')
+    if kieu not in LUONG:
+        if entry.get('bat_buoc'):
+            return False, 'chưa có luồng tải tự động cho "%s"' % entry['mo_ta']
+        return True, '(bỏ qua — chưa có luồng tự động, file tuỳ chọn)'
     page = ctx.new_page()
+    page.set_viewport_size({'width': 1400, 'height': 900})
     try:
-        page.goto(entry['export']['url'], wait_until='domcontentloaded', timeout=60000)
-        page.wait_for_timeout(3000)
-        if la_trang_dang_nhap(page.url, san):
-            return False, 'MẤT ĐĂNG NHẬP %s (bị đẩy về %s)' % (san, page.url)
-
-        # Shopee chặn mật khẩu ở mục Tài chính — KHÔNG được nhập, dừng báo chủ shop.
-        if san == 'shopee' and entry.get('role') == 'income':
-            body = (page.content() or '').lower()
-            if 'mật khẩu' in body and 'shopee' in body and 'income' not in page.url:
-                pass  # (giữ chỗ) — nếu hiện hộp nhập mật khẩu thì xử ở nhánh dưới
-
-        chon_ky(page, san, entry, tu, den)
-        page.wait_for_timeout(1000)
-
-        try:
-            with page.expect_download(timeout=90000) as dl_info:
-                if not bam_nut_xuat(page, entry['export'].get('nut_text', ['Xuất', 'Export'])):
-                    raise RuntimeError('không thấy nút Xuất/Export (sàn có thể đổi giao diện)')
-                # một số trang cần bấm thêm "Tải xuống" ở danh sách báo cáo đã xuất
-            download = dl_info.value
-        except Exception as e:
-            # chụp màn hình để người dựng soi trên PC
+        last = None
+        for lan in (1, 2):   # thử tối đa 2 lần: sàn đôi khi chậm/hiện hộp thoại bất chợt
             try:
-                os.makedirs(anh_loi_dir, exist_ok=True)
-                page.screenshot(path=os.path.join(anh_loi_dir, entry['id'] + '.png'),
-                                full_page=True)
-            except Exception:
-                pass
-            return False, 'lỗi khi xuất "%s": %s' % (entry['mo_ta'], e)
-
-        name = download.suggested_filename
-        dest = os.path.join(downloads, name)
-        download.save_as(dest)
-        return True, name
+                dest = LUONG[kieu](page, tu, den, downloads)
+                if la_trang_dang_nhap(page.url, san):
+                    return False, 'MẤT ĐĂNG NHẬP %s (bị đẩy về %s)' % (san, page.url)
+                return True, os.path.basename(dest)
+            except Exception as e:
+                last = e
+                if la_trang_dang_nhap(page.url, san):
+                    return False, 'MẤT ĐĂNG NHẬP %s (bị đẩy về %s)' % (san, page.url)
+                try:
+                    os.makedirs(anh_loi_dir, exist_ok=True)
+                    page.screenshot(path=os.path.join(anh_loi_dir, '%s-lan%d.png' % (entry['id'], lan)))
+                except Exception:
+                    pass
+        return False, 'lỗi khi tải "%s": %s' % (entry['mo_ta'], str(last)[:300])
     finally:
         try:
             page.close()

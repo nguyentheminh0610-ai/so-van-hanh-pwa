@@ -59,7 +59,7 @@
       }
     },
     {
-      "id": "tiktok_don_hang_thang",
+      "id": "tiktok_don_hang_thang", "kieu": "tt_don_hang",
       "mo_ta": "TikTok — Tất cả đơn hàng — THÁNG",
       "san": "tiktok", "role": "tiktokOrders", "lich": "thang", "bat_buoc": true,
       "export": {
@@ -70,7 +70,7 @@
       }
     },
     {
-      "id": "tiktok_tra_hang_thang",
+      "id": "tiktok_tra_hang_thang", "kieu": "tt_tra_hang",
       "mo_ta": "TikTok — Đơn trả hàng/hoàn tiền — THÁNG",
       "san": "tiktok", "role": "tiktokReturns", "lich": "thang", "bat_buoc": true,
       "export": {
@@ -81,7 +81,7 @@
       }
     },
     {
-      "id": "tiktok_tai_chinh_thang",
+      "id": "tiktok_tai_chinh_thang", "kieu": "tt_tai_chinh",
       "mo_ta": "TikTok — Tài chính (income_...) — THÁNG",
       "san": "tiktok", "role": "tiktokFinance", "lich": "thang", "bat_buoc": true,
       "export": {
