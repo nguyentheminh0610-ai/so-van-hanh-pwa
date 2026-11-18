@@ -11,9 +11,11 @@ Thứ tự chạy SQL trong Supabase (chọn "Run without RLS"): 01 → 02 → 0
   warehouse_cutoff_daily, warehouse_return_dup_log; drop cột co_staff của warehouse_outbound_checks.
 Mục 1 (lý do đơn chưa đóng) KHÔNG nằm trong "cách mới", giữ lại.
 
-## Chưa làm ở lần này
-Nút Chốt lương, job tự chạy 19:00, kiểm tra Sapo, khiếu nại 24 giờ, nút "Hàng về kho", màn Đối chiếu hoàn,
-màn nhập/job tự chạy cho warehouse_cutoff_daily.
+## Đã BỎ (chốt 18/11/2026, anh Minh: "bỏ hết 6 cái này, tập trung việc anh giao")
+Nút Chốt lương, job tự chạy 19:00, kiểm tra Sapo, khiếu nại 24 giờ, nút "Hàng về kho", màn Đối chiếu hoàn.
+Không làm nữa, trừ khi anh Minh nhắc lại. (Màn nhập/job tự chạy cho warehouse_cutoff_daily đã làm xong 17-18/11: job 20:00.)
+
+## Chốt 18/11/2026: lương cách mới hiện từ tháng 11/2026 (PN_SHOW_MONTH), song song cách cũ; từ 12/2026 (PN_START_MONTH) cách cũ tự ẩn.
 
 ## Thêm 17/11/2026 (lần 2)
 - Thẻ "Đơn trước 16h" ở tab Tổng quan đọc bảng warehouse_cutoff_daily + warehouse_cutoff_orders (chi tiết tự xoá sau 40 ngày).
