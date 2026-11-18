@@ -27,6 +27,27 @@ JSON tiếng Việt từ file UTF-8 (`--data-binary @file`), không gõ thẳng 
 Tín hiệu: khách báo thiếu/giao thiếu ("thiếu 1 quần", "không có cái..."), nhân
 viên đã hứa "gửi bù", hoặc chủ shop nhắn tên khách.
 
+**Câu mơ hồ kiểu "đặt 2 đơn/2 cái mà chỉ thấy 1" — PHẢI mở đơn xem số lượng
+trước khi phân loại** (chốt 18/11/2026). Khách hay gọi "2 đơn" khi thật ra là
+1 đơn số lượng 2. Mở tab Đơn hàng của khách (khung bên phải webchat Shopee /
+chi tiết đơn TikTok):
+- Có 1 đơn SL ≥ 2 (hoặc nhiều món) mà khách nói chỉ nhận 1 → **giao thiếu**,
+  làm theo file này (mở case, xin ảnh vỏ đơn + thông tin).
+- Thật sự có 2 đơn riêng, 1 đơn chưa giao tới → mới là vận chuyển (để chủ shop).
+- Không chắc → xem ảnh khách gửi; vẫn không chắc thì báo Telegram, đừng tự xếp
+  vào "vận chuyển" rồi bỏ qua.
+
+**Ảnh/tin mới của khách đã có trong nhật ký `cskh-log` vẫn phải xem lại**
+(chốt 18/11/2026). Quy tắc chống trùng chỉ để không GHI log 2 lần, KHÔNG có
+nghĩa là giữ nguyên cách phân loại cũ. Khách gửi thêm ảnh/tin sau mốc log →
+mở ra xem, phân loại lại nếu ảnh cho thấy khác (vd ảnh chỉ có 1 món).
+
+*Lý do:* case `obe9hvmo5o` (Shopee, đơn 261114AGT3DCNC, Caro Xanh Lá 03 L x2)
+ngày 18/11/2026: khách nhắn 22:23 "mình đặt 2 đơn quần mà chỉ thấy ship 1 cái
+thôi nhỉ?" rồi 22:26 gửi ảnh túi hàng chỉ có 1 quần. Lượt 22:25 hiểu là 2 đơn
+riêng → xếp "logistics", không mở đơn; lượt 23:10 thấy tên đã có trong log nên
+bỏ qua luôn ảnh mới. Khách bị treo tới khi chủ shop hỏi lại; case #8 mở lúc 23:29.
+
 Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_order_code`
 (bỏ qua dòng `cancelled`):
 - **Đã có dòng** → KHÔNG insert. Làm theo trạng thái hiện tại:
