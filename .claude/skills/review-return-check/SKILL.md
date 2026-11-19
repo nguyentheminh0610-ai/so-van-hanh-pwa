@@ -198,7 +198,7 @@ cần chờ khách trả lời giữa 2 tin.
    - Gửi tin 1: dòng 35 (TikTok) hoặc 36 (Shopee) — nhờ đổi lý do. Tên lý do
      **khác nhau theo sàn**, đọc nguyên văn từ Sheet:
      - TikTok Shop: mời đổi sang **"Đổi ý"**.
-     - Shopee: mời đổi sang **"Hàng nguyên vẹn nhưng không còn nhu cầu"** (chủ shop xác nhận 17/11).
+     - Shopee: mời đổi sang **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"** (chốt 19/11/2026, thay tên cũ "Hàng nguyên vẹn nhưng không còn nhu cầu").
    - Gửi tin 2 (ngay sau): dòng 25 — hỏi lý do thật để shop cải thiện.
 3. **Không phải lỗi shop** → gửi **1 tin duy nhất**: dòng 25 (hỏi lý do, trung
    lập, không mời đổi gì).
@@ -257,8 +257,8 @@ Thay cho TODO 30/10. Dùng Chrome Shopee (deviceId trong
 6. **Phân nhóm lý do:** theo bảng chốt 17/11 trong
    [reference_return_reason_fault_classification](../../shared/reference_return_reason_fault_classification.md)
    (mục "BẢNG CHỐT"). **Hai sàn khác nhau:** TikTok dùng badge "Không phải lỗi người bán"
-   (không ảnh hưởng: "Đổi ý", "Đặt sai kích cỡ"); Shopee không có badge, chỉ "Hàng nguyên vẹn nhưng không còn nhu cầu"
-   (hiện trên danh sách là "Đổi ý (Sản phẩm còn nguyên tem…)") là không ảnh hưởng, còn "Khác với mô tả" / "Người bán gửi sai hàng" /
+   (không ảnh hưởng: "Đổi ý", "Đặt sai kích cỡ"); Shopee không có badge, chỉ "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"
+   (chốt 19/11/2026; tên cũ "Hàng nguyên vẹn nhưng không còn nhu cầu") là không ảnh hưởng, còn "Khác với mô tả" / "Người bán gửi sai hàng" /
    "Hàng lỗi" / "Thiếu hàng" là nhóm 1 — kể cả khi khách thực ra chỉ chê size. Lý do Shopee
    chưa có trong bảng → coi nhóm 1 và ghi sổ để chủ shop bổ sung. **Nội dung tin nhắn:
    dùng 2 bản tách riêng TikTok / Shopee trong [mau-tin-nhan-tra-hang](../../shared/mau-tin-nhan-tra-hang.md)**

@@ -34,11 +34,10 @@ Việc nhờ khách đổi (dòng 35): đổi sang **"Đổi ý"**.
 | **Thiếu hàng** | **1 — ảnh hưởng** |
 | Tôi muốn thay đổi sản phẩm (kích thước, màu sắc, số lượng…) · Tôi muốn cập nhật địa chỉ/sđt · Thay đổi đơn hàng/mã giảm giá · Lý do khác · Giao hàng không thành công | không phải trả hàng — là **đơn huỷ/hoàn tiền ngay trước khi giao** → chỉ ghi sổ, không nhắn |
 
-Việc nhờ khách đổi (dòng 36): đổi sang **"Hàng nguyên vẹn nhưng không còn nhu cầu"** —
-**chủ shop xác nhận 17/11/2026 đây là lý do không ảnh hưởng đúng của Shopee** (không phải
-"Đổi ý"). Trên danh sách người bán, lý do này hiện nhãn "Đổi ý (Sản phẩm còn nguyên tem,
-nhãn mác, bao bì)" — coi là CÙNG một lý do (suy luận từ nhãn; chưa có tài liệu Shopee nói
-thẳng). Cột **"Lý do điều chỉnh bởi Shopee"** trên danh sách: nếu có giá trị thì lý do
+Việc nhờ khách đổi (dòng 36): đổi sang **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"**
+— **chốt 19/11/2026: đây là lý do DUY NHẤT không ảnh hưởng shop trên Shopee** (thay cho quy
+tắc cũ 17/11 ghi "Hàng nguyên vẹn nhưng không còn nhu cầu"; tên cũ là cùng 1 lý do, không
+dùng khi nhắn khách nữa). Cột **"Lý do điều chỉnh bởi Shopee"** trên danh sách: nếu có giá trị thì lý do
 được điều chỉnh đó mới là lý do tính chỉ số, ưu tiên hơn lý do khách chọn (17/11 toàn bộ đang "-").
 Điều kiện: Shopee giới hạn lý do này cho khách Kim Cương/Vàng/ShopeeVIP.
 Mẫu tin 2 sàn: [mau-tin-nhan-tra-hang.md](mau-tin-nhan-tra-hang.md).
@@ -118,7 +117,7 @@ Bảng "chính sách công khai" bên dưới là bản cũ; khi lệch với b�
 | Hàng bị lỗi, vỡ, hư hại trong quá trình vận chuyển | ⚠️ Có |
 | Hàng giao sai, khác mô tả | ⚠️ Có |
 | Nhận thiếu hàng | ⚠️ Có |
-| Hàng nguyên vẹn nhưng không còn nhu cầu | ✅ Không |
+| Hàng nguyên vẹn nhưng không còn nhu cầu (tên cũ — nay hiện là "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)", chốt 19/11/2026) | ✅ Không |
 
 → **Quy tắc:** dòng ⚠️ → lỗi shop → gửi 2 tin (row 36 + row 25).
 Dòng ✅ → không phải lỗi shop → gửi 1 tin (row 25).
@@ -128,7 +127,8 @@ Dòng ✅ → không phải lỗi shop → gửi 1 tin (row 25).
 - **TikTok Shop:** lý do "**Đổi ý**" (tiếng Anh: "Change of Mind"). Chỉ áp dụng
   được với sản phẩm có gắn nhãn "Change of Mind" trên trang chi tiết sản phẩm —
   không phải mọi đơn đều có lựa chọn này, khách có thể báo không thấy tuỳ chọn.
-- **Shopee:** lý do "**Hàng nguyên vẹn nhưng không còn nhu cầu**". Từ
+- **Shopee:** lý do "**Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)**" (chốt 19/11/2026;
+  trước đó ghi tên "Hàng nguyên vẹn nhưng không còn nhu cầu" — cùng 1 lý do). Từ
   19/6/2025 Shopee giới hạn lý do này — theo cập nhật 24/11/2025, chỉ áp dụng
   cho khách có hạng thành viên **Kim Cương/Vàng (Diamond/Gold)** hoặc đang dùng
   **ShopeeVIP**; khách thường có thể không thấy lựa chọn này. **Shop
