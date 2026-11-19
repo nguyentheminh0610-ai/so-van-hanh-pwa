@@ -327,6 +327,14 @@ Thay cho TODO 30/10. Dùng Chrome Shopee (deviceId trong
    "Phản hồi"/"Trả lời" công khai dưới đánh giá** — phản hồi công khai là
    việc của chủ shop. Thread chat đã có người trả lời rồi thì bỏ qua (Hard
    rule 3).
+   **Cách mở chat khi tên khách bị che (chốt 19/11/2026, case Hoàng Đức Mạnh):**
+   tên trong đánh giá là tên thật, còn hộp thư chỉ hiện handle (vd `mnh14926`) nên
+   tìm theo tên/quét danh sách sẽ KHÔNG ra, đừng kết luận "khách chưa từng nhắn".
+   Thay vào đó mở `https://seller-vn.tiktok.com/order/detail?order_no=<order_code>&shop_region=VN`,
+   bấm biểu tượng chat nhỏ ở góc phải khung **"Chi tiết khách hàng"** (tooltip "Liên hệ với
+   khách hàng này từ đây") → mở đúng thread của khách ở tab Trò chuyện (đây cũng là cách
+   của đơn trả hàng). Thread chỉ có tin tự động (lời chào, xác nhận đơn, kho vận) thì coi
+   là untouched, được nhắn.
 4. Tally for the report: count of new reviews, and if any, the star
    breakdown + full verbatim text of negative ones and any positive ones
    with real insight (not just a star rating).
