@@ -64,6 +64,12 @@
       "port": 8870
     },
     {
+      "name": "hau-mai-local",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8871", "-d", "C:\\sokho\\so-van-hanh-pwa"],
+      "port": 8871
+    },
+    {
       "name": "koc-tab-preview",
       "runtimeExecutable": "bash",
       "runtimeArgs": [
