@@ -172,8 +172,8 @@ function buildTabsHTML(){
   return `<div class="tabs" id="tabs">
     <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
     <button class="tab-btn" data-tab="library">Tải file &amp; lịch sử</button>
-    <button class="tab-btn" data-tab="cskh">Đánh giá &amp; Trả hàng</button>
-    <button class="tab-btn" data-tab="resend">Gửi bù</button>
+    <button class="tab-btn" data-tab="cskh">Hậu mãi</button>
+    <button class="tab-btn" data-tab="cskhstats">Thống kê</button>
     <button class="tab-btn" data-tab="koc">Chấm điểm KOC</button>
     <button class="tab-btn" data-tab="skuperf">Hiệu suất SKU</button>
   </div>`;
@@ -184,12 +184,12 @@ function switchToTab(tab){
   document.getElementById('screen-dashboard').classList.toggle('active', tab === 'dashboard');
   document.getElementById('screen-library').classList.toggle('active', tab === 'library');
   document.getElementById('screen-cskh').classList.toggle('active', tab === 'cskh');
-  document.getElementById('screen-resend').classList.toggle('active', tab === 'resend');
+  document.getElementById('screen-cskhstats').classList.toggle('active', tab === 'cskhstats');
   document.getElementById('screen-koc').classList.toggle('active', tab === 'koc');
   document.getElementById('screen-skuperf').classList.toggle('active', tab === 'skuperf');
   if (tab === 'library') refreshLibrary();
-  if (tab === 'cskh') refreshCskh(); // tải lười: chỉ gọi Supabase khi mở tab
-  if (tab === 'resend') refreshResend(); // luôn tải lại khi mở tab (nhạy thời gian)
+  if (tab === 'cskh') refreshCskh(); // luôn tải lại khi mở tab (có nút duyệt, nhạy thời gian)
+  if (tab === 'cskhstats') refreshCskhStats(); // dùng lại dữ liệu đã tải nếu có
   if (tab === 'koc') refreshKoc();
   if (tab === 'skuperf') refreshSkuPerf(); // tải lười: chỉ fetch JSON khi mở tab
 }
@@ -1404,7 +1404,7 @@ function init(){
     `<div class="screen active" id="screen-dashboard">${buildDashboardHTML()}</div>` +
     `<div class="screen" id="screen-library">${buildUploadFlowHTML()}${buildLibraryScreenHTML()}</div>` +
     `<div class="screen" id="screen-cskh">${buildCskhScreenHTML()}</div>` +
-    `<div class="screen" id="screen-resend">${buildResendScreenHTML()}</div>` +
+    `<div class="screen" id="screen-cskhstats">${buildCskhStatsScreenHTML()}</div>` +
     `<div class="screen" id="screen-koc">${buildKocScreenHTML()}</div>` +
     `<div class="screen" id="screen-skuperf">${buildSkuPerfScreenHTML()}</div>`;
   wireInstallHint();
@@ -1412,7 +1412,6 @@ function init(){
   wireTabs();
   wireSkuPerf();
   wireCskh();
-  wireResend();
   wireKoc();
   document.getElementById('history-select').addEventListener('change', onHistorySelectChange);
   wireRcDropdown();

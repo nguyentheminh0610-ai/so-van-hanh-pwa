@@ -536,7 +536,20 @@
     .cskh-kpi{ grid-template-columns:1fr; }
   }
 
-  /* ---------- Tab "Gửi bù" (resend.js, 17/11/2026) ---------- */
+  /* ---------- Tab "Hậu mãi" (cskh.js, viết lại 19/11/2026) ---------- */
+  .hm-banner{ border-radius:10px; padding:11px 15px; font-size:13.5px; margin-bottom:16px; border:1px solid var(--line); background:var(--surface); }
+  .hm-banner.warn{ border-color:var(--warn); background:var(--warn-soft); color:var(--ink); }
+  .hm-banner.ok{ border-color:var(--good); background:var(--good-soft, #e3f5ea); color:var(--good); }
+  .hm-src{ flex:none; font-size:11.5px; color:var(--ink-faint); font-weight:600; }
+  .when.hm-old{ color:var(--warn); font-weight:700; }
+  .hm-fold{ margin-top:14px; }
+  .hm-fold > summary{ cursor:pointer; font-size:13px; font-weight:700; color:var(--ink-soft); padding:6px 0; }
+  .hm-fold[open] > summary{ margin-bottom:8px; }
+  .btn-errskip{ font-family:inherit; font-size:12px; font-weight:600; color:var(--ink-soft); background:var(--bg);
+    border:1px solid var(--line); border-radius:7px; padding:6px 12px; cursor:pointer; }
+  .btn-errskip:hover{ background:var(--line); }
+
+  /* ---------- Phiếu "Gửi bù" (resend.js, 17/11/2026) — nay nằm trong tab Hậu mãi ---------- */
   .rs-card{ padding:11px 13px; }
   .rs-card.rs-late{ border-color:var(--warn); background:var(--warn-soft); }
   .rs-body{ margin-top:5px; }

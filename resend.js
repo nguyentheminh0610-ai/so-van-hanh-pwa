@@ -1,15 +1,13 @@
 /* ============================================================================
-   Tab "Gửi bù" — duyệt các case khách báo thiếu hàng (chốt 17/11/2026).
-   Dữ liệu: bảng resend_cases (schema ở scripts/resend-tables.sql), do task CSKH
-   và task gửi bù trên PC trực ghi. Luồng + mẫu tin:
+   Dữ liệu + thẻ + hành động của luồng "Gửi bù" (bảng resend_cases, schema ở
+   scripts/resend-tables.sql). Từ 19/11/2026 KHÔNG còn tab riêng: hiển thị nằm ở
+   cskh.js (tab "Hậu mãi", nhóm "Duyệt gửi bù"). Luồng + mẫu tin:
    .claude/skills/resend-missing-item/references/resend-flow-batch-2026-11-17.md
 
    Trang này ghi vào DB ĐÚNG MỘT VIỆC: đổi status khi anh bấm nút. Mọi lần đổi
    đều CÓ ĐIỀU KIỆN (PATCH ...&status=eq.<cũ>) nên bấm 2 lần / 2 máy cùng bấm
-   không làm hỏng trạng thái. Không có SĐT/địa chỉ đầy đủ trong bảng (khoá anon
-   nằm trong repo public) — bản đầy đủ anh xem ở tin Telegram.
+   không làm hỏng trạng thái. Không có SĐT/địa chỉ đầy đủ trong bảng.
 ============================================================================ */
-
 const RESEND_RUN_HOUR = 15;      // mốc kho: PDF vào Sổ Kho trước 15h30 (chốt 18/11/2026)
 const RESEND_CHECK2_MIN = 10;    // duyệt lần 2 trước 15h10 để kịp 15h30 (kho đóng hàng muộn nhất 16h)
 const RESEND_LOOKBACK_DAYS = 14; // case đã xong chỉ hiện trong 14 ngày
@@ -152,68 +150,15 @@ function resendDoneRowHtml(row){
     + '<td>' + (url ? '<a class="lnk" href="' + esc(url) + '" target="_blank" rel="noopener">PDF</a>' : '') + '</td></tr>';
 }
 
-// --------------------------------------------------------------- render -----
-function resendRender(){
-  const bodyEl = document.getElementById('resend-body');
-  if (!bodyEl || !resendRows) return;
-  const rows = resendRows;
-  const need = rows.filter(r => r.status === 'wait_approve_1' || r.status === 'wait_approve_2');
-  const stuck = rows.filter(r => r.status === 'stalled' || r.status === 'verifying');
-  const running = rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status));
-  const closed = rows.filter(r => ['done', 'blocked', 'cancelled'].includes(r.status)).slice(0, 30);
-
-  const group = (title, note, list, empty) => '<div class="act-group"><div class="act-head"><b>' + esc(title) + '</b>'
-    + (list.length ? '<span class="act-n">' + fmtInt(list.length) + '</span>' : '')
-    + (note ? '<span class="act-note">' + esc(note) + '</span>' : '') + '</div>'
-    + (list.length ? '<div class="feed">' + list.map(resendCardHtml).join('') + '</div>' : '<p class="cskh-quiet">' + esc(empty) + '</p>') + '</div>';
-
-  const tiles = [
-    ['Chờ anh duyệt', need.length, need.filter(r => r.status === 'wait_approve_1').length + ' lần 1 · ' + need.filter(r => r.status === 'wait_approve_2').length + ' lần 2', true],
-    ['Đang chạy', running.length, 'đang hỏi khách / chờ phiên ' + RESEND_RUN_HOUR + 'h', false],
-    ['Treo / chờ khách', stuck.length, stuck.length ? 'anh có thể duyệt dù khách chưa xác nhận' : 'không có', false],
-  ];
-  const kpi = '<div class="kpi-row cskh-kpi">' + tiles.map(([label, val, sub, warn]) =>
-    '<div class="kpi-tile"><div class="k-label">' + esc(label) + '</div><div class="k-value"' + (warn && val ? ' style="color:var(--warn)"' : '') + '>'
-    + fmtInt(val) + '</div><div class="k-sub">' + esc(sub) + '</div></div>').join('') + '</div>';
-
-  bodyEl.innerHTML = kpi
-    + group('Chờ anh duyệt', 'lần 1: trước ' + RESEND_RUN_HOUR + 'h để đơn vào phiên · lần 2: trước ' + RESEND_RUN_HOUR + 'h' + RESEND_CHECK2_MIN + ' để kho kịp in', need, 'Không có case nào chờ anh.')
-    + (stuck.length ? group('Treo / chờ khách xác nhận', 'khách im lặng hoặc task gặp lỗi lặp', stuck, '') : '')
-    + (running.length ? group('Đang chạy', 'em đang xử lý, anh không cần làm gì', running, '') : '')
-    + '<div class="act-group"><div class="act-head"><b>Xong / đã dừng gần đây</b></div>'
-    + (closed.length
-      ? '<div class="card"><table class="dtable"><thead><tr><th>Khách</th><th>Món</th><th>Mã vận đơn</th><th>Trạng thái</th><th></th></tr></thead><tbody>'
-        + closed.map(resendDoneRowHtml).join('') + '</tbody></table></div>'
-      : '<p class="cskh-quiet">Chưa có case nào xong trong ' + RESEND_LOOKBACK_DAYS + ' ngày qua.</p>')
-    + '</div>';
-}
-
-function buildResendScreenHTML(){
-  return `
-  <div class="topbar">
-    <button class="btn-rs edit" id="resend-reload">Tải lại</button>
-    <span class="up-status" id="resend-updated">Đang tải…</span>
-  </div>
-  <div id="resend-body"></div>
-  <footer>
-    <p><b>Luồng:</b> khách báo thiếu → em hỏi thông tin + gửi tin xác minh → khách xác nhận → <b>anh duyệt lần 1</b> → phiên tạo đơn ${RESEND_RUN_HOUR}h hằng ngày → <b>anh duyệt lần 2</b> (xem PDF) → em ghi Sổ Kho + nhắn khách. Khách xác nhận sau 14h thì đơn đi ngày mai.</p>
-    <p><b>Riêng tư:</b> bảng không lưu SĐT/địa chỉ đầy đủ (khoá truy cập nằm trong repo public); bản đầy đủ chỉ có ở tin Telegram gửi anh và file cục bộ trên PC.</p>
-  </footer>`;
-}
-
-async function refreshResend(){
-  const statusEl = document.getElementById('resend-updated');
-  const bodyEl = document.getElementById('resend-body');
-  if (!bodyEl) return;
-  try {
-    await resendLoadRows(); // luôn tải lại: tab này nhạy thời gian, không cache như tab CSKH
-    statusEl.textContent = 'Cập nhật ' + new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
-    resendRender();
-  } catch (err){
-    statusEl.textContent = '';
-    bodyEl.innerHTML = '<p class="cskh-quiet">Chưa đọc được dữ liệu: ' + esc(err.message)
-      + '. Nếu là lỗi bảng chưa tồn tại thì chạy <code>scripts/resend-tables.sql</code> trên Supabase trước.</p>';
-  }
+// -------------------------------------------------------------- phân nhóm ---
+// Hiển thị nằm ở cskh.js (tab "Hậu mãi", 19/11/2026) — file này giữ dữ liệu, thẻ và hành động.
+function resendGroups(rows){
+  return {
+    // cần anh làm: 2 lần duyệt + case treo (duyệt dù khách chưa xác nhận / dừng)
+    need: rows.filter(r => ['wait_approve_1', 'wait_approve_2', 'verifying', 'stalled'].includes(r.status)),
+    running: rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status)),
+    closed: rows.filter(r => ['done', 'blocked', 'cancelled'].includes(r.status)).slice(0, 30),
+  };
 }
 
 // ----------------------------------------------------------- hành động ------
@@ -253,19 +198,9 @@ async function resendAct(btn){
     if (!res || !res.length){
       alert('Case này vừa đổi trạng thái (task hoặc máy khác đã xử lý). Em tải lại danh sách.');
     }
-    await refreshResend();
+    await refreshCskh();
   } catch (err){
     btn.disabled = false; btn.textContent = old;
     alert('Chưa lưu được: ' + err.message);
   }
-}
-
-function wireResend(){
-  const body = document.getElementById('resend-body');
-  if (body) body.addEventListener('click', (e) => {
-    const b = e.target.closest('.btn-rs');
-    if (b) resendAct(b);
-  });
-  const reload = document.getElementById('resend-reload');
-  if (reload) reload.addEventListener('click', refreshResend);
 }
