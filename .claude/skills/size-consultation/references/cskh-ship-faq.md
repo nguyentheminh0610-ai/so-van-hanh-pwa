@@ -175,14 +175,17 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
    > lý nhất đó ạ, tuy nhiên mình cũng sẵn sàng hỗ trợ bạn đổi hàng ạ.
    → hỏi khách muốn đổi sang size nào + kiểm còn hàng (xin cao/nặng nếu cần).
 2. Hướng dẫn đổi hàng (ưu tiên Cách 1: đặt đơn mới + trả hàng đơn cũ):
+   - **CHỐT 19/11/2026 (chủ shop sửa lại trong Sheet "Mau tin nhan", thay cho
+     câu cũ chọn "Tôi nhận đủ mặt hàng nhưng hàng có vấn đề" / "Đã nhận được
+     hàng nhưng hàng có vấn đề"):** hướng khách chọn lý do **"Đổi ý"** để shop
+     không bị sàn phạt (xem thêm [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md)).
    - **TikTok Shop:** "Mình xin hướng dẫn bạn đổi hàng ạ. Đầu tiên, bạn giúp shop
-     đặt lại một đơn mới ngay trên sàn. Sau đó, bạn bấm "Yêu cầu hoàn tiền" cho
-     đơn hàng vừa rồi, và chọn "Tôi nhận đủ mặt hàng nhưng hàng có vấn đề" và chọn
-     đúng lý do gặp phải. Sau đó, sẽ có shipper qua lấy hàng, bạn nhớ lưu lại mã
-     trả hàng để cung cấp cho shipper. Tiền của đơn hàng cũ sẽ được hoàn về ví
-     trên sàn nhé ạ."
-   - **Shopee:** như trên nhưng bấm "Trả hàng/Hoàn tiền" và chọn "Đã nhận được
-     hàng nhưng hàng có vấn đề".
+     đặt lại 1 đơn mới trên sàn, rồi bấm trả hàng cho đơn cũ với lý do "Đổi ý".
+     Bạn chọn đúng lý do này giúp shop, nếu không shop bị phạt nặng lắm ạ, còn
+     đơn trả của bạn không bị ảnh hưởng gì đâu ạ. Sau đó shipper sẽ qua lấy hàng,
+     bạn lưu mã trả hàng để đưa shipper, tiền đơn cũ sẽ hoàn về ví trên sàn nhé ạ."
+   - **Shopee:** câu y hệt nhưng lý do là "Đổi ý (Sản phẩm còn nguyên tem, nhãn
+     mác, bao bì)".
 3. Sau khi hướng dẫn xong mới hỏi lý do (mẫu "Hỏi xác định lý do đổi size"):
    > Dạ b ơi, cho mình hỏi thêm chút là sản phẩm mình mặc bị rộng/chật quá là do
    > mình đã chọn size theo đúng bảng size của shop hay mình có thể đã đặt nhầm
