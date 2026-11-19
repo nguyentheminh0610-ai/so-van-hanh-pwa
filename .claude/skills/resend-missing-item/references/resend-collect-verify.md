@@ -69,6 +69,31 @@ Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_orde
   đọc lại dòng và tiếp tục theo trạng thái.
 - Có tranh chấp / đòi hoàn tiền trong hội thoại → KHÔNG mở case, báo Telegram.
 
+## 1b. KHÔNG để phiếu đứng im — tin mới của khách có phiếu mở (chốt 19/11/2026)
+
+*Lý do:* phiếu #7 `_ciara07_` (TikTok, đơn 587168972405048607) mở 18/11 22:42 ở `collecting`.
+Hôm 19/11 16:23 khách gửi SĐT, lượt quét ghi "không rõ ngữ cảnh, chưa trả lời" (category `khac`)
+vì không đối chiếu với phiếu đang mở → khách chờ cả ngày, phiếu không bao giờ lên tab duyệt.
+Chủ shop: "khách phải chờ đợi là không được".
+
+Quy tắc, áp dụng MỌI lượt quét (cả 4 task CSKH), TRƯỚC khi phân loại bất kỳ tin nào:
+
+1. **Tra `resend_cases` theo `platform` + `handle` của khách** (status `collecting` /
+   `verifying` / `wait_approve_*`). Có phiếu mở → tin mới của khách (SĐT, địa chỉ, họ tên,
+   ảnh, "đúng rồi", "ok", tên món...) là CÂU TRẢ LỜI cho phiếu đó. **Cấm** xếp vào `khac` /
+   "không rõ ngữ cảnh" / bỏ qua. Làm tiếp từ mục 2 (đang `collecting`) hoặc mục 4 (đang `verifying`).
+2. **Tin chỉ có SĐT / địa chỉ rời** vẫn đọc và ghi nhận. Chưa đủ thì chỉ hỏi phần còn thiếu
+   bằng 1 tin ngắn, không hỏi lại phần khách đã gửi.
+3. **Món thiếu chưa rõ** (vd đơn có 2 cái cùng phân loại): đừng treo. Hỏi khách 1 câu ngắn
+   kèm danh sách món của đơn để khách chọn, rồi chạy tiếp song song với việc xin thông tin.
+4. **Chống đứng im:** phiếu `collecting` quá **2 giờ** (trong giờ 9h–2h sáng) mà `updated_at`
+   không đổi → lượt quét kế tiếp PHẢI mở chat khách xem có tin mới chưa, xử lý ngay; nếu vẫn
+   thiếu thông tin do khách chưa trả lời thì làm theo mục 5 (nhắc). Nếu không làm gì được
+   (lỗi đọc, hộp quyền...) → Telegram cho chủ shop 1 lần/phiếu, nêu tên khách + vướng ở đâu.
+   Không để phiếu nằm im qua nhiều lượt mà không ai biết.
+5. Mỗi lượt quét đầu tiên trong ngày liệt kê các phiếu mở, ghi vào `cskh-log` dòng
+   "phiếu #<id> <handle> <status> — việc tiếp theo: ..." để lượt sau không phải đoán.
+
 ## 2. Hỏi thông tin (`collecting`)
 
 ### ⚠️ Ảnh bằng chứng — BẮT BUỘC (chủ shop chốt lại 18/11/2026)
