@@ -276,6 +276,31 @@ deviceId TikTok, KHÔNG dùng built-in browser:
 but haven't been walked through yet in this skill; same hard rules apply
 when you do.
 
+### Shopee — luồng ĐÁNH GIÁ ĐÃ DỰNG (chốt 19/11/2026, kiểm trên Chrome thật)
+
+**Shopee BẮT BUỘC phải quét mỗi lượt, không được bỏ** (chủ shop nhắc 19/11). Dùng Chrome
+Shopee (deviceId ở [reference_chrome_browsers](../../shared/reference_chrome_browsers.md)),
+nhớ `select_browser` ngay trước mỗi thao tác Shopee.
+
+1. **Trang đánh giá:** `https://banhang.shopee.vn/portal/settings/shop/rating`
+   (menu: Chăm sóc khách hàng → Quản lý đánh giá). Mới nhất lên đầu, có cột ngày giờ.
+2. **Lọc theo sao bằng URL** (đừng click ô chọn, từng click trượt tọa độ):
+   `.../rating?pageNumber=1&fromPageNumber=1&cursor=0&pageSize=20&replied=ALL&ratingStar=3&ratingStar=2&ratingStar=1`
+   → chỉ 1–3★. Đổi `ratingStar=5&ratingStar=4` để xem 4–5★. `replied=ALL` (xem cả đã
+   trả lời) hoặc bỏ để lọc theo trạng thái.
+3. **Đọc bằng `javascript_tool`**, bỏ dòng "Phân loại:" và "[Hàng..." vì rất dài:
+   `document.body.innerText` rồi cắt từ chữ "Đặt lại". Mỗi đánh giá có: handle khách,
+   **ID đơn hàng**, nội dung, "Sản phẩm: <nhãn khách chọn, vd Sản phẩm chất lượng kém>",
+   giờ đánh giá, và "Seller Response" nếu shop đã trả lời. **Văn bản KHÔNG chứa số sao** —
+   số sao chỉ biết nhờ bộ lọc ở bước 2.
+4. **Cửa sổ ngày:** đánh giá 1–3★ trên Shopee ít (1 cái/tuần), danh sách sắp theo ngày
+   nên chỉ cần nhìn vài dòng đầu; nếu cái mới nhất đã ngoài cửa sổ thì ghi "không có mới".
+5. Đánh giá 1–3★ mới trong cửa sổ → nhắn mẫu dòng 24 qua chat Shopee (cùng cách mở chat
+   như đơn trả hàng bên dưới), ghi `cskh_reviews` + `needs_action`; "Seller Response" có
+   sẵn mẫu dòng 24 nghĩa là shop đã nhắn rồi, đừng nhắn lại.
+6. Luôn ghi 1 dòng `cskh_run_log` kể cả khi không có gì mới, ghi rõ đã quét cả TikTok
+   lẫn Shopee, để lượt sau biết đã kiểm đến đâu.
+
 ### Shopee — luồng trả hàng ĐÃ DỰNG (chốt 17/11/2026, kiểm trên Chrome thật)
 
 Thay cho TODO 30/10. Dùng Chrome Shopee (deviceId trong
