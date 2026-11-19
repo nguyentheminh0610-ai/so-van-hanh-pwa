@@ -24,6 +24,11 @@ JSON tiếng Việt từ file UTF-8 (`--data-binary @file`), không gõ thẳng 
 
 ## 1. Phát hiện + chống trùng
 
+Nguồn thứ hai (chốt 19/11/2026): lượt review-return-check có thể đã mở sẵn phiếu `collecting`
+cho đơn khách báo thiếu qua trả hàng/đánh giá và đã nhắn tin liên hệ + xin ảnh (Tin 3a/3b trong
+`.claude/shared/mau-tin-nhan-tra-hang.md`). Gặp phiếu như vậy → tiếp tục từ mục 2, **đừng mở
+phiếu mới, đừng gửi lại câu mở đầu**.
+
 Tín hiệu: khách báo thiếu/giao thiếu ("thiếu 1 quần", "không có cái..."), nhân
 viên đã hứa "gửi bù", hoặc chủ shop nhắn tên khách.
 

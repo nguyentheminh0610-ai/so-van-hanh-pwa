@@ -155,7 +155,13 @@ rồi **báo Telegram**, KHÔNG tự đề xuất số tiền/hướng xử lý 
    khách, mã đơn, loại lỗi + mức đề xuất, đã gửi tin gì, ảnh đã có chưa, link hội thoại.
 6. Không hứa hoàn tiền/đổi/gửi lại, không nêu % hay số tiền, không tự ghi Sổ Kho.
 7. Giao thiếu vẫn theo `resend-missing-item` (thu thập → duyệt lần 1/2) như cũ.
-8. Vẫn ghi nhật ký `cskh-log` (category khieu_nai) kèm "context" ghi rõ đã nhắn tin đầu.
+8. **Khách đến từ luồng trả hàng/đánh giá (chốt 19/11/2026):** review-return-check đã nhắn
+   Tin 3a+3b (liên hệ hỗ trợ + xin bằng chứng) và ghi dòng `cskh_returns`/`cskh_reviews` với
+   `action_type='khieu_nai_cho_bang_chung'`, `needs_action=false`. Khi khách trả lời trong chat:
+   KHÔNG xin ảnh lần nữa nếu họ đã gửi; có bằng chứng → PATCH dòng đó `needs_action=true`
+   + `action_note` ghi đã nhận ảnh lúc HH:MM, rồi theo mục 3–6 ở trên (xác nhận lỗi, Telegram).
+   Giao thiếu → theo resend-collect-verify (phiếu `collecting` đã mở sẵn, đừng mở trùng).
+9. Vẫn ghi nhật ký `cskh-log` (category khieu_nai) kèm "context" ghi rõ đã nhắn tin đầu.
 9. **Ghi đề xuất lỗi để chủ shop DUYỆT trên web (chốt 17/11/2026 — nguồn thứ 3 cho Sổ Kho, cùng
    cơ chế với trả hàng/đánh giá).** Khi khách báo **giao nhầm** (sai size/màu/mẫu) hoặc **hàng lỗi**
    (rách/bẩn/ố/in hỏng/tuột chỉ) và nội dung chat + ảnh cho thấy đó là lỗi shop/NCC → POST 1 dòng

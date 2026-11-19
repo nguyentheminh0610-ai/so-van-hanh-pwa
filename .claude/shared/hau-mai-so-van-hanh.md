@@ -23,6 +23,13 @@ giá mức lỗi Nhẹ/Vừa/Nặng, đề xuất % hoàn... là việc riêng c
   `shop_error_kind='giao_thieu'` hoặc `errlog_status='owned_resend'` mà đã có phiếu
   `resend_cases` cùng `platform + orig_order_code` thì web ẩn dòng đó.
 
+## Đã giải quyết 19/11 (chủ shop chốt luồng)
+
+Cả hai mục 1 và 2 bên dưới đã được ghi vào skill: review-return-check mục B2 + 4.2 (giao thiếu
+qua trả hàng/đánh giá → mở phiếu gửi bù `collecting`; nhầm/lỗi → bắt buộc `errlog_code`,
+`needs_action` bật khi khách gửi bằng chứng hoặc sau 24h). Dòng cũ vẫn thiếu mã sẽ được bổ sung
+ở lượt chạy kế tiếp.
+
 ## Điều CSKH cần làm để web đúng (việc còn thiếu thấy khi rà dữ liệu 19/11)
 
 1. **Khách báo giao thiếu trong thẻ trả hàng / đánh giá** (vd TikTok `l04032006llcd`,

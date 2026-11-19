@@ -87,6 +87,8 @@ Với mỗi yêu cầu **trả hàng/hoàn tiền** (cả TikTok lẫn Shopee) t
 | **1 — lý do ẢNH HƯỞNG shop** | TikTok: thẻ KHÔNG có badge "Không phải lỗi người bán". Shopee: lý do ⚠️ trong [bảng phân loại](../../shared/reference_return_reason_fault_classification.md) | **2 tin liên tiếp:** (1) dòng 35/36 nhờ đổi lý do sang lý do có lợi shop; (2) dòng 25 hỏi lý do thật để shop cải thiện |
 | **2 — lý do KHÔNG ảnh hưởng shop** | TikTok: có badge xanh. Shopee: lý do ✅ | **1 tin:** dòng 25 (hỏi lý do để cải thiện) |
 
+- **Ngoại lệ (chốt 19/11/2026):** nếu nội dung thật là giao thiếu/giao nhầm/hàng lỗi thì
+  gửi Tin 3 thay Tin 2 — xem mục B2 ngay dưới.
 - Đơn **huỷ trước khi lấy hàng / giao không thành công / hoàn do không giao được**
   không phải khách yêu cầu trả hàng → chỉ ghi sổ, không nhắn, không báo.
 - Hard rule 3 giữ nguyên (thread đã có người nhắn → không nhắn thêm), nhưng
@@ -116,6 +118,49 @@ Quét **tất cả** đánh giá mới trong cửa sổ (không chỉ hàng ch�
    chê: "đẹp nhưng chỉ thừa", "giao hơi lâu", "đóng gói sơ sài") → `needs_action = true`,
    `action_type = 'danh_gia_van_de'`, không nhắn khách. Chỉ bấm sao / khen thuần
    → không báo.
+
+### B2. Khiếu nại thực chất: giao thiếu / giao nhầm / hàng lỗi (chốt 19/11/2026)
+
+Chủ shop chốt luồng cho khách phàn nàn 3 loại này qua **trả hàng hoặc đánh giá 1–3★**
+(mind-map 19/11; web tab "Hậu mãi" đọc theo [hau-mai-so-van-hanh](../../shared/hau-mai-so-van-hanh.md)).
+
+**Nhận định KHÁCH QUAN, không theo từ khoá hay tên lý do khách chọn.** Đọc toàn bộ: lý do
+chính + lý do phụ + ô "Nhận xét của khách hàng" + tin nhắn khách đã có + nội dung đánh giá
++ ảnh đính kèm, rồi tự kết luận khách thực sự đang nói gì: `giao_thieu` / `giao_nham` /
+`san_pham_loi` (định nghĩa ở mục 4.1) hay không phải ba loại này. Khách chọn lý do "Đổi ý"
+nhưng ghi "shop gửi nhầm màu" → vẫn là `giao_nham`. Khách chọn "Hàng lỗi" nhưng nội dung chỉ
+chê size → KHÔNG phải. Không chắc → coi là không phải, ghi `action_note` để chủ shop xem.
+
+**Các bước (mỗi đơn đúng 1 lần, thread chưa có người nhắn — Hard rule 3):**
+
+1. Trả hàng **nhóm 1** (lý do ảnh hưởng shop) → gửi **Tin 1** nhờ đổi lý do trước
+   ([mau-tin-nhan-tra-hang](../../shared/mau-tin-nhan-tra-hang.md), theo sàn).
+2. Gửi **Tin 3a** (liên hệ hỗ trợ) rồi **Tin 3b** (xin bằng chứng) — cũng ở file mẫu đó.
+   **Tin 3 THAY Tin 2 (dòng 25) và THAY dòng 24 của đánh giá xấu** — không gửi cả hai.
+   Không phải 3 loại trên → giữ cách cũ (Tin 2 / dòng 24).
+3. Đánh giá **4–5★** nói về giao thiếu/nhầm/lỗi: KHÔNG nhắn (như mục B.2), chỉ báo sổ.
+4. Ghi sổ — **một dòng cho mỗi đơn**, ghi `shop_error_kind`:
+   - `giao_thieu` → mở dòng `resend_cases` `status=collecting` theo
+     [resend-collect-verify](../resend-missing-item/references/resend-collect-verify.md) mục 1
+     (kiểm trùng trước), đặt `msg_photo_at` nếu đã gửi 3b. Từ đây **luồng gửi bù cũ lo hết**
+     (thu thập → xác minh → anh duyệt 2 lần trên web → tạo đơn 15h). Dòng cskh để
+     `errlog_status='owned_resend'`, web tự ẩn khi đã có phiếu.
+   - `giao_nham` / `san_pham_loi` → dòng cskh có `shop_error_kind`, **`errlog_code` (mã vận
+     đơn)** theo mục 4.2, `errlog_status='suggest'`, `action_type='khieu_nai_cho_bang_chung'`,
+     `action_note` = đã nhắn xin bằng chứng lúc HH:MM, chờ khách. Để `needs_action=false`
+     cho tới khi một trong hai xảy ra:
+     (a) khách gửi bằng chứng — **lượt CSKH inbox** bật `needs_action=true`
+     ([size-consultation cskh-faq mục 13](../size-consultation/references/cskh-faq-17-11.md));
+     (b) **quá 24h khách im** — lượt review-return-check kế tiếp (đã đọc dòng 3 ngày gần
+     nhất ở mục C) bật `needs_action=true`, `action_note` thêm "khách chưa gửi bằng chứng sau 24h".
+   Thẻ lên Sổ Vận Hành đúng lúc anh có thể xử lý, không sớm hơn.
+5. **Không** tự đề xuất % hoàn, không hứa đổi/hoàn, không tự ghi Sổ Kho (việc của anh).
+   Mức Nhẹ/Vừa/Nặng là của CSKH inbox (mục 13), không làm ở đây.
+
+**Bàn giao với CSKH inbox:** khách trả lời tin 3b trong chat → lượt CSKH inbox nhặt tiếp
+(giao thiếu → resend-collect-verify; nhầm/lỗi → mục 13: xác nhận lỗi, báo Telegram, bật
+`needs_action`). Vì vậy review-return-check KHÔNG nhắn tin thứ hai sau 3b, KHÔNG báo
+Telegram riêng cho loại này (chỉ tin 1 dòng "Có K case mới" ở mục C.6 khi dòng bật `needs_action`).
 
 ### C. Chạy 2 lần/ngày sao cho rẻ + bền
 
@@ -446,7 +491,10 @@ và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
    Giao thiếu do skill [resend-missing-item](../resend-missing-item/SKILL.md) độc quyền (nó tự tạo đơn gửi
    bù + tự ghi `warehouse_error_log`). Mình chỉ hiện cho chủ shop biết, không
    mở nút ghi để khỏi ghi 2 lần.
-2. **`giao_nham` / `san_pham_loi`:** phải lấy **mã vận đơn gốc** rồi dò trùng:
+2. **`giao_nham` / `san_pham_loi`:** phải lấy **mã vận đơn gốc** rồi dò trùng. **BẮT BUỘC
+   điền `errlog_code` + `shop_error_kind` ngay lúc ghi dòng** (19/11/2026 rà dữ liệu thấy
+   nhiều dòng `suggest` thiếu mã, vd Shopee 2611112GTMGHSY, 26110176GE13NH → web không dựng
+   được nút Ghi Sổ Kho). Dòng cũ còn thiếu mã: lượt chạy này bổ sung luôn (PATCH).
    - **Lấy `errlog_code` (mã vận đơn):** trả hàng → cột `outbound_tracking`
      của đúng dòng trong `platform_returns_feed` (match theo `order_name` =
      mã đơn + `platform`). Đánh giá (không có phiếu trả) → tra bằng

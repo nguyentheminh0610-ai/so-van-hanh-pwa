@@ -51,3 +51,25 @@ khách báo không thấy lựa chọn thì ghi nhận, không ép.
 
 **Tin 2 — hỏi lý do thật (cả nhóm 1 và nhóm 2)** (Sheet dòng 25):
 > Chào bạn ạ, Shop thấy bạn có yêu cầu trả hàng, không biết mình gặp vấn đề gì với sản phẩm không ạ? Bạn chia sẻ giúp shop một chút nhé, để shop biết và cải thiện tốt hơn .
+
+---
+
+## TIN 3 — LIÊN HỆ HỖ TRỢ + XIN BẰNG CHỨNG (khiếu nại thực chất: giao thiếu / giao nhầm / hàng lỗi) — chốt 19/11/2026
+
+Dùng khi **nội dung thật** của yêu cầu trả hàng hoặc đánh giá 1–3★ là giao thiếu / giao nhầm
+(sai mẫu, màu, size) / hàng lỗi (bẩn, rách, tuột chỉ, in hỏng...). Cách nhận định xem mục
+"Khiếu nại thực chất" trong `review-return-check/SKILL.md`. **Tin 3 THAY Tin 2** (không gửi
+cả hai, tránh nhắn khách dồn dập). Dùng cho cả TikTok và Shopee (không nhắc tên lý do sàn).
+
+**Tin 3a — mở đầu** (chủ shop viết 19/11/2026; thay `<...>` bằng điều khách phản ánh, nói
+chung chung, không trích nguyên văn):
+> Bạn ơi mình thấy bạn có yêu cầu trả hàng (hoặc đánh giá) phản ánh <giao thiếu / giao nhầm / hàng lỗi> ạ, mình liên hệ qua đây để hỗ trợ bạn ạ.
+
+**Tin 3b — xin bằng chứng**, gửi NGAY SAU 3a trong cùng lượt mở thread:
+- **Giao nhầm / hàng lỗi** — nguyên văn từ `size-consultation/references/cskh-faq-17-11.md` mục 13:
+  > Dạ shop xin lỗi bạn về sự bất tiện này ạ. Bạn gửi giúp shop ảnh (hoặc video mở hàng) phần bị lỗi/bị nhầm và ảnh tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ.
+- **Giao thiếu** — "Tin xin ảnh vỏ đơn" ở `resend-missing-item/references/resend-flow-batch-2026-11-17.md`
+  (nguyên văn). Khách đã gửi ảnh trong chat → bỏ 3b, theo luật "Ảnh bằng chứng" của resend-collect-verify.
+
+Nhóm 1 (lý do ảnh hưởng shop) vẫn gửi **Tin 1 trước** (nhờ đổi lý do sang lý do không ảnh
+hưởng shop), rồi 3a, rồi 3b. Thứ tự: Tin 1 → 3a → 3b.
