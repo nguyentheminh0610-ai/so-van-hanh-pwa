@@ -153,6 +153,11 @@ chê size → KHÔNG phải. Không chắc → coi là không phải, ghi `actio
      ([size-consultation cskh-faq mục 13](../size-consultation/references/cskh-faq-17-11.md));
      (b) **quá 24h khách im** — lượt review-return-check kế tiếp (đã đọc dòng 3 ngày gần
      nhất ở mục C) bật `needs_action=true`, `action_note` thêm "khách chưa gửi bằng chứng sau 24h".
+   **Ngoại lệ — không nhắn được** (không mở được thread chat, vd tên khách bị che nên không
+   tìm ra hội thoại; Chrome bị chặn): sẽ không có bằng chứng nào gửi về, nên bật
+   `needs_action=true` NGAY, `action_note` = "chưa nhắn được khách: <lý do>, anh nhắn tay".
+   Giao thiếu không nhắn được thì cũng đừng mở phiếu `collecting` rỗng — flag `needs_action=true`
+   như trên để anh thấy thẻ cảnh báo.
    Thẻ lên Sổ Vận Hành đúng lúc anh có thể xử lý, không sớm hơn.
 5. **Không** tự đề xuất % hoàn, không hứa đổi/hoàn, không tự ghi Sổ Kho (việc của anh).
    Mức Nhẹ/Vừa/Nặng là của CSKH inbox (mục 13), không làm ở đây.
