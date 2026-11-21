@@ -253,7 +253,11 @@ function resendCardHtml(row){
     + (resendRefundFlag(row) ? '<span class="tag why rs-refund">⚠ Khách đang yêu cầu hoàn tiền vì thiếu — anh vào kiểm</span>' : '')
     + (row.confirm_slot === 'tomorrow' ? '<span class="tag why">đi ngày mai</span>' : '')
     + (row.approved_override ? '<span class="tag why">duyệt dù khách chưa xác nhận</span>' : '')
-    + (row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? '<span class="tag why">⚠ ' + esc(row.stall_reason.split(/[·—\n]/)[0].trim()) + '</span>' : '');
+    // Trước chỉ hiện khi status==='stalled' nên lúc đang 'collecting' (khách đã gửi 1 phần,
+    // ví dụ địa chỉ thiếu phường/xã) thẻ chỉ có ✗ trơn, dễ hiểu nhầm là khách chưa gửi gì
+    // (chốt 21/11/2026, case _ciara07_ #7 — chủ shop tưởng khách đã gửi đủ địa chỉ).
+    + (row.stall_reason && !['done', 'cancelled'].includes(row.status) && /^\s*thiếu/i.test(row.stall_reason)
+      ? '<span class="tag why">⚠ ' + esc(row.stall_reason.split(/[·—\n]/)[0].trim()) + '</span>' : '');
   const body = [
     '<div class="rs-item">Thiếu: <b>' + esc(row.item_summary) + '</b>'
       + (conf ? ' <span class="rs-conf ' + conf.cls + '">' + esc(conf.label) + '</span>' : '') + '</div>',
