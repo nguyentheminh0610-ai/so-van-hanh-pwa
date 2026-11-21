@@ -274,10 +274,12 @@ function resendCardHtml(row){
     btns = resendBtn('Duyệt lần 2', 'ok', 'approve2', row)
       + resendBtn('Chưa ổn', 'stop', 'block', row);
   } else if (row.status === 'verifying' || row.status === 'stalled'){
-    btns = resendOverrideBtn(row)
+    btns = (row.status === 'stalled' ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
+      + resendOverrideBtn(row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
-    btns = (resendMissing(row) ? resendOverrideBtn(row) : '')
+    btns = (resendOwnerWait(row) ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
+      + (resendMissing(row) ? resendOverrideBtn(row) : '')
       + resendBtn('Dừng', 'stop', 'stop', row);
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'
@@ -324,6 +326,21 @@ const RESEND_ACTIONS = {
   edit:     { from: ['wait_approve_1'], ask: 'Món thiếu đúng là gì? (vd: Chất Lông-Shin 02 - size M - SL 1). Em sẽ gửi lại tin xác minh cho khách với món mới.', required: true,
               body: (note) => ({ status: 'collecting', item_summary: note, item_confidence: 'high', owner_note: 'Anh sửa món → gửi lại tin xác minh', data_hash: null,
                                  customer_confirmed_at: null, confirm_slot: null, run_date: null, msg_verify_at: null, msg_ack_at: null }) },
+  // Anh xác nhận món thiếu để task chạy tiếp (chốt 21/11/2026, phiếu #9): task từng dừng ở [chờ anh] vì "đơn không có món X"
+  // trong khi đơn có món đó. Nút này gỡ chặn: xoá lý do treo, ghi 1 dòng tiến độ [đang làm], GIỮ nguyên mọi dòng cũ + dòng ☑.
+  confirmitem: { from: ['collecting', 'stalled'], ask: 'Món khách thiếu đúng là gì? (bỏ trống = giữ món đang ghi). Task sẽ gửi tin xác minh cho khách + chuyển sang chờ duyệt, không chờ anh nữa.',
+    body: (note, row) => {
+      row = row || {};
+      const d = new Date(), p2 = n => String(n).padStart(2, '0');
+      const item = note || row.item_summary || '';
+      const keep = String(row.owner_note || '').split('\n').filter(l => l.trim());
+      const chk = keep.filter(l => /^\s*☑/.test(l)).pop();
+      const rest = keep.filter(l => !/^\s*☑/.test(l));
+      rest.push('▸ ' + p2(d.getDate()) + '/' + p2(d.getMonth() + 1) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes())
+        + ' · [đang làm] Chủ shop xác nhận món thiếu: ' + item + ' — đơn có món này; task gửi tin xác minh cho khách + chuyển chờ duyệt, KHÔNG chờ anh quyết mẫu nữa');
+      if (chk) rest.push(chk);
+      return { stall_reason: null, item_summary: item, item_confidence: 'high', owner_note: rest.join('\n') };
+    } },
   approve2: { from: ['wait_approve_2'], body: () => ({ status: 'finalizing', approved2_at: new Date().toISOString() }) },
   block:    { from: ['wait_approve_2'], ask: 'Chỗ nào chưa ổn? (em sẽ không ghi Sổ Kho / không nhắn khách)', required: true,
               body: (note) => ({ status: 'blocked', owner_note: note }) },
@@ -344,7 +361,7 @@ async function resendAct(btn){
   btn.disabled = true; const old = btn.textContent; btn.textContent = 'Đang lưu…';
   try {
     const res = await sbFetch('resend_cases?id=eq.' + encodeURIComponent(id) + '&status=in.(' + def.from.join(',') + ')',
-      { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(def.body(note)) });
+      { method: 'PATCH', headers: { Prefer: 'return=representation' }, body: JSON.stringify(def.body(note, (resendRows || []).find(x => String(x.id) === String(id)))) });
     if (!res || !res.length){
       alert('Case này vừa đổi trạng thái (task hoặc máy khác đã xử lý). Em tải lại danh sách.');
     }

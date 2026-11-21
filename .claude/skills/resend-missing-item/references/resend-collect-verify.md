@@ -207,6 +207,11 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
 5. Mục 3, 4, 5 bên dưới đã viết lại theo luồng này (không còn `verifying`, không còn Telegram duyệt lần 1).
    Nhắc khách im ≥ 4 giờ (mục 1e) vẫn áp dụng cho tin xác minh chưa được trả lời.
 
+7. **Nút "Món đúng rồi — chạy tiếp" trên web (chốt 21/11/2026, cách gỡ lâu dài khi task kẹt `[chờ anh]` vì món):** chủ shop bấm → web
+   xoá `stall_reason`, đặt `item_confidence=high`, ghi 1 dòng `▸ [đang làm] Chủ shop xác nhận món thiếu: <món> …` vào `owner_note`
+   (giữ nguyên dòng cũ + dòng `☑`). Task thấy dòng cuối là `[đang làm] Chủ shop xác nhận món thiếu` thì **coi món đã CHỐT, không đối chiếu lại với
+   đơn, không chuyển `[chờ anh]` nữa**: gửi tin xác minh + `wait_approve_1` ngay (mục 1h) và trả lời luôn câu khách đang hỏi (vd "bao giờ có").
+
 ## 1g. SỔ KIỂM "KHÁCH ĐÃ GỬI GÌ" = dòng `☑` — CẤM hỏi lại thứ khách đã gửi (chốt 21/11/2026, case #9)
 
 *Lý do (sự cố thật):* phiếu #9 `ntt1072006` (TikTok). 20/11 khách đã gửi **địa chỉ bằng chữ** và **SĐT bằng ảnh
