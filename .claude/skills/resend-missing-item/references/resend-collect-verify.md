@@ -170,8 +170,26 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
 3. **Dòng dấu tích cho web:** mỗi lần cập nhật phiếu, thêm/ghi lại dòng riêng trong `owner_note` (dòng CUỐI thắng):
    `☑ sdt=1 diachi=1 anh=0` (1 = đã có, 0 = chưa). SĐT/địa chỉ chỉ tính 1 khi ĐỦ dùng để tạo đơn (địa chỉ có phường/xã + tỉnh).
    Web hiện thành "✓ SĐT ✓ Địa chỉ ✗ Ảnh"; không có dòng này thì web tự đoán (kém chính xác).
-4. **Chỉ "xong" khi khách NHẬN được đơn gửi bù** (chủ shop chốt 21/11/2026), không phải lúc nhắn mã vận đơn. Hiện bước này CHƯA
-   tự động: sau khi nhắn mã vận đơn phiếu đang chuyển `done`. Việc cần làm tiếp: theo dõi trạng thái SPX tới "đã giao" rồi mới `done`.
+4. **"Xong" = đã nhắn khách tin kèm link theo dõi đơn** (chủ shop chốt lại 21/11/2026, thay cho câu "chỉ xong khi khách nhận được đơn" — KHÔNG
+   cần theo dõi SPX tới khi giao). Giữ nguyên cách đóng phiếu hiện tại.
+
+## 1g. LUỒNG NHANH — gửi xác minh cho khách ĐỒNG THỜI đưa chủ shop duyệt (chốt 21/11/2026, THAY mục 3 + 4)
+
+*Lý do:* chủ shop: "chờ khách xác nhận rồi mới sang a duyệt là bị chậm". Hai việc chạy SONG SONG, bên nào xong trước thì đi tiếp.
+
+1. **Ngay khi đủ 3 thứ (ảnh + SĐT + địa chỉ) + biết món thiếu**, trong CÙNG lượt: ghi file dữ liệu chốt + `data_hash` (như mục 3), gửi tin xác minh cho
+   khách, và PATCH **thẳng `status=wait_approve_1`** (KHÔNG qua `verifying` nữa) kèm `msg_verify_at`, `run_date` = hôm nay, `customer_confirmed_at` = null.
+   Ghi `▸ [chờ anh] Đã gửi khách xác minh — chờ anh duyệt lần 1 (khách trả lời đúng thì tự chạy)`. Không Telegram.
+2. **Duyệt lần 1 = BÊN NÀO ĐẾN TRƯỚC:**
+   - Chủ shop bấm "Duyệt" trên web (`approved`) → đi tạo đơn luôn (lượt CSKH làm ngay, như mục 18/11), KHÔNG chờ khách trả lời.
+   - Chủ shop chưa kịp duyệt mà khách trả lời "đúng/ok" → task tự PATCH `status=approved` (điều kiện `status=eq.wait_approve_1`),
+     `customer_confirmed_at`, gửi tin ghi nhận (cờ `msg_ack_at` lên trước), rồi tạo đơn luôn. Không chờ anh.
+   - Anh đã duyệt rồi khách mới trả lời "đúng" → chỉ ghi `customer_confirmed_at` + gửi tin ghi nhận, không đổi trạng thái.
+3. **Khách SỬA thông tin sau khi đã gửi xác minh:** ghi lại file dữ liệu + `data_hash`, gửi tin xác minh mới, đặt lại `wait_approve_1`
+   (đang `approved` mà chưa `creating` cũng đặt lại được). Đã `creating` trở đi thì KHÔNG đụng: ghi `▸ [chờ anh] Khách sửa thông tin sau khi đã tạo đơn — anh kiểm`.
+4. Duyệt lần 2 (sau khi tạo đơn SPX + PDF) vẫn là quyền chủ shop, không đổi.
+5. Mục 3, 4, 5 ở dưới: mọi chỗ nói `verifying` / "khách xác nhận mới sang `wait_approve_1`" / Telegram chủ shop duyệt lần 1 → đọc theo mục 1g này.
+   Nhắc khách im ≥ 4 giờ (mục 1e) vẫn áp dụng cho tin xác minh chưa được trả lời.
 
 5. **MỌI đơn liên quan giao thiếu phải hiện trên sổ (chủ shop bắt buộc, 21/11/2026)** — từ chat, đánh giá, trả hàng, hay khách tự bấm
    hoàn tiền/khiếu nại trên sàn: phải có phiếu `resend_cases` + dòng `▸` đầu tiên, không bỏ sót. Khách ĐÃ bấm "Hoàn tiền / Trả hàng và hoàn tiền"

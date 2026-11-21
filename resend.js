@@ -16,8 +16,8 @@ let resendRows = null;
 const RESEND_STATUS = {
   collecting:     'Đang hỏi thông tin khách',
   verifying:      'Chờ khách xác nhận thông tin',
-  wait_approve_1: 'Chờ anh duyệt lần 1',
-  approved:       'Đã duyệt, chờ phiên tạo đơn',
+  wait_approve_1: 'Đã gửi khách xác minh · chờ anh duyệt lần 1 (khách trả lời "đúng" trước thì tự chạy)',
+  approved:       'Đã duyệt lần 1 — đang tạo đơn',
   creating:       'Đang tạo đơn SPX',
   wait_approve_2: 'Chờ anh duyệt lần 2',
   finalizing:     'Đang ghi Sổ Kho + nhắn khách',

@@ -32,8 +32,8 @@ Web (cskh.js `cskhProgressHtml`) tự: hiện bước cuối + lịch sử, và 
 1. `[đang làm]` Phát hiện khách báo thiếu (nguồn: chat/đánh giá/trả hàng) — đang xin ảnh + SĐT + địa chỉ
 2. `[chờ khách]` Đã hỏi <thứ thiếu> lúc HH:MM — đang chờ khách (cập nhật mỗi lần khách gửi thêm 1 phần: "đã có SĐT, đang xin nốt địa chỉ")
 3. `[chờ khách]` Đã nhắc khách lần 2 (sau 4 giờ) — vẫn thiếu <...>
-4. `[chờ khách]` Đã gửi tin xác minh — chờ khách xác nhận
-5. `[chờ anh]` Khách đã xác nhận — chờ anh duyệt lần 1
+4. `[chờ anh]` Đã gửi khách xác minh — chờ anh duyệt lần 1 (khách trả lời "đúng" trước thì tự chạy; chốt 21/11/2026, xem 1g resend-collect-verify.md)
+5. `[đang làm]` Khách đã xác nhận (hoặc anh đã duyệt) — đang tạo đơn SPX
 6. `[đang làm]` Đã duyệt lần 1 — chờ phiên 15h tạo đơn SPX
 7. `[chờ anh]` Đã tạo đơn <mã vận đơn> — chờ anh duyệt lần 2
 8. `[đang làm]` Đã duyệt lần 2 — đang ghi Sổ Kho + nhắn khách mã vận đơn
