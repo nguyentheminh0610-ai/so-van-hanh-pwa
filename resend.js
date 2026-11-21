@@ -37,11 +37,21 @@ const RESEND_CONF = {
 function resendMissing(r){
   return r.status === 'collecting' && /^\s*thiếu/i.test(r.stall_reason || '');
 }
+// Chủ shop chỉ được "duyệt dù thiếu" khi thiếu MỖI ẢNH (chốt 21/11/2026). Thiếu SĐT/địa chỉ thì không có gì để tạo đơn.
+function resendOverrideOk(r){
+  const why = r.stall_reason || '';
+  return !(/^\s*thiếu/i.test(why) && /sđt|sdt|số điện thoại|địa chỉ/i.test(why));
+}
+function resendOverrideBtn(r){
+  if (!resendOverrideOk(r)) return '';
+  const photo = /^\s*thiếu:\s*ảnh/i.test(r.stall_reason || '');
+  return resendBtn(photo ? 'Duyệt dù thiếu ảnh' : 'Duyệt dù khách chưa xác nhận', 'edit', 'override', r);
+}
 // Khách chưa phản hồi sau 4h kể từ lần task hỏi/cập nhật gần nhất (hoặc đã nhắc mà vẫn chưa đủ)
 function resendSilentHtml(r){
   if (!resendMissing(r)) return '';
   const hrs = (Date.now() - new Date(r.updated_at).getTime()) / 3600000;
-  if (r.msg_remind_at) return '<div class="rs-sub rs-bad">⚠ Đã hỏi và nhắc khách 1 lần, khách vẫn chưa gửi đủ — anh vào xử lý (duyệt dù thiếu hoặc dừng).</div>';
+  if (r.msg_remind_at) return '<div class="rs-sub rs-bad">⚠ Đã hỏi và nhắc khách 1 lần, khách vẫn chưa gửi đủ — anh vào xử lý (' + (resendOverrideOk(r) ? 'duyệt dù thiếu ảnh hoặc dừng' : 'chưa duyệt được vì thiếu SĐT/địa chỉ — hỏi lại khách hoặc dừng') + ').</div>';
   return hrs >= 4
     ? '<div class="rs-sub rs-bad">⚠ Đã hỏi khách, <b>chưa phản hồi</b> sau ' + Math.floor(hrs) + ' giờ.</div>'
     : '<div class="rs-sub">Đã hỏi khách, đang chờ khách gửi (mốc 4 giờ).</div>';
@@ -141,10 +151,10 @@ function resendCardHtml(row){
     btns = resendBtn('Duyệt lần 2', 'ok', 'approve2', row)
       + resendBtn('Chưa ổn', 'stop', 'block', row);
   } else if (row.status === 'verifying' || row.status === 'stalled'){
-    btns = resendBtn(row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? 'Duyệt dù thiếu thông tin' : 'Duyệt dù khách chưa xác nhận', 'edit', 'override', row)
+    btns = resendOverrideBtn(row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
-    btns = (resendMissing(row) ? resendBtn('Duyệt dù thiếu thông tin', 'edit', 'override', row) : '')
+    btns = (resendMissing(row) ? resendOverrideBtn(row) : '')
       + resendBtn('Dừng', 'stop', 'stop', row);
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'

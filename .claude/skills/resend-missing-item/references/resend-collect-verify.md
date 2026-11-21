@@ -127,25 +127,28 @@ Hệ thống phải tự bắt kịp, chủ shop không phải báo từng case:
   Claude/Chrome) tự báo Telegram khi: quét đánh giá/trả hàng quá 14 giờ chưa thành công (CHỈ việc này; báo
   phiếu đứng im / chờ duyệt đã TẮT 21/11/2026 — hiện thẳng trên Sổ Vận Hành, xem 1e). Nhờ `StartWhenAvailable`, sau khi PC bật lại nó chạy bù ngay.
 
-## 1e. QUY TẮC CHỐT 21/11/2026 — thiếu thông tin: hỏi lại + hiện trên Sổ Vận Hành (KHÔNG báo Telegram)
+## 1e. QUY TẮC CHỐT 21/11/2026 — thiếu thông tin: PHẢI hỏi bằng được khách, hiện trên Sổ Vận Hành (KHÔNG Telegram)
 
 *Thay cho* mọi chỗ khác trong file này nói "nhắc sau 24h / treo 72h", "chưa có ảnh → KHÔNG ping chủ shop" và "báo Telegram
 cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo tele, rối lắm, hiển thị trên sổ vận hành là được".
+**Chủ shop KHÔNG tự điền SĐT/địa chỉ thay khách** (SĐT/địa chỉ đầy đủ không được vào Supabase): phải hỏi khách bằng được.
 
-**Cần đủ 3 thứ để lên duyệt lần 1: ảnh bằng chứng + SĐT + địa chỉ.** Họ tên KHÔNG cần khách gửi — lấy tên hiển thị
-của khách trên sàn. Ảnh chụp màn hình có SĐT/địa chỉ = đã gửi (xem mục cuối file). Sàn che tên/SĐT trong đơn nên KHÔNG tra từ đơn.
+**Cần đủ 3 thứ: ảnh bằng chứng + SĐT + địa chỉ.** Họ tên KHÔNG cần khách gửi — lấy tên hiển thị của khách trên sàn.
+Ảnh chụp màn hình có SĐT/địa chỉ = đã gửi (xem mục cuối file). Sàn che tên/SĐT trong đơn nên KHÔNG tra từ đơn.
 
-1. **Đủ 3 thứ:** ghi file dữ liệu chốt, gửi tin xác minh (mục 3), chuyển `wait_approve_1` luôn (không chờ khách "đúng").
-   Khách sửa thông tin sau đó → ghi lại file + `data_hash`, `owner_note` "khách sửa lúc HH:MM".
-   Xoá `stall_reason` (set null).
-2. **Thiếu 1–3 thứ:** gửi NGAY 1 tin hỏi đúng thứ còn thiếu (mục 1c ở trên: mẫu câu), VÀ **ghi `stall_reason` = `Thiếu: <thứ>`**
-   (vd `Thiếu: SĐT`, `Thiếu: ảnh + địa chỉ`) trong cùng lượt, giữ `status=collecting`. Web tự đưa phiếu có `stall_reason`
-   bắt đầu bằng "Thiếu" lên nhóm "Duyệt gửi bù" kèm dòng "Đã hỏi khách, đang chờ / chưa phản hồi sau N giờ" + nút
-   "Duyệt dù thiếu thông tin" / "Dừng". Mỗi lượt quét cập nhật lại `stall_reason` cho khớp thứ còn thiếu.
+**Quy trình luôn đủ các bước (không bỏ bước nào):** hỏi khách phần thiếu → có đủ SĐT + địa chỉ → GỬI TIN XÁC MINH cho khách
+(mục 3, `verifying`) → khách xác nhận "đúng" (mục 4, `wait_approve_1`) → chủ shop duyệt lần 1 → tạo đơn → duyệt lần 2.
+
+1. **Thiếu SĐT hoặc địa chỉ:** KHÔNG có đường tắt, chủ shop KHÔNG duyệt dù thiếu được (không có gì để tạo đơn).
+   Gửi NGAY 1 tin hỏi đúng thứ thiếu, ghi `stall_reason` = `Thiếu: SĐT` / `Thiếu: địa chỉ` (kèm ảnh nếu thiếu cả ảnh), giữ `collecting`.
+   Web hiện phiếu ở nhóm "Duyệt gửi bù" với dòng "Thiếu…" + "đã hỏi khách / chưa phản hồi sau N giờ"; chỉ có nút "Dừng".
+2. **Chỉ thiếu ẢNH** (đã có SĐT + địa chỉ): vẫn phải gửi tin hỏi ảnh (mục 2) VÀ gửi tin xác minh thông tin (mục 3) như thường;
+   ghi `stall_reason` = `Thiếu: ảnh`. Web hiện thêm nút "Duyệt dù thiếu ảnh" → chủ shop duyệt luôn không cần chờ ảnh, nhưng
+   quy trình xác minh với khách vẫn chạy; khách sửa thông tin thì ghi lại file dữ liệu + `data_hash` + `owner_note`.
 3. **Khách im ≥ 4 giờ** (tính từ tin hỏi của shop hoặc tin cuối của khách; lượt quét nào tới trước trong khoảng 4–6 giờ):
    nhắc khách **1 lần duy nhất** (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <thứ còn thiếu> để
-   shop kịp gửi bù cho bạn nhé ạ". Web tự hiện cảnh báo "khách chưa phản hồi" — KHÔNG gửi Telegram, KHÔNG đổi sang `stalled`.
-4. Khách gửi bổ sung → quay lại bước 1 hoặc 2 theo thứ còn thiếu.
+   shop kịp gửi bù cho bạn nhé ạ". Web tự hiện cảnh báo "khách chưa phản hồi" — KHÔNG Telegram, KHÔNG đổi sang `stalled`.
+4. Đủ ảnh + SĐT + địa chỉ → set `stall_reason` null → mục 3 (tin xác minh) → mục 4.
 5. Mọi lượt quét (kể cả ban đêm) đều áp dụng — không bỏ qua phiếu `collecting` vì "đang ngoài giờ".
 
 **Đánh giá xấu (1–3★) đã nhắn khách:** web hiện "đã nhắn khách lúc X, khách chưa phản hồi sau N giờ" khi ≥ 4 giờ, dựa vào
