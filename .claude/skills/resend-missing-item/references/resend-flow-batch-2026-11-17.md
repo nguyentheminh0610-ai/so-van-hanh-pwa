@@ -90,6 +90,21 @@ Lưu ý: SĐT trong đơn trên TikTok bị che; cách chụp thông tin giao h�
 ích khi khách tự mở đơn của họ. Cả 2 cách đều là ảnh nên **bắt buộc gửi tin xác
 minh lại** (đọc ảnh dễ nhầm số).
 
+**Hỏi thông tin nhận hàng — theo phần còn thiếu** (chốt 21/11/2026, case #9 `ntt1072006` bị hỏi lại
+SĐT/địa chỉ đã gửi). Chọn mẫu theo dòng `☑ sdt= diachi= anh=` của phiếu (mục 1f.3 + 1g file collect-verify); mẫu gộp ở trên
+**chỉ dùng khi cả SĐT và địa chỉ đều chưa có**, và bỏ chữ "họ tên" (tên lấy trên sàn):
+
+| Còn thiếu | Tin gửi khách |
+|---|---|
+| Chỉ SĐT | `Dạ bạn cho shop xin thêm số điện thoại nhận hàng để shop tạo đơn gửi bù cho bạn nhé ạ. TikTok hay chặn gõ số, bạn chụp màn hình ghi chú có số gửi shop, hoặc gõ cách bằng dấu chấm (vd 09.12.345.678) giúp shop ạ.` |
+| Chỉ địa chỉ | `Dạ bạn cho shop xin địa chỉ nhận hàng đầy đủ gồm số nhà, phường/xã, tỉnh/thành để shop gửi bù đúng chỗ cho bạn nhé ạ.` |
+| Địa chỉ thiếu phường/xã hoặc tỉnh | `Dạ địa chỉ bạn gửi shop còn thiếu <phường/xã | tỉnh/thành>, bạn bổ sung giúp shop để shop tạo đơn gửi bù nhé ạ.` |
+| SĐT + địa chỉ | mẫu gộp ở trên, bỏ "họ tên": `Dạ bạn cho shop xin SĐT và địa chỉ nhận hàng để shop gửi bù nhé ạ. ...` |
+| Chỉ ảnh | tin "Xin ảnh vỏ đơn" ở trên — KHÔNG kèm câu xin SĐT/địa chỉ |
+
+Trong tin **không nhắc tới** mục khách đã gửi (không viết "shop đã nhận địa chỉ, giờ xin thêm SĐT" — ngắn gọn là
+đủ). Trên Shopee bỏ phần hướng dẫn chụp màn hình/gõ cách (Shopee không chặn số).
+
 **Tin xác minh** (Step 2b, giọng nhẹ hơn):
 
 ```

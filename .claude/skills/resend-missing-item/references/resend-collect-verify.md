@@ -101,8 +101,9 @@ im 14 giờ không ai hỏi; phiếu #8 `obe9hvmo5o` khách gửi đủ từ 19/
 xác minh, đứng 57 giờ. Chủ shop: "thiếu SĐT hoặc địa chỉ khách chưa gửi hoặc em chưa rõ thì hỏi lại khách 1 câu",
 không để chủ shop phải vào kiểm tay từng case.
 
-Mỗi lần đọc phiếu `collecting` (mọi lượt quét), đối chiếu 5 mục: ảnh bằng chứng, món thiếu,
-họ tên, SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành).
+Mỗi lần đọc phiếu `collecting` (mọi lượt quét), đối chiếu 4 mục: ảnh bằng chứng, món thiếu,
+SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành). Họ tên không hỏi (lấy trên sàn, mục 1e).
+**"Đã có / còn thiếu" đọc từ dòng `☑` của phiếu (mục 1f.3 + 1g), không suy từ ghi chú tự do.**
 - **Thiếu hoặc chưa rõ mục nào → gửi NGAY 1 tin ngắn chỉ hỏi đúng mục đó** (gộp nhiều mục trong
   1 tin, không hỏi lại phần khách đã gửi, không chờ lượt sau). Vd: "Dạ bạn cho shop xin thêm số điện thoại
   nhận hàng để shop tạo đơn gửi bù cho bạn nhé ạ."; địa chỉ thiếu phường/xã: "Dạ bạn cho shop xin địa chỉ
@@ -179,6 +180,43 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
    Hết yêu cầu hoàn tiền (khách rút) thì ghi `⚑ hoantien=0`.
 6. **Mẫu thiếu mà đơn có 3 món (phiếu #9, 21/11/2026):** chủ shop xác nhận món thiếu `Chất Lông-Đốm Hồng L` CÓ trong đơn (món thứ 3, bị ẩn sau
    nút "Ẩn bớt/Xem thêm" ở khung đơn hàng chat TikTok). Phải bấm mở rộng danh sách mặt hàng trước khi kết luận "đơn không có món X".
+
+## 1g. SỔ KIỂM "KHÁCH ĐÃ GỬI GÌ" = dòng `☑` — CẤM hỏi lại thứ khách đã gửi (chốt 21/11/2026, case #9)
+
+*Lý do (sự cố thật):* phiếu #9 `ntt1072006` (TikTok). 20/11 khách đã gửi **địa chỉ bằng chữ** và **SĐT bằng ảnh
+chụp màn hình** (TikTok chặn gõ số). Lượt 22:15 không mở ảnh, ghi vào ghi chú "khách từ chối gửi SĐT". Lượt sáng
+21/11 (09:36, `msg_remind_at`) tin vào ghi chú đó, soạn tin theo mẫu gộp "xin họ tên, SĐT và địa chỉ" → khách bị hỏi
+lại cả thứ đã gửi. Chủ shop: "khách có gửi SĐT và địa chỉ rồi mà vẫn hỏi lại".
+
+Gốc rễ: trước 21/11 phiếu **không có chỗ ghi "khách đã gửi gì"**. Mỗi lượt 15 phút tự đọc lại chat (hay bỏ qua tin
+ảnh) rồi suy "còn thiếu gì" từ câu chữ tự do của lượt trước (`stall_reason`, `owner_note`) — một lượt đọc sai là các
+lượt sau sai theo. **Nguồn sự thật duy nhất từ nay là dòng `☑` trong `owner_note`** (định dạng ở mục 1f.3, dòng cuối
+thắng), mở rộng thêm phần "đã hỏi":
+
+```
+☑ sdt=1 diachi=1 anh=0 hoi=anh@22:15
+```
+`hoi=` liệt kê mục shop ĐÃ gửi tin hỏi (`sdt`, `diachi`, `anh`) kèm giờ gửi, cách nhau dấu phẩy; không có thì bỏ.
+Web chỉ đọc 3 cặp `sdt/diachi/anh`, phần `hoi=` dành cho các lượt quét.
+
+Quy tắc, áp dụng MỌI lượt quét có phiếu `collecting`:
+
+1. **Đọc chat → ghi dòng `☑` ngay**, không chờ đủ. Khách gửi mục nào (bằng chữ HOẶC ảnh) thì ghi `=1` mục đó ngay
+   lượt đó + cập nhật `recipient_masked` từng phần (có SĐT thì thêm `09******00`, có địa chỉ thì thêm `Tỉnh / Phường`).
+   Tin ảnh của khách **bắt buộc mở ra đọc (phóng to)** trước khi kết luận thiếu gì — chưa mở ảnh thì chưa được hỏi.
+2. **Trước khi soạn BẤT KỲ tin hỏi/nhắc → đọc dòng `☑` của phiếu.** Chỉ được nhắc tới mục `=0`. Mục `=1` →
+   **cấm xuất hiện trong tin**, dù lượt trước ghi gì trong `stall_reason`/`owner_note`. Mẫu tin theo tổ hợp thiếu ở
+   [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md) mục "Hỏi thông tin nhận hàng — theo phần còn
+   thiếu". Mẫu gộp "SĐT và địa chỉ" chỉ dùng khi **cả `sdt=0` và `diachi=0`** (bỏ chữ "họ tên" — tên lấy trên sàn, mục 1e).
+3. **Mục đã hỏi (có trong `hoi=`) mà khách chưa trả lời → không hỏi lại**; chỉ nhắc 1 lần ở mốc 4h theo 1e.3, và tin
+   nhắc cũng chỉ nêu mục còn `=0`. Gửi tin hỏi xong thì thêm mục đó vào `hoi=` cùng lượt.
+4. **Ghi chú tự do không phải nguồn sự thật.** Thấy ghi chú lượt trước kiểu "khách từ chối gửi SĐT" / "chưa có SĐT"
+   nhưng `sdt=0` và trong chat có tin ảnh chưa đọc → mở ảnh đọc lại trước, sửa dòng `☑`, rồi mới quyết hỏi hay không.
+   Ghi dòng `▸` nói rõ "đã đọc ảnh HH:MM: có SĐT/địa chỉ" để lượt sau không đọc lại.
+5. `stall_reason` khi còn thiếu ghi **đúng định dạng có dấu** `Thiếu: <SĐT|địa chỉ|ảnh, nối bằng " + ">` — chỉ liệt kê
+   mục `=0`, không chèn thêm câu chữ về mục đã có. Đủ 3 mục `=1` → `stall_reason` null → mục 3 (tin xác minh).
+6. Phiếu mở TRƯỚC 21/11 chưa có dòng `☑`: lượt đầu gặp phải đọc lại cả hội thoại (mở mọi ảnh) rồi ghi dòng `☑` trước
+   khi làm gì khác.
 
 ## 2. Hỏi thông tin (`collecting`)
 
