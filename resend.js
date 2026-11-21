@@ -146,16 +146,42 @@ function resendChecklist(r){
     const v = k => { const x = new RegExp(k + '\\s*=\\s*([01])').exec(m); return !!x && x[1] === '1'; };
     return [{ label: 'SĐT', ok: v('sdt') }, { label: 'Địa chỉ', ok: v('diachi') }, { label: 'Ảnh', ok: v('anh') }];
   }
-  const why = /^\s*thieu/.test(resendNorm(r.stall_reason)) ? resendNorm(r.stall_reason) : '';
+  // Lỗi cũ 21/11/2026 (phiếu #9): chỉ nhìn recipient_masked (task không ghi) nên khách ĐÃ gửi đủ vẫn hiện ✗ ✗ ✗.
+  // Giờ đọc "bằng chứng" trong lý do + các dòng tiến độ (mới → cũ): câu nào nhắc tới mục đó, có chữ "đã gửi/đã có/đủ" → ✓,
+  // có "thiếu/chưa/hỏi" → ✗. Không có bằng chứng nào mới dùng recipient_masked; phiếu đã qua bước hỏi (verifying…) coi là đủ.
+  const KEYS = {
+    sdt:  /sđt|sdt|số điện thoại|so dien thoai/,
+    addr: /địa chỉ|dia chi/,
+    photo:/ảnh|anh vo don|anh tui|anh bang chung/,
+  };
+  const NEG = /thiếu|thieu|chưa|chua|hỏi|hoi\b|xin\b/;
+  const POS = /đã gửi|da gui|đã có|da co|đã đủ|da du|\bđủ\b|\bdu\b/;
+  const lines = [];
+  if (r.stall_reason) lines.push(r.stall_reason);
+  cskhProgressParse(r.owner_note).slice().reverse().forEach(e => lines.push(e.text));
+  const segs = [];
+  lines.forEach(t => String(t).toLowerCase().split(/[.;\n,—]| - /).forEach(s => segs.push(s)));
+  const judge = (re) => {
+    for (const s of segs){
+      if (!re.test(s)) continue;
+      if (NEG.test(s)) return false;
+      if (POS.test(s)) return true;
+    }
+    return null;
+  };
   const masked = r.recipient_masked || '';
   const parts = masked.split('·').map(x => x.trim()).filter(Boolean);
-  const hasPhoneData = /\d[\d*\s]{6,}\d/.test(masked);
-  const addrPart = parts.find(x => /\/|,/.test(x) && !/\d[\d*]{6,}/.test(x));
-  const early = r.status === 'collecting';
+  const fallback = {
+    sdt: /\d[\d*\s]{6,}\d/.test(masked),
+    addr: !!parts.find(x => /\/|,/.test(x) && !/\d[\d*]{6,}/.test(x)),
+    photo: false,
+  };
+  const past = r.status !== 'collecting' ? true : null;   // đã qua bước hỏi khách (verifying, chờ duyệt…)
+  const pick = (k) => { const j = judge(KEYS[k]); return j !== null ? j : (fallback[k] || past === true); };
   return [
-    { label: 'SĐT',     ok: hasPhoneData && !/sdt|so dien thoai/.test(why) },
-    { label: 'Địa chỉ', ok: !!addrPart && !/dia chi/.test(why) },
-    { label: 'Ảnh',     ok: !/anh/.test(why) && !(early && !why) },
+    { label: 'SĐT',     ok: pick('sdt') },
+    { label: 'Địa chỉ', ok: pick('addr') },
+    { label: 'Ảnh',     ok: pick('photo') },
   ];
 }
 function resendChecklistHtml(r){
