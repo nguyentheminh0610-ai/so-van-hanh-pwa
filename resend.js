@@ -16,7 +16,7 @@ let resendRows = null;
 const RESEND_STATUS = {
   collecting:     'Đang hỏi thông tin khách',
   verifying:      'Chờ khách xác nhận thông tin',
-  wait_approve_1: 'Đủ thông tin · chờ anh duyệt lần 1',
+  wait_approve_1: 'Đã gửi khách xác minh · chờ anh duyệt lần 1 (khách trả lời "đúng" trước thì tự chạy)',
   approved:       'Đã duyệt lần 1 — đang tạo đơn',
   creating:       'Đang tạo đơn SPX',
   wait_approve_2: 'Chờ anh duyệt lần 2',
@@ -191,7 +191,7 @@ function resendChecklistHtml(r){
 
 // ---- THANH TIẾN ĐỘ 6 BƯỚC (chốt 21/11/2026, thay cho đoạn "Tiến độ:" dài) -----------------------------
 // Bước hiện tại suy từ status + cột có sẵn, KHÔNG phụ thuộc câu chữ task ghi → không sai khi task đổi cách viết.
-const RESEND_STEPS = ['Hỏi thông tin', 'Duyệt lần 1', 'Tạo đơn SPX', 'Duyệt lần 2', 'Ghi sổ + nhắn khách', 'Xong'];
+const RESEND_STEPS = ['Hỏi thông tin', 'Xác minh + duyệt 1', 'Tạo đơn SPX', 'Duyệt lần 2', 'Ghi sổ + nhắn khách', 'Xong'];
 function resendStepIndex(r){
   switch (r.status){
     case 'collecting': return 0;
@@ -205,7 +205,7 @@ function resendStepIndex(r){
 }
 function resendHolder(r){
   if (['done', 'cancelled'].includes(r.status)) return '';
-  if (r.status === 'wait_approve_1' || r.status === 'verifying') return 'anh duyệt';
+  if (r.status === 'wait_approve_1' || r.status === 'verifying') return 'anh duyệt hoặc khách xác nhận';
   if (r.status === 'wait_approve_2') return 'anh duyệt';
   if (r.status === 'stalled' || r.status === 'blocked') return 'anh xử lý';
   const ev = cskhProgressParse(r.owner_note), st = ev.length ? ev[ev.length - 1].state : '';
@@ -321,8 +321,8 @@ const RESEND_ACTIONS = {
               body: () => ({ status: 'approved', approved_override: true, approved_at: new Date().toISOString() }) },
   stop:     { from: ['collecting', 'verifying', 'wait_approve_1', 'approved', 'stalled'], ask: 'Lý do dừng case này (ghi chú, có thể bỏ trống):',
               body: (note) => ({ status: 'cancelled', owner_note: note || null }) },
-  edit:     { from: ['wait_approve_1'], ask: 'Món thiếu đúng là gì? (vd: Chất Lông-Shin 02 - size M - SL 1). Task sẽ ghi lại dữ liệu và đưa phiếu lại chờ duyệt lần 1.', required: true,
-              body: (note) => ({ status: 'collecting', item_summary: note, item_confidence: 'high', owner_note: 'Anh sửa món → task ghi lại dữ liệu, đưa lại chờ duyệt lần 1', data_hash: null,
+  edit:     { from: ['wait_approve_1'], ask: 'Món thiếu đúng là gì? (vd: Chất Lông-Shin 02 - size M - SL 1). Em sẽ gửi lại tin xác minh cho khách với món mới.', required: true,
+              body: (note) => ({ status: 'collecting', item_summary: note, item_confidence: 'high', owner_note: 'Anh sửa món → gửi lại tin xác minh', data_hash: null,
                                  customer_confirmed_at: null, confirm_slot: null, run_date: null, msg_verify_at: null, msg_ack_at: null }) },
   approve2: { from: ['wait_approve_2'], body: () => ({ status: 'finalizing', approved2_at: new Date().toISOString() }) },
   block:    { from: ['wait_approve_2'], ask: 'Chỗ nào chưa ổn? (em sẽ không ghi Sổ Kho / không nhắn khách)', required: true,
