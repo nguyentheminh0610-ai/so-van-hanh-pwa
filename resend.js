@@ -189,6 +189,58 @@ function resendChecklistHtml(r){
     '<span class="rs-chk ' + (c.ok ? 'y' : 'n') + '">' + (c.ok ? '✓' : '✗') + ' ' + c.label + '</span>').join('') + '</div>';
 }
 
+// ---- THANH TIẾN ĐỘ 6 BƯỚC (chốt 21/11/2026, thay cho đoạn "Tiến độ:" dài) -----------------------------
+// Bước hiện tại suy từ status + cột có sẵn, KHÔNG phụ thuộc câu chữ task ghi → không sai khi task đổi cách viết.
+const RESEND_STEPS = ['Hỏi thông tin', 'Xác minh + duyệt 1', 'Tạo đơn SPX', 'Duyệt lần 2', 'Ghi sổ + nhắn khách', 'Xong'];
+function resendStepIndex(r){
+  switch (r.status){
+    case 'collecting': return 0;
+    case 'verifying': case 'wait_approve_1': return 1;
+    case 'approved': case 'creating': return 2;
+    case 'wait_approve_2': case 'blocked': return 3;
+    case 'finalizing': return 4;
+    case 'done': return 5;
+    default: return r.spx_tracking ? 3 : (r.msg_verify_at ? 1 : 0);   // stalled / cancelled: dừng ở bước đã tới
+  }
+}
+function resendHolder(r){
+  if (['done', 'cancelled'].includes(r.status)) return '';
+  if (r.status === 'wait_approve_1' || r.status === 'verifying') return 'anh duyệt hoặc khách xác nhận';
+  if (r.status === 'wait_approve_2') return 'anh duyệt';
+  if (r.status === 'stalled' || r.status === 'blocked') return 'anh xử lý';
+  const ev = cskhProgressParse(r.owner_note), st = ev.length ? ev[ev.length - 1].state : '';
+  return st === 'chờ khách' ? 'chờ khách' : st === 'chờ anh' ? 'anh xử lý' : 'hệ thống đang làm';
+}
+function resendStepperHtml(r){
+  const cur = resendStepIndex(r);
+  const stopped = ['stalled', 'blocked', 'cancelled'].includes(r.status);
+  return '<div class="rs-steps">' + RESEND_STEPS.map((name, i) => {
+    const cls = i < cur || (i === cur && r.status === 'done') ? 'done' : i === cur ? (stopped ? 'stop' : 'cur') : 'todo';
+    const mark = cls === 'done' ? '✓' : cls === 'stop' ? '✗' : cls === 'cur' ? '●' : '○';
+    return '<span class="rs-step ' + cls + '">' + mark + ' ' + esc(name) + '</span>';
+  }).join('<span class="rs-sep">›</span>') + '</div>';
+}
+// Dòng ngắn "đang ở đâu / ai cầm / kẹt bao lâu" + lịch sử gập (câu chữ dài của task nằm trong lịch sử)
+function resendProgressHtml(r){
+  const closed = ['done', 'cancelled', 'blocked'].includes(r.status);
+  const ev = cskhProgressParse(r.owner_note);
+  const who = resendHolder(r);
+  let head = '';
+  if (!closed){
+    const last = ev.length ? ev[ev.length - 1] : null;
+    const hrs = last ? (Date.now() - last.at.getTime()) / 3600000 : 0;
+    const limit = last ? (last.state === 'chờ khách' ? 4 : last.state === 'đang làm' ? 1 : 0) : 0;
+    const stuck = !!limit && hrs >= limit;
+    head = '<div class="rs-sub' + (stuck ? ' rs-bad' : '') + '">' + (who ? '<b>' + esc(who.charAt(0).toUpperCase() + who.slice(1)) + '</b>' : '')
+      + (last ? ' <span class="rs-faint">· cập nhật ' + esc(last.label) + '</span>' : '')
+      + (stuck ? ' · <b>⚠ đứng ở bước này ' + Math.floor(hrs) + ' giờ — anh vào xử lý</b>' : '') + '</div>';
+  }
+  const hist = ev.length
+    ? '<details class="hm-fold"><summary>Chi tiết ' + ev.length + ' bước</summary><div class="rs-sub">'
+      + ev.slice().reverse().map(e => esc(e.label) + ' · [' + esc(e.state) + '] ' + esc(e.text)).join('<br>') + '</div></details>' : '';
+  return resendStepperHtml(r) + head + hist;
+}
+
 function resendCardHtml(row){
   const plat = cskhPlatName(row.platform);
   const dl = resendDeadline(row);
@@ -234,7 +286,7 @@ function resendCardHtml(row){
     + (row.last_error && row.status !== 'done' ? ' · <span class="rs-bad">lỗi gần nhất: ' + esc(row.last_error) + '</span>' : '');
   return '<div class="fi compact rs-card' + (dl.late ? ' rs-late' : '') + '" data-id="' + esc(String(row.id)) + '">'
     + '<div class="fi-line1">' + line1 + '<span class="when">' + esc(fmtDMY(cskhDateKey(new Date(row.created_at))) || '') + '</span></div>'
-    + '<div class="rs-body">' + body + extra + cskhProgressHtml(row.owner_note, ['done', 'cancelled', 'blocked'].includes(row.status)) + resendSilentHtml(row) + '</div>'
+    + '<div class="rs-body">' + body + extra + resendProgressHtml(row) + resendSilentHtml(row) + '</div>'
     + '<div class="rs-state-line">' + stateLine + (dl.text ? ' · <span class="rs-dl' + (dl.late ? ' late' : '') + '">' + esc(dl.text) + '</span>' : '') + '</div>'
     + '<div class="err-foot">' + btns + orderLink + '</div></div>';
 }
