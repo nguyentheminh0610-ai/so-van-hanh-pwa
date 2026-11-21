@@ -79,6 +79,37 @@ Dùng đúng logic mục 1. Nếu đơn **ĐÃ gửi đi** rồi:
 
 (Nhớ đổi {X} theo đúng hãng của sàn: TikTok→J&T, Shopee→SPX, và theo khu vực khách.)
 
+### 2b. Khách xin hẹn giờ giao cụ thể (chốt 21/11/2026)
+Khách đòi giao đúng giờ (vd "trước 12h trưa mai", "chiều mai em không có nhà").
+Shop **không có số shipper và không được sàn cho phép yêu cầu giờ giao** → không
+hứa hẹn giờ, chỉ hướng khách tự báo với shipper lúc được gọi.
+> Dạ shop không có số của shipper và cũng không được sàn cho phép yêu cầu giờ
+> giao ạ, mong bạn thông cảm giúp shop nhé. Khi nào shipper gọi thì bạn báo giờ
+> thuận tiện trực tiếp với shipper giúp shop ạ.
+
+### 2c. Khách xin đóng gấp / gửi sớm cho kịp (chốt 21/11/2026)
+Khách xin đóng hàng ngay để shipper lấy sớm (vd "mai người ta lấy sớm được
+không"). KHÔNG hứa mốc giờ cụ thể, chỉ trấn an sẽ ưu tiên.
+> Dạ đơn của bạn shop sẽ ưu tiên đóng gói gửi sớm hơn các đơn khác nếu không có
+> vấn đề gì phát sinh, bạn yên tâm giúp shop nhé ạ.
+
+### 2d. Đơn sàn báo "Đã hoàn thành" nhưng khách nói chưa nhận (chốt 21/11/2026)
+Hướng khách tự kiểm tra trước (nhiều trường hợp người nhà nhận mà khách không
+biết), chỉ nhận khiếu nại hộ khi khách xác nhận vẫn không có hàng.
+> Dạ bạn kiểm tra giúp shop mục giao hàng trên đơn nhé, sàn thường có ảnh giao
+> hàng và thời gian giao cụ thể đó ạ. Bạn hỏi thêm người nhà xem có ai nhận hộ
+> chưa báo không nhé, nhiều trường hợp người nhà nhận mà mình chưa biết ạ. Nếu
+> kiểm tra vẫn không thấy, bạn báo lại shop để shop hỗ trợ khiếu nại lên sàn
+> giúp bạn ạ.
+
+### 2e. Người nhà từ chối nhận, khách xin giao lại (chốt 21/11/2026)
+Shop không có số shipper và không có tính năng yêu cầu giao lại → hướng khách
+tự liên hệ lại shipper.
+> Dạ shop không có số shipper và không có tính năng yêu cầu giao lại nên mong
+> bạn thông cảm ạ. Bạn chủ động gọi lại số shipper vừa gọi giao để báo giao lại
+> nhé (nếu đơn chưa bị hoàn). Trường hợp hay đặt hàng qua sàn thì bạn gọi số
+> shipper khu vực đó báo giao lại giúp shop luôn ạ.
+
 ### 3. "Có được kiểm tra hàng trước khi nhận không"
 > Dạ hiện sàn có cho mình kiểm tra hàng trước khi nhận luôn nha bạn, lỡ nhận về
 > mà không ưng ý thì bạn vẫn yêu cầu trả hàng được, nên bạn cứ yên tâm đặt nha.
