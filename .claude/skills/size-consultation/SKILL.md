@@ -1,6 +1,6 @@
 ---
 name: size-consultation
-description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22/23) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không" -- must confirm which phân loại first), closing out finished conversations, and short product-FAQ questions (unisex? có dây rút không?). Also handles (chốt 2026-10-28, xem references/cskh-ship-faq.md) shipping-time questions / giục giao gấp / "khi nào đơn đến / khi nào vận chuyển" (TikTok=J&T, Shopee=SPX, kho Hà Nội, mốc 3h chiều gửi trong ngày), "được kiểm tra hàng trước khi nhận không", a customer's post-purchase worry "sợ dài/rộng quá" (now reassure đổi trả), and a KOC/creator messaging in the inbox to xin mẫu, and đổi size / đổi trả hàng sau khi mua (quy trình Mục 8 + mẫu câu chuẩn ở Google Sheet "Mau tin nhan"). Also (chốt 2026-11-17, xem references/cskh-faq-17-11.md mục 13) sends the FIRST reply on giao sai / hàng lỗi-bẩn-rách complaints then pings the shop owner on Telegram, who handles the rest. Still do NOT use this for khiếu nại nặng without a template or sửa thông tin đơn (sai SĐT, shipper không liên hệ được) -- those stay for the shop owner.
+description: Reply to TikTok Shop / Shopee chat messages for shop SOME.TIME's sleepwear -- use whenever the shop owner says "check ib khách", "vào rep khách đi", "trả lời tin nhắn khách/size" or similar, or you need to compute a size for a customer. PRIMARY scope is genuine product SIZE questions (height/weight -> size nào, or a request for the size chart) -- covers quần Hoạt Hình (Quần Lông), Quần Caro, Quần Thun / Bộ Dài / Bộ Ngắn / Quần Short / Combo. Also handles (chốt 2026-10-22/23) generic greetings with no specific ask ("Hi", "Shop ơi"), stock-availability questions ("còn size nào không" -- must confirm which phân loại first), closing out finished conversations, and short product-FAQ questions (unisex? có dây rút không?). Also handles (chốt 2026-10-28, xem references/cskh-ship-faq.md) shipping-time questions / giục giao gấp / "khi nào đơn đến / khi nào vận chuyển" (TikTok=J&T, Shopee=SPX, kho Hà Nội, mốc 3h chiều gửi trong ngày), "được kiểm tra hàng trước khi nhận không", a customer's post-purchase worry "sợ dài/rộng quá" (now reassure đổi trả), and a KOC/creator messaging in the inbox to xin mẫu, and đổi size / đổi trả hàng sau khi mua (quy trình Mục 8 + mẫu câu chuẩn ở Google Sheet "Mau tin nhan"). Also (chốt 2026-11-21, xem references/cskh-doi-hang-loi-21-11.md) handles giao sai mẫu / hàng lỗi-bẩn-rách complaints end-to-end when the customer already sent photos: apologise + confirm fault, offer free exchange + voucher, send the exchange guide, send the 10k voucher (NOT for giao thiếu -- that stays with resend-missing-item); refund demands or unclear evidence still get only the first reply + Telegram ping (chốt 2026-11-17, references/cskh-faq-17-11.md mục 13). Still do NOT use this for khiếu nại nặng without a template or sửa thông tin đơn (sai SĐT, shipper không liên hệ được) -- those stay for the shop owner.
 ---
 
 # Tư vấn size cho khách (chat TikTok Shop & Shopee)
@@ -21,7 +21,7 @@ bao nhiêu" (thường kèm chiều cao/cân nặng), hoặc xin bảng size chu
 
 **KHÔNG trả lời** (để trống cho chủ shop hoặc skill khác xử lý), kể cả khi
 có chữ "size"/"dài"/"rộng" trong câu:
-- Khiếu nại khác, logistics, KOC/affiliate (RIÊNG giao sai/hàng lỗi-bẩn-rách: chốt 17/11/2026 CS nhắn tin đầu rồi báo Telegram, xem references/cskh-faq-17-11.md mục 13; giao thiếu: theo resend-missing-item)
+- Khiếu nại khác, logistics, KOC/affiliate (RIÊNG giao sai/hàng lỗi-bẩn-rách: **chốt 21/11/2026** khách đã gửi ảnh + lỗi rõ → CS tự chạy đủ 5 bước đổi hàng + tặng mã giảm 10k, xem [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md); khách đòi hoàn tiền / ảnh không rõ → vẫn theo quy tắc 17/11 nhắn tin đầu rồi báo Telegram, references/cskh-faq-17-11.md mục 13; giao thiếu: theo resend-missing-item)
 - Lo lắng/hỏi lại **sau khi đã đặt hàng** (vd "sợ về sẽ dài quá", "hàng có
   đúng size không") — đây là CSKH/khiếu nại, không phải tư vấn size mới
 - Đổi size cho đơn **đã lỡ đặt nhầm** (vd "mình lỡ đặt 2XL, mặc XL được
@@ -262,6 +262,11 @@ TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đ
   references/cskh-ship-faq.md.
 - **Nguồn mẫu CSKH ngoài size (master):** Google Sheet "Mau tin nhan"
   (`1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`) — đổi/trả/hoàn/deal lỗi 2 sàn.
+- **Hàng lỗi / giao nhầm mẫu, khách đã gửi ảnh (chốt 21/11/2026):** không xin ảnh
+  lại → xin lỗi + xác nhận lỗi → "hỗ trợ đổi hàng + gửi 1 mã giảm" → tin hướng dẫn
+  đổi theo sàn → gửi voucher 10k (TikTok: tab Voucher cột phải). Khách chỉ kêu hơi
+  dài/rộng thì KHÔNG phải hàng lỗi — deal cắt ngắn/cố mặc như cũ. Xem
+  [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md).
 - **CHƯA train:** sửa thông tin đơn (sai SĐT, shipper không liên hệ được) +
   khiếu nại nặng chưa có mẫu → chủ shop/PC xử lý.
 - **Không in tên SP/giá trên hộp (chốt 30/10):** từ chối khéo, nêu lý do vận

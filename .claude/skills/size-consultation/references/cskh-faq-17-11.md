@@ -120,6 +120,13 @@ mua được nhé."
 
 ## 13. Giao sai / hàng lỗi / bẩn / rách — ĐÃ CÓ hướng dẫn, dùng chính sách này (ghi chú 17/11/2026)
 
+> **CẬP NHẬT 21/11/2026:** khi khách **đã gửi ảnh** và lỗi rõ (rách/bẩn/sai mẫu-màu-size),
+> CS **tự chạy đủ luồng đổi hàng + tặng mã giảm 10k** theo
+> [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md) (ví dụ chuẩn wdat1504) — không
+> còn dừng ở "nhắn tin đầu rồi chờ anh". Phần "Phạm vi mở" bên dưới chỉ còn áp dụng cho:
+> chưa có ảnh / ảnh không rõ, khách đòi hoàn tiền (một phần hoặc toàn bộ), khiếu nại nặng.
+> Giao thiếu không đổi: vẫn `resend-missing-item`.
+
 Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`
 — tab **"Chinh sach xu ly loi"** (mức lỗi, % hoàn, mã giảm) + tab **"Mau tin nhan"**
 (câu chuẩn). Đọc dòng thật trong Sheet, không chép lại từ trí nhớ.
