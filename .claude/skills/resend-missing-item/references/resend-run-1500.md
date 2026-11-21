@@ -43,6 +43,13 @@ trong file. Khung giờ lấy hàng: chọn theo giờ hiện tại — phiên 1
 hôm nay nếu SPX còn cho, không thì sáng hôm sau; **không bao giờ chọn khung đã qua**.
 Không cần xin "ok" lần nữa: chủ shop đã duyệt lần 1 trên web (thay Hard rule cũ).
 
+**Địa chỉ trên SPX — chọn "Địa chỉ MỚI (2 cấp)", KHÔNG dừng vì "không có phường" (chốt 21/11/2026, phiếu #9 ntt1072006):**
+sau sáp nhập, SPX chỉ có Tỉnh / Phường-Xã mới (2 cấp), phường cũ (vd "Gia Cẩm") không còn trong danh sách riêng — bị gộp vào phường mới
+(vd Gia Cẩm → **Phường Việt Trì**). Cách làm: dán nguyên địa chỉ khách gửi (số nhà, đường, phường cũ, thành phố, tỉnh) vào ô **"Nhập tự động"** rồi bấm
+**"Tự động điền"**; giữ nguyên tên phường cũ trong ô **"Địa chỉ chi tiết"**; ô "Tỉnh / Phường-Xã" lấy đúng kết quả tự điền (hoặc phường mới gộp). Điền
+Điện thoại + Tên. Làm vậy là ĐÚNG, không cần hỏi chủ shop; chỉ ghi 1 dòng `▸` "địa chỉ: phường cũ X → SPX chọn phường Y" để anh đối chiếu ở duyệt 2.
+Chỉ dừng khi tỉnh/phường tự điền ra khác hẳn địa chỉ khách gửi (khác tỉnh).
+
 **A4. Ghi NGAY mã vận đơn mới** vào `spx_tracking` (và `spx_order_sn` từ URL) —
 trước mọi bước khác. Đây là điểm chống tạo trùng.
 
