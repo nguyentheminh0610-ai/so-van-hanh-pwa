@@ -126,6 +126,34 @@ Hệ thống phải tự bắt kịp, chủ shop không phải báo từng case:
   Claude/Chrome) tự báo Telegram khi: quét đánh giá/trả hàng quá 14 giờ chưa thành công; phiếu gửi bù
   đứng im > 3 giờ; phiếu chờ duyệt > 1 giờ. Nhờ `StartWhenAvailable`, sau khi PC bật lại nó chạy bù ngay.
 
+## 1c. THIẾU THÔNG TIN thì xử lý thế nào — KHÔNG để khách/phiếu chờ vô hạn (chủ shop chốt 21/11/2026)
+
+*Thay cho* các câu "chưa có ảnh → giữ `collecting`, KHÔNG ping chủ shop" ở mục 2 và "nhắc sau 24h / treo sau 72h" ở mục 5
+(2 mốc đó thay bằng mốc 4 giờ bên dưới). *Lý do:* phiếu #7 `_ciara07_` còn thiếu ảnh, #9 `ntt1072006` khách
+không gửi được SĐT trong chat TikTok → cả hai đứng im ở `collecting`, chủ shop không thấy gì trên Sổ Vận Hành.
+
+**Thông tin BẮT BUỘC để đẩy duyệt lần 1: ảnh bằng chứng + SĐT + địa chỉ.**
+**Họ tên KHÔNG cần khách gửi** — lấy luôn tên hiển thị của khách trên TikTok/Shopee làm tên người nhận
+(ghi vào file dữ liệu chốt `name`). Sàn che tên/SĐT trong đơn nên KHÔNG cố tra từ chi tiết đơn.
+
+1. **Đủ cả 3** (ảnh + SĐT + địa chỉ): ghi file dữ liệu chốt, gửi tin xác minh như mục 3, và chuyển luôn
+   `wait_approve_1` (không chờ khách trả lời "đúng") để chủ shop duyệt lần 1 ngay. `item_evidence` ghi rõ "đủ 3 thông tin,
+   tin xác minh gửi lúc HH:MM". Nếu sau đó khách sửa thông tin → ghi lại file + `data_hash` mới, ghi `owner_note`
+   "khách sửa thông tin lúc HH:MM" để chủ shop biết trước khi duyệt/ khi tạo đơn.
+2. **Thiếu 1–3 mục:** gửi NGAY 1 tin ngắn chỉ hỏi đúng mục còn thiếu (không hỏi lại mục đã có, không hỏi tên).
+   Mẫu: "Dạ bạn gửi giúp shop thêm <ảnh vỏ đơn/ảnh hàng nhận được | SĐT | địa chỉ nhận hàng> để shop gửi bù cho bạn nhanh nhé ạ".
+   Riêng SĐT bị TikTok chặn khi gõ trong chat → hướng khách chụp màn hình ghi chú điện thoại hoặc thông tin giao hàng (mẫu ở mục 2).
+3. **Mốc 4 giờ tính từ tin cuối cùng của KHÁCH** (hoặc từ tin hỏi của shop nếu khách chưa nhắn lại), mỗi lượt quét kiểm:
+   - Khách trả lời, đủ 3 mục → làm bước 1.
+   - Khách im ≥ 4 giờ (trong khoảng 4–6 giờ, lượt quét nào tới trước): (a) gửi **1 lần duy nhất** tin nhắc
+     (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <mục còn thiếu> để shop kịp gửi bù cho bạn nhé ạ";
+     (b) **đẩy phiếu lên Sổ Vận Hành để chủ shop giải quyết**: PATCH `status=stalled` (điều kiện `status=eq.collecting`),
+     `stall_reason` = `Thiếu: <mục>` (vd `Thiếu: SĐT`, `Thiếu: ảnh + địa chỉ`) + 1 câu tình hình (vd "khách im từ 14:20").
+     Phiếu hiện ở nhóm "Duyệt gửi bù" kèm cảnh báo thiếu gì, chủ shop bấm "Duyệt dù thiếu thông tin" hoặc "Dừng"; báo Telegram 1 lần/phiếu.
+   - Sau khi đã đẩy lên mà khách gửi bổ sung đủ 3 mục → PATCH `stalled` → `wait_approve_1` (điều kiện `status=eq.stalled`), bỏ `stall_reason`,
+     ghi `owner_note` "khách bổ sung lúc HH:MM"; báo Telegram để chủ shop duyệt.
+4. Mọi lượt quét (kể cả ban đêm, 1h/lần) đều áp dụng mốc 4 giờ — không bỏ qua phiếu `collecting` vì "đang ngoài giờ".
+
 ## 2. Hỏi thông tin (`collecting`)
 
 ### ⚠️ Ảnh bằng chứng — BẮT BUỘC (chủ shop chốt lại 18/11/2026)

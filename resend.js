@@ -22,7 +22,7 @@ const RESEND_STATUS = {
   wait_approve_2: 'Chờ anh duyệt lần 2',
   finalizing:     'Đang ghi Sổ Kho + nhắn khách',
   done:           'Xong',
-  stalled:        'Treo',
+  stalled:        'Treo / thiếu thông tin',
   blocked:        'Anh đã chặn',
   cancelled:      'Đã dừng',
 };
@@ -103,7 +103,8 @@ function resendCardHtml(row){
     + '<span class="cust">Khách <b>' + esc(row.handle) + '</b></span>'
     + '<span class="code">' + esc(row.orig_order_code) + '</span>'
     + (row.confirm_slot === 'tomorrow' ? '<span class="tag why">đi ngày mai</span>' : '')
-    + (row.approved_override ? '<span class="tag why">duyệt dù khách chưa xác nhận</span>' : '');
+    + (row.approved_override ? '<span class="tag why">duyệt dù khách chưa xác nhận</span>' : '')
+    + (row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? '<span class="tag why">⚠ ' + esc(row.stall_reason.split(/[·—\n]/)[0].trim()) + '</span>' : '');
   const body = [
     '<div class="rs-item">Thiếu: <b>' + esc(row.item_summary) + '</b>'
       + (conf ? ' <span class="rs-conf ' + conf.cls + '">' + esc(conf.label) + '</span>' : '') + '</div>',
@@ -126,7 +127,7 @@ function resendCardHtml(row){
     btns = resendBtn('Duyệt lần 2', 'ok', 'approve2', row)
       + resendBtn('Chưa ổn', 'stop', 'block', row);
   } else if (row.status === 'verifying' || row.status === 'stalled'){
-    btns = resendBtn('Duyệt dù khách chưa xác nhận', 'edit', 'override', row)
+    btns = resendBtn(row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? 'Duyệt dù thiếu thông tin' : 'Duyệt dù khách chưa xác nhận', 'edit', 'override', row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
     btns = resendBtn('Dừng', 'stop', 'stop', row);
