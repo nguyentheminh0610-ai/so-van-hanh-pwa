@@ -555,6 +555,9 @@
   .rs-body{ margin-top:5px; }
   .rs-item{ font-size:13px; }
   .rs-sub{ font-size:12px; color:var(--ink-soft); margin-top:3px; line-height:1.45; }
+  .rs-checks{ display:flex; gap:12px; margin-top:6px; font-size:13px; font-weight:700; }
+  .rs-chk.y{ color:var(--good); }
+  .rs-chk.n{ color:var(--bad, #c0392b); }
   .rs-faint{ color:var(--ink-faint); }
   .rs-conf{ font-size:11px; font-weight:700; border-radius:5px; padding:1px 7px; }
   .rs-conf.ok{ background:var(--good-soft, #e3f5ea); color:var(--good); }

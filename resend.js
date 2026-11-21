@@ -118,6 +118,26 @@ function resendBtn(label, cls, action, row, extra){
   return '<button class="btn-rs ' + cls + '" data-act="' + action + '" data-id="' + esc(String(row.id)) + '"' + (extra || '') + '>' + esc(label) + '</button>';
 }
 
+// 3 dấu ✓/✗ thay cho các dòng chú thích nhỏ (chốt 21/11/2026): SĐT / địa chỉ / ảnh bằng chứng.
+// Không có cột riêng → suy từ recipient_masked + stall_reason ("Thiếu: ảnh + SĐT..." do task ghi).
+function resendChecklist(r){
+  const why = /^\s*thiếu/i.test(r.stall_reason || '') ? r.stall_reason : '';
+  const masked = r.recipient_masked || '';
+  const parts = masked.split('·').map(x => x.trim()).filter(Boolean);
+  const hasPhoneData = /\d[\d*\s]{6,}\d/.test(masked);
+  const addrPart = parts.find(x => /\/|,/.test(x) && !/\d[\d*]{6,}/.test(x));
+  const early = r.status === 'collecting';
+  return [
+    { label: 'SĐT',     ok: hasPhoneData && !/sđt|sdt|số điện thoại/i.test(why) },
+    { label: 'Địa chỉ', ok: !!addrPart && !/địa chỉ/i.test(why) },
+    { label: 'Ảnh',     ok: !/ảnh/i.test(why) && !(early && !why) },
+  ];
+}
+function resendChecklistHtml(r){
+  return '<div class="rs-checks">' + resendChecklist(r).map(c =>
+    '<span class="rs-chk ' + (c.ok ? 'y' : 'n') + '">' + (c.ok ? '✓' : '✗') + ' ' + c.label + '</span>').join('') + '</div>';
+}
+
 function resendCardHtml(row){
   const plat = cskhPlatName(row.platform);
   const dl = resendDeadline(row);
@@ -133,9 +153,7 @@ function resendCardHtml(row){
   const body = [
     '<div class="rs-item">Thiếu: <b>' + esc(row.item_summary) + '</b>'
       + (conf ? ' <span class="rs-conf ' + conf.cls + '">' + esc(conf.label) + '</span>' : '') + '</div>',
-    row.item_evidence ? '<div class="rs-sub">' + esc(row.item_evidence) + '</div>' : '',
-    row.order_items ? '<div class="rs-sub">Đơn gốc có: ' + esc(row.order_items) + '</div>' : '',
-    row.recipient_masked ? '<div class="rs-sub">Người nhận: ' + esc(row.recipient_masked) + ' <span class="rs-faint">(đầy đủ ở tin Telegram)</span></div>' : '',
+    resendChecklistHtml(row),
   ].join('');
 
   let extra = '', btns = '';
@@ -159,7 +177,7 @@ function resendCardHtml(row){
       + resendBtn('Dừng', 'stop', 'stop', row);
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'
-    + (row.stall_reason && (row.status === 'stalled' || resendMissing(row)) ? ' · <b>' + esc(row.stall_reason) + '</b>' : '')
+    + (row.stall_reason && row.status === 'stalled' ? ' · <b>' + esc(row.stall_reason) + '</b>' : '')
     + (cskhProgressStripped(row.owner_note) ? ' · ghi chú: ' + esc(cskhProgressStripped(row.owner_note)) : '')
     + (row.last_error && row.status !== 'done' ? ' · <span class="rs-bad">lỗi gần nhất: ' + esc(row.last_error) + '</span>' : '');
   return '<div class="fi compact rs-card' + (dl.late ? ' rs-late' : '') + '" data-id="' + esc(String(row.id)) + '">'
