@@ -240,3 +240,10 @@ vẫn không rõ thì hỏi lại 1 câu ngắn "Thông tin trên đã đúng ch
 
 Lỗi lặp, kẹt hộp quyền, đọc ảnh không ra, SĐT không khớp phần che → báo Telegram
 1 tin ngắn nêu rõ case nào, lỗi gì; đặt `stalled` nếu không tự gỡ được.
+
+## Khách gửi SĐT bằng ẢNH chụp màn hình = ĐÃ gửi SĐT (chốt 21/11/2026, case #9 ntt1072006)
+
+TikTok chặn khách gõ SĐT trong chat; khách làm theo hướng dẫn thì chụp màn hình rồi gửi ảnh ("số điện thoại em ko gửi
+dc, shop xem ảnh giúp em"). Lượt quét 20/11 22:15 hiểu nhầm thành "khách từ chối gửi SĐT". Quy tắc: tin ảnh của khách luôn
+PHẢI mở ra đọc (phóng to) — thấy SĐT/địa chỉ trong ảnh thì tính là đã có. Đọc không ra số thì KHÔNG ghi "khách từ chối";
+ghi "SĐT nằm trong ảnh, task đọc không ra — chủ shop mở chat xem" và đẩy lên Sổ Vận Hành.
