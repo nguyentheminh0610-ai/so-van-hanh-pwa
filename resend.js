@@ -50,6 +50,7 @@ function resendOverrideBtn(r){
 // Khách chưa phản hồi sau 4h kể từ lần task hỏi/cập nhật gần nhất (hoặc đã nhắc mà vẫn chưa đủ)
 function resendSilentHtml(r){
   if (!resendMissing(r)) return '';
+  if (cskhProgressParse(r.owner_note).length) return '';   // đã có dòng tiến độ → không hiện dòng suy đoán cũ
   const hrs = (Date.now() - new Date(r.updated_at).getTime()) / 3600000;
   if (r.msg_remind_at) return '<div class="rs-sub rs-bad">⚠ Đã hỏi và nhắc khách 1 lần, khách vẫn chưa gửi đủ — anh vào xử lý (' + (resendOverrideOk(r) ? 'duyệt dù thiếu ảnh hoặc dừng' : 'chưa duyệt được vì thiếu SĐT/địa chỉ — hỏi lại khách hoặc dừng') + ').</div>';
   return hrs >= 4
