@@ -62,7 +62,9 @@ Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_orde
   - `done`: gửi lại mã vận đơn + link `https://spx.vn/track?<mã>`.
   - Món khác cùng đơn: cùng trạng thái trước `approved` → sửa `item_summary` gộp
     cả món; sau đó → mở dòng phụ (`handle` giữ nguyên, `orig_order_code` thêm
-    hậu tố `-2`) và ghi `owner_note` "liên quan case <id>".
+    hậu tố `-2`) và ghi `owner_note` "liên quan case <id>". **Chép luôn dòng `☑` của
+    case gốc sang dòng phụ** (chốt 21/11/2026) — cùng khách cùng đơn thì SĐT/địa chỉ
+    đã có ở phiếu gốc vẫn dùng được, KHÔNG hỏi lại chỉ vì mở phiếu mới.
 - **Chưa có** → còn kiểm Sổ Kho (`warehouse_notices?category=eq.gui_don_bu` có nội
   dung chứa mã đơn gốc chưa) và lịch sử chat. Có rồi → không mở case, báo chủ shop.
 - Insert dòng mới `status=collecting`. Bị lỗi 409 (trùng khoá) = lượt khác vừa mở,
