@@ -245,7 +245,7 @@ Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn x
    the "Nhập tự động" box and click "Dán và nhập tự động" (label flips to
    "Tự động điền" after first use) — it parses phone/name/address and
    even auto-selects the right Tỉnh/Phường for the "Địa chỉ MỚI (2 cấp)"
-   format. Double check the parsed fields rather than assuming it's
+   format (phường cũ đã gộp vào phường mới, vd Gia Cẩm → Phường Việt Trì — đây là ĐÚNG, xem resend-run-1500.md). Quick-check the parsed fields (số điện thoại, tên, tỉnh) rather than second-guessing the ward; it is
    perfect.
 3. **"6. Thông tin gửi hàng" → "Thời gian lấy hàng" dropdown defaults to
    *today as of whenever the page first loaded in this session*.** If

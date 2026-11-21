@@ -37,6 +37,10 @@ tính SHA-256, so với `data_hash`. Không khớp / thiếu file → `status=st
 `stall_reason='dữ liệu chốt không khớp'`, Telegram, sang case khác. **Tạo đơn chỉ
 chép từ file này**, không đọc lại ảnh hay suy luận lại.
 
+**Giá sản phẩm (ô "giá sản phẩm" ở mục 4 của form SPX) — KHÔNG dừng vì thiếu giá (chốt 21/11/2026, phiếu #9):** lấy `price` trong file chốt; file
+cũ chưa có `price` thì lấy GIÁ BÁN của món thiếu trên đơn gốc (khung đơn hàng chat / trang chi tiết đơn, vd Chất Lông-Đốm Hồng L = 150284) × số lượng.
+Chỉ dừng + báo `[chờ anh]` khi không đọc ra được giá từ đơn gốc. Ghi dòng `▸` "khai giá <số> theo giá món trên đơn gốc" để anh thấy ở duyệt 2.
+
 **A3. Tạo đơn SPX** (Chrome VÀNG — chọn bằng deviceId, xem
 `.claude/shared/reference_chrome_browsers.md`) theo Step 3 của SKILL.md với dữ liệu
 trong file. Khung giờ lấy hàng: chọn theo giờ hiện tại — phiên 15h thì chọn khung
