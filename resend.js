@@ -160,7 +160,7 @@ function resendChecklist(r){
   if (r.stall_reason) lines.push(r.stall_reason);
   cskhProgressParse(r.owner_note).slice().reverse().forEach(e => lines.push(e.text));
   const segs = [];
-  lines.forEach(t => String(t).toLowerCase().split(/[.;\n,—]| - /).forEach(s => segs.push(s)));
+  lines.forEach(t => String(t).toLowerCase().split(/[.;\n,—]| - | nhưng | nhung | còn | con | mà | ma /).forEach(s => segs.push(s)));
   const judge = (re) => {
     for (const s of segs){
       if (!re.test(s)) continue;
