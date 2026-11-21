@@ -292,7 +292,7 @@ hoặc đơn có nhiều món cùng loại; low = đoán), `item_evidence` (1-2 
 1. Ghi **file dữ liệu chốt** cục bộ (NGOÀI git): `C:\sokho\resend-data\<platform>_<handle>_<mã đơn gốc>.json`
    với `name`, `phone` (dạng liền, vd `0900000000`), `address`, `item_name`
    (tên sản phẩm SPX theo `.claude/shared/notice_naming.md`), `item_summary`,
-   `qty`, `orig_order_code`, `orig_tracking`.
+   `qty`, **`price`** (giá bán 1 món thiếu trên đơn gốc, số nguyên đồng, vd 150284 — SPX bắt khai "giá sản phẩm"), `orig_order_code`, `orig_tracking`.
 2. Gửi tin xác minh (mẫu "Tin xác minh") — các trường lấy từ **chính file này**.
 3. PATCH: `status=wait_approve_1`, `run_date` = hôm nay, `customer_confirmed_at` = null, `msg_verify_at`, `item_*`, `recipient_masked`,
    `orig_tracking`, `data_hash` = SHA-256 của file
