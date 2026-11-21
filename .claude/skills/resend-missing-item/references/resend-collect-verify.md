@@ -156,6 +156,30 @@ cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo 
 `message_note` của dòng `cskh_reviews` (web đổi dòng cảnh báo thành "khách đã phản hồi — anh mở chat xem"). Không nhắc khách lần 2.
 **Trả hàng thường:** chỉ nhắn khách 1 lần, không theo dõi, không nhắc.
 
+## 1f. KHÔNG TỰ DỪNG ĐỂ CHỜ CHỦ SHOP; DẤU ✓/✗ CHO WEB (chốt 21/11/2026)
+
+*Lý do:* phiếu #9 `ntt1072006` dừng ở `[chờ anh]` vì khách nói thiếu "đốm hồng size L" mà task thấy đơn "không có mẫu đốm hồng" —
+nhưng task mới xem 2/3 món (web ghi "+1 mặt hàng (chưa xem)"), món thứ 3 chưa mở. Phiếu #8 cũng đứng ở `[chờ anh]` vì khách bấm hoàn tiền.
+Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừng".
+
+1. **Món thiếu không khớp đơn → TRƯỚC HẾT mở đủ MỌI món của đơn gốc** (kể cả mặt hàng bị gập/ẩn) rồi so lại. Vẫn không khớp thì
+   HỎI KHÁCH 1 câu kèm danh sách món để khách chọn (mục 1c). KHÔNG chuyển sang `[chờ anh]` chỉ vì "chưa rõ món".
+2. `[chờ anh]` chỉ dùng cho việc đúng là quyền chủ shop: 2 lần duyệt, hoàn tiền/tranh chấp, đọc ảnh không ra. Phiếu `collecting` mà
+   dòng cuối là `[chờ anh]` thì web đưa vào nhóm "Duyệt gửi bù" (đừng ghi `stall_reason` không dấu: phải là `Thiếu: ...` có dấu).
+3. **Dòng dấu tích cho web:** mỗi lần cập nhật phiếu, thêm/ghi lại dòng riêng trong `owner_note` (dòng CUỐI thắng):
+   `☑ sdt=1 diachi=1 anh=0` (1 = đã có, 0 = chưa). SĐT/địa chỉ chỉ tính 1 khi ĐỦ dùng để tạo đơn (địa chỉ có phường/xã + tỉnh).
+   Web hiện thành "✓ SĐT ✓ Địa chỉ ✗ Ảnh"; không có dòng này thì web tự đoán (kém chính xác).
+4. **Chỉ "xong" khi khách NHẬN được đơn gửi bù** (chủ shop chốt 21/11/2026), không phải lúc nhắn mã vận đơn. Hiện bước này CHƯA
+   tự động: sau khi nhắn mã vận đơn phiếu đang chuyển `done`. Việc cần làm tiếp: theo dõi trạng thái SPX tới "đã giao" rồi mới `done`.
+
+5. **MỌI đơn liên quan giao thiếu phải hiện trên sổ (chủ shop bắt buộc, 21/11/2026)** — từ chat, đánh giá, trả hàng, hay khách tự bấm
+   hoàn tiền/khiếu nại trên sàn: phải có phiếu `resend_cases` + dòng `▸` đầu tiên, không bỏ sót. Khách ĐÃ bấm "Hoàn tiền / Trả hàng và hoàn tiền"
+   vì thiếu hàng (vd #8 obe9hvmo5o, Shopee 165.000đ) → thêm dòng riêng `⚑ hoantien=1` vào `owner_note` + dòng `▸ [chờ anh]` nói rõ
+   số tiền, giờ khách bấm, khách hỏi gì; web hiện nhãn đỏ "Khách đang yêu cầu hoàn tiền vì thiếu". Chủ shop vào kiểm rồi quyết hoàn tiền hay gửi bù.
+   Hết yêu cầu hoàn tiền (khách rút) thì ghi `⚑ hoantien=0`.
+6. **Mẫu thiếu mà đơn có 3 món (phiếu #9, 21/11/2026):** chủ shop xác nhận món thiếu `Chất Lông-Đốm Hồng L` CÓ trong đơn (món thứ 3, bị ẩn sau
+   nút "Ẩn bớt/Xem thêm" ở khung đơn hàng chat TikTok). Phải bấm mở rộng danh sách mặt hàng trước khi kết luận "đơn không có món X".
+
 ## 2. Hỏi thông tin (`collecting`)
 
 ### ⚠️ Ảnh bằng chứng — BẮT BUỘC (chủ shop chốt lại 18/11/2026)
