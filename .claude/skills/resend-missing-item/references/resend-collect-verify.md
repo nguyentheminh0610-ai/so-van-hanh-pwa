@@ -94,6 +94,38 @@ Quy tắc, áp dụng MỌI lượt quét (cả 4 task CSKH), TRƯỚC khi phân
 5. Mỗi lượt quét đầu tiên trong ngày liệt kê các phiếu mở, ghi vào `cskh-log` dòng
    "phiếu #<id> <handle> <status> — việc tiếp theo: ..." để lượt sau không phải đoán.
 
+## 1c. Thiếu / chưa rõ thông tin → HỎI LẠI KHÁCH ĐÚNG 1 CÂU, không để phiếu đứng im (chốt 21/11/2026)
+
+*Lý do:* phiếu #9 `ntt1072006` (20/11) khách gửi tên + địa chỉ + ảnh nhưng chưa có SĐT, phiếu đứng
+im 14 giờ không ai hỏi; phiếu #8 `obe9hvmo5o` khách gửi đủ từ 19/11 11:02 nhưng không ai chạy bước
+xác minh, đứng 57 giờ. Chủ shop: "thiếu SĐT hoặc địa chỉ khách chưa gửi hoặc em chưa rõ thì hỏi lại khách 1 câu",
+không để chủ shop phải vào kiểm tay từng case.
+
+Mỗi lần đọc phiếu `collecting` (mọi lượt quét), đối chiếu 5 mục: ảnh bằng chứng, món thiếu,
+họ tên, SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành).
+- **Thiếu hoặc chưa rõ mục nào → gửi NGAY 1 tin ngắn chỉ hỏi đúng mục đó** (gộp nhiều mục trong
+  1 tin, không hỏi lại phần khách đã gửi, không chờ lượt sau). Vd: "Dạ bạn cho shop xin thêm số điện thoại
+  nhận hàng để shop tạo đơn gửi bù cho bạn nhé ạ."; địa chỉ thiếu phường/xã: "Dạ bạn cho shop xin địa chỉ
+  đầy đủ gồm số nhà, phường/xã, tỉnh/thành để shop gửi đúng chỗ ạ."
+- Món thiếu chưa rõ → hỏi 1 câu kèm danh sách món của đơn để khách chọn (như mục 1b.3).
+- **TikTok chặn gửi SĐT trong chat** (khách báo gửi không được): hỏi 1 lần "Dạ bạn gõ số điện thoại cách
+  bằng dấu chấm hoặc dấu cách giúp shop (vd 09.12.345.678) được không ạ". Khách vẫn không gửi được →
+  KHÔNG im lặng: ghi `owner_note` "khách không gửi được SĐT trong chat TikTok", bật Telegram cho chủ shop
+  1 lần để quyết định (đọc SĐT từ đơn nếu xem được, hoặc duyệt khi có SĐT che một phần).
+- Mỗi mục thiếu chỉ hỏi **1 lần**; hỏi rồi mà khách im thì theo mục 5 (nhắc 24h, treo 72h), không spam.
+- Cờ chống trùng: đặt `msg_remind_at` (hoặc cột tương ứng) lên TRƯỚC khi gửi.
+- Đủ 5 mục → chuyển ngay mục 3 (gửi tin xác minh), không chờ lượt sau.
+
+## 1d. Chạy bù sau khi PC tắt / mất điện (chốt 21/11/2026)
+
+Hệ thống phải tự bắt kịp, chủ shop không phải báo từng case:
+- Mọi lượt CSKH inbox (ngày/tối/đêm) ở Bước 0a **luôn** tra `resend_cases` phiếu `collecting`/`verifying`
+  mà `updated_at` cũ hơn 30 phút và xử lý theo 1b + 1c, kể cả khi 2 inbox đều "0 chưa trả lời" (khách
+  có thể đã trả lời xong từ trước và tin đã bị đánh dấu đã đọc).
+- Windows Task Scheduler `Claude - Watchdog` (`scripts/watchdog.py`, 30 phút/lần, 0 token, không cần
+  Claude/Chrome) tự báo Telegram khi: quét đánh giá/trả hàng quá 14 giờ chưa thành công; phiếu gửi bù
+  đứng im > 3 giờ; phiếu chờ duyệt > 1 giờ. Nhờ `StartWhenAvailable`, sau khi PC bật lại nó chạy bù ngay.
+
 ## 2. Hỏi thông tin (`collecting`)
 
 ### ⚠️ Ảnh bằng chứng — BẮT BUỘC (chủ shop chốt lại 18/11/2026)
