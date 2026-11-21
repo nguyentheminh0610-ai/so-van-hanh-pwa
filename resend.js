@@ -278,7 +278,7 @@ function resendCardHtml(row){
       + resendOverrideBtn(row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
-    btns = (resendOwnerWait(row) ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
+    btns = (resendOwnerWait(row) && !resendRefundFlag(row) ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
       + (resendMissing(row) ? resendOverrideBtn(row) : '')
       + resendBtn('Dừng', 'stop', 'stop', row);
   }
