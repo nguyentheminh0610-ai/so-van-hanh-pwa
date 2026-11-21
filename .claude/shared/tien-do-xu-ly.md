@@ -14,7 +14,7 @@ Mỗi lần task LÀM hoặc ĐỔI TRẠNG THÁI một việc → **thêm 1 dò
 Định dạng 1 dòng (giữ nguyên dấu `▸` và `·`, giờ Việt Nam):
 
 ```
-▸ 21/11 10:34 · [chờ khách] Đã gửi tin xác minh — chờ khách xác nhận
+▸ 21/11 10:34 · [chờ khách] Đã hỏi khách xin nốt địa chỉ — chờ khách trả lời
 ```
 
 Nhãn trạng thái (đúng 1 trong 4): `[đang làm]` task đang xử lý · `[chờ khách]` đã nhắn, chờ khách trả lời ·
@@ -32,12 +32,11 @@ Web (cskh.js `cskhProgressHtml`) tự: hiện bước cuối + lịch sử, và 
 1. `[đang làm]` Phát hiện khách báo thiếu (nguồn: chat/đánh giá/trả hàng) — đang xin ảnh + SĐT + địa chỉ
 2. `[chờ khách]` Đã hỏi <thứ thiếu> lúc HH:MM — đang chờ khách (cập nhật mỗi lần khách gửi thêm 1 phần: "đã có SĐT, đang xin nốt địa chỉ")
 3. `[chờ khách]` Đã nhắc khách lần 2 (sau 4 giờ) — vẫn thiếu <...>
-4. `[chờ anh]` Đã gửi khách xác minh — chờ anh duyệt lần 1 (khách trả lời "đúng" trước thì tự chạy; chốt 21/11/2026, xem 1g resend-collect-verify.md)
-5. `[đang làm]` Khách đã xác nhận (hoặc anh đã duyệt) — đang tạo đơn SPX
-6. `[đang làm]` Đã duyệt lần 1 — chờ phiên 15h tạo đơn SPX
-7. `[chờ anh]` Đã tạo đơn <mã vận đơn> — chờ anh duyệt lần 2
-8. `[đang làm]` Đã duyệt lần 2 — đang ghi Sổ Kho + nhắn khách mã vận đơn
-9. `[xong]` Đã nhắn khách mã vận đơn <mã>
+4. `[chờ anh]` Đủ thông tin (ảnh + SĐT + địa chỉ + món) — chờ anh duyệt lần 1 (KHÔNG xác minh với khách, chốt 21/11/2026, mục 1h)
+5. `[đang làm]` Anh đã duyệt lần 1 — đang tạo đơn SPX
+6. `[chờ anh]` Đã tạo đơn <mã vận đơn> — chờ anh duyệt lần 2
+7. `[đang làm]` Đã duyệt lần 2 — đang ghi Sổ Kho + nhắn khách mã vận đơn
+8. `[xong]` Đã nhắn khách mã vận đơn <mã>
 
 **Đánh giá xấu (1–3★)** (ghi vào `cskh_reviews.message_note`):
 1. `[chờ khách]` Đã nhắn tin 1 hỏi lý do lúc HH:MM

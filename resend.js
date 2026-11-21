@@ -16,7 +16,7 @@ let resendRows = null;
 const RESEND_STATUS = {
   collecting:     'Đang hỏi thông tin khách',
   verifying:      'Chờ khách xác nhận thông tin',
-  wait_approve_1: 'Đã gửi khách xác minh · chờ anh duyệt lần 1 (khách trả lời "đúng" trước thì tự chạy)',
+  wait_approve_1: 'Đủ thông tin · chờ anh duyệt lần 1',
   approved:       'Đã duyệt lần 1 — đang tạo đơn',
   creating:       'Đang tạo đơn SPX',
   wait_approve_2: 'Chờ anh duyệt lần 2',
@@ -191,7 +191,7 @@ function resendChecklistHtml(r){
 
 // ---- THANH TIẾN ĐỘ 6 BƯỚC (chốt 21/11/2026, thay cho đoạn "Tiến độ:" dài) -----------------------------
 // Bước hiện tại suy từ status + cột có sẵn, KHÔNG phụ thuộc câu chữ task ghi → không sai khi task đổi cách viết.
-const RESEND_STEPS = ['Hỏi thông tin', 'Xác minh + duyệt 1', 'Tạo đơn SPX', 'Duyệt lần 2', 'Ghi sổ + nhắn khách', 'Xong'];
+const RESEND_STEPS = ['Hỏi thông tin', 'Duyệt lần 1', 'Tạo đơn SPX', 'Duyệt lần 2', 'Ghi sổ + nhắn khách', 'Xong'];
 function resendStepIndex(r){
   switch (r.status){
     case 'collecting': return 0;
@@ -205,7 +205,7 @@ function resendStepIndex(r){
 }
 function resendHolder(r){
   if (['done', 'cancelled'].includes(r.status)) return '';
-  if (r.status === 'wait_approve_1' || r.status === 'verifying') return 'anh duyệt hoặc khách xác nhận';
+  if (r.status === 'wait_approve_1' || r.status === 'verifying') return 'anh duyệt';
   if (r.status === 'wait_approve_2') return 'anh duyệt';
   if (r.status === 'stalled' || r.status === 'blocked') return 'anh xử lý';
   const ev = cskhProgressParse(r.owner_note), st = ev.length ? ev[ev.length - 1].state : '';
@@ -274,12 +274,10 @@ function resendCardHtml(row){
     btns = resendBtn('Duyệt lần 2', 'ok', 'approve2', row)
       + resendBtn('Chưa ổn', 'stop', 'block', row);
   } else if (row.status === 'verifying' || row.status === 'stalled'){
-    btns = (row.status === 'stalled' ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
-      + resendOverrideBtn(row)
+    btns = resendOverrideBtn(row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
-    btns = (resendOwnerWait(row) && !resendRefundFlag(row) ? resendBtn('Món đúng rồi — chạy tiếp', 'ok', 'confirmitem', row) : '')
-      + (resendMissing(row) ? resendOverrideBtn(row) : '')
+    btns = (resendMissing(row) ? resendOverrideBtn(row) : '')
       + resendBtn('Dừng', 'stop', 'stop', row);
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'
@@ -323,24 +321,9 @@ const RESEND_ACTIONS = {
               body: () => ({ status: 'approved', approved_override: true, approved_at: new Date().toISOString() }) },
   stop:     { from: ['collecting', 'verifying', 'wait_approve_1', 'approved', 'stalled'], ask: 'Lý do dừng case này (ghi chú, có thể bỏ trống):',
               body: (note) => ({ status: 'cancelled', owner_note: note || null }) },
-  edit:     { from: ['wait_approve_1'], ask: 'Món thiếu đúng là gì? (vd: Chất Lông-Shin 02 - size M - SL 1). Em sẽ gửi lại tin xác minh cho khách với món mới.', required: true,
-              body: (note) => ({ status: 'collecting', item_summary: note, item_confidence: 'high', owner_note: 'Anh sửa món → gửi lại tin xác minh', data_hash: null,
+  edit:     { from: ['wait_approve_1'], ask: 'Món thiếu đúng là gì? (vd: Chất Lông-Shin 02 - size M - SL 1). Task sẽ ghi lại dữ liệu và đưa phiếu lại chờ duyệt lần 1.', required: true,
+              body: (note) => ({ status: 'collecting', item_summary: note, item_confidence: 'high', owner_note: 'Anh sửa món → task ghi lại dữ liệu, đưa lại chờ duyệt lần 1', data_hash: null,
                                  customer_confirmed_at: null, confirm_slot: null, run_date: null, msg_verify_at: null, msg_ack_at: null }) },
-  // Anh xác nhận món thiếu để task chạy tiếp (chốt 21/11/2026, phiếu #9): task từng dừng ở [chờ anh] vì "đơn không có món X"
-  // trong khi đơn có món đó. Nút này gỡ chặn: xoá lý do treo, ghi 1 dòng tiến độ [đang làm], GIỮ nguyên mọi dòng cũ + dòng ☑.
-  confirmitem: { from: ['collecting', 'stalled'], ask: 'Món khách thiếu đúng là gì? (bỏ trống = giữ món đang ghi). Task sẽ gửi tin xác minh cho khách + chuyển sang chờ duyệt, không chờ anh nữa.',
-    body: (note, row) => {
-      row = row || {};
-      const d = new Date(), p2 = n => String(n).padStart(2, '0');
-      const item = note || row.item_summary || '';
-      const keep = String(row.owner_note || '').split('\n').filter(l => l.trim());
-      const chk = keep.filter(l => /^\s*☑/.test(l)).pop();
-      const rest = keep.filter(l => !/^\s*☑/.test(l));
-      rest.push('▸ ' + p2(d.getDate()) + '/' + p2(d.getMonth() + 1) + ' ' + p2(d.getHours()) + ':' + p2(d.getMinutes())
-        + ' · [đang làm] Chủ shop xác nhận món thiếu: ' + item + ' — đơn có món này; task gửi tin xác minh cho khách + chuyển chờ duyệt, KHÔNG chờ anh quyết mẫu nữa');
-      if (chk) rest.push(chk);
-      return { stall_reason: null, item_summary: item, item_confidence: 'high', owner_note: rest.join('\n') };
-    } },
   approve2: { from: ['wait_approve_2'], body: () => ({ status: 'finalizing', approved2_at: new Date().toISOString() }) },
   block:    { from: ['wait_approve_2'], ask: 'Chỗ nào chưa ổn? (em sẽ không ghi Sổ Kho / không nhắn khách)', required: true,
               body: (note) => ({ status: 'blocked', owner_note: note }) },

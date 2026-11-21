@@ -89,7 +89,7 @@ Quy tắc, áp dụng MỌI lượt quét (cả 4 task CSKH), TRƯỚC khi phân
 1. **Tra `resend_cases` theo `platform` + `handle` của khách** (status `collecting` /
    `verifying` / `wait_approve_*`). Có phiếu mở → tin mới của khách (SĐT, địa chỉ, họ tên,
    ảnh, "đúng rồi", "ok", tên món...) là CÂU TRẢ LỜI cho phiếu đó. **Cấm** xếp vào `khac` /
-   "không rõ ngữ cảnh" / bỏ qua. Làm tiếp từ mục 2 (đang `collecting`) hoặc mục 4 (đang `wait_approve_1`, khách trả lời xác minh).
+   "không rõ ngữ cảnh" / bỏ qua. Làm tiếp từ mục 2 (đang `collecting`) hoặc mục 1h (đang `wait_approve_1`: ghi nhận tin mới, không nhắn lại).
 2. **Tin chỉ có SĐT / địa chỉ rời** vẫn đọc và ghi nhận. Chưa đủ thì chỉ hỏi phần còn thiếu
    bằng 1 tin ngắn, không hỏi lại phần khách đã gửi.
 3. **Món thiếu chưa rõ** (vd đơn có 2 cái cùng phân loại): đừng treo. Hỏi khách 1 câu ngắn
@@ -145,15 +145,14 @@ cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo 
 **Cần đủ 3 thứ: ảnh bằng chứng + SĐT + địa chỉ.** Họ tên KHÔNG cần khách gửi — lấy tên hiển thị của khách trên sàn.
 Ảnh chụp màn hình có SĐT/địa chỉ = đã gửi (xem mục cuối file). Sàn che tên/SĐT trong đơn nên KHÔNG tra từ đơn.
 
-**Quy trình (theo mục 1h, chốt 21/11/2026 — chạy SONG SONG, không tuần tự như bản cũ):** hỏi khách phần thiếu → có đủ SĐT + địa chỉ →
-GỬI TIN XÁC MINH cho khách + ĐỒNG THỜI `wait_approve_1` để chủ shop duyệt → bên nào đến trước (chủ shop duyệt / khách nói "đúng") thì tạo đơn luôn → duyệt lần 2.
+**Quy trình (theo mục 1h, chốt 21/11/2026 — BỎ xác minh với khách):** hỏi khách phần thiếu → đủ ảnh + SĐT + địa chỉ + món → ghi file dữ liệu + `wait_approve_1`
+→ chủ shop duyệt lần 1 → tạo đơn → chủ shop duyệt lần 2. Chủ shop chỉ làm 2 lần duyệt.
 
 1. **Thiếu SĐT hoặc địa chỉ:** KHÔNG có đường tắt, chủ shop KHÔNG duyệt dù thiếu được (không có gì để tạo đơn).
    Gửi NGAY 1 tin hỏi đúng thứ thiếu, ghi `stall_reason` = `Thiếu: SĐT` / `Thiếu: địa chỉ` (kèm ảnh nếu thiếu cả ảnh), giữ `collecting`.
    Web hiện phiếu ở nhóm "Duyệt gửi bù" với dòng "Thiếu…" + "đã hỏi khách / chưa phản hồi sau N giờ"; chỉ có nút "Dừng".
-2. **Chỉ thiếu ẢNH** (đã có SĐT + địa chỉ): vẫn phải gửi tin hỏi ảnh (mục 2) VÀ gửi tin xác minh thông tin (mục 3) như thường;
-   ghi `stall_reason` = `Thiếu: ảnh`. Web hiện thêm nút "Duyệt dù thiếu ảnh" → chủ shop duyệt luôn không cần chờ ảnh, nhưng
-   quy trình xác minh với khách vẫn chạy; khách sửa thông tin thì ghi lại file dữ liệu + `data_hash` + `owner_note`.
+2. **Chỉ thiếu ẢNH** (đã có SĐT + địa chỉ): gửi tin hỏi ảnh (mục 2), ghi `stall_reason` = `Thiếu: ảnh`, giữ `collecting`. Web hiện nút
+   "Duyệt dù thiếu ảnh" → chủ shop duyệt luôn không cần chờ ảnh; khi đó task vẫn ghi file dữ liệu + `data_hash` rồi tạo đơn như bình thường.
 3. **Khách im ≥ 4 giờ** (tính từ tin hỏi của shop hoặc tin cuối của khách; lượt quét nào tới trước trong khoảng 4–6 giờ):
    nhắc khách **1 lần duy nhất** (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <thứ còn thiếu> để
    shop kịp gửi bù cho bạn nhé ạ". Web tự hiện cảnh báo "khách chưa phản hồi" — KHÔNG Telegram, KHÔNG đổi sang `stalled`.
