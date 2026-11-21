@@ -33,6 +33,20 @@ const RESEND_CONF = {
   low:    { label: 'chưa chắc — anh kiểm lại món', cls: 'low' },
 };
 
+// Phiếu đang hỏi khách mà còn thiếu thông tin (task ghi "Thiếu: ảnh + SĐT" vào stall_reason)
+function resendMissing(r){
+  return r.status === 'collecting' && /^\s*thiếu/i.test(r.stall_reason || '');
+}
+// Khách chưa phản hồi sau 4h kể từ lần task hỏi/cập nhật gần nhất (hoặc đã nhắc mà vẫn chưa đủ)
+function resendSilentHtml(r){
+  if (!resendMissing(r)) return '';
+  const hrs = (Date.now() - new Date(r.updated_at).getTime()) / 3600000;
+  if (r.msg_remind_at) return '<div class="rs-sub rs-bad">⚠ Đã hỏi và nhắc khách 1 lần, khách vẫn chưa gửi đủ — anh vào xử lý (duyệt dù thiếu hoặc dừng).</div>';
+  return hrs >= 4
+    ? '<div class="rs-sub rs-bad">⚠ Đã hỏi khách, <b>chưa phản hồi</b> sau ' + Math.floor(hrs) + ' giờ.</div>'
+    : '<div class="rs-sub">Đã hỏi khách, đang chờ khách gửi (mốc 4 giờ).</div>';
+}
+
 function resendMinText(m){
   if (m < 60) return m + ' phút';
   const h = Math.floor(m / 60), r = m % 60;
@@ -130,15 +144,16 @@ function resendCardHtml(row){
     btns = resendBtn(row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? 'Duyệt dù thiếu thông tin' : 'Duyệt dù khách chưa xác nhận', 'edit', 'override', row)
       + resendBtn('Dừng', 'stop', 'stop', row);
   } else if (row.status === 'collecting' || row.status === 'approved'){
-    btns = resendBtn('Dừng', 'stop', 'stop', row);
+    btns = (resendMissing(row) ? resendBtn('Duyệt dù thiếu thông tin', 'edit', 'override', row) : '')
+      + resendBtn('Dừng', 'stop', 'stop', row);
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'
-    + (row.stall_reason && (row.status === 'stalled') ? ' · ' + esc(row.stall_reason) : '')
+    + (row.stall_reason && (row.status === 'stalled' || resendMissing(row)) ? ' · <b>' + esc(row.stall_reason) + '</b>' : '')
     + (row.owner_note ? ' · ghi chú: ' + esc(row.owner_note) : '')
     + (row.last_error && row.status !== 'done' ? ' · <span class="rs-bad">lỗi gần nhất: ' + esc(row.last_error) + '</span>' : '');
   return '<div class="fi compact rs-card' + (dl.late ? ' rs-late' : '') + '" data-id="' + esc(String(row.id)) + '">'
     + '<div class="fi-line1">' + line1 + '<span class="when">' + esc(fmtDMY(cskhDateKey(new Date(row.created_at))) || '') + '</span></div>'
-    + '<div class="rs-body">' + body + extra + '</div>'
+    + '<div class="rs-body">' + body + extra + resendSilentHtml(row) + '</div>'
     + '<div class="rs-state-line">' + stateLine + (dl.text ? ' · <span class="rs-dl' + (dl.late ? ' late' : '') + '">' + esc(dl.text) + '</span>' : '') + '</div>'
     + '<div class="err-foot">' + btns + orderLink + '</div></div>';
 }
@@ -156,8 +171,9 @@ function resendDoneRowHtml(row){
 function resendGroups(rows){
   return {
     // cần anh làm: 2 lần duyệt + case treo (duyệt dù khách chưa xác nhận / dừng)
-    need: rows.filter(r => ['wait_approve_1', 'wait_approve_2', 'verifying', 'stalled'].includes(r.status)),
-    running: rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status)),
+    // collecting mà đang THIẾU thông tin (stall_reason bắt đầu bằng "Thiếu") cũng hiện ở đây để anh thấy ngay thiếu gì
+    need: rows.filter(r => ['wait_approve_1', 'wait_approve_2', 'verifying', 'stalled'].includes(r.status) || resendMissing(r)),
+    running: rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status) && !resendMissing(r)),
     closed: rows.filter(r => ['done', 'blocked', 'cancelled'].includes(r.status)).slice(0, 30),
   };
 }
@@ -168,7 +184,7 @@ function resendGroups(rows){
 // nghĩa là trạng thái đã đổi (task vừa chạy, hoặc máy khác đã bấm) → báo và tải lại.
 const RESEND_ACTIONS = {
   approve1: { from: ['wait_approve_1'], body: () => ({ status: 'approved', approved_at: new Date().toISOString() }) },
-  override: { from: ['verifying', 'stalled'], confirm: 'Duyệt dù khách CHƯA xác nhận thông tin? Em sẽ tạo đơn theo dữ liệu đang có, nếu thông tin sai đơn sẽ giao sai.',
+  override: { from: ['collecting', 'verifying', 'stalled'], confirm: 'Duyệt dù khách CHƯA xác nhận thông tin? Em sẽ tạo đơn theo dữ liệu đang có, nếu thông tin sai đơn sẽ giao sai.',
               body: () => ({ status: 'approved', approved_override: true, approved_at: new Date().toISOString() }) },
   stop:     { from: ['collecting', 'verifying', 'wait_approve_1', 'approved', 'stalled'], ask: 'Lý do dừng case này (ghi chú, có thể bỏ trống):',
               body: (note) => ({ status: 'cancelled', owner_note: note || null }) },

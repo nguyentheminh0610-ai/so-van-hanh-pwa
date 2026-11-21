@@ -112,7 +112,8 @@ họ tên, SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành).
   bằng dấu chấm hoặc dấu cách giúp shop (vd 09.12.345.678) được không ạ". Khách vẫn không gửi được →
   KHÔNG im lặng: ghi `owner_note` "khách không gửi được SĐT trong chat TikTok", bật Telegram cho chủ shop
   1 lần để quyết định (đọc SĐT từ đơn nếu xem được, hoặc duyệt khi có SĐT che một phần).
-- Mỗi mục thiếu chỉ hỏi **1 lần**; hỏi rồi mà khách im thì theo mục 5 (nhắc 24h, treo 72h), không spam.
+- Mỗi mục thiếu chỉ hỏi **1 lần**; hỏi rồi mà khách im thì theo mục 1e (nhắc 1 lần ở mốc 4h, hiện trên Sổ Vận Hành,
+  KHÔNG Telegram — thay cho "nhắc 24h / treo 72h" cũ và cho câu "bật Telegram" ở trên), không spam.
 - Cờ chống trùng: đặt `msg_remind_at` (hoặc cột tương ứng) lên TRƯỚC khi gửi.
 - Đủ 5 mục → chuyển ngay mục 3 (gửi tin xác minh), không chờ lượt sau.
 
@@ -123,36 +124,34 @@ Hệ thống phải tự bắt kịp, chủ shop không phải báo từng case:
   mà `updated_at` cũ hơn 30 phút và xử lý theo 1b + 1c, kể cả khi 2 inbox đều "0 chưa trả lời" (khách
   có thể đã trả lời xong từ trước và tin đã bị đánh dấu đã đọc).
 - Windows Task Scheduler `Claude - Watchdog` (`scripts/watchdog.py`, 30 phút/lần, 0 token, không cần
-  Claude/Chrome) tự báo Telegram khi: quét đánh giá/trả hàng quá 14 giờ chưa thành công; phiếu gửi bù
-  đứng im > 3 giờ; phiếu chờ duyệt > 1 giờ. Nhờ `StartWhenAvailable`, sau khi PC bật lại nó chạy bù ngay.
+  Claude/Chrome) tự báo Telegram khi: quét đánh giá/trả hàng quá 14 giờ chưa thành công (CHỈ việc này; báo
+  phiếu đứng im / chờ duyệt đã TẮT 21/11/2026 — hiện thẳng trên Sổ Vận Hành, xem 1e). Nhờ `StartWhenAvailable`, sau khi PC bật lại nó chạy bù ngay.
 
-## 1c. THIẾU THÔNG TIN thì xử lý thế nào — KHÔNG để khách/phiếu chờ vô hạn (chủ shop chốt 21/11/2026)
+## 1e. QUY TẮC CHỐT 21/11/2026 — thiếu thông tin: hỏi lại + hiện trên Sổ Vận Hành (KHÔNG báo Telegram)
 
-*Thay cho* các câu "chưa có ảnh → giữ `collecting`, KHÔNG ping chủ shop" ở mục 2 và "nhắc sau 24h / treo sau 72h" ở mục 5
-(2 mốc đó thay bằng mốc 4 giờ bên dưới). *Lý do:* phiếu #7 `_ciara07_` còn thiếu ảnh, #9 `ntt1072006` khách
-không gửi được SĐT trong chat TikTok → cả hai đứng im ở `collecting`, chủ shop không thấy gì trên Sổ Vận Hành.
+*Thay cho* mọi chỗ khác trong file này nói "nhắc sau 24h / treo 72h", "chưa có ảnh → KHÔNG ping chủ shop" và "báo Telegram
+cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo tele, rối lắm, hiển thị trên sổ vận hành là được".
 
-**Thông tin BẮT BUỘC để đẩy duyệt lần 1: ảnh bằng chứng + SĐT + địa chỉ.**
-**Họ tên KHÔNG cần khách gửi** — lấy luôn tên hiển thị của khách trên TikTok/Shopee làm tên người nhận
-(ghi vào file dữ liệu chốt `name`). Sàn che tên/SĐT trong đơn nên KHÔNG cố tra từ chi tiết đơn.
+**Cần đủ 3 thứ để lên duyệt lần 1: ảnh bằng chứng + SĐT + địa chỉ.** Họ tên KHÔNG cần khách gửi — lấy tên hiển thị
+của khách trên sàn. Ảnh chụp màn hình có SĐT/địa chỉ = đã gửi (xem mục cuối file). Sàn che tên/SĐT trong đơn nên KHÔNG tra từ đơn.
 
-1. **Đủ cả 3** (ảnh + SĐT + địa chỉ): ghi file dữ liệu chốt, gửi tin xác minh như mục 3, và chuyển luôn
-   `wait_approve_1` (không chờ khách trả lời "đúng") để chủ shop duyệt lần 1 ngay. `item_evidence` ghi rõ "đủ 3 thông tin,
-   tin xác minh gửi lúc HH:MM". Nếu sau đó khách sửa thông tin → ghi lại file + `data_hash` mới, ghi `owner_note`
-   "khách sửa thông tin lúc HH:MM" để chủ shop biết trước khi duyệt/ khi tạo đơn.
-2. **Thiếu 1–3 mục:** gửi NGAY 1 tin ngắn chỉ hỏi đúng mục còn thiếu (không hỏi lại mục đã có, không hỏi tên).
-   Mẫu: "Dạ bạn gửi giúp shop thêm <ảnh vỏ đơn/ảnh hàng nhận được | SĐT | địa chỉ nhận hàng> để shop gửi bù cho bạn nhanh nhé ạ".
-   Riêng SĐT bị TikTok chặn khi gõ trong chat → hướng khách chụp màn hình ghi chú điện thoại hoặc thông tin giao hàng (mẫu ở mục 2).
-3. **Mốc 4 giờ tính từ tin cuối cùng của KHÁCH** (hoặc từ tin hỏi của shop nếu khách chưa nhắn lại), mỗi lượt quét kiểm:
-   - Khách trả lời, đủ 3 mục → làm bước 1.
-   - Khách im ≥ 4 giờ (trong khoảng 4–6 giờ, lượt quét nào tới trước): (a) gửi **1 lần duy nhất** tin nhắc
-     (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <mục còn thiếu> để shop kịp gửi bù cho bạn nhé ạ";
-     (b) **đẩy phiếu lên Sổ Vận Hành để chủ shop giải quyết**: PATCH `status=stalled` (điều kiện `status=eq.collecting`),
-     `stall_reason` = `Thiếu: <mục>` (vd `Thiếu: SĐT`, `Thiếu: ảnh + địa chỉ`) + 1 câu tình hình (vd "khách im từ 14:20").
-     Phiếu hiện ở nhóm "Duyệt gửi bù" kèm cảnh báo thiếu gì, chủ shop bấm "Duyệt dù thiếu thông tin" hoặc "Dừng"; báo Telegram 1 lần/phiếu.
-   - Sau khi đã đẩy lên mà khách gửi bổ sung đủ 3 mục → PATCH `stalled` → `wait_approve_1` (điều kiện `status=eq.stalled`), bỏ `stall_reason`,
-     ghi `owner_note` "khách bổ sung lúc HH:MM"; báo Telegram để chủ shop duyệt.
-4. Mọi lượt quét (kể cả ban đêm, 1h/lần) đều áp dụng mốc 4 giờ — không bỏ qua phiếu `collecting` vì "đang ngoài giờ".
+1. **Đủ 3 thứ:** ghi file dữ liệu chốt, gửi tin xác minh (mục 3), chuyển `wait_approve_1` luôn (không chờ khách "đúng").
+   Khách sửa thông tin sau đó → ghi lại file + `data_hash`, `owner_note` "khách sửa lúc HH:MM".
+   Xoá `stall_reason` (set null).
+2. **Thiếu 1–3 thứ:** gửi NGAY 1 tin hỏi đúng thứ còn thiếu (mục 1c ở trên: mẫu câu), VÀ **ghi `stall_reason` = `Thiếu: <thứ>`**
+   (vd `Thiếu: SĐT`, `Thiếu: ảnh + địa chỉ`) trong cùng lượt, giữ `status=collecting`. Web tự đưa phiếu có `stall_reason`
+   bắt đầu bằng "Thiếu" lên nhóm "Duyệt gửi bù" kèm dòng "Đã hỏi khách, đang chờ / chưa phản hồi sau N giờ" + nút
+   "Duyệt dù thiếu thông tin" / "Dừng". Mỗi lượt quét cập nhật lại `stall_reason` cho khớp thứ còn thiếu.
+3. **Khách im ≥ 4 giờ** (tính từ tin hỏi của shop hoặc tin cuối của khách; lượt quét nào tới trước trong khoảng 4–6 giờ):
+   nhắc khách **1 lần duy nhất** (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <thứ còn thiếu> để
+   shop kịp gửi bù cho bạn nhé ạ". Web tự hiện cảnh báo "khách chưa phản hồi" — KHÔNG gửi Telegram, KHÔNG đổi sang `stalled`.
+4. Khách gửi bổ sung → quay lại bước 1 hoặc 2 theo thứ còn thiếu.
+5. Mọi lượt quét (kể cả ban đêm) đều áp dụng — không bỏ qua phiếu `collecting` vì "đang ngoài giờ".
+
+**Đánh giá xấu (1–3★) đã nhắn khách:** web hiện "đã nhắn khách lúc X, khách chưa phản hồi sau N giờ" khi ≥ 4 giờ, dựa vào
+`messaged_at`. Khi lượt CSKH inbox thấy khách TRẢ LỜI tin đó trong chat → thêm chữ "khách đã phản hồi HH:MM" vào
+`message_note` của dòng `cskh_reviews` (web đổi dòng cảnh báo thành "khách đã phản hồi — anh mở chat xem"). Không nhắc khách lần 2.
+**Trả hàng thường:** chỉ nhắn khách 1 lần, không theo dõi, không nhắc.
 
 ## 2. Hỏi thông tin (`collecting`)
 

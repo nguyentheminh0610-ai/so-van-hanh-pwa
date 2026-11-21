@@ -214,6 +214,22 @@ function cskhAgeHtml(c){
   return '<span class="when' + (days >= 2 ? ' hm-old' : '') + '">' + (days === 1 ? 'Hôm qua' : 'tồn ' + days + ' ngày') + '</span>';
 }
 
+// Đánh giá xấu (1–3★) đã nhắn khách: hiện tình trạng "khách chưa phản hồi sau Nh" (chốt 21/11/2026,
+// mốc 4h). Task CSKH inbox thêm chữ "khách đã phản hồi" vào message_note khi khách trả lời.
+const CSKH_REPLY_WAIT_H = 4;
+function cskhReplyHtml(c){
+  const rv = c.infos.find(i => i.kind === 'review' && i.row.action_type === 'danh_gia_xau' && i.row.messaged_at);
+  if (!rv) return '';
+  const at = new Date(rv.row.messaged_at);
+  const hh = at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + at.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  if (/khách đã phản hồi/i.test(rv.row.message_note || ''))
+    return '<div class="rs-sub">Đã nhắn khách ' + hh + ' · <b>khách đã phản hồi</b> — anh mở chat xem.</div>';
+  const hrs = (Date.now() - at.getTime()) / 3600000;
+  return hrs >= CSKH_REPLY_WAIT_H
+    ? '<div class="rs-sub rs-bad">⚠ Đã nhắn khách ' + hh + ', <b>khách chưa phản hồi</b> sau ' + Math.floor(hrs) + ' giờ — anh vào xử lý.</div>'
+    : '<div class="rs-sub">Đã nhắn khách ' + hh + ' · đang chờ khách phản hồi (mốc ' + CSKH_REPLY_WAIT_H + ' giờ).</div>';
+}
+
 function cskhCaseCardHtml(c){
   const plat = cskhPlatName(c.platform);
   const types = cskhCaseTypes(c).map(t => '<span class="tag why">' + esc(t) + '</span>').join('');
@@ -241,7 +257,7 @@ function cskhCaseCardHtml(c){
       ${c.order ? '<span class="code">' + esc(c.order) + '</span>' : ''}
       ${code ? '<span class="code" title="mã vận đơn">VĐ ' + esc(code) + '</span>' : ''}${cskhAgeHtml(c)}</div>
     <div class="fi-line2"><span class="hm-src">${esc(cskhCaseSources(c))}</span>${snip ? '<span class="snippet" title="' + esc(snip) + '">' + esc(snip) + '</span>' : '<span class="snippet"></span>'}</div>
-    ${orphan}${noCode}
+    ${orphan}${noCode}${cskhReplyHtml(c)}
     <div class="err-foot">${btns}${cskhCaseLinks(c)}</div>
   </div>`;
 }

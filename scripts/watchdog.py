@@ -79,7 +79,9 @@ def main():
 
     # 2 + 3. Phieu gui bu
     rows = get('resend_cases?select=id,handle,platform,status,updated_at&status=in.(collecting,verifying,wait_approve_1,wait_approve_2,stalled)')
-    for r in rows:
+    # Chốt 21/11/2026: chủ shop KHÔNG muốn báo Telegram cho phiếu đứng im / chờ duyệt (rối) — các phiếu này
+    # hiện thẳng trên Sổ Vận Hành (tab Hậu mãi) kèm "thiếu gì / khách chưa phản hồi". Bật lại bằng --resend-telegram.
+    for r in (rows if '--resend-telegram' in sys.argv else []):
         h = hours(r['updated_at'])
         k = 'resend%s' % r['id']
         if r['status'] in ('collecting', 'verifying', 'stalled') and h > 3 and due(st, k, 6):

@@ -119,6 +119,12 @@ Quét **tất cả** đánh giá mới trong cửa sổ (không chỉ hàng ch�
    `action_type = 'danh_gia_van_de'`, không nhắn khách. Chỉ bấm sao / khen thuần
    → không báo.
 
+**Theo dõi "khách chưa phản hồi" (chốt 21/11/2026, mốc 4 giờ — chỉ cho đánh giá 1–3★ và giao thiếu):**
+đánh giá 1–3★ đã nhắn khách thì ghi `messaged_at` đúng giờ gửi; web tự hiện "đã nhắn lúc X, khách chưa phản hồi sau N giờ"
+khi ≥ 4 giờ. Khi lượt CSKH inbox thấy khách trả lời tin đó, nó thêm "khách đã phản hồi HH:MM" vào `message_note`. KHÔNG nhắn
+khách lần 2, KHÔNG Telegram. **Trả hàng thường chỉ nhắn 1 lần, không theo dõi.** Giao thiếu thiếu thông tin: xem
+[resend-collect-verify](../resend-missing-item/references/resend-collect-verify.md) mục 1e.
+
 ### B2. Khiếu nại thực chất: giao thiếu / giao nhầm / hàng lỗi (chốt 19/11/2026)
 
 Chủ shop chốt luồng cho khách phàn nàn 3 loại này qua **trả hàng hoặc đánh giá 1–3★**
