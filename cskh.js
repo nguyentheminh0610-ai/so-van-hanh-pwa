@@ -235,7 +235,7 @@ function cskhProgressParse(text){
   return out;
 }
 function cskhProgressStripped(text){
-  return String(text || '').split('\n').filter(l => !/^\s*▸/.test(l)).join(' ').trim();
+  return String(text || '').split('\n').filter(l => !/^\s*[▸☑⚑]/.test(l)).join(' ').trim();
 }
 function cskhProgressHtml(text, closed){
   const ev = cskhProgressParse(text);

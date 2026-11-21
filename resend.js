@@ -34,17 +34,36 @@ const RESEND_CONF = {
 };
 
 // Phiếu đang hỏi khách mà còn thiếu thông tin (task ghi "Thiếu: ảnh + SĐT" vào stall_reason)
+// Bỏ dấu để nhận cả khi task ghi không dấu ("Thieu: ..." — phiếu #9 21/11/2026 bị lọt khỏi nhóm cần anh vì lỗi này)
+function resendNorm(t){ return String(t || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd').toLowerCase(); }
 function resendMissing(r){
-  return r.status === 'collecting' && /^\s*thiếu/i.test(r.stall_reason || '');
+  return r.status === 'collecting' && /^\s*thieu/.test(resendNorm(r.stall_reason));
+}
+// Khách đã bấm hoàn tiền / trả hàng vì thiếu (chốt 21/11/2026, phiếu #8): dòng `⚑ hoantien=1` do task ghi, hoặc suy từ chữ trong lý do / bước cuối.
+function resendRefundFlag(r){
+  if (['done', 'cancelled'].includes(r.status)) return false;
+  const lines = String(r.owner_note || '').split('\n');
+  const f = lines.filter(l => /^\s*⚑/.test(l)).pop();
+  if (f) return /hoantien\s*=\s*1/.test(f);
+  const ev = cskhProgressParse(r.owner_note);
+  const last = ev.length ? ev[ev.length - 1].text : '';
+  return /hoan tien|tra hang va hoan|yeu cau hoan/.test(resendNorm(r.stall_reason + ' ' + last));
+}
+// Phiếu `collecting` mà bước cuối task ghi là [chờ anh], hoặc stall_reason báo tranh chấp → cần anh, không được chìm vào nhóm "tự động"
+function resendOwnerWait(r){
+  if (r.status !== 'collecting') return false;
+  const ev = cskhProgressParse(r.owner_note);
+  if (ev.length && ev[ev.length - 1].state === 'chờ anh') return true;
+  return /^\s*tranh chap/.test(resendNorm(r.stall_reason));
 }
 // Chủ shop chỉ được "duyệt dù thiếu" khi thiếu MỖI ẢNH (chốt 21/11/2026). Thiếu SĐT/địa chỉ thì không có gì để tạo đơn.
 function resendOverrideOk(r){
-  const why = r.stall_reason || '';
-  return !(/^\s*thiếu/i.test(why) && /sđt|sdt|số điện thoại|địa chỉ/i.test(why));
+  const why = resendNorm(r.stall_reason);
+  return !(/^\s*thieu/.test(why) && /sdt|so dien thoai|dia chi/.test(why));
 }
 function resendOverrideBtn(r){
   if (!resendOverrideOk(r)) return '';
-  const photo = /^\s*thiếu:\s*ảnh/i.test(r.stall_reason || '');
+  const photo = /^\s*thieu:\s*anh/.test(resendNorm(r.stall_reason));
   return resendBtn(photo ? 'Duyệt dù thiếu ảnh' : 'Duyệt dù khách chưa xác nhận', 'edit', 'override', r);
 }
 // Khách chưa phản hồi sau 4h kể từ lần task hỏi/cập nhật gần nhất (hoặc đã nhắc mà vẫn chưa đủ)
@@ -121,16 +140,22 @@ function resendBtn(label, cls, action, row, extra){
 // 3 dấu ✓/✗ thay cho các dòng chú thích nhỏ (chốt 21/11/2026): SĐT / địa chỉ / ảnh bằng chứng.
 // Không có cột riêng → suy từ recipient_masked + stall_reason ("Thiếu: ảnh + SĐT..." do task ghi).
 function resendChecklist(r){
-  const why = /^\s*thiếu/i.test(r.stall_reason || '') ? r.stall_reason : '';
+  // Ưu tiên dòng task ghi vào owner_note: "☑ sdt=1 diachi=0 anh=1" (dòng cuối thắng)
+  const m = String(r.owner_note || '').split('\n').filter(l => /^\s*☑/.test(l)).pop();
+  if (m){
+    const v = k => { const x = new RegExp(k + '\\s*=\\s*([01])').exec(m); return !!x && x[1] === '1'; };
+    return [{ label: 'SĐT', ok: v('sdt') }, { label: 'Địa chỉ', ok: v('diachi') }, { label: 'Ảnh', ok: v('anh') }];
+  }
+  const why = /^\s*thieu/.test(resendNorm(r.stall_reason)) ? resendNorm(r.stall_reason) : '';
   const masked = r.recipient_masked || '';
   const parts = masked.split('·').map(x => x.trim()).filter(Boolean);
   const hasPhoneData = /\d[\d*\s]{6,}\d/.test(masked);
   const addrPart = parts.find(x => /\/|,/.test(x) && !/\d[\d*]{6,}/.test(x));
   const early = r.status === 'collecting';
   return [
-    { label: 'SĐT',     ok: hasPhoneData && !/sđt|sdt|số điện thoại/i.test(why) },
-    { label: 'Địa chỉ', ok: !!addrPart && !/địa chỉ/i.test(why) },
-    { label: 'Ảnh',     ok: !/ảnh/i.test(why) && !(early && !why) },
+    { label: 'SĐT',     ok: hasPhoneData && !/sdt|so dien thoai/.test(why) },
+    { label: 'Địa chỉ', ok: !!addrPart && !/dia chi/.test(why) },
+    { label: 'Ảnh',     ok: !/anh/.test(why) && !(early && !why) },
   ];
 }
 function resendChecklistHtml(r){
@@ -147,6 +172,7 @@ function resendCardHtml(row){
   const line1 = '<span class="tag ' + (row.platform === 'shopee' ? 'shopee' : 'tiktok') + '">' + plat + '</span>'
     + '<span class="cust">Khách <b>' + esc(row.handle) + '</b></span>'
     + '<span class="code">' + esc(row.orig_order_code) + '</span>'
+    + (resendRefundFlag(row) ? '<span class="tag why rs-refund">⚠ Khách đang yêu cầu hoàn tiền vì thiếu — anh vào kiểm</span>' : '')
     + (row.confirm_slot === 'tomorrow' ? '<span class="tag why">đi ngày mai</span>' : '')
     + (row.approved_override ? '<span class="tag why">duyệt dù khách chưa xác nhận</span>' : '')
     + (row.status === 'stalled' && /^\s*thiếu/i.test(row.stall_reason || '') ? '<span class="tag why">⚠ ' + esc(row.stall_reason.split(/[·—\n]/)[0].trim()) + '</span>' : '');
@@ -201,8 +227,8 @@ function resendGroups(rows){
   return {
     // cần anh làm: 2 lần duyệt + case treo (duyệt dù khách chưa xác nhận / dừng)
     // collecting mà đang THIẾU thông tin (stall_reason bắt đầu bằng "Thiếu") cũng hiện ở đây để anh thấy ngay thiếu gì
-    need: rows.filter(r => ['wait_approve_1', 'wait_approve_2', 'verifying', 'stalled'].includes(r.status) || resendMissing(r)),
-    running: rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status) && !resendMissing(r)),
+    need: rows.filter(r => ['wait_approve_1', 'wait_approve_2', 'verifying', 'stalled'].includes(r.status) || resendMissing(r) || resendOwnerWait(r)),
+    running: rows.filter(r => ['collecting', 'approved', 'creating', 'finalizing'].includes(r.status) && !resendMissing(r) && !resendOwnerWait(r)),
     closed: rows.filter(r => ['done', 'blocked', 'cancelled'].includes(r.status)).slice(0, 30),
   };
 }
