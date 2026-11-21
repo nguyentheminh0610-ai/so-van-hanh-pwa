@@ -214,6 +214,46 @@ function cskhAgeHtml(c){
   return '<span class="when' + (days >= 2 ? ' hm-old' : '') + '">' + (days === 1 ? 'Hôm qua' : 'tồn ' + days + ' ngày') + '</span>';
 }
 
+// ---- TIẾN ĐỘ XỬ LÝ (chốt 21/11/2026) -------------------------------------------------------------
+// Task ghi mỗi bước thành 1 dòng bắt đầu bằng "▸ " vào cột text SẴN CÓ (resend_cases.owner_note,
+// cskh_reviews.message_note) — không cần đổi schema DB. Định dạng 1 dòng:
+//   ▸ 21/11 10:34 · [chờ khách] Đã gửi tin xác minh — chờ khách xác nhận
+// Nhãn trạng thái: [đang làm] (task đang xử lý) · [chờ khách] · [chờ anh] · [xong].
+// Dòng CUỐI = bước hiện tại. Quá mốc (chờ khách ≥ 4h, đang làm ≥ 1h) thì web hiện ⚠ "đứng ở bước này N giờ".
+// Chi tiết cách ghi: .claude/shared/tien-do-xu-ly.md
+const CSKH_PROG_RE = /^▸\s*(\d{1,2})\/(\d{1,2})\s+(\d{1,2}):(\d{2})\s*·\s*\[([^\]]+)\]\s*(.*)$/;
+function cskhProgressParse(text){
+  const out = [];
+  String(text || '').split('\n').forEach(l => {
+    const m = CSKH_PROG_RE.exec(l.trim());
+    if (!m) return;
+    const now = new Date(); let y = now.getFullYear();
+    let d = new Date(y, +m[2] - 1, +m[1], +m[3], +m[4]);
+    if (d.getTime() - now.getTime() > 86400000) d = new Date(y - 1, +m[2] - 1, +m[1], +m[3], +m[4]);
+    out.push({ at: d, label: m[1] + '/' + m[2] + ' ' + m[3].padStart(2, '0') + ':' + m[4], state: m[5].trim().toLowerCase(), text: m[6] });
+  });
+  return out;
+}
+function cskhProgressStripped(text){
+  return String(text || '').split('\n').filter(l => !/^\s*▸/.test(l)).join(' ').trim();
+}
+function cskhProgressHtml(text, closed){
+  const ev = cskhProgressParse(text);
+  if (!ev.length) return '<div class="rs-sub rs-faint">Tiến độ: chưa có cập nhật (task chưa ghi bước nào).</div>';
+  const last = ev[ev.length - 1];
+  const hrs = (Date.now() - last.at.getTime()) / 3600000;
+  const limit = last.state === 'chờ khách' ? 4 : last.state === 'đang làm' ? 1 : 0;
+  const stuck = !closed && limit && hrs >= limit;
+  const icon = { 'đang làm': '⚙', 'chờ khách': '⏳', 'chờ anh': '👉', 'xong': '✓' }[last.state] || '•';
+  const head = '<div class="rs-sub' + (stuck ? ' rs-bad' : '') + '"><b>Tiến độ:</b> ' + icon + ' ' + esc(last.text)
+    + ' <span class="rs-faint">(' + esc(last.label) + ', ' + esc(last.state) + ')</span>'
+    + (stuck ? ' · <b>⚠ đứng ở bước này ' + Math.floor(hrs) + ' giờ — anh vào xử lý</b>' : '') + '</div>';
+  const hist = ev.length > 1
+    ? '<details class="hm-fold"><summary>Lịch sử ' + ev.length + ' bước</summary><div class="rs-sub">'
+      + ev.slice().reverse().map(e => esc(e.label) + ' · [' + esc(e.state) + '] ' + esc(e.text)).join('<br>') + '</div></details>' : '';
+  return head + hist;
+}
+
 // Đánh giá xấu (1–3★) đã nhắn khách: hiện tình trạng "khách chưa phản hồi sau Nh" (chốt 21/11/2026,
 // mốc 4h). Task CSKH inbox thêm chữ "khách đã phản hồi" vào message_note khi khách trả lời.
 const CSKH_REPLY_WAIT_H = 4;
@@ -222,6 +262,7 @@ function cskhReplyHtml(c){
   if (!rv) return '';
   const at = new Date(rv.row.messaged_at);
   const hh = at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + at.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+  if (cskhProgressParse(rv.row.message_note).length) return cskhProgressHtml(rv.row.message_note, false);
   if (/khách đã phản hồi/i.test(rv.row.message_note || ''))
     return '<div class="rs-sub">Đã nhắn khách ' + hh + ' · <b>khách đã phản hồi</b> — anh mở chat xem.</div>';
   const hrs = (Date.now() - at.getTime()) / 3600000;
@@ -324,7 +365,7 @@ function cskhRenderMain(){
     + (rg.closed.length ? '<div class="sub-label">Gửi bù đã xong / dừng</div><div class="card"><table class="dtable"><thead><tr><th>Khách</th><th>Món</th><th>Mã vận đơn</th><th>Trạng thái</th><th></th></tr></thead><tbody>' + rg.closed.map(resendDoneRowHtml).join('') + '</tbody></table></div>' : '')
     + '</details>';
   const runningHtml = rg.running.length
-    ? `<details class="hm-fold"><summary>Gửi bù đang chạy · ${fmtInt(rg.running.length)} phiếu (em đang xử lý, anh không cần làm gì)</summary><div class="feed">${rg.running.map(resendCardHtml).join('')}</div></details>` : '';
+    ? `<details class="hm-fold" open><summary>Gửi bù đang xử lý tự động · ${fmtInt(rg.running.length)} phiếu (xem tiến độ; có ⚠ là kẹt, anh vào xử lý)</summary><div class="feed">${rg.running.map(resendCardHtml).join('')}</div></details>` : '';
 
   bodyEl.innerHTML = banner + sec('ghi') + guiBu + sec('xu_ly') + sec('xem') + runningHtml + doneHtml;
 }

@@ -638,3 +638,11 @@ cũng gộp vào dòng này. Không có gì thì bỏ hẳn dòng `Lưu ý:`.
   layer for.
 - [shop-knowledge-base-artifacts](../../shared/reference_shop_knowledge_base_artifacts.md) — other live Artifacts/Sheets for this
   shop (product guide, size-consultation rules, quick policy lookup).
+
+### Đánh giá 1–3★: tin 1 → 4 giờ → tin 2 (chốt 21/11/2026, thay cho "KHÔNG nhắn lần 2")
+
+Ghi tiến độ vào `message_note` theo [tien-do-xu-ly.md](../../shared/tien-do-xu-ly.md): sau khi nhắn tin 1 ghi
+`▸ <ngày giờ> · [chờ khách] Đã nhắn tin 1 hỏi lý do`. Lượt **CSKH inbox** (chạy 15 phút/lần, không phải lượt 08:00/20:00) tra
+`cskh_reviews` có `action_type=danh_gia_xau`, `messaged_at` ≥ 4 giờ, khách chưa trả lời, chưa có dòng "tin 2" → nhắn **tin 2 đúng 1 lần**
+(câu ở tien-do-xu-ly.md) và ghi `▸ ... [chờ khách] 4 giờ chưa trả lời — đã nhắn tin 2`. Khách vẫn im thêm 4 giờ hoặc đã trả lời →
+ghi `[chờ anh]`. Không Telegram. Trả hàng thường chỉ nhắn 1 lần, không theo dõi.

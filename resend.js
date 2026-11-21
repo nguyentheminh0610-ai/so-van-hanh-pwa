@@ -159,11 +159,11 @@ function resendCardHtml(row){
   }
   const stateLine = '<span class="rs-state">' + esc(RESEND_STATUS[row.status] || row.status) + '</span>'
     + (row.stall_reason && (row.status === 'stalled' || resendMissing(row)) ? ' · <b>' + esc(row.stall_reason) + '</b>' : '')
-    + (row.owner_note ? ' · ghi chú: ' + esc(row.owner_note) : '')
+    + (cskhProgressStripped(row.owner_note) ? ' · ghi chú: ' + esc(cskhProgressStripped(row.owner_note)) : '')
     + (row.last_error && row.status !== 'done' ? ' · <span class="rs-bad">lỗi gần nhất: ' + esc(row.last_error) + '</span>' : '');
   return '<div class="fi compact rs-card' + (dl.late ? ' rs-late' : '') + '" data-id="' + esc(String(row.id)) + '">'
     + '<div class="fi-line1">' + line1 + '<span class="when">' + esc(fmtDMY(cskhDateKey(new Date(row.created_at))) || '') + '</span></div>'
-    + '<div class="rs-body">' + body + extra + resendSilentHtml(row) + '</div>'
+    + '<div class="rs-body">' + body + extra + cskhProgressHtml(row.owner_note, ['done', 'cancelled', 'blocked'].includes(row.status)) + resendSilentHtml(row) + '</div>'
     + '<div class="rs-state-line">' + stateLine + (dl.text ? ' · <span class="rs-dl' + (dl.late ? ' late' : '') + '">' + esc(dl.text) + '</span>' : '') + '</div>'
     + '<div class="err-foot">' + btns + orderLink + '</div></div>';
 }

@@ -249,3 +249,10 @@ TikTok chặn khách gõ SĐT trong chat; khách làm theo hướng dẫn thì c
 dc, shop xem ảnh giúp em"). Lượt quét 20/11 22:15 hiểu nhầm thành "khách từ chối gửi SĐT". Quy tắc: tin ảnh của khách luôn
 PHẢI mở ra đọc (phóng to) — thấy SĐT/địa chỉ trong ảnh thì tính là đã có. Đọc không ra số thì KHÔNG ghi "khách từ chối";
 ghi "SĐT nằm trong ảnh, task đọc không ra — chủ shop mở chat xem" và đẩy lên Sổ Vận Hành.
+
+## GHI TIẾN ĐỘ MỖI BƯỚC (chốt 21/11/2026) — bắt buộc
+
+Mọi bước ở trên (phát hiện, hỏi khách, nhắc, gửi xác minh, khách xác nhận, báo chủ shop...) phải kèm 1 dòng `▸` thêm vào
+`owner_note` của phiếu theo [tien-do-xu-ly.md](../../../shared/tien-do-xu-ly.md) (có bảng các bước + nhãn `[đang làm]/[chờ khách]/[chờ anh]/[xong]`).
+Web đo thời gian ở bước cuối và hiện ⚠ khi kẹt; chủ shop theo dõi tiến độ trên Sổ Vận Hành, không dùng Telegram.
+Phiếu nào phát hiện giao thiếu từ BẤT KỲ nguồn nào cũng phải mở ngay + ghi dòng đầu tiên, để hiện lên sổ.
