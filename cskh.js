@@ -400,7 +400,7 @@ async function cskhActWrite(c){
   if (dup && dup.length){ errId = dup[0].id; status = 'dup'; }
   else {
     const ins = await sbFetch('warehouse_error_log', { method: 'POST', headers: { Prefer: 'return=representation' },
-      body: JSON.stringify({ code, error_type: kind.etype, detail_reason: kind.dreason, reason: sug.row.errlog_reason || null }) });
+      body: JSON.stringify({ code, error_type: kind.etype, detail_reason: kind.dreason, reason: sug.row.errlog_reason || kind.label || kind.dreason }) });
     errId = ins && ins[0] && ins[0].id;
   }
   const now = new Date().toISOString();
