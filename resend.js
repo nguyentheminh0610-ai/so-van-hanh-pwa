@@ -51,10 +51,18 @@ function resendRefundFlag(r){
 }
 // Phiếu `collecting` mà bước cuối task ghi là [chờ anh], hoặc stall_reason báo tranh chấp → cần anh, không được chìm vào nhóm "tự động"
 function resendOwnerWait(r){
-  if (r.status !== 'collecting') return false;
+  // Phiếu chưa xong mà CÓ VẤN ĐỀ phải luôn nằm ở nhóm "cần anh" (chốt 21/11/2026, phiếu #9 dừng ở approved vì thiếu giá/phường
+  // nhưng bị chìm vào khung "tự động"): bước cuối [chờ anh], có lỗi gần nhất, hoặc đứng quá mốc (đang làm ≥ 1h, chờ khách ≥ 4h).
+  if (!['collecting', 'approved', 'creating', 'finalizing'].includes(r.status)) return false;
+  if (r.last_error) return true;
   const ev = cskhProgressParse(r.owner_note);
-  if (ev.length && ev[ev.length - 1].state === 'chờ anh') return true;
-  return /^\s*tranh chap/.test(resendNorm(r.stall_reason));
+  if (ev.length){
+    const last = ev[ev.length - 1], hrs = (Date.now() - last.at.getTime()) / 3600000;
+    if (last.state === 'chờ anh') return true;
+    if (last.state === 'đang làm' && hrs >= 1) return true;
+    if (last.state === 'chờ khách' && hrs >= 4) return true;
+  }
+  return r.status === 'collecting' && /^\s*tranh chap/.test(resendNorm(r.stall_reason));
 }
 // Chủ shop chỉ được "duyệt dù thiếu" khi thiếu MỖI ẢNH (chốt 21/11/2026). Thiếu SĐT/địa chỉ thì không có gì để tạo đơn.
 function resendOverrideOk(r){

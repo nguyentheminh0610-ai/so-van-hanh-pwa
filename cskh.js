@@ -177,6 +177,7 @@ function cskhCaseTypes(c){
     const t = (k && CSKH_TYPE_LABEL[k]) || (a && CSKH_TYPE_LABEL[a]) || (i.pendAck ? 'Cần xem' : '');
     if (t && !out.includes(t)) out.push(t);
   });
+  out.sort((a, b) => a.at - b.at);   // task có lúc chèn dòng mới lên đầu → luôn xếp theo giờ, dòng cuối = bước hiện tại
   return out;
 }
 
@@ -232,6 +233,7 @@ function cskhProgressParse(text){
     if (d.getTime() - now.getTime() > 86400000) d = new Date(y - 1, +m[2] - 1, +m[1], +m[3], +m[4]);
     out.push({ at: d, label: m[1] + '/' + m[2] + ' ' + m[3].padStart(2, '0') + ':' + m[4], state: m[5].trim().toLowerCase(), text: m[6] });
   });
+  out.sort((a, b) => a.at - b.at);   // task có lúc chèn dòng mới lên đầu → luôn xếp theo giờ, dòng cuối = bước hiện tại
   return out;
 }
 function cskhProgressStripped(text){

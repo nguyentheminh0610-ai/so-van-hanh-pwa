@@ -62,3 +62,12 @@ trạng thái `[chờ ...]` để web đo thời gian kẹt, (4) thêm bảng b�
 | Quy tắc trong tài liệu mâu thuẫn | 2 mục "1c" khác nhau | mục 1e của resend-collect-verify.md là bản chốt |
 | Thiếu file dữ liệu chốt khi tạo đơn 15h | phiên 15h đặt phiếu `stalled` | chỉ chuyển `wait_approve_1` khi đã ghi file + `data_hash` |
 | Chat Shopee hiện dữ liệu cũ | gửi trùng 3 lần 17/11 | đọc chat xong phải chụp đáy khung chat trước khi gõ |
+
+## Có vấn đề / dừng giữa chừng → ĐẨY LÊN SỔ NGAY (chốt 21/11/2026, phiếu #9)
+
+Chủ shop: "đơn gửi bù chưa hoàn thành thì luôn hiện, có vấn đề gì đẩy lên để anh xem". Mọi lần task DỪNG, lỗi, hoặc cần chủ shop quyết
+(thiếu giá trị bưu gửi, phường không có trên SPX, SPX báo lỗi, PDF lỗi, đọc ảnh không ra...) phải làm ĐỦ 2 việc trong cùng lượt:
+1. Ghi `last_error` = 1 câu nói rõ vướng gì (web hiện đỏ trên thẻ).
+2. Thêm 1 dòng `▸ DD/MM HH:MM · [chờ anh] <vướng gì + cần anh quyết gì>` vào CUỐI `owner_note` (dòng mới luôn nối ở cuối, không chèn lên đầu).
+Web tự đưa phiếu vào nhóm "Duyệt gửi bù" (cần anh) khi: có `last_error`, bước cuối `[chờ anh]`, `[đang làm]` quá 1 giờ, hoặc `[chờ khách]` quá 4 giờ.
+Phiếu chưa `done` thì luôn nằm trên sổ; không có chỗ nào để phiếu "biến mất".
