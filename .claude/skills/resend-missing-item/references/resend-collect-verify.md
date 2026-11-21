@@ -18,6 +18,12 @@ JSON tiếng Việt từ file UTF-8 (`--data-binary @file`), không gõ thẳng 
 - **PII:** SĐT/địa chỉ đầy đủ KHÔNG ghi vào Supabase hay git. Chỉ ghi
   `recipient_masked` (vd `N*** V*** A · 09******00 · Hà Nội / P. Cầu Giấy`).
 - Chỉ xử lý giờ theo **giờ khách nhắn trên sàn**, không phải giờ task đọc.
+- **CẤM HỎI LẠI THỨ KHÁCH ĐÃ CÓ TRONG CHAT (chủ shop nhấn mạnh 21/11/2026).** Trước MỌI tin gửi khách trong luồng gửi bù (xin ảnh, SĐT,
+  địa chỉ, món, nhắc, xác minh) làm đủ 4 việc, thiếu 1 việc là KHÔNG được gửi: (1) đọc dòng `☑` của phiếu (mục 1g); (2) đọc LẠI TOÀN BỘ
+  hội thoại từ tin đầu — kể cả tin ảnh (mở phóng to), tin của nhân viên CS/chủ shop gõ tay (họ có thể đã hỏi hoặc khách đã trả lời họ),
+  và đơn/ảnh khách gửi từ trước khi phiếu mở; (3) chỉ hỏi mục thật sự `=0` và chưa có trong `hoi=` (shop đã hỏi mà khách chưa trả lời thì không hỏi lại);
+  (4) soạn tin xong đối chiếu từng mục trong tin với dòng `☑` — mục nào `=1` mà vẫn có trong tin thì xoá khỏi tin. Đọc không ra ảnh thì
+  KHÔNG hỏi lại khách, đẩy lên sổ `[chờ anh]` để chủ shop mở chat xem.
 - Hộp "Giữ thông tin bí mật" của TikTok khi gửi tin có SĐT: với **tin xác minh**
   bấm "Vẫn gửi" (chủ shop cho phép 16/11/2026). Không bấm được thì KHÔNG gửi,
   đặt case `stalled` + `last_error`, báo Telegram.
@@ -56,7 +62,7 @@ bỏ qua luôn ảnh mới. Khách bị treo tới khi chủ shop hỏi lại; c
 Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_order_code`
 (bỏ qua dòng `cancelled`):
 - **Đã có dòng** → KHÔNG insert. Làm theo trạng thái hiện tại:
-  - `collecting`/`verifying`/`wait_approve_*`/`approved`/`creating`: đừng nhắn
+  - `collecting`/`wait_approve_*`/`approved`/`creating`: đừng nhắn
     thêm câu xin thông tin; nếu khách hỏi lại thì trả lời ngắn "shop đã ghi nhận
     và đang xử lý đơn gửi bù cho bạn, có mã vận đơn shop gửi bạn liền ạ".
   - `done`: gửi lại mã vận đơn + link `https://spx.vn/track?<mã>`.
@@ -83,7 +89,7 @@ Quy tắc, áp dụng MỌI lượt quét (cả 4 task CSKH), TRƯỚC khi phân
 1. **Tra `resend_cases` theo `platform` + `handle` của khách** (status `collecting` /
    `verifying` / `wait_approve_*`). Có phiếu mở → tin mới của khách (SĐT, địa chỉ, họ tên,
    ảnh, "đúng rồi", "ok", tên món...) là CÂU TRẢ LỜI cho phiếu đó. **Cấm** xếp vào `khac` /
-   "không rõ ngữ cảnh" / bỏ qua. Làm tiếp từ mục 2 (đang `collecting`) hoặc mục 4 (đang `verifying`).
+   "không rõ ngữ cảnh" / bỏ qua. Làm tiếp từ mục 2 (đang `collecting`) hoặc mục 4 (đang `wait_approve_1`, khách trả lời xác minh).
 2. **Tin chỉ có SĐT / địa chỉ rời** vẫn đọc và ghi nhận. Chưa đủ thì chỉ hỏi phần còn thiếu
    bằng 1 tin ngắn, không hỏi lại phần khách đã gửi.
 3. **Món thiếu chưa rõ** (vd đơn có 2 cái cùng phân loại): đừng treo. Hỏi khách 1 câu ngắn
@@ -123,7 +129,7 @@ SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành). Họ tên không
 ## 1d. Chạy bù sau khi PC tắt / mất điện (chốt 21/11/2026)
 
 Hệ thống phải tự bắt kịp, chủ shop không phải báo từng case:
-- Mọi lượt CSKH inbox (ngày/tối/đêm) ở Bước 0a **luôn** tra `resend_cases` phiếu `collecting`/`verifying`
+- Mọi lượt CSKH inbox (ngày/tối/đêm) ở Bước 0a **luôn** tra `resend_cases` phiếu `collecting`/`wait_approve_1`
   mà `updated_at` cũ hơn 30 phút và xử lý theo 1b + 1c, kể cả khi 2 inbox đều "0 chưa trả lời" (khách
   có thể đã trả lời xong từ trước và tin đã bị đánh dấu đã đọc).
 - Windows Task Scheduler `Claude - Watchdog` (`scripts/watchdog.py`, 30 phút/lần, 0 token, không cần
@@ -139,8 +145,8 @@ cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo 
 **Cần đủ 3 thứ: ảnh bằng chứng + SĐT + địa chỉ.** Họ tên KHÔNG cần khách gửi — lấy tên hiển thị của khách trên sàn.
 Ảnh chụp màn hình có SĐT/địa chỉ = đã gửi (xem mục cuối file). Sàn che tên/SĐT trong đơn nên KHÔNG tra từ đơn.
 
-**Quy trình luôn đủ các bước (không bỏ bước nào):** hỏi khách phần thiếu → có đủ SĐT + địa chỉ → GỬI TIN XÁC MINH cho khách
-(mục 3, `verifying`) → khách xác nhận "đúng" (mục 4, `wait_approve_1`) → chủ shop duyệt lần 1 → tạo đơn → duyệt lần 2.
+**Quy trình (theo mục 1h, chốt 21/11/2026 — chạy SONG SONG, không tuần tự như bản cũ):** hỏi khách phần thiếu → có đủ SĐT + địa chỉ →
+GỬI TIN XÁC MINH cho khách + ĐỒNG THỜI `wait_approve_1` để chủ shop duyệt → bên nào đến trước (chủ shop duyệt / khách nói "đúng") thì tạo đơn luôn → duyệt lần 2.
 
 1. **Thiếu SĐT hoặc địa chỉ:** KHÔNG có đường tắt, chủ shop KHÔNG duyệt dù thiếu được (không có gì để tạo đơn).
    Gửi NGAY 1 tin hỏi đúng thứ thiếu, ghi `stall_reason` = `Thiếu: SĐT` / `Thiếu: địa chỉ` (kèm ảnh nếu thiếu cả ảnh), giữ `collecting`.
@@ -151,7 +157,7 @@ cho chủ shop" về phiếu thiếu thông tin. Chủ shop: "không cần báo 
 3. **Khách im ≥ 4 giờ** (tính từ tin hỏi của shop hoặc tin cuối của khách; lượt quét nào tới trước trong khoảng 4–6 giờ):
    nhắc khách **1 lần duy nhất** (cờ `msg_remind_at` lên trước khi gửi): "Dạ shop nhắc nhẹ, bạn gửi giúp shop <thứ còn thiếu> để
    shop kịp gửi bù cho bạn nhé ạ". Web tự hiện cảnh báo "khách chưa phản hồi" — KHÔNG Telegram, KHÔNG đổi sang `stalled`.
-4. Đủ ảnh + SĐT + địa chỉ → set `stall_reason` null → mục 3 (tin xác minh) → mục 4.
+4. Đủ ảnh + SĐT + địa chỉ → set `stall_reason` null → mục 3 (gửi tin xác minh + `wait_approve_1` cùng lúc, mục 1h).
 5. Mọi lượt quét (kể cả ban đêm) đều áp dụng — không bỏ qua phiếu `collecting` vì "đang ngoài giờ".
 
 **Đánh giá xấu (1–3★) đã nhắn khách:** web hiện "đã nhắn khách lúc X, khách chưa phản hồi sau N giờ" khi ≥ 4 giờ, dựa vào
@@ -175,7 +181,15 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
 4. **"Xong" = đã nhắn khách tin kèm link theo dõi đơn** (chủ shop chốt lại 21/11/2026, thay cho câu "chỉ xong khi khách nhận được đơn" — KHÔNG
    cần theo dõi SPX tới khi giao). Giữ nguyên cách đóng phiếu hiện tại.
 
-## 1g. LUỒNG NHANH — gửi xác minh cho khách ĐỒNG THỜI đưa chủ shop duyệt (chốt 21/11/2026, THAY mục 3 + 4)
+5. **MỌI đơn liên quan giao thiếu phải hiện trên sổ (chủ shop bắt buộc, 21/11/2026)** — từ chat, đánh giá, trả hàng, hay khách tự bấm
+   hoàn tiền/khiếu nại trên sàn: phải có phiếu `resend_cases` + dòng `▸` đầu tiên, không bỏ sót. Khách ĐÃ bấm "Hoàn tiền / Trả hàng và hoàn tiền"
+   vì thiếu hàng (vd #8 obe9hvmo5o, Shopee 165.000đ) → thêm dòng riêng `⚑ hoantien=1` vào `owner_note` + dòng `▸ [chờ anh]` nói rõ
+   số tiền, giờ khách bấm, khách hỏi gì; web hiện nhãn đỏ "Khách đang yêu cầu hoàn tiền vì thiếu". Chủ shop vào kiểm rồi quyết hoàn tiền hay gửi bù.
+   Hết yêu cầu hoàn tiền (khách rút) thì ghi `⚑ hoantien=0`.
+6. **Mẫu thiếu mà đơn có 3 món (phiếu #9, 21/11/2026):** chủ shop xác nhận món thiếu `Chất Lông-Đốm Hồng L` CÓ trong đơn (món thứ 3, bị ẩn sau
+   nút "Ẩn bớt/Xem thêm" ở khung đơn hàng chat TikTok). Phải bấm mở rộng danh sách mặt hàng trước khi kết luận "đơn không có món X".
+
+## 1h. LUỒNG NHANH — gửi xác minh cho khách ĐỒNG THỜI đưa chủ shop duyệt (chốt 21/11/2026, THAY mục 3 + 4 + 5 cũ)
 
 *Lý do:* chủ shop: "chờ khách xác nhận rồi mới sang a duyệt là bị chậm". Hai việc chạy SONG SONG, bên nào xong trước thì đi tiếp.
 
@@ -190,16 +204,8 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
 3. **Khách SỬA thông tin sau khi đã gửi xác minh:** ghi lại file dữ liệu + `data_hash`, gửi tin xác minh mới, đặt lại `wait_approve_1`
    (đang `approved` mà chưa `creating` cũng đặt lại được). Đã `creating` trở đi thì KHÔNG đụng: ghi `▸ [chờ anh] Khách sửa thông tin sau khi đã tạo đơn — anh kiểm`.
 4. Duyệt lần 2 (sau khi tạo đơn SPX + PDF) vẫn là quyền chủ shop, không đổi.
-5. Mục 3, 4, 5 ở dưới: mọi chỗ nói `verifying` / "khách xác nhận mới sang `wait_approve_1`" / Telegram chủ shop duyệt lần 1 → đọc theo mục 1g này.
+5. Mục 3, 4, 5 bên dưới đã viết lại theo luồng này (không còn `verifying`, không còn Telegram duyệt lần 1).
    Nhắc khách im ≥ 4 giờ (mục 1e) vẫn áp dụng cho tin xác minh chưa được trả lời.
-
-5. **MỌI đơn liên quan giao thiếu phải hiện trên sổ (chủ shop bắt buộc, 21/11/2026)** — từ chat, đánh giá, trả hàng, hay khách tự bấm
-   hoàn tiền/khiếu nại trên sàn: phải có phiếu `resend_cases` + dòng `▸` đầu tiên, không bỏ sót. Khách ĐÃ bấm "Hoàn tiền / Trả hàng và hoàn tiền"
-   vì thiếu hàng (vd #8 obe9hvmo5o, Shopee 165.000đ) → thêm dòng riêng `⚑ hoantien=1` vào `owner_note` + dòng `▸ [chờ anh]` nói rõ
-   số tiền, giờ khách bấm, khách hỏi gì; web hiện nhãn đỏ "Khách đang yêu cầu hoàn tiền vì thiếu". Chủ shop vào kiểm rồi quyết hoàn tiền hay gửi bù.
-   Hết yêu cầu hoàn tiền (khách rút) thì ghi `⚑ hoantien=0`.
-6. **Mẫu thiếu mà đơn có 3 món (phiếu #9, 21/11/2026):** chủ shop xác nhận món thiếu `Chất Lông-Đốm Hồng L` CÓ trong đơn (món thứ 3, bị ẩn sau
-   nút "Ẩn bớt/Xem thêm" ở khung đơn hàng chat TikTok). Phải bấm mở rộng danh sách mặt hàng trước khi kết luận "đơn không có món X".
 
 ## 1g. SỔ KIỂM "KHÁCH ĐÃ GỬI GÌ" = dòng `☑` — CẤM hỏi lại thứ khách đã gửi (chốt 21/11/2026, case #9)
 
@@ -258,16 +264,16 @@ tự tra được món/mã vận đơn.
   ảnh sp rồi mà sao còn hỏi lại" → bỏ.
 - Chưa có ảnh nào → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
   TRƯỚC, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
-- **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `verifying`,
-  KHÔNG ping chủ shop duyệt.** Giữ `collecting`; quá 24h nhắc như mục 5.
+- **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `wait_approve_1`,
+  KHÔNG đưa chủ shop duyệt** (trừ khi anh bấm "Duyệt dù thiếu ảnh"). Giữ `collecting`; nhắc khách theo mục 1e (4h, 1 lần).
   Cột `msg_photo_at` chưa có trên DB (chủ shop chưa chạy SQL) thì kiểm lịch sử chat
   xem đã xin ảnh chưa, đừng xin lại.
-- Khi khách gửi ảnh: ghi vào `item_evidence` "khách gửi ảnh vỏ đơn/ảnh sản phẩm nhận được lúc HH:MM", và ở
-  Telegram duyệt lần 1 phải ghi rõ **tên khách + sàn + "mở chat xem ảnh khách gửi rồi duyệt"**.
+- Khi khách gửi ảnh: ghi vào `item_evidence` "khách gửi ảnh vỏ đơn/ảnh sản phẩm nhận được lúc HH:MM" (web hiện để anh
+  mở chat xem ảnh rồi duyệt; KHÔNG Telegram — chốt 21/11/2026).
 
-Cần đủ: ảnh bằng chứng (ảnh vỏ đơn HOẶC ảnh sản phẩm/gói hàng nhận được), món thiếu (mẫu, size, SL), họ tên + SĐT, địa chỉ. Thiếu mục nào hỏi mục đó
-(mẫu: Tin xin ảnh vỏ đơn, Tin xin họ tên/SĐT/địa chỉ ở file flow-batch). Món thiếu
-chưa rõ → không tự hỏi, báo chủ shop (chưa có mẫu).
+Cần đủ: ảnh bằng chứng (ảnh vỏ đơn HOẶC ảnh sản phẩm/gói hàng nhận được), món thiếu (mẫu, size, SL), SĐT, địa chỉ (tên lấy trên sàn). Thiếu mục nào hỏi
+ĐÚNG mục đó (mẫu theo phần còn thiếu ở file flow-batch). Món thiếu chưa rõ → mở đủ mọi món của đơn (1f.1), vẫn chưa rõ thì hỏi khách 1 câu kèm
+danh sách món (1c) — không báo chủ shop trừ khi khách không trả lời được.
 
 Khi khách gửi ảnh: đọc ra tên, SĐT, địa chỉ; ghép SĐT với SĐT bị che trong đơn
 (prefix/suffix phải khớp, xem Step 2 của SKILL.md). Tra mã vận đơn gốc:
@@ -278,47 +284,38 @@ Xác định món thiếu: từ lời khách + danh sách món của đơn gốc
 hoặc đơn có nhiều món cùng loại; low = đoán), `item_evidence` (1-2 câu),
 `order_items`.
 
-## 3. Gửi tin xác minh → `verifying`
+## 3. Gửi tin xác minh + ĐỒNG THỜI → `wait_approve_1` (mục 1h; KHÔNG còn `verifying`)
 
 1. Ghi **file dữ liệu chốt** cục bộ (NGOÀI git): `C:\sokho\resend-data\<platform>_<handle>_<mã đơn gốc>.json`
    với `name`, `phone` (dạng liền, vd `0900000000`), `address`, `item_name`
    (tên sản phẩm SPX theo `.claude/shared/notice_naming.md`), `item_summary`,
    `qty`, `orig_order_code`, `orig_tracking`.
 2. Gửi tin xác minh (mẫu "Tin xác minh") — các trường lấy từ **chính file này**.
-3. PATCH: `status=verifying`, `msg_verify_at`, `item_*`, `recipient_masked`,
+3. PATCH: `status=wait_approve_1`, `run_date` = hôm nay, `customer_confirmed_at` = null, `msg_verify_at`, `item_*`, `recipient_masked`,
    `orig_tracking`, `data_hash` = SHA-256 của file
    (`python -c "import hashlib,sys;print(hashlib.sha256(open(sys.argv[1],'rb').read()).hexdigest())" <file>`).
 
 Khách sửa thông tin → ghi lại file, gửi tin xác minh mới, cập nhật `data_hash`
 (đặt `msg_verify_at` mới). Cờ lên trước khi gửi như quy tắc chung.
 
-## 4. Khách xác nhận → `wait_approve_1`
+## 4. Khách trả lời "đúng" khi phiếu đang `wait_approve_1`
 
 Khách trả lời đúng ("đúng rồi", "ok"...). Gửi **Tin ghi nhận** (không hứa giờ, mẫu ở
-[resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md); chốt 18/11/2026,
-thay cho Tin 2a/2b theo giờ). Không còn chọn tin theo giờ khách xác nhận.
-
-PATCH `status=wait_approve_1` (điều kiện `status=eq.verifying`),
-`customer_confirmed_at`, `run_date` = hôm nay, `msg_ack_at` (cờ lên trước khi gửi).
-Rồi gửi **Telegram** cho chủ shop (bot như `daily-warehouse-report`, chat_id của chủ
-shop): nguyên văn tin xác minh (có đủ SĐT/địa chỉ — chỉ chủ shop thấy), món thiếu +
-độ chắc + bằng chứng, và "Duyệt lần 1 ở tab 'Gửi bù' trên Sổ Vận Hành (trước ~14h40
-để đơn kịp đi hôm nay)".
+[resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md); chốt 18/11/2026).
+PATCH `customer_confirmed_at`, `msg_ack_at` (cờ lên trước khi gửi) và, nếu chủ shop CHƯA duyệt, `status=approved`
+(điều kiện `status=eq.wait_approve_1`) để tạo đơn luôn (mục 1h.2). KHÔNG Telegram duyệt lần 1 — chủ shop thấy phiếu "chờ duyệt" ngay trên Sổ Vận Hành
+(hạn duyệt trước ~14h40 để đơn kịp đi hôm nay, web tự hiện).
 
 Khách trả lời mà không rõ có xác nhận không → không đoán, đọc lại cả hội thoại;
 vẫn không rõ thì hỏi lại 1 câu ngắn "Thông tin trên đã đúng chưa bạn nhỉ ạ?".
 
 ## 5. Nhắc / treo
 
-- `verifying` hoặc `collecting` quá 24h không có tin khách mới → nhắc 1 lần
-  (`msg_remind_at` lên trước, nội dung ngắn nhẹ nhàng nhắc khách gửi/xác nhận
-  thông tin để shop tạo đơn gửi bù; chủ shop chưa duyệt câu chữ → dùng
-  "Dạ bạn xác nhận giúp shop thông tin gửi bù để shop tạo đơn sớm cho bạn nhé ạ").
-- Quá 72h vẫn im → `status=stalled`, `stall_reason='Khách im > 72h'`.
-  Chủ shop có thể bấm "Duyệt dù khách chưa xác nhận" trên tab.
-- Sau 14h30 mà case vẫn `wait_approve_1` → Telegram nhắc 1 lần (14h50 nhắc lần 2,
-  "duyệt sau 14h40 thì đơn đi ngày mai"). Duyệt muộn vẫn được, chỉ đi ngày mai; không
-  còn "trượt phiên" hay tin xin lỗi riêng (chốt 18/11/2026).
+- `collecting` im ≥ 4 giờ → nhắc 1 lần theo mục 1e (chỉ nêu mục còn `=0`). Phiếu `wait_approve_1` mà khách chưa trả lời xác minh thì KHÔNG
+  nhắc khách (đã gửi đủ rồi; chủ shop duyệt là đi được, không cần khách).
+- Quá 72h vẫn im ở `collecting` → `status=stalled`, `stall_reason='Khách im > 72h'`. Chủ shop xử lý trên web.
+- Chờ duyệt lần 1 gần 14h40: web tự hiện hạn + cảnh báo (KHÔNG Telegram, chốt 21/11/2026 thay cho Telegram nhắc 14h30/14h50). Duyệt muộn vẫn được,
+  chỉ đi ngày mai; không còn "trượt phiên" hay tin xin lỗi riêng (chốt 18/11/2026).
 
 ## Telegram ngoài ý muốn
 
