@@ -26,7 +26,8 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
   giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
 - Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu gợi ý (Claude soạn 22/11/2026, chủ shop
   chưa duyệt từng chữ): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
-- Khách không muốn đổi mà muốn **trả hàng hoàn tiền** (chủ shop chốt 22/11/2026): **HỖ TRỢ**. Làm giống luồng đổi
+- **CHỈ KHI khách tự yêu cầu trả hàng hoàn tiền** (chủ shop nhấn mạnh 22/11/2026) mới hướng dẫn trả hàng hoàn tiền; còn lại
+  LUÔN hướng dẫn **đổi hàng mới** (đừng chủ động mời trả hàng hoàn tiền). Khách không muốn đổi mà muốn **trả hàng hoàn tiền** (chủ shop chốt 22/11/2026): **HỖ TRỢ**. Làm giống luồng đổi
   (bước 1–3: không xin ảnh nếu đã có, xin lỗi + xác nhận lỗi + câu "note và báo lại anh quản lý") nhưng
   **khách KHÔNG đặt đơn mới, chỉ bấm trả hàng**: hướng dẫn trả hàng hoàn tiền theo mẫu Sheet "Mau tin nhan"
   (đọc nguyên văn, xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md)), lý do chọn "Đổi ý"
@@ -42,7 +43,7 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 |---|---|---|
 | 1 | **Không xin ảnh nữa** nếu khách đã gửi ảnh/video lỗi | Bỏ hẳn tin "Bạn gửi giúp shop ảnh...". Chỉ xin ảnh khi khách CHƯA gửi (dùng tin ở faq-17-11 mục 13.2). Khách gửi ảnh **trước** rồi mới gõ chữ là chuyện thường — nhớ cuộn lên xem. |
 | 2 | **Xin lỗi + xác nhận lỗi** | Hàng lỗi: "Dạ, sau khi kiểm tra thì shop xác nhận đây là lỗi chưa kiểm tra kĩ trước khi giao hàng. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." Giao nhầm: "...shop xác nhận đây là lỗi kho bên mình giao bị nhầm. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." (Sheet "Mau tin nhan" dòng 8–10, 13–14; câu in đậm chủ shop thêm 22/11/2026, đặt TRƯỚC đề xuất xử lý, áp dụng toàn bộ case lỗi shop.) Có thể mở đầu ngắn kiểu người thật ("Uii dạ") như anh làm. |
-| 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11; đã thêm vào Sheet "Mau tin nhan"). |
+| 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng **miễn phí** và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11, thêm chữ "miễn phí" ngày 22/11/2026; chưa sửa trong Sheet "Mau tin nhan" — nhờ chủ shop cập nhật nếu muốn Sheet khớp). |
 | 4 | **Hướng dẫn đổi hàng** theo sàn | Nguyên văn Sheet "Mau tin nhan" mục "Đổi hàng": TikTok lý do **"Đổi ý"**; Shopee lý do **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"** — xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md). Khách đặt đơn mới → bấm trả đơn cũ → shipper qua lấy → tiền về ví sàn. |
 | 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. **Phải xác minh đúng thẻ là Giảm 10.000₫ (đọc chữ trên thẻ, không đoán theo vị trí) trước khi bấm Gửi, và đọc lại thẻ hiện trong chat sau khi gửi.** Sai mức (không phải 10k) → không gửi, báo Telegram. |
 | 6 | **Tin báo mã giảm** (chủ shop thêm 22/11/2026), gửi ngay sau thẻ voucher | "Dạ mình gửi bạn mã giảm giá 10k khi đặt lại đơn hàng, 1 lần nữa mình xin lỗi bạn vì trải nghiệm chưa được tốt ạ." |
