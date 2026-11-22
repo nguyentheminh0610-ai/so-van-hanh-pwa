@@ -72,6 +72,22 @@ dự phòng (cổng rẻ nên không tốn).
 
 ## Mẫu tin nhắn khách (chủ shop chốt 17/11/2026)
 
+**Tin XIN LỖI mở đầu — gửi TRƯỚC mọi tin hỏi (chủ shop chốt 22/11/2026).** Lý do: khách báo thiếu hàng
+là đã có trải nghiệm mua không tốt, vào thẳng "chụp ảnh vỏ đơn" nghe như đòi chứng minh; xin lỗi trước
+để khách thấy shop nhận phần trách nhiệm. Gửi thành **1 tin riêng, ngay trước** tin xin ảnh / xin SĐT-địa chỉ
+đầu tiên của case (không gộp chung 1 tin):
+
+```
+Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ.
+```
+(Câu do Claude soạn theo ý chủ shop 22/11/2026; chủ shop chưa duyệt từng chữ — sửa tại đây nếu muốn đổi.)
+
+- **Chỉ gửi 1 lần/case**, ghi `xl@HH:MM` vào `hoi=` trong dòng `☑` của `owner_note` TRƯỚC khi gửi (cờ chống trùng, không cần cột mới).
+- **Không gửi** nếu trong chat đã có lời xin lỗi của shop/nhân viên cho đúng vụ này (đọc lại cả hội thoại, mục 2
+  của collect-verify), hoặc phiếu mở từ lượt review-return-check đã gửi tin xin lỗi sau Tin 3a (xem `.claude/shared/mau-tin-nhan-tra-hang.md`, Tin 3b giao thiếu).
+- Khách đã gửi ảnh bằng chứng (nên bỏ tin xin ảnh) thì tin xin lỗi vẫn đi trước tin hỏi SĐT/địa chỉ đầu tiên.
+- Khách đang tranh chấp/đòi hoàn tiền: không thuộc luồng này (xem collect-verify mục 1), đừng gửi.
+
 **Xin ảnh vỏ đơn / ảnh bằng chứng** (BẮT BUỘC có ảnh bằng chứng mọi case, chốt lại 18/11/2026; khách ĐÃ gửi ảnh sản phẩm/gói hàng nhận được thì KHÔNG gửi tin này — chốt 18/11/2026 tối — xem mục "Ảnh bằng chứng" trong
 [resend-collect-verify.md](resend-collect-verify.md)). Nguyên văn chủ shop soạn 13/10/2026:
 

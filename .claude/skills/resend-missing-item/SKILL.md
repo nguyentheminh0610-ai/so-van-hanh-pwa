@@ -159,7 +159,13 @@ references/resend-collect-verify.md mục 2):
 Để shop kiểm tra và hỗ trợ gửi bù sản phẩm còn thiếu cho bạn nhanh nhất, bạn chụp giúp shop 1 tấm ảnh phần vỏ đơn hàng (tem/mã vận đơn dán bên ngoài túi/hộp) gửi qua đây giúp shop nhé ạ.
 ```
 
-Case mới chưa có gì → gửi Tin 2 trước, rồi Tin 1. Sản phẩm thiếu (b)
+**Tin 0 (xin lỗi) — chốt 22/11/2026, gửi TRƯỚC mọi tin ở trên**, 1 tin riêng, 1 lần/case
+(mẫu + điều kiện bỏ qua ở references/resend-flow-batch-2026-11-17.md):
+```
+Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ.
+```
+
+Case mới chưa có gì → gửi Tin 0 (xin lỗi), rồi Tin 2, rồi Tin 1. Sản phẩm thiếu (b)
 thường khách đã nói ngay trong tin báo thiếu. Nếu chưa rõ mẫu/size/số
 lượng, **không tự hỏi** — báo chủ shop qua Telegram, vì chưa có mẫu tin
 cho phần này.

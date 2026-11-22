@@ -68,7 +68,7 @@ chung chung, không trích nguyên văn):
 **Tin 3b — xin bằng chứng**, gửi NGAY SAU 3a trong cùng lượt mở thread:
 - **Giao nhầm / hàng lỗi** — nguyên văn từ `size-consultation/references/cskh-faq-17-11.md` mục 13:
   > Dạ shop xin lỗi bạn về sự bất tiện này ạ. Bạn gửi giúp shop ảnh (hoặc video mở hàng) phần bị lỗi/bị nhầm và ảnh tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ.
-- **Giao thiếu** — "Tin xin ảnh vỏ đơn" ở `resend-missing-item/references/resend-flow-batch-2026-11-17.md`
+- **Giao thiếu** — gửi thêm **tin xin lỗi** ("Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ.", chốt 22/11/2026) NGAY SAU 3a, rồi mới "Tin xin ảnh vỏ đơn" ở `resend-missing-item/references/resend-flow-batch-2026-11-17.md`
   (nguyên văn). Khách đã gửi ảnh trong chat → bỏ 3b, theo luật "Ảnh bằng chứng" của resend-collect-verify.
 
 Nhóm 1 (lý do ảnh hưởng shop) vẫn gửi **Tin 1 trước** (nhờ đổi lý do sang lý do không ảnh

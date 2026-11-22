@@ -265,8 +265,11 @@ tự tra được món/mã vận đơn.
   Shopee, `order_to_tracking.sh`). *Lý do:* case `obe9hvmo5o` 18/11 — khách đã gửi ảnh túi
   hàng chỉ có 1 quần lúc 22:26, vẫn bị xin "ảnh vỏ đơn" lúc 23:29; chủ shop: "khách đã gửi
   ảnh sp rồi mà sao còn hỏi lại" → bỏ.
+- **Thứ tự tin đầu tiên của case (chủ shop chốt 22/11/2026): Tin XIN LỖI → Tin xin ảnh → tin xin SĐT/địa chỉ.**
+  Tin xin lỗi ("Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ.", mẫu + điều kiện bỏ qua ở
+  [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md)) gửi 1 lần/case, ghi `xl@HH:MM` vào `hoi=` trước khi gửi.
 - Chưa có ảnh nào → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
-  TRƯỚC, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
+  sau tin xin lỗi, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
 - **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `wait_approve_1`,
   KHÔNG đưa chủ shop duyệt** (trừ khi anh bấm "Duyệt dù thiếu ảnh"). Giữ `collecting`; nhắc khách theo mục 1e (4h, 1 lần).
   Cột `msg_photo_at` chưa có trên DB (chủ shop chưa chạy SQL) thì kiểm lịch sử chat
