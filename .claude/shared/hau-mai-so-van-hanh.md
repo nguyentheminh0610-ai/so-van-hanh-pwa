@@ -68,18 +68,39 @@ Chủ shop yêu cầu 22/11/2026: (1) **toàn bộ** case hậu mãi phải hi�
 | Vừa xong (gập) | case xong chưa quá 3 ngày, ghi "ẩn sau N ngày" | Mở lại |
 | Đã ẩn (gập) | case xong quá 3 ngày, giữ 30 ngày để tra | Mở lại (nếu do anh bấm) |
 
-### BẢNG XÁC MINH "THẾ NÀO LÀ XONG" (bản đề xuất 22/11/2026 — chủ shop chưa sửa gì thì chạy theo bảng này)
+### BẢNG XÁC MINH "THẾ NÀO LÀ XONG" — chia 3 khu vực theo nguồn (chủ shop yêu cầu chia lại 22/11/2026)
+
+Bản đề xuất 22/11/2026 — chủ shop chưa sửa gì thì chạy theo bảng này. Quy tắc chung cho cả 3 khu vực: anh bấm **Xong** →
+rời danh sách NGAY, nằm ở "Vừa xong" 3 ngày; khách nhắn lại → thẻ tự mở lại.
+
+**Khu vực 1 — CHAT** (bảng `cskh_chat_errors` + phiếu `resend_cases`; task CSKH inbox 15 phút/lần)
 
 | Loại case | Web coi là XONG khi | Sau đó |
 |---|---|---|
 | Giao thiếu (gửi bù) | phiếu `status='done'` = đã nhắn khách mã vận đơn; hoặc anh Dừng / Chưa ổn | 3 ngày ở "Vừa xong" rồi ẩn |
-| Giao nhầm / hàng lỗi (chat) | task ghi `[xong]` (đã hướng dẫn đổi/trả + gửi mã 10k, hoặc đã từ chối) **VÀ** anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
-| Đổi size, trả hàng hoàn tiền, đòi hoàn tiền giữ hàng (chat) | task ghi `[xong]` (đã hướng dẫn đủ / đã từ chối) | 3 ngày rồi ẩn |
-| Bất kỳ case nào đang `[chờ khách]` | khách im lặng đủ 3 ngày kể từ bước cuối | ẩn luôn, ghi "tự ẩn: 3 ngày không có gì mới" |
-| Đánh giá xấu 1–3★ | đã nhắn khách mà 3 ngày không có gì mới; hoặc anh bấm Xong | ẩn luôn / 3 ngày |
-| Trả hàng trên sàn (ảnh hưởng shop, không tranh chấp) | 3 ngày kể từ lần cuối có gì mới (sàn tự xử lý hoàn tiền) | ẩn luôn |
-| Thẻ "Chỉ cần xem" | 3 ngày kể từ ngày phát sinh | ẩn luôn |
-| Mọi loại | anh bấm **Xong** | rời danh sách NGAY, nằm ở "Vừa xong" 3 ngày |
+| Giao nhầm / hàng lỗi | task ghi `[xong]` (đã hướng dẫn đổi/trả + gửi mã 10k, hoặc đã từ chối) **VÀ** anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
+| Đổi size / đổi mẫu | task ghi `[xong]` (đã hướng dẫn đủ) | 3 ngày rồi ẩn |
+| Trả hàng hoàn tiền, đòi hoàn tiền giữ hàng | task ghi `[xong]` (đã hướng dẫn / đã từ chối) | 3 ngày rồi ẩn |
+| Đang `[chờ khách]` (mọi loại trừ gửi bù) | khách im lặng đủ 3 ngày kể từ bước cuối | ẩn luôn |
+
+**Khu vực 2 — ĐÁNH GIÁ** (bảng `cskh_reviews`; skill review-return-check 08:00 & 20:00)
+
+| Loại case | Web coi là XONG khi | Sau đó |
+|---|---|---|
+| Đánh giá xấu 1–3★, đã nhắn khách | 3 ngày không có gì mới (khách không phản hồi) | ẩn luôn |
+| Đánh giá xấu, khách đã phản hồi / hết 2 tin (`[chờ anh]`) | chỉ khi anh bấm Xong | 3 ngày ở "Vừa xong" |
+| Đánh giá nêu lỗi kho / lỗi sản phẩm | anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
+| Đánh giá 4–5★ có nhắc vấn đề (chỉ xem) | 3 ngày kể từ ngày đánh giá | ẩn luôn |
+
+**Khu vực 3 — TRẢ HÀNG** (bảng `cskh_returns`; skill review-return-check 08:00 & 20:00)
+
+| Loại case | Web coi là XONG khi | Sau đó |
+|---|---|---|
+| Trả hàng lý do ảnh hưởng shop, không tranh chấp | 3 ngày kể từ lần cuối có gì mới (sàn tự xử lý hoàn tiền) | ẩn luôn |
+| Trả hàng nêu giao nhầm / hàng lỗi | anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
+| Trả hàng vì thiếu hàng | theo phiếu gửi bù (khu vực 1) | — |
+| Tranh chấp / khách hỏi tiền hoàn | chỉ khi anh bấm Xong | 3 ngày ở "Vừa xong" |
+| Trả hàng nói về SP / kho (chỉ xem) | 3 ngày kể từ ngày yêu cầu | ẩn luôn |
 
 **KHÔNG BAO GIỜ tự ẩn — chỉ anh đóng được** (thẻ ghi "chờ anh · không tự ẩn"), vì ẩn nhầm là mất tiền/mất số liệu:
 - Đề xuất ghi lỗi Sổ Kho chưa quyết (ẩn = mất thống kê lỗi nhân viên / nhà cung cấp).
