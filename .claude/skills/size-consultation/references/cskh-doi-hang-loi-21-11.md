@@ -41,7 +41,7 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 
 ## ĐIỀU KIỆN ĐỔI / TRẢ — cắt mác, đã giặt, 15 ngày (chủ shop chốt 22/11/2026)
 
-Áp dụng cho cả hàng lỗi và giao nhầm (luồng 5 bước), khớp Mục 8.3 tài liệu CSKH.
+Áp dụng cho cả hàng lỗi, giao nhầm (luồng 5 bước) **và đổi size vì rộng/chật**, khớp Mục 8.3 tài liệu CSKH.
 - **KHÔNG tự soi ảnh để đoán hàng đã dùng hay chưa.** Chỉ xét khi **khách tự nhắn** là đã cắt mác / đã giặt / đã mặc.
 - **Khách nói đã cắt mác** → không sao, vẫn hỗ trợ bình thường. Câu (Claude soạn theo ý chủ shop, chưa duyệt từng chữ):
   "Dạ không sao đâu ạ, bạn cắt mác rồi shop vẫn hỗ trợ cho bạn nhé ạ." rồi chạy tiếp các bước.
@@ -109,10 +109,9 @@ chỉ hiện dòng chat ở nhóm "Ghi lỗi Sổ Kho". Cho tới khi web đư�
 
 Đây là **lỗi khách quan**, không phải hàng lỗi — KHÔNG chạy luồng 5 bước ở trên. Phần
 "deal" này **đã có sẵn** trong tài liệu, dùng lại:
-- Rộng/chật một chút → gợi ý cố mặc, vẫn sẵn sàng đổi: "Dạ, nếu rộng hoặc chật không
-  quá nhiều thì bạn cố gắng mặc giúp mình là hợp lý nhất đó ạ, tuy nhiên mình cũng sẵn
-  sàng hỗ trợ bạn đổi hàng ạ." (Sheet dòng 11; luồng đầy đủ ở
-  [cskh-ship-faq.md](cskh-ship-faq.md) mục "Đổi size / đổi trả hàng sau khi mua").
+- Rộng/chật → **câu mới chốt 22/11/2026** (sẵn sàng đổi miễn phí, gợi ý cố mặc hoặc mang đi sửa nếu rộng) rồi gửi
+  NGAY hướng dẫn đổi, không hỏi size muốn đổi / không kiểm tồn — nguyên văn + thứ tự ở
+  [cskh-ship-faq.md](cskh-ship-faq.md) mục "Đổi size / đổi trả hàng sau khi mua" (câu cũ Sheet dòng 11 không dùng nữa).
 - Dài quá → gợi ý mang ra hàng cắt ngắn, yên tâm không mất form (Sheet "Deal khách —
   Dài quá" dòng 31; câu ngắn hơn ở [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 10).
   Câu trong Sheet có đoạn "hoàn lại [x]đ qua ngân hàng" — **số tiền là của chủ shop**,

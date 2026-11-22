@@ -201,10 +201,15 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
 "Chinh sach xu ly loi". Khi cần mẫu CSKH ngoài size → đọc Sheet này, nó thắng.
 
 **Luồng xử lý "khách muốn đổi size" (TikTok/Shopee):**
-1. Chưa hỏi lý do đổi trước. Trả lời mẫu gợi ý giữ hàng + sẵn sàng đổi:
-   > Dạ, nếu rộng hoặc chật không quá nhiều thì bạn cố gắng mặc giúp mình là hợp
-   > lý nhất đó ạ, tuy nhiên mình cũng sẵn sàng hỗ trợ bạn đổi hàng ạ.
-   → hỏi khách muốn đổi sang size nào + kiểm còn hàng (xin cao/nặng nếu cần).
+1. Chưa hỏi lý do đổi trước. Gửi câu sẵn sàng đổi miễn phí + gợi ý giữ hàng — **câu mới chủ shop chốt
+   22/11/2026** (Claude chỉ sửa chính tả/dấu câu, giữ ý và độ dài), thay cho câu cũ "Dạ, nếu rộng hoặc chật
+   không quá nhiều thì bạn cố gắng mặc giúp mình là hợp lý nhất đó ạ, tuy nhiên mình cũng sẵn sàng hỗ trợ bạn đổi hàng ạ.":
+   > Dạ, mình sẵn sàng hỗ trợ đổi lại hàng miễn phí cho bạn như sau ạ. Nhưng vì đổi hàng có thể mất 2-5 ngày
+   > và cũng hơi mất công một chút xíu, nên nếu chỉ hơi ngắn hoặc hơi bé thì shop khuyên bạn có thể cố mặc
+   > giúp shop, còn nếu rộng thì bạn có thể mang ra hàng sửa lại một chút xíu là ok ạ.
+   → **gửi NGAY tin hướng dẫn đổi hàng (bước 2)**, không chờ khách trả lời câu trên.
+   **BỎ bước hỏi khách muốn đổi sang size nào + kiểm tồn** (chủ shop chốt 22/11/2026, thay cho quy tắc cũ
+   "hỏi size muốn đổi + kiểm còn hàng"): khách tự chọn size khi đặt đơn mới trên sàn.
 2. Hướng dẫn đổi hàng (ưu tiên Cách 1: đặt đơn mới + trả hàng đơn cũ):
    - **CHỐT 19/11/2026 (chủ shop sửa lại trong Sheet "Mau tin nhan", thay cho
      câu cũ chọn "Tôi nhận đủ mặt hàng nhưng hàng có vấn đề" / "Đã nhận được
@@ -228,8 +233,11 @@ vì tự thấy rộng/chật (lỗi khách, không phải hàng lỗi) → sau 
 **gửi thêm 1 mã giảm 10.000đ** để khuyến khích đặt lại đơn mới, giống mã của case hàng lỗi.
 - TikTok: tab "Voucher" ở cột phải khung chat → thẻ "Voucher tặng riêng — Giảm 10.000₫" → Gửi
   (chi tiết + thẻ không được gửi nhầm: [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md)).
-- Shopee: chưa xác minh nút gửi voucher trong webchat → báo Telegram "cần gửi mã 10k cho khách X (Shopee)".
-- Thẻ 10k hết hiệu lực → KHÔNG tự tạo voucher mới, báo Telegram.
+- Shopee: được tự gửi khi xác minh đúng mã 10k (chốt 22/11/2026); không thấy nút/mã → đẩy lên Sổ Vận Hành `[chờ anh]`
+  (cách làm + ngoại lệ Telegram tạm thời: [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md)).
+- Thẻ 10k hết hiệu lực → KHÔNG tự tạo voucher mới, đẩy lên Sổ Vận Hành `[chờ anh]`.
+- Thứ tự tin case đổi size (22/11/2026): câu sẵn sàng đổi (bước 1) → hướng dẫn đổi (bước 2) → mã 10k → hỏi lý do (bước 3).
+- Điều kiện cắt mác / đã giặt / quá 15 ngày: dùng chung mục "ĐIỀU KIỆN ĐỔI / TRẢ" trong cskh-doi-hang-loi-21-11.md.
 - Dòng cũ "15k nếu lỗi shop" ở dưới vẫn chờ chủ shop xác nhận; case hàng lỗi/giao nhầm dùng 10k.
 - Lý do chọn khi khách bấm trả đơn cũ để đổi: theo chốt 19/11/2026 là **"Đổi ý"** (Shopee:
   "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), xem `.claude/shared/mau-tin-nhan-tra-hang.md`
