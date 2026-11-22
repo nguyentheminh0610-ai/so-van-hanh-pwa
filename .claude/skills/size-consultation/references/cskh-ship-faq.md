@@ -227,10 +227,9 @@ skill và báo lại chủ shop để sửa Sheet.
    - **Shopee:** câu y hệt nhưng lý do là "Đổi ý (Sản phẩm còn nguyên tem, nhãn
      mác, bao bì)".
 3. Sau khi hướng dẫn xong mới hỏi lý do (mẫu "Hỏi xác định lý do đổi size"):
-   > Dạ b ơi, cho mình hỏi thêm chút là sản phẩm mình mặc bị rộng/chật quá là do
-   > mình đã chọn size theo đúng bảng size của shop hay mình có thể đã đặt nhầm
-   > size ạ? Với b cho mình xin thêm chiều cao, cân nặng của bạn để shop tham khảo
-   > và ghi nhận, từ đó có thể điều chỉnh bảng size cho phù hợp hơn ạ.
+   > Dạ b cho shop hỏi thêm là mình đã chọn size theo bảng size của shop hay đặt nhầm size ạ? B cho shop xin chiều
+   > cao, cân nặng để shop ghi nhận và điều chỉnh bảng size cho phù hợp hơn nhé ạ.
+   (Bản gọn chủ shop duyệt 23/11/2026, thay câu dài cũ.)
 
 **KHÔNG gửi mã giảm 10k khi khách đổi size vì rộng/chật (chủ shop chốt lại 22/11/2026 tối, THAY cho dòng
 "gửi mã 10k" ghi trưa 22/11 — hiểu nhầm):** mã 10k **CHỈ dành cho lỗi của shop** (giao nhầm, hàng lỗi), xem
