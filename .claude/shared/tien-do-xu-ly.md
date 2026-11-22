@@ -39,6 +39,8 @@ Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ c
 
 ## Các bước theo loại case
 
+**Câu chữ nhắn khách mới nhất cho mọi case hậu mãi: [hau-mai-mau-tin-moi-nhat.md](hau-mai-mau-tin-moi-nhat.md) (chốt 23/11/2026).**
+
 **Giao nhầm / hàng lỗi / đổi size từ CHAT** (chốt 22/11/2026; luồng nhắn khách ở
 `size-consultation/references/cskh-doi-hang-loi-21-11.md` và `cskh-ship-faq.md`):
 1. `[đang làm]` Phát hiện khách báo <giao nhầm/hàng lỗi/đổi size> — đang kiểm ảnh + đơn

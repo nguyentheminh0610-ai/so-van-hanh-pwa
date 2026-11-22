@@ -5,6 +5,10 @@ description: Handle a customer report of a missing item from their order ("giao 
 
 # Gửi bù hàng giao thiếu
 
+> **Câu chữ nhắn khách mới nhất (chốt 23/11/2026):** tin xin lỗi + lý do, tin hướng xử lý "gửi bù miễn phí", tin xin ảnh,
+> tin xin thông tin gộp sản phẩm thiếu, cách 3 tờ giấy — ở [../../shared/hau-mai-mau-tin-moi-nhat.md](../../shared/hau-mai-mau-tin-moi-nhat.md)
+> mục "Case 1". Lệch với câu nào trong skill này thì theo file đó. Tiến độ ghi Sổ Vận Hành, không Telegram cho việc thu thập.
+
 ## ⛔ BƯỚC 0 — CHỈ CHẠY TRÊN MÁY WINDOWS (bắt buộc, làm trước mọi thứ)
 
 Chạy `hostname`. Nếu kết quả **không phải `DESKTOP-N7T8LNP`** (vd máy Mac)
