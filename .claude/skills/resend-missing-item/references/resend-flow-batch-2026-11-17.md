@@ -80,10 +80,9 @@ là đã có trải nghiệm mua không tốt, vào thẳng "chụp ảnh vỏ �
 đầu tiên của case (không gộp chung 1 tin):
 
 ```
-Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Do bên mình có bạn nhân viên mới vào nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
 ```
-(Câu thứ hai chủ shop thêm 22/11/2026 cho toàn bộ case lỗi, đặt ở tin xin lỗi đầu, trước mọi đề xuất xử lý.)
-(Câu do Claude soạn theo ý chủ shop 22/11/2026; chủ shop chưa duyệt từng chữ — sửa tại đây nếu muốn đổi.)
+(Chủ shop duyệt 23/11/2026: thêm câu nêu lý do "nhân viên mới vào nên đóng hàng bị thiếu" — thay bản 22/11 chưa có lý do.)
 
 - **Chỉ gửi 1 lần/case**, ghi `xl@HH:MM` vào `hoi=` trong dòng `☑` của `owner_note` TRƯỚC khi gửi (cờ chống trùng, không cần cột mới).
 - **Không gửi** nếu trong chat đã có lời xin lỗi của shop/nhân viên cho đúng vụ này (đọc lại cả hội thoại, mục 2
@@ -101,9 +100,15 @@ Giao sai hàng: nhờ khách chụp thêm sản phẩm nhận được (không c
 
 **Hỏi thông tin nhận hàng** (thay Tin 1 cũ; vì sàn chặn SĐT/địa chỉ dạng chữ):
 
+**Chốt 23/11/2026 (thay bản 22/11 liệt kê 3 cách):** báo ngắn lý do sàn chặn, chỉ đưa 2 cách ảnh; GỘP luôn câu hỏi sản
+phẩm thiếu (tên mẫu, size, số lượng) — thường khách đã nói, thiếu phần nào thì hỏi đúng phần đó trong ngoặc:
 ```
-Dạ bạn cho shop xin họ tên, SĐT và địa chỉ nhận hàng để shop gửi bù nhé ạ. Để gửi thông tin bạn giúp shop 1 trong 3 cách: ghi thông tin vào ghi chú điện thoại rồi chụp màn hình gửi shop, hoặc ghi ra tờ giấy rồi chụp ảnh gửi shop (thêm 22/11/2026), hoặc chụp phần thông tin giao hàng của đơn (có đủ SĐT và địa chỉ) gửi shop ạ.
+Dạ bạn cho shop xin họ tên, SĐT, địa chỉ nhận hàng và sản phẩm bị thiếu (tên mẫu, size, số lượng) để shop gửi bù nhé ạ. Vì sàn không cho gửi SĐT và địa chỉ qua tin nhắn, bạn gửi giúp shop thông tin đó bằng ảnh nhé ạ (ảnh chụp màn hình ghi chú điện thoại, hoặc ảnh chụp phần thông tin giao hàng của đơn trên sàn).
 ```
+- Khách đã nói đủ tên mẫu + size + số lượng → bỏ đoạn "và sản phẩm bị thiếu (tên mẫu, size, số lượng)".
+- Khách nói thiếu một phần (vd chỉ nói tên mẫu) → chỉ giữ phần còn thiếu trong ngoặc, vd "(size, số lượng)".
+- **Cách 3 — CHỈ gửi khi khách nói không biết làm / không gửi được ảnh:**
+  `Dạ bạn có thể ghi họ tên, SĐT, địa chỉ ra 1 tờ giấy rồi chụp ảnh gửi shop cũng được ạ.`
 
 Lưu ý: SĐT trong đơn trên TikTok bị che; cách chụp thông tin giao hàng chỉ có
 ích khi khách tự mở đơn của họ. Cả 2 cách đều là ảnh nên **bắt buộc gửi tin xác

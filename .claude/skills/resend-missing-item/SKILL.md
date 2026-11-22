@@ -152,9 +152,10 @@ sản phẩm/gói hàng khách nhận được (chốt 18/11/2026), (b) sản ph
 Dùng **đúng nguyên văn 2 tin nhắn chủ shop đã soạn** (chốt 2026-10-13),
 không tự diễn đạt lại. Thiếu mục nào thì chỉ gửi tin của mục đó:
 
-**Tin 1 (hỏi thông tin nhận hàng)** — khi chưa có họ tên/SĐT/địa chỉ:
+**Tin 1 (hỏi thông tin nhận hàng + sản phẩm thiếu)** — chốt 23/11/2026, thay bản cũ; quy tắc bỏ/giữ phần sản phẩm và
+"cách 3 tờ giấy" (chỉ khi khách không biết làm) ở references/resend-flow-batch-2026-11-17.md:
 ```
-Bạn cho shop xin họ tên, số điện thoại và địa chỉ nhận hàng để shop gửi bù sản phẩm thiếu nhé ạ. Bạn có thể viết vào ghi chú điện thoại rồi chụp màn hình gửi shop, hoặc ghi ra tờ giấy rồi chụp ảnh gửi shop, để shop tạo đơn gửi bù cho chuẩn ạ.
+Dạ bạn cho shop xin họ tên, SĐT, địa chỉ nhận hàng và sản phẩm bị thiếu (tên mẫu, size, số lượng) để shop gửi bù nhé ạ. Vì sàn không cho gửi SĐT và địa chỉ qua tin nhắn, bạn gửi giúp shop thông tin đó bằng ảnh nhé ạ (ảnh chụp màn hình ghi chú điện thoại, hoặc ảnh chụp phần thông tin giao hàng của đơn trên sàn).
 ```
 
 **Tin 2 (xin ảnh vỏ đơn)** — CHỈ khi khách chưa gửi ảnh nào. Khách đã gửi ảnh
@@ -167,13 +168,12 @@ references/resend-collect-verify.md mục 2):
 **Tin 0 (xin lỗi) — chốt 22/11/2026, gửi TRƯỚC mọi tin ở trên**, 1 tin riêng, 1 lần/case
 (mẫu + điều kiện bỏ qua ở references/resend-flow-batch-2026-11-17.md):
 ```
-Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Do bên mình có bạn nhân viên mới vào nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
 ```
 
 Case mới chưa có gì → gửi Tin 0 (xin lỗi), rồi Tin 2, rồi Tin 1. Sản phẩm thiếu (b)
-thường khách đã nói ngay trong tin báo thiếu. Nếu chưa rõ mẫu/size/số
-lượng, **không tự hỏi** — báo chủ shop qua Telegram, vì chưa có mẫu tin
-cho phần này.
+thường khách đã nói ngay trong tin báo thiếu. Chưa rõ mẫu/size/số lượng → **hỏi luôn trong Tin 1** (chốt 23/11/2026,
+thay cho "không tự hỏi, báo Telegram").
 
 Sàn chặn gửi SĐT/địa chỉ bằng chữ, nên khách sẽ gửi ảnh chụp ghi chú. Đọc
 ảnh đó, ghép với SĐT bị che trong đơn (Step 2) để xác nhận. Sau đó các lượt quét 15 phút tự kiểm tra khách đã trả lời
