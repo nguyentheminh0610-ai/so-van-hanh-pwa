@@ -155,3 +155,13 @@ wdat1504 đều dùng **10k** cho lỗi shop. Luồng này theo **10k** (Sheet +
 
 **Khách hỏi tiền hoàn về đâu** (mọi case trả hàng trên sàn, chốt 22/11/2026): "Dạ tiền đó sẽ được hoàn về ví, nếu có liên kết
 với ngân hàng thì bạn có thể rút về hoặc dùng để thanh toán các đơn hàng tiếp theo trên sàn ạ." — xem cskh-ship-faq.md.
+
+### Dòng do script đối soát thêm (chốt 22/11/2026)
+
+Script `scripts/doi_soat_chat.py` (30 phút/lần, không phải lượt AI) tự thêm 1 dòng `cskh_chat_errors` khi nhật ký có khách
+báo hàng lỗi / giao nhầm mà chưa có trên sổ; `dedup_key` của các dòng này kết thúc bằng `|doi_soat`. Khi xử lý 1 khách báo
+lỗi, **trước khi tạo dòng mới** hãy tìm dòng `|doi_soat` cùng sàn + cùng khách: có thì cập nhật dòng đó (bổ sung `order_code`,
+`has_photo`, nối `progress_note`), không tạo dòng thứ 2 — nếu không khách sẽ thành 2 thẻ trên tab Hậu mãi. Script chỉ là
+lưới an toàn: lượt CSKH vẫn phải tự ghi dòng ngay khi khách báo lỗi như hướng dẫn ở trên. Chi tiết:
+[hau-mai-so-van-hanh.md](../../../shared/hau-mai-so-van-hanh.md).
+

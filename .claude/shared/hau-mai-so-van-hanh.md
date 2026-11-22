@@ -159,5 +159,34 @@ tiếp về cùng việc thì nối `▸` vào dòng cũ, không tạo dòng m�
 | 10 | Thẻ đề xuất lỗi thiếu mã vận đơn / loại lỗi | không có nút Ghi Sổ Kho, thẻ không tự ẩn | Nằm ở "Anh xử lý" kèm chữ "anh kiểm tay"; lượt quét sau bổ sung mã, hoặc anh bấm Xong |
 | 11 | Dòng `▸` sai định dạng (thiếu ngày giờ / nhãn) | web không đọc được bước | Dòng đó bị bỏ qua, thẻ hiện "chưa có cập nhật"; giữ đúng mẫu `▸ DD/MM HH:MM · [nhãn] nội dung` |
 | 12 | Supabase sập `PGRST002` | cả tab không tải | Xem [reference_supabase_pgrst002_su_co.md](reference_supabase_pgrst002_su_co.md) |
-| 14 | Khách báo lỗi trong CHAT nhưng task không ghi dòng lên sổ (rà 22/11: từ 17/11 lọt ít nhất 4 khách — `kl_24090`, `trwn.baozx`, `hihibuy1`, `isywp_` — có trong `cskh-log` nhưng không có trong `cskh_chat_errors`) | lỗi kho/sản phẩm không bao giờ được ghi Sổ Kho | **Chưa làm, chờ chủ shop duyệt:** script đối soát không mở trình duyệt, đọc `C:\sokho\cskh-log\*.jsonl`, dòng `khieu_nai` / `doi_tra` có mã đơn mà chưa có trên sổ thì tự thêm 1 dòng chat (không quy lỗi, để chủ shop tự chọn) |
+| 14 | Khách báo lỗi trong CHAT nhưng task không ghi dòng lên sổ (rà 22/11: từ 15/11 lọt 6 khách báo rách / giao nhầm, có trong `cskh-log` nhưng không có trên sổ) | lỗi kho/sản phẩm không bao giờ được ghi Sổ Kho | **Đã làm 22/11/2026 (chủ shop duyệt):** script đối soát `scripts/doi_soat_chat.py`, Task Scheduler `Claude - Doi soat chat hau mai` 30 phút/lần — xem mục "ĐỐI SOÁT NGUỒN CHAT" bên dưới |
+| 15 | Script đối soát chết (Python lỗi, mất mạng, task bị gỡ) | lưới an toàn nguồn chat mất mà không ai biết | mỗi lượt ghi 1 dòng vào `logs\doi-soat-chat.log` (`OK ...` hoặc `LOI: ...`); lượt sau tự nhìn lại 7 ngày nhật ký nên nghỉ vài ngày vẫn bù được, không mất case. Chưa có cảnh báo trên web cho script này |
+| 16 | Bộ lọc từ khoá của script bắt nhầm / bắt sót (khách tả lỗi bằng từ lạ, hoặc lượt CSKH xếp sai `category`) | thẻ thừa (anh bấm Xong là hết) hoặc sót | thêm từ vào `RE_SP` / `RE_KHO` trong script; chạy `--dry-run` xem trước |
 | 13 | Điện thoại giữ bản web cũ | không thấy nút/nhóm mới | Đã tăng phiên bản cache `sw.js` (v65); mở lại app 1–2 lần |
+
+---
+
+## ĐỐI SOÁT NGUỒN CHAT (chốt 22/11/2026 — chủ shop duyệt "Làm script")
+
+**Vì sao:** chủ shop muốn không sót lỗi kho / lỗi sản phẩm nhưng không vẽ thêm khu mới. Trả hàng và đánh giá đã kín (thẻ
+không tự mất trước khi anh xem). Riêng chat thì lượt CSKH ghi mọi cuộc vào `C:\sokho\cskh-log\*.jsonl` nhưng hay quên đẩy
+lên sổ khi chưa chắc là lỗi shop. Script này là **lưới an toàn phía sau khu Chat**, không tạo khu mới, không quy lỗi.
+
+- File: `scripts/doi_soat_chat.py` (chạy qua `scripts/run-doi-soat-chat.ps1`, cài bằng `scripts/setup-doi-soat-chat-task.ps1`).
+  Không mở trình duyệt, không tốn token, không nhắn khách, không gửi Telegram. Chỉ chạy trên PC (nhật ký chỉ có ở PC).
+- **Bắt gì:** dòng nhật ký 7 ngày gần nhất, `category` ∈ `khieu_nai / doi_tra / hau_mai / sau_mua`, và `last_msg` + `context`
+  có từ tả **hàng lỗi** (rách, thủng, lủng, bung chỉ, bẩn, ố, phai màu...) hoặc **giao nhầm** (giao/gửi nhầm, sai mẫu, sai màu...).
+- **Không bắt:** giao thiếu (luồng gửi bù lo); khách tự "đặt nhầm / mua nhầm"; phàn nàn size rộng/dài.
+- **Coi là đã có trên sổ → bỏ qua** khi cùng sàn + cùng khách (hoặc cùng mã đơn) đã có: dòng `cskh_chat_errors`, phiếu
+  `resend_cases`, hoặc dòng trả hàng / đánh giá **đang là thẻ** (có `needs_action`, có đề xuất ghi lỗi, hoặc anh đã đóng).
+  Dòng trả hàng không thành thẻ (vd khách chọn "Đổi ý" nhưng trong chat nói quần rách — case `hihibuy1` 20/11) thì KHÔNG
+  tính là đã có: script thêm thẻ chat mang đúng mã đơn đó để gộp 1 đơn 1 thẻ.
+- **Ghi gì:** 1 dòng / khách, `dedup_key = platform|<mã đơn hoặc @khách>|<ngày đầu>|doi_soat`, `shop_error_kind = null`,
+  `errlog_status = 'none'`, `case_type` = điều KHÁCH nói (`giao_nham` / `san_pham_loi`, chỉ là nhãn, không phải kết luận),
+  `needs_action = true`, `progress_note` 1 bước `[chờ anh]` → thẻ **không tự ẩn**, anh bấm Ghi Sổ Kho hoặc Xong.
+  Supabase chưa có cột mới (PGRST204) thì ghi kiểu cũ `errlog_status='suggest'` + `shop_error_kind=null` để thẻ vẫn hiện.
+- **Lượt CSKH gặp lại khách này:** tìm dòng có `dedup_key` kết thúc `|doi_soat` của cùng sàn + khách và **cập nhật dòng đó**
+  (bổ sung `order_code`, `has_photo`, nối `progress_note`), KHÔNG tạo dòng mới — tránh 1 khách 2 thẻ.
+- Lần chạy đầu 22/11/2026 đã thêm 6 khách: `thiingaatieuu`, `soncotu25`, `ben.bantumlum`, `trwn.baozx`, `hihibuy1`, `isywp_`.
+- Chạy tay: `python scripts/doi_soat_chat.py --dry-run` (chỉ xem) · bỏ `--dry-run` để ghi · `--days 14` để nhìn lại xa hơn.
+
