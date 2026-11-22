@@ -12,7 +12,8 @@ case lỗi/nhầm **rõ ràng** (khách đã gửi ảnh, nhìn ảnh thấy l�
 đây là lỗi của shop, cách xử lý không cần cân nhắc từng ca, để khách chờ anh duyệt
 chỉ làm chậm.
 
-Vẫn **để chủ shop quyết** (nhắn tin đầu + Telegram như quy tắc 17/11) khi:
+Vẫn **để chủ shop quyết** (nhắn tin đầu + đẩy lên Sổ Vận Hành `[chờ anh]`, xem mục "ĐẨY LÊN SỔ VẬN HÀNH" bên dưới —
+sửa 22/11/2026, thay cho "Telegram như quy tắc 17/11") khi:
 - khách **đòi hoàn tiền kèm trả hàng** (không muốn đổi) — từ 22/11/2026 CS tự hướng dẫn trả hàng hoàn tiền, xem mục "HÀNG LỖI CHỈ HỖ TRỢ ĐỔI" bên dưới;
 - ảnh không rõ lỗi, hoặc khách chưa gửi ảnh và mô tả mơ hồ;
 - lỗi "nặng" kèm bức xúc, doạ đánh giá xấu, đòi bồi thường thêm.
@@ -33,9 +34,23 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
   (đọc nguyên văn, xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md)), lý do chọn "Đổi ý"
   (Shopee: "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), shipper qua lấy, tiền về ví sàn. Không đặt lại đơn nên
   **không gửi mã giảm 10k / không có tin báo mã** (suy từ việc mã chỉ để khuyến khích đặt lại — chủ shop chưa nói riêng, sửa nếu khác).
-  Vẫn ghi `cskh-log`, `cskh_chat_errors`, báo Telegram 1 dòng như các case lỗi shop.
+  Vẫn ghi `cskh-log`, `cskh_chat_errors` và đẩy lên Sổ Vận Hành như các case lỗi shop (mục "ĐẨY LÊN SỔ VẬN HÀNH").
 - **Phân biệt:** "không hoàn tiền không hoàn hàng" = khách muốn GIỮ hàng lỗi mà đòi shop hoàn tiền → từ chối, đưa lại 2 lựa chọn
   (đổi hàng mới, hoặc trả hàng hoàn tiền). Khách chịu trả hàng thì hoàn tiền bình thường.
+- Bước deal "giữ hàng hoàn 1 phần" cho lỗi rất nhẹ/nhẹ: chủ shop cân nhắc rồi **bỏ** (22/11/2026) — mọi hàng lỗi hỗ trợ đổi luôn.
+
+## ĐIỀU KIỆN ĐỔI / TRẢ — cắt mác, đã giặt, 15 ngày (chủ shop chốt 22/11/2026)
+
+Áp dụng cho cả hàng lỗi và giao nhầm (luồng 5 bước), khớp Mục 8.3 tài liệu CSKH.
+- **KHÔNG tự soi ảnh để đoán hàng đã dùng hay chưa.** Chỉ xét khi **khách tự nhắn** là đã cắt mác / đã giặt / đã mặc.
+- **Khách nói đã cắt mác** → không sao, vẫn hỗ trợ bình thường. Câu (Claude soạn theo ý chủ shop, chưa duyệt từng chữ):
+  "Dạ không sao đâu ạ, bạn cắt mác rồi shop vẫn hỗ trợ cho bạn nhé ạ." rồi chạy tiếp các bước.
+- **Khách nói đã giặt hoặc đã sử dụng** → từ chối khéo (câu chủ shop, đã sửa chính tả):
+  "Dạ bên mình không hỗ trợ đổi lại với sản phẩm đã qua giặt hoặc sử dụng ạ, mong bạn thông cảm giúp shop nhé ạ."
+- **Quá 15 ngày kể từ khi khách nhận hàng** → không hỗ trợ nữa. Ngày nhận = ngày "Đã giao" trong tab Đơn hàng của khách;
+  không thấy ngày thì coi như còn hạn (đừng chặn oan). Câu (Claude soạn, chưa duyệt từng chữ):
+  "Dạ đơn của bạn đã quá 15 ngày kể từ khi nhận hàng nên shop không hỗ trợ đổi trả được nữa ạ, mong bạn thông cảm giúp shop nhé ạ."
+- Từ chối (đã giặt / quá 15 ngày) vẫn ghi lên Sổ Vận Hành với dòng `[xong] Đã từ chối — <lý do>` để chủ shop thấy.
 
 ## 5 bước (đúng thứ tự, mỗi bước 1 tin riêng)
 
@@ -45,7 +60,7 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 | 2 | **Xin lỗi + xác nhận lỗi** | Hàng lỗi: "Dạ, sau khi kiểm tra thì shop xác nhận đây là lỗi chưa kiểm tra kĩ trước khi giao hàng. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." Giao nhầm: "...shop xác nhận đây là lỗi kho bên mình giao bị nhầm. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." (Sheet "Mau tin nhan" dòng 8–10, 13–14; câu in đậm chủ shop thêm 22/11/2026, đặt TRƯỚC đề xuất xử lý, áp dụng toàn bộ case lỗi shop.) Có thể mở đầu ngắn kiểu người thật ("Uii dạ") như anh làm. |
 | 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng **miễn phí** và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11, thêm chữ "miễn phí" ngày 22/11/2026; chưa sửa trong Sheet "Mau tin nhan" — nhờ chủ shop cập nhật nếu muốn Sheet khớp). |
 | 4 | **Hướng dẫn đổi hàng** theo sàn | Nguyên văn Sheet "Mau tin nhan" mục "Đổi hàng": TikTok lý do **"Đổi ý"**; Shopee lý do **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"** — xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md). Khách đặt đơn mới → bấm trả đơn cũ → shipper qua lấy → tiền về ví sàn. |
-| 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. **Phải xác minh đúng thẻ là Giảm 10.000₫ (đọc chữ trên thẻ, không đoán theo vị trí) trước khi bấm Gửi, và đọc lại thẻ hiện trong chat sau khi gửi.** Sai mức (không phải 10k) → không gửi, báo Telegram. |
+| 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. **Phải xác minh đúng thẻ là Giảm 10.000₫ (đọc chữ trên thẻ, không đoán theo vị trí) trước khi bấm Gửi, và đọc lại thẻ hiện trong chat sau khi gửi.** Sai mức (không phải 10k) → không gửi, đẩy lên Sổ Vận Hành `[chờ anh]`. |
 | 6 | **Tin báo mã giảm** (chủ shop thêm 22/11/2026), gửi ngay sau thẻ voucher | "Dạ mình gửi bạn mã giảm giá 10k khi đặt lại đơn hàng, 1 lần nữa mình xin lỗi bạn vì trải nghiệm chưa được tốt ạ." |
 
 Sau 5 bước: khách hỏi thêm thì trả lời bình thường (vd wdat1504 hỏi "tiền về ví
@@ -63,13 +78,13 @@ chat như tin nhắn (ở wdat1504 nó nằm ngay sau tin hướng dẫn đổi 
 
 Đừng gửi nhầm các thẻ khác đang có cùng danh sách: "Giảm 50%", "Giảm 5% (tối đa
 400.000₫)", "Giảm 15.000₫ cho đơn trên 230.000₫" (voucher thường). Nếu thẻ 10k hết
-hiệu lực/không còn → KHÔNG tự tạo voucher mới, báo Telegram để chủ shop tạo lại.
+hiệu lực/không còn → KHÔNG tự tạo voucher mới, đẩy lên Sổ Vận Hành `[chờ anh]` để chủ shop tạo lại.
 
 **Shopee (chủ shop cho phép CS tự gửi voucher từ 22/11/2026, với điều kiện xác minh đúng mã 10k):**
 nút gửi voucher trong webchat Shopee chưa được xác minh thật. CS được tự gửi, nhưng chỉ khi thấy
 đúng 1 mã **giảm 10.000đ** trong danh sách và đọc rõ chữ trên mã; không thấy nút / không thấy mã 10k /
-không chắc → KHÔNG thử bừa, gửi bước 1–4 + 6 bằng chữ rồi báo Telegram "cần gửi mã giảm 10k cho khách X
-(Shopee)". Lần đầu gửi thành công trên Shopee thì ghi lại cách bấm vào đây.
+không chắc → KHÔNG thử bừa, gửi bước 1–4 + 6 bằng chữ rồi đẩy lên Sổ Vận Hành `[chờ anh] Cần gửi mã giảm 10k
+cho khách (Shopee)`. Lần đầu gửi thành công trên Shopee thì ghi lại cách bấm vào đây.
 
 ## Vẫn làm sau khi nhắn xong (giữ nguyên từ 17/11)
 
@@ -77,8 +92,18 @@ không chắc → KHÔNG thử bừa, gửi bước 1–4 + 6 bằng chữ rồi
 - Ghi đề xuất lỗi vào `cskh_chat_errors` (`shop_error_kind` = `san_pham_loi` / `giao_nham`,
   `has_photo=true`) để chủ shop bấm ghi Sổ Kho — xem faq-17-11 mục 13.9. Không tự ghi
   `warehouse_error_log`.
-- Telegram: vẫn báo 1 dòng cho chủ shop biết (sàn, tên khách, mã đơn, lỗi gì, đã đổi +
-  gửi voucher chưa), nhưng là **báo cáo**, không phải xin duyệt.
+- ~~Telegram báo 1 dòng~~ — **bỏ 22/11/2026**: thay bằng mục "ĐẨY LÊN SỔ VẬN HÀNH" dưới đây.
+
+## ĐẨY LÊN SỔ VẬN HÀNH — 100% case hậu mãi (chủ shop nhắc lại 22/11/2026)
+
+Quy tắc gốc 21/11/2026 ở [tien-do-xu-ly.md](../../../shared/tien-do-xu-ly.md): mọi case hậu mãi phải hiện trên tab
+"Hậu mãi" của Sổ Vận Hành để chủ shop theo dõi, **không dùng Telegram**. Định nghĩa "case hậu mãi" + bảng bước của
+case giao nhầm / hàng lỗi / đổi size ở file đó. Mọi chỗ trong file này trước đây ghi "báo Telegram" đều đổi thành đẩy lên sổ.
+
+**Giới hạn hiện tại (ghi nhận 22/11/2026):** bảng `cskh_chat_errors` chưa có cột ghi tiến độ / "cần anh xử lý", nên web
+chỉ hiện dòng chat ở nhóm "Ghi lỗi Sổ Kho". Cho tới khi web được nâng cấp (thêm cột, xem tien-do-xu-ly.md): vẫn ghi
+`cskh_chat_errors` như cũ; riêng việc `[chờ anh]` (không xác nhận được lỗi, voucher không gửi được, khách đòi thêm)
+**TẠM** báo Telegram 1 dòng để khỏi rơi mất — ngoại lệ tạm, bỏ ngay khi web có chỗ hiện.
 
 ## Khách chỉ kêu "hơi dài / hơi rộng" (không phải lỗi sản phẩm)
 

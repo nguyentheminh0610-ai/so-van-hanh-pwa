@@ -26,7 +26,30 @@ Mỗi lần ghi nhớ PATCH kèm điều kiện trạng thái như thường l�
 Web (cskh.js `cskhProgressHtml`) tự: hiện bước cuối + lịch sử, và hiện **⚠ đứng ở bước này N giờ** khi
 `[chờ khách]` ≥ 4 giờ hoặc `[đang làm]` ≥ 1 giờ. Case có dòng cuối `[xong]` không bị cảnh báo.
 
+## Thế nào là "case hậu mãi" (chủ shop nhắc lại 22/11/2026: 100% phải lên sổ)
+
+Case hậu mãi = khách **đã có đơn** và nhắn về **vấn đề với đơn/sản phẩm sau khi đặt**, gồm:
+giao thiếu · giao nhầm (sai mẫu/màu/size) · hàng lỗi (rách, bẩn, ố, in hỏng, tuột chỉ...) · đổi size/đổi mẫu vì rộng/chật ·
+trả hàng hoàn tiền · đòi hoàn tiền giữ hàng · đánh giá xấu 1–3★ · yêu cầu trả hàng trên sàn.
+KHÔNG tính: tư vấn size/chất liệu trước khi mua, hỏi tồn kho, hỏi thời gian giao/giục giao, chào hỏi chung.
+Không chắc có phải hậu mãi không → coi là hậu mãi, ghi lên sổ (thừa còn hơn sót).
+Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ chối, đều phải có dòng trên sổ + dòng `▸` cuối cùng.
+
 ## Các bước theo loại case
+
+**Giao nhầm / hàng lỗi / đổi size từ CHAT** (chốt 22/11/2026; luồng nhắn khách ở
+`size-consultation/references/cskh-doi-hang-loi-21-11.md` và `cskh-ship-faq.md`):
+1. `[đang làm]` Phát hiện khách báo <giao nhầm/hàng lỗi/đổi size> — đang kiểm ảnh + đơn
+2. `[chờ khách]` Đã xin lỗi + xin ảnh lúc HH:MM (chỉ khi khách chưa gửi ảnh)
+3. `[chờ anh]` Không xác nhận được lỗi — <vì sao: ảnh mờ, không thấy mác, đơn nhiều phân loại giống nhau...>
+4. `[chờ khách]` Đã xác nhận lỗi + hướng dẫn đổi (hoặc trả hàng nếu khách tự yêu cầu) + gửi mã 10k lúc HH:MM
+5. `[chờ anh]` Chưa gửi được mã 10k (Shopee / thẻ hết hạn) — anh gửi giúp
+6. `[xong]` Đã hướng dẫn xong, đủ tin + mã / `[xong]` Đã từ chối — <đã giặt / quá 15 ngày>
+
+**Giới hạn web (ghi nhận 22/11/2026):** bảng `cskh_chat_errors` CHƯA có cột ghi chú tiến độ, cột "cần anh xử lý"
+(`needs_action`) hay `acked_at`, nên web hiện dòng chat CHỈ ở nhóm "Ghi lỗi Sổ Kho" (khi `suggest` + mã vận đơn).
+Muốn bảng bước trên hiện được cần: thêm 3 cột (`progress_note`, `needs_action`, `acked_at`) bằng SQL trên Supabase +
+sửa `cskh.js` đọc chúng. Chưa làm xong thì các bước `[chờ anh]` của case chat TẠM báo Telegram 1 dòng (ngoại lệ tạm).
 
 **Giao thiếu (mọi nguồn: chat, đánh giá, trả hàng)** — phát hiện là mở phiếu `resend_cases` NGAY + dòng đầu tiên:
 1. `[đang làm]` Phát hiện khách báo thiếu (nguồn: chat/đánh giá/trả hàng) — đang xin ảnh + SĐT + địa chỉ
