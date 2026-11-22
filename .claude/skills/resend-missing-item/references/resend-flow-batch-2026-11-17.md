@@ -80,7 +80,7 @@ là đã có trải nghiệm mua không tốt, vào thẳng "chụp ảnh vỏ �
 đầu tiên của case (không gộp chung 1 tin):
 
 ```
-Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Do bên mình có bạn nhân viên mới vào nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
 ```
 (Chủ shop duyệt 23/11/2026: thêm câu nêu lý do "nhân viên mới vào nên đóng hàng bị thiếu" — thay bản 22/11 chưa có lý do.)
 

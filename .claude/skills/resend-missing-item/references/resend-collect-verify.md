@@ -288,7 +288,7 @@ tự tra được món/mã vận đơn.
   hàng chỉ có 1 quần lúc 22:26, vẫn bị xin "ảnh vỏ đơn" lúc 23:29; chủ shop: "khách đã gửi
   ảnh sp rồi mà sao còn hỏi lại" → bỏ.
 - **Thứ tự tin đầu tiên của case (chủ shop chốt 22/11/2026): Tin XIN LỖI → Tin xin ảnh → tin xin SĐT/địa chỉ.**
-  Tin xin lỗi ("Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Do bên mình có bạn nhân viên mới vào nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.", mẫu + điều kiện bỏ qua ở
+  Tin xin lỗi ("Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.", mẫu + điều kiện bỏ qua ở
   [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md)) gửi 1 lần/case, ghi `xl@HH:MM` vào `hoi=` trước khi gửi.
 - Chưa có ảnh nào → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
   sau tin xin lỗi, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).

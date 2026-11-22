@@ -168,7 +168,7 @@ references/resend-collect-verify.md mục 2):
 **Tin 0 (xin lỗi) — chốt 22/11/2026, gửi TRƯỚC mọi tin ở trên**, 1 tin riêng, 1 lần/case
 (mẫu + điều kiện bỏ qua ở references/resend-flow-batch-2026-11-17.md):
 ```
-Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Do bên mình có bạn nhân viên mới vào nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
 ```
 
 Case mới chưa có gì → gửi Tin 0 (xin lỗi), rồi Tin 2, rồi Tin 1. Sản phẩm thiếu (b)
