@@ -526,6 +526,13 @@ Với mỗi case trả hàng / đánh giá, sau khi đã upsert dòng cskh (mụ
 và điền các cột `shop_error_kind` / `errlog_code` / `errlog_reason` /
 `errlog_status`:
 
+**Chốt 22/11/2026 (tối) — chủ shop tự quyết loại lỗi trên Sổ Vận Hành.** Mọi thẻ trả hàng / đánh giá trên tab Hậu mãi
+giờ có sẵn 2 nút `Ghi Sổ Kho: lỗi kho` / `lỗi sản phẩm` để chủ shop tự chọn sau khi tự xác minh. Vì vậy: chỉ đặt
+`errlog_status='suggest'` khi CÓ BẰNG CHỨNG (ảnh/video hoặc khách mô tả cụ thể); lý do sàn kiểu "Chất lượng kém", "Khác với
+mô tả" mà không ảnh, không chi tiết thì để `shop_error_kind=null`, `errlog_status='none'` — KHÔNG tự quy lỗi. Và **luôn ghi
+`messaged_at` khi đã nhắn khách** (thẻ trả hàng ảnh hưởng shop chỉ tự ẩn sau khi đã nhắn khách 3 ngày). Chi tiết:
+[hau-mai-so-van-hanh.md](../../shared/hau-mai-so-van-hanh.md).
+
 ### 4.1 Phân loại `shop_error_kind` (đọc lý do/nội dung, đừng đoán)
 
 - **Lỗi shop** → gắn kind tương ứng:

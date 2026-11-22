@@ -56,17 +56,27 @@ Chủ shop yêu cầu 22/11/2026: (1) **toàn bộ** case hậu mãi phải hi�
 **Nguyên tắc ổn định:** việc ẩn thẻ do **web tự tính lúc mở trang** từ dữ liệu sẵn có (ngày, `messaged_at`, dòng `▸` cuối,
 `acked_at`). KHÔNG có task "dọn thẻ" nào → không có gì để kẹt; PC tắt, Chrome mất đăng nhập thì thẻ vẫn ẩn đúng hạn.
 
-### Các nhóm trên trang
+### Trang xếp theo 3 KHU VỰC nguồn (chốt 22/11/2026 tối — thay cho 4 nhóm "Ghi lỗi Sổ Kho / Duyệt gửi bù / Anh xử lý / Chỉ xem")
 
-| Nhóm | Thẻ nào vào | Nút |
+Chủ shop: "không muốn bị trùng mục đích ở 2 khu khác nhau, kết hợp luôn vào 3 nguồn thì càng tốt". Vì vậy **không còn khu
+"Ghi lỗi Sổ Kho" riêng** — nút ghi lỗi nằm ngay trên từng thẻ.
+
+| Khu | Thẻ nào vào | Thứ tự trong khu |
 |---|---|---|
-| Ghi lỗi Sổ Kho | đề xuất lỗi shop có đủ loại lỗi + mã vận đơn | Ghi Sổ Kho / Không phải lỗi shop |
-| Duyệt gửi bù | phiếu `resend_cases` chờ anh / có vấn đề | như cũ |
-| Anh xử lý với khách | `needs_action`; bước cuối `[chờ anh]`; case task **kẹt** (`[đang làm]` ≥ 1 giờ, `[chờ khách]` ≥ 24 giờ) | Xong |
-| Đang theo dõi | có dòng `▸`, bước cuối `[đang làm]` / `[chờ khách]` chưa quá mốc; phiếu gửi bù đang chạy tự động | Xong |
-| Chỉ cần xem | `needs_action` + `action_type` loại chỉ xem | Xong |
-| Vừa xong (gập) | case xong chưa quá 3 ngày, ghi "ẩn sau N ngày" | Mở lại |
-| Đã ẩn (gập) | case xong quá 3 ngày, giữ 30 ngày để tra | Mở lại (nếu do anh bấm) |
+| Chat | đơn có dòng `cskh_chat_errors` đang mở + mọi phiếu gửi bù (`resend_cases`) | phiếu cần anh duyệt → việc của anh → task đang theo dõi → phiếu gửi bù đang chạy |
+| Đánh giá | đơn chỉ có dòng `cskh_reviews` đang mở | việc của anh → đang theo dõi → chỉ xem |
+| Trả hàng | đơn có dòng `cskh_returns` đang mở (không có chat đang mở) | như trên |
+| Vừa xong / Đã ẩn (gập) | case xong ≤ 3 ngày / quá 3 ngày (giữ 30 ngày) | Mở lại |
+
+1 đơn chỉ nằm ở 1 khu: có chat đang mở → Chat; không thì Trả hàng; không thì Đánh giá. Thẻ vẫn ghi "1 trả hàng + 1 chat".
+
+**Nút trên MỌI thẻ:** `Ghi Sổ Kho: lỗi kho` · `Ghi Sổ Kho: lỗi sản phẩm` · `Xong`.
+- **Chủ shop tự chọn loại lỗi sau khi tự xác minh** (chốt 22/11/2026 tối). Lý do: khách chọn "Chất lượng kém" mà không ảnh,
+  không chi tiết thì KHÔNG được tự quy là lỗi sản phẩm; lỗi kho vận cũng vậy. Task chỉ được **đề xuất** (`errlog_status='suggest'`
+  + `shop_error_kind`) khi có bằng chứng — web tô đậm nút tương ứng và ghi "Task đề xuất: ...", quyết vẫn là chủ shop.
+- Bấm ghi: web tìm mã vận đơn (`errlog_code` → `platform_returns_feed.outbound_tracking` → hỏi chủ shop), hỏi 1 câu mô tả,
+  dò trùng theo mã vận đơn rồi ghi 1 dòng `warehouse_error_log` (lỗi kho = `kho_van`/`giao_nham`; lỗi sản phẩm = `san_pham`/`san_pham_loi`).
+- `Xong` = đóng thẻ, **không** ghi lỗi (đề xuất của task chuyển `dismissed`, có hỏi lại 1 lần).
 
 ### BẢNG XÁC MINH "THẾ NÀO LÀ XONG" — chia 3 khu vực theo nguồn (chủ shop yêu cầu chia lại 22/11/2026)
 
@@ -85,19 +95,24 @@ rời danh sách NGAY, nằm ở "Vừa xong" 3 ngày; khách nhắn lại → t
 
 **Khu vực 2 — ĐÁNH GIÁ** (bảng `cskh_reviews`; skill review-return-check 08:00 & 20:00)
 
+**Chốt 22/11/2026 tối (chủ shop sửa bản đề xuất): đánh giá CHỈ ẩn khi anh bấm** — không tự ẩn theo 3 ngày, kể cả khi task
+đã ghi `[xong]`. Thay cho bản đề xuất cùng ngày ("3 ngày khách không phản hồi thì ẩn").
+
 | Loại case | Web coi là XONG khi | Sau đó |
 |---|---|---|
-| Đánh giá xấu 1–3★, đã nhắn khách | 3 ngày không có gì mới (khách không phản hồi) | ẩn luôn |
-| Đánh giá xấu, khách đã phản hồi / hết 2 tin (`[chờ anh]`) | chỉ khi anh bấm Xong | 3 ngày ở "Vừa xong" |
-| Đánh giá nêu lỗi kho / lỗi sản phẩm | anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
-| Đánh giá 4–5★ có nhắc vấn đề (chỉ xem) | 3 ngày kể từ ngày đánh giá | ẩn luôn |
+| Mọi đánh giá lên sổ (1–3★, 4–5★ có nhắc vấn đề) | anh bấm **Xong**, hoặc anh bấm Ghi Sổ Kho | 3 ngày ở "Vừa xong" rồi ẩn |
 
 **Khu vực 3 — TRẢ HÀNG** (bảng `cskh_returns`; skill review-return-check 08:00 & 20:00)
 
+**Chốt 22/11/2026 tối (chủ shop sửa bản đề xuất): trả hàng lý do ảnh hưởng shop phải NHẮN KHÁCH XONG mới tính là xong**, rồi
+3 ngày sau mới ẩn. Chưa nhắn → thẻ ghi "chưa nhắn khách · không tự ẩn". Web coi là đã nhắn khi `messaged_at` có giá trị, hoặc
+`message_note` bắt đầu bằng chữ "đã nhắn". → **skill phải ghi `messaged_at` mỗi khi đã nhắn khách**, kể cả khi nhắn ở thread
+của đơn khác cùng khách (khi đó ghi `message_note` bắt đầu bằng "đã nhắn ... ở đơn <mã>").
+
 | Loại case | Web coi là XONG khi | Sau đó |
 |---|---|---|
-| Trả hàng lý do ảnh hưởng shop, không tranh chấp | 3 ngày kể từ lần cuối có gì mới (sàn tự xử lý hoàn tiền) | ẩn luôn |
-| Trả hàng nêu giao nhầm / hàng lỗi | anh đã quyết Ghi Sổ Kho / Không phải lỗi shop | 3 ngày rồi ẩn |
+| Trả hàng lý do ảnh hưởng shop, không tranh chấp | **đã nhắn khách** + 3 ngày không có gì mới | ẩn luôn |
+| Trả hàng task đề xuất giao nhầm / hàng lỗi | anh bấm Ghi Sổ Kho hoặc Xong | 3 ngày rồi ẩn |
 | Trả hàng vì thiếu hàng | theo phiếu gửi bù (khu vực 1) | — |
 | Tranh chấp / khách hỏi tiền hoàn | chỉ khi anh bấm Xong | 3 ngày ở "Vừa xong" |
 | Trả hàng nói về SP / kho (chỉ xem) | 3 ngày kể từ ngày yêu cầu | ẩn luôn |
@@ -108,6 +123,8 @@ rời danh sách NGAY, nằm ở "Vừa xong" 3 ngày; khách nhắn lại → t
 - Giao thiếu chưa có phiếu gửi bù.
 - `action_type` = `tranh_chap` hoặc `lien_he_khach`.
 - Bước cuối `[chờ anh]`.
+- Mọi thẻ Đánh giá (chốt 22/11/2026 tối).
+- Trả hàng lý do ảnh hưởng shop mà CHƯA nhắn khách (chốt 22/11/2026 tối).
 
 **Tự mở lại:** thẻ đã đóng/đã ẩn mà task ghi thêm 1 dòng `▸` mới (khách nhắn lại) → thẻ quay lại danh sách, không cần ai bấm.
 
@@ -142,4 +159,5 @@ tiếp về cùng việc thì nối `▸` vào dòng cũ, không tạo dòng m�
 | 10 | Thẻ đề xuất lỗi thiếu mã vận đơn / loại lỗi | không có nút Ghi Sổ Kho, thẻ không tự ẩn | Nằm ở "Anh xử lý" kèm chữ "anh kiểm tay"; lượt quét sau bổ sung mã, hoặc anh bấm Xong |
 | 11 | Dòng `▸` sai định dạng (thiếu ngày giờ / nhãn) | web không đọc được bước | Dòng đó bị bỏ qua, thẻ hiện "chưa có cập nhật"; giữ đúng mẫu `▸ DD/MM HH:MM · [nhãn] nội dung` |
 | 12 | Supabase sập `PGRST002` | cả tab không tải | Xem [reference_supabase_pgrst002_su_co.md](reference_supabase_pgrst002_su_co.md) |
-| 13 | Điện thoại giữ bản web cũ | không thấy nút/nhóm mới | Đã tăng phiên bản cache `sw.js` (v64); mở lại app 1–2 lần |
+| 14 | Khách báo lỗi trong CHAT nhưng task không ghi dòng lên sổ (rà 22/11: từ 17/11 lọt ít nhất 4 khách — `kl_24090`, `trwn.baozx`, `hihibuy1`, `isywp_` — có trong `cskh-log` nhưng không có trong `cskh_chat_errors`) | lỗi kho/sản phẩm không bao giờ được ghi Sổ Kho | **Chưa làm, chờ chủ shop duyệt:** script đối soát không mở trình duyệt, đọc `C:\sokho\cskh-log\*.jsonl`, dòng `khieu_nai` / `doi_tra` có mã đơn mà chưa có trên sổ thì tự thêm 1 dòng chat (không quy lỗi, để chủ shop tự chọn) |
+| 13 | Điện thoại giữ bản web cũ | không thấy nút/nhóm mới | Đã tăng phiên bản cache `sw.js` (v65); mở lại app 1–2 lần |
