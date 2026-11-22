@@ -100,10 +100,18 @@ Quy tắc gốc 21/11/2026 ở [tien-do-xu-ly.md](../../../shared/tien-do-xu-ly.
 "Hậu mãi" của Sổ Vận Hành để chủ shop theo dõi, **không dùng Telegram**. Định nghĩa "case hậu mãi" + bảng bước của
 case giao nhầm / hàng lỗi / đổi size ở file đó. Mọi chỗ trong file này trước đây ghi "báo Telegram" đều đổi thành đẩy lên sổ.
 
-**Giới hạn hiện tại (ghi nhận 22/11/2026):** bảng `cskh_chat_errors` chưa có cột ghi tiến độ / "cần anh xử lý", nên web
-chỉ hiện dòng chat ở nhóm "Ghi lỗi Sổ Kho". Cho tới khi web được nâng cấp (thêm cột, xem tien-do-xu-ly.md): vẫn ghi
-`cskh_chat_errors` như cũ; riêng việc `[chờ anh]` (không xác nhận được lỗi, voucher không gửi được, khách đòi thêm)
-**TẠM** báo Telegram 1 dòng để khỏi rơi mất — ngoại lệ tạm, bỏ ngay khi web có chỗ hiện.
+**Cách ghi (chốt 22/11/2026 tối, thay cho "giới hạn hiện tại" ghi sáng 22/11 — web đã nâng cấp):** mỗi case hậu mãi từ
+chat (giao nhầm, hàng lỗi, đổi size, trả hàng hoàn tiền, đòi hoàn tiền giữ hàng) = **1 dòng `cskh_chat_errors`**, upsert theo
+`dedup_key`, kèm 3 cột mới: `case_type`, `progress_note` (nhật ký `▸`), `needs_action`. Chi tiết từng cột, giá trị hợp lệ, và
+thế nào là "xong" ở [hau-mai-so-van-hanh.md](../../../shared/hau-mai-so-van-hanh.md) mục "Hợp đồng dữ liệu cho dòng chat".
+Đổi size / trả hàng không phải lỗi shop thì `errlog_status='none'`, `shop_error_kind=null`.
+
+**Nếu Supabase trả lỗi `PGRST204` (cột chưa tồn tại)** = chủ shop chưa chạy phần SQL 22/11 trong `scripts/cskh-tables.sql`:
+ghi lại dòng đó KHÔNG kèm 3 cột mới (như cũ, để không mất đề xuất lỗi), và việc `[chờ anh]` TẠM báo Telegram 1 dòng.
+Không thử lại nhiều lần, không tự ý bỏ ghi.
+
+**KHÔNG bao giờ ghi cột `acked_at`** (chủ shop bấm Xong trên web). Dòng đã có `acked_at` = chủ shop đã đóng: không nhắn thêm,
+không ghi thêm bước — TRỪ KHI khách gửi tin mới, lúc đó xử lý bình thường và nối 1 dòng `▸` mới (web tự mở lại thẻ).
 
 ## Khách chỉ kêu "hơi dài / hơi rộng" (không phải lỗi sản phẩm)
 

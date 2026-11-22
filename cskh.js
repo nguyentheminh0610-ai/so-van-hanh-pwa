@@ -107,6 +107,9 @@ const CSKH_TYPE_LABEL = {
   danh_gia_xau: 'Đánh giá 1–3★', danh_gia_van_de: 'Đánh giá 4–5★ có nhắc vấn đề',
   tra_hang_anh_huong_shop: 'Trả hàng ảnh hưởng shop', tra_hang_noi_dung_sp_kho: 'Trả hàng nói về SP / kho',
   lien_he_khach: 'Anh tự nhắn khách', tranh_chap: 'Tranh chấp / khiếu nại',
+  // case_type của dòng chat (cột mới 22/11/2026) — loại hậu mãi không phải lỗi shop
+  doi_size: 'Đổi size / đổi mẫu', tra_hang_hoan_tien: 'Trả hàng hoàn tiền', hoan_tien_giu_hang: 'Đòi hoàn tiền giữ hàng',
+  khac: 'Hậu mãi khác',
 };
 // action_type chỉ cần "xem" (không có việc gì phải làm với khách)
 const CSKH_VIEW_ONLY = new Set(['danh_gia_van_de', 'tra_hang_noi_dung_sp_kho']);
@@ -116,25 +119,73 @@ function cskhCaseKey(plat, order, tbl, id){
   return order ? (plat + '|' + order) : (plat + '|~' + tbl + id);
 }
 
+// ---- VÒNG ĐỜI 1 CASE (chốt 22/11/2026 — chủ shop: "case xong thì 3 ngày sau biến mất, có nút Xong
+//      bấm là biến mất luôn; phải chạy ổn định") ------------------------------------------------------
+// Web TỰ TÍNH lúc mở trang, không cần task nào chạy để "dọn" → không có job dọn thì không có gì để kẹt.
+//   ĐANG MỞ   → hiện ở 1 trong các nhóm việc.
+//   XONG      → vào "Vừa xong" CSKH_HIDE_DAYS ngày rồi tự ẩn. Xong khi 1 trong 3:
+//               (a) anh bấm Xong / Ghi Sổ Kho / Không phải lỗi shop   (acked_at, errlog_status)
+//               (b) task ghi bước cuối [xong]                          (dòng ▸ cuối)
+//               (c) im lặng CSKH_HIDE_DAYS ngày mà KHÔNG phải đang chờ anh (khách không phản hồi, thẻ chỉ xem)
+//   KHÔNG BAO GIỜ TỰ ẨN (chỉ anh đóng được): đề xuất ghi lỗi Sổ Kho, giao thiếu chưa có phiếu gửi bù,
+//               tranh chấp, "anh tự nhắn khách", bước cuối [chờ anh]; phiếu gửi bù chưa done (quy tắc 21/11).
+//   TỰ MỞ LẠI: sau khi đã đóng mà task ghi thêm bước mới (khách nhắn lại) → thẻ quay lại danh sách.
+// Bảng tiêu chí đầy đủ: .claude/shared/hau-mai-so-van-hanh.md
+const CSKH_HIDE_DAYS = 3;
+const CSKH_DAY_MS = 86400000;
+const CSKH_STUCK_H = { 'đang làm': 1, 'chờ khách': 24 };       // quá mốc này thì thẻ nhảy lên nhóm "cần anh"
+const CSKH_OWNER_ONLY = new Set(['tranh_chap', 'lien_he_khach']); // action_type chỉ anh đóng được
+
 // Biến 1 dòng (đánh giá/trả hàng/chat) thành bản ghi trạng thái chung
 function cskhRowInfo(tbl, row, resendOrders){
   const kind = tbl === 'cskh_reviews' ? 'review' : tbl === 'cskh_returns' ? 'return' : 'chat';
   const date = kind === 'review' ? row.review_date : kind === 'return' ? row.request_date : row.chat_date;
-  const hasAckCol = tbl !== 'cskh_chat_errors';
-  const acked = hasAckCol && !!row.acked_at;
+  const now = Date.now();
+  // Bảng chat chỉ có acked_at / progress_note / needs_action sau khi chạy phần "22/11/2026" của
+  // scripts/cskh-tables.sql. Chưa chạy thì các cột này undefined → chat chạy đúng như cũ.
+  const hasAckCol = 'acked_at' in row;
+  const note = kind === 'chat' ? row.progress_note : row.message_note;
+  const ev = cskhProgressParse(note);
+  const last = ev.length ? ev[ev.length - 1] : null;
+  const ackedRaw = hasAckCol && !!row.acked_at;
+  const ackedAt = ackedRaw ? new Date(row.acked_at).getTime() : 0;
+  // đã đóng mà task ghi bước mới sau đó (khách nhắn lại) → tự mở lại
+  const reopened = ackedRaw && !!last && last.state !== 'xong' && last.at.getTime() > ackedAt + 60000;
+  const acked = ackedRaw && !reopened;
   const st = row.errlog_status || 'none';
   const isMissing = row.shop_error_kind === 'giao_thieu' || st === 'owned_resend';
   const resendOwns = isMissing && !!row.order_code && resendOrders.has(row.platform + '|' + row.order_code);
-  return {
-    tbl, row, kind, date, st, acked, resendOwns,
-    // chờ anh quyết ghi lỗi Sổ Kho (chat không có acked_at → chỉ dựa errlog_status)
-    pendErr: st === 'suggest' && !acked && !resendOwns,
-    // chờ anh bấm đã xử lý/đã xem
-    pendAck: !!row.needs_action && !acked && !resendOwns,
-    // giao thiếu nhưng CHƯA có phiếu gửi bù (không để bị bỏ lửng)
-    pendOrphan: st === 'owned_resend' && !resendOwns && !acked,
-    final: CSKH_ERR_FINAL.has(st) || (!!row.needs_action && acked),
-  };
+  const xongLine = !!last && last.state === 'xong';
+  // chờ anh quyết ghi lỗi Sổ Kho (chat không có acked_at → chỉ dựa errlog_status)
+  const pendErr = st === 'suggest' && !acked && !resendOwns;
+  const pendErrOk = pendErr && !!CSKH_ERRKIND[row.shop_error_kind] && !!row.errlog_code;
+  // chờ anh bấm Xong ([xong] do task ghi thì coi như xong, kể cả khi task quên tắt needs_action)
+  const pendAck = !!row.needs_action && !acked && !resendOwns && !xongLine;
+  // giao thiếu nhưng CHƯA có phiếu gửi bù (không để bị bỏ lửng)
+  const pendOrphan = st === 'owned_resend' && !resendOwns && !acked;
+  // task đang xử lý / chờ khách / chờ anh — có dòng tiến độ, chưa tới [xong]
+  const track = !!last && !xongLine && !acked && !resendOwns;
+  const hrs = last ? (now - last.at.getTime()) / 3600000 : 0;
+  const stuck = track && !!CSKH_STUCK_H[last.state] && hrs >= CSKH_STUCK_H[last.state];
+  const waitsOwner = pendErr || pendOrphan || (pendAck && CSKH_OWNER_ONLY.has(row.action_type))
+    || (track && last.state === 'chờ anh');
+  // lần cuối có gì đó xảy ra với dòng này
+  const dayEnd = date ? Math.min(now, new Date(date + 'T23:59:59').getTime()) : 0;
+  const lastAct = Math.max(dayEnd, row.messaged_at ? new Date(row.messaged_at).getTime() : 0,
+    row.created_at ? new Date(row.created_at).getTime() : 0, last ? last.at.getTime() : 0, reopened ? 0 : ackedAt);
+  const live = pendErr || pendAck || pendOrphan || track;
+  const autoHide = live && !waitsOwner && (now - lastAct) >= CSKH_HIDE_DAYS * CSKH_DAY_MS; // (c)
+  const open = live && !autoHide;
+  const final = CSKH_ERR_FINAL.has(st) || acked || xongLine || autoHide;
+  let doneAt = 0, doneWhy = '';
+  if (!open && final){
+    if (acked){ doneAt = ackedAt; doneWhy = 'anh bấm Xong'; }
+    else if (autoHide){ doneAt = lastAct; doneWhy = 'tự ẩn: ' + CSKH_HIDE_DAYS + ' ngày không có gì mới'; }
+    else if (xongLine){ doneAt = last.at.getTime(); doneWhy = 'task báo xong'; }
+    else { doneAt = lastAct; doneWhy = ''; }
+  }
+  return { tbl, row, kind, date, st, acked, ackedRaw, resendOwns, ev, last, hasAckCol,
+    pendErr, pendErrOk, pendAck, pendOrphan, track, stuck, waitsOwner, lastAct, open, final, doneAt, doneWhy };
 }
 
 function cskhBuildCases(){
@@ -148,7 +199,7 @@ function cskhBuildCases(){
   infos.forEach(i => {
     if (i.resendOwns) return; // giao thiếu đã có phiếu gửi bù → chỉ hiện ở nhóm "Duyệt gửi bù"
     // dòng không cần ai làm gì (đã nhắn xong, không cờ) thì không thành thẻ
-    if (!i.pendErr && !i.pendAck && !i.pendOrphan && !i.final) return;
+    if (!i.open && !i.final) return;
     const key = cskhCaseKey(i.row.platform, i.row.order_code, i.tbl, i.row.id);
     if (!map.has(key)) map.set(key, { key, platform: i.row.platform, order: i.row.order_code || '', customer: '', infos: [] });
     map.get(key).infos.push(i);
@@ -159,12 +210,22 @@ function cskhBuildCases(){
     c.dates = c.infos.map(i => i.date).filter(Boolean).sort();
     c.firstDate = c.dates[0] || '';
     c.lastDate = c.dates[c.dates.length - 1] || '';
-    const open = c.infos.filter(i => i.pendErr || i.pendAck || i.pendOrphan);
+    const open = c.infos.filter(i => i.open);
     c.open = open.length > 0;
-    const ghi = open.some(i => i.pendErr && CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code);
+    const ghi = open.some(i => i.pendErrOk);
     const needClient = open.some(i => (i.pendAck && !CSKH_VIEW_ONLY.has(i.row.action_type)) || i.pendOrphan
-      || (i.pendErr && !(CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code)));
-    c.section = !c.open ? 'done' : ghi ? 'ghi' : needClient ? 'xu_ly' : 'xem';
+      || (i.pendErr && !i.pendErrOk) || (i.track && (i.last.state === 'chờ anh' || i.stuck)));
+    const tracking = open.some(i => i.track);
+    c.section = !c.open ? 'done' : ghi ? 'ghi' : needClient ? 'xu_ly' : tracking ? 'theo_doi' : 'xem';
+    c.stuck = open.some(i => i.stuck);
+    c.waitsOwner = open.some(i => i.waitsOwner);
+    // còn mấy ngày nữa thì tự ẩn (chỉ tính khi không có dòng nào đang chờ anh)
+    c.lastAct = Math.max(0, ...c.infos.map(i => i.lastAct));
+    if (!c.open){
+      c.doneAt = Math.max(0, ...c.infos.map(i => i.doneAt));
+      c.doneWhy = (c.infos.slice().sort((a, b) => b.doneAt - a.doneAt)[0] || {}).doneWhy || '';
+      c.hidden = (Date.now() - c.doneAt) >= CSKH_HIDE_DAYS * CSKH_DAY_MS;
+    }
   });
   return cases;
 }
@@ -173,11 +234,11 @@ function cskhBuildCases(){
 function cskhCaseTypes(c){
   const out = [];
   c.infos.forEach(i => {
-    const k = i.row.shop_error_kind, a = i.row.action_type;
-    const t = (k && CSKH_TYPE_LABEL[k]) || (a && CSKH_TYPE_LABEL[a]) || (i.pendAck ? 'Cần xem' : '');
+    const k = i.row.shop_error_kind, a = i.row.action_type, ct = i.row.case_type;
+    const t = (k && CSKH_TYPE_LABEL[k]) || (ct && CSKH_TYPE_LABEL[ct]) || (a && CSKH_TYPE_LABEL[a])
+      || (i.kind === 'review' && i.track ? 'Đánh giá 1–3★' : i.pendAck ? 'Cần xem' : '');
     if (t && !out.includes(t)) out.push(t);
   });
-  out.sort((a, b) => a.at - b.at);   // task có lúc chèn dòng mới lên đầu → luôn xếp theo giờ, dòng cuối = bước hiện tại
   return out;
 }
 
@@ -211,8 +272,17 @@ function cskhCaseLinks(c){
 function cskhAgeHtml(c){
   if (!c.firstDate) return '';
   const days = Math.round((cskhToday() - new Date(c.firstDate + 'T00:00:00')) / 86400000);
-  if (days <= 0) return '<span class="when">Hôm nay</span>';
-  return '<span class="when' + (days >= 2 ? ' hm-old' : '') + '">' + (days === 1 ? 'Hôm qua' : 'tồn ' + days + ' ngày') + '</span>';
+  const age = days <= 0 ? '<span class="when">Hôm nay</span>'
+    : '<span class="when' + (days >= 2 ? ' hm-old' : '') + '">' + (days === 1 ? 'Hôm qua' : 'tồn ' + days + ' ngày') + '</span>';
+  return age + cskhHideHintHtml(c);
+}
+
+// Nói rõ thẻ này sẽ tự ẩn khi nào, hay phải chờ anh — để không ai phải đoán vì sao thẻ còn/mất
+function cskhHideHintHtml(c){
+  if (!c.open) return '';
+  if (c.waitsOwner) return '<span class="hm-hint stay" title="Việc này chỉ anh quyết được nên không tự ẩn">chờ anh · không tự ẩn</span>';
+  const left = Math.max(1, Math.ceil(CSKH_HIDE_DAYS - (Date.now() - c.lastAct) / CSKH_DAY_MS));
+  return '<span class="hm-hint" title="Không có gì mới thì thẻ tự ẩn; khách nhắn lại thì thẻ tự quay lại">tự ẩn sau ' + left + ' ngày</span>';
 }
 
 // ---- TIẾN ĐỘ XỬ LÝ (chốt 21/11/2026) -------------------------------------------------------------
@@ -260,7 +330,10 @@ function cskhProgressHtml(text, closed){
 // mốc 4h). Task CSKH inbox thêm chữ "khách đã phản hồi" vào message_note khi khách trả lời.
 const CSKH_REPLY_WAIT_H = 4;
 function cskhReplyHtml(c){
-  const rv = c.infos.find(i => i.kind === 'review' && i.row.action_type === 'danh_gia_xau' && i.row.messaged_at);
+  // dòng nào có nhật ký ▸ thì hiện bước hiện tại + lịch sử (ưu tiên dòng đang mở, mới nhất)
+  const pg = c.infos.filter(i => i.ev.length).sort((a, b) => (b.open - a.open) || (b.last.at - a.last.at))[0];
+  if (pg) return cskhProgressHtml(pg.kind === 'chat' ? pg.row.progress_note : pg.row.message_note, !pg.open);
+  const rv =c.infos.find(i => i.kind === 'review' && i.row.action_type === 'danh_gia_xau' && i.row.messaged_at);
   if (!rv) return '';
   const at = new Date(rv.row.messaged_at);
   const hh = at.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + at.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
@@ -279,19 +352,18 @@ function cskhCaseCardHtml(c){
   const snip = cskhCaseSnippet(c);
   const orphan = c.infos.some(i => i.pendOrphan)
     ? '<div class="rs-sub rs-bad">Giao thiếu nhưng chưa có phiếu gửi bù — để task gửi bù thu thập thông tin, hoặc anh tự xử lý rồi bấm Đã xem.</div>' : '';
-  const noCode = c.infos.some(i => i.pendErr && !(CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code))
+  const noCode = c.infos.some(i => i.open && i.pendErr && !i.pendErrOk)
     ? '<div class="rs-sub rs-bad">Nghi lỗi shop nhưng thiếu mã vận đơn / loại lỗi — anh kiểm tay trên sàn.</div>' : '';
   let btns = '';
   const k = esc(c.key);
   if (c.section === 'ghi'){
-    const sug = c.infos.find(i => i.pendErr && CSKH_ERRKIND[i.row.shop_error_kind] && i.row.errlog_code);
+    const sug = c.infos.find(i => i.open && i.pendErrOk);
     const kind = CSKH_ERRKIND[sug.row.shop_error_kind];
     btns = `<button class="btn-errlog" data-hm="write" data-case="${k}">Ghi Sổ Kho: ${esc(kind.label)}</button>`
       + `<button class="btn-errskip" data-hm="dismiss" data-case="${k}">Không phải lỗi shop</button>`;
-  } else if (c.section === 'xu_ly'){
-    btns = `<button class="btn-ack" data-hm="ack" data-case="${k}">Đã xử lý</button>`;
   } else {
-    btns = `<button class="btn-ack" data-hm="ack" data-case="${k}">Đã xem</button>`;
+    // 1 nút duy nhất cho mọi nhóm còn lại (chốt 22/11/2026): bấm là thẻ rời danh sách ngay
+    btns = `<button class="btn-ack" data-hm="ack" data-case="${k}">Xong</button>`;
   }
   const code = (c.infos.find(i => i.row.errlog_code) || { row: {} }).row.errlog_code;
   return `<div class="fi compact${c.section === 'ghi' ? ' err' : ''}">
@@ -313,9 +385,12 @@ function cskhDoneRowHtml(c){
   const result = written ? '✓ đã ghi Sổ Kho' + (written.row.errlog_id ? ' #' + written.row.errlog_id : '')
     : dup ? 'Sổ Kho đã có dòng cho mã này'
     : dismissed ? 'không phải lỗi shop'
-    : 'đã xử lý' + (ackedAt ? ' ' + new Date(ackedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '');
-  const canReopen = !written && c.infos.some(i => i.acked && i.row.needs_action);
-  return `<tr><td><span class="tag ${c.platform === 'shopee' ? 'shopee' : 'tiktok'}">${cskhPlatName(c.platform)}</span></td>
+    : (c.doneWhy || 'đã xử lý') + (ackedAt ? ' ' + new Date(ackedAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '');
+  const canReopen = c.infos.some(i => i.acked);
+  const left = Math.ceil(CSKH_HIDE_DAYS - (Date.now() - c.doneAt) / CSKH_DAY_MS);
+  const when = c.hidden ? 'xong ' + new Date(c.doneAt).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' })
+    : 'ẩn sau ' + Math.max(1, left) + ' ngày';
+  return `<tr><td class="rs-faint">${esc(when)}</td><td><span class="tag ${c.platform === 'shopee' ? 'shopee' : 'tiktok'}">${cskhPlatName(c.platform)}</span></td>
     <td>${esc(c.customer || '')}<div class="code">${esc(c.order)}</div></td>
     <td>${esc(cskhCaseTypes(c).join(' · '))}<div class="rs-faint">${esc(cskhCaseSources(c))}</div></td>
     <td>${esc(result)}</td>
@@ -325,8 +400,9 @@ function cskhDoneRowHtml(c){
 // ------------------------------------------------------------- nhóm việc -----
 const CSKH_SECTIONS = [
   { id: 'ghi',   title: 'Ghi lỗi vào Sổ Kho', note: 'lỗi kho (giao nhầm) · lỗi sản phẩm — anh xem bằng chứng rồi quyết' },
-  { id: 'xu_ly', title: 'Anh xử lý với khách', note: 'đánh giá xấu · tranh chấp · trả hàng ảnh hưởng shop — xong thì bấm Đã xử lý' },
-  { id: 'xem',   title: 'Chỉ cần xem', note: 'không có việc gì phải làm — xem rồi bấm Đã xem' },
+  { id: 'xu_ly', title: 'Anh xử lý với khách', note: 'đánh giá xấu · tranh chấp · trả hàng ảnh hưởng shop · case task bị kẹt — xong thì bấm Xong' },
+  { id: 'theo_doi', title: 'Đang theo dõi', note: 'task đang xử lý hoặc đang chờ khách (đổi hàng, hàng lỗi, đổi size, đánh giá xấu...) — anh không phải làm gì, kẹt thì thẻ tự nhảy lên nhóm trên' },
+  { id: 'xem',   title: 'Chỉ cần xem', note: 'không có việc gì phải làm — tự ẩn sau ' + CSKH_HIDE_DAYS + ' ngày, hoặc bấm Xong' },
 ];
 
 function cskhGroupHtml(title, note, n, inner, empty){
@@ -343,33 +419,50 @@ function cskhRenderMain(){
   const byOf = (id) => cases.filter(c => c.section === id).sort((a, b) => (a.firstDate || '').localeCompare(b.firstDate || '')); // cũ nhất lên trên
   const rg = resendGroups(cskhRows.resend || []);
   rg.need.sort((a, b) => ({ wait_approve_2: 0, wait_approve_1: 1 }[a.status] ?? 2) - ({ wait_approve_2: 0, wait_approve_1: 1 }[b.status] ?? 2));
-  const n = { ghi: byOf('ghi').length, gui_bu: rg.need.length, xu_ly: byOf('xu_ly').length, xem: byOf('xem').length };
-  const total = n.ghi + n.gui_bu + n.xu_ly + n.xem;
+  const n = { ghi: byOf('ghi').length, gui_bu: rg.need.length, xu_ly: byOf('xu_ly').length, xem: byOf('xem').length,
+    theo_doi: byOf('theo_doi').length + rg.running.length };
+  const total = n.ghi + n.gui_bu + n.xu_ly + n.xem;           // việc CỦA ANH (đang theo dõi không tính)
   const lateResend = rg.need.some(r => resendDeadline(r).late);
+  const nStuck = cases.filter(c => c.open && c.stuck).length;
 
   const parts = [];
   if (n.ghi) parts.push(n.ghi + ' ghi Sổ Kho');
   if (n.gui_bu) parts.push(n.gui_bu + ' gửi bù');
   if (n.xu_ly) parts.push(n.xu_ly + ' xử lý khách');
   if (n.xem) parts.push(n.xem + ' chỉ xem');
-  const banner = total
-    ? `<div class="hm-banner warn"><b>Còn ${fmtInt(total)} việc</b> · ${esc(parts.join(' · '))}${lateResend ? ' · <b>⚠ có phiếu gửi bù sắp quá giờ</b>' : ''}</div>`
-    : '<div class="hm-banner ok"><b>Không còn việc tồn.</b> Cả 4 nhóm đều đã xong.</div>';
+  const tail = (n.theo_doi ? ' · <span class="rs-faint">' + n.theo_doi + ' case task đang theo dõi</span>' : '')
+    + (nStuck ? ' · <b>⚠ ' + nStuck + ' case kẹt quá mốc</b>' : '')
+    + (lateResend ? ' · <b>⚠ có phiếu gửi bù sắp quá giờ</b>' : '');
+  // Máy quét kẹt = case mới KHÔNG lên sổ → phải to và đỏ, không để chìm ở dòng chữ nhỏ (xem cskhRunStatus)
+  const health = cskhHealth.bad
+    ? `<div class="hm-banner bad"><b>⚠ Máy quét đang kẹt</b> — case mới có thể CHƯA lên sổ, danh sách dưới đây có thể thiếu. ${esc(cskhHealth.bad)}</div>` : '';
+  const banner = health + (total
+    ? `<div class="hm-banner warn"><b>Còn ${fmtInt(total)} việc của anh</b> · ${esc(parts.join(' · '))}${tail}</div>`
+    : `<div class="hm-banner ok"><b>Không còn việc nào của anh.</b>${tail}</div>`);
 
   const feed = (list) => '<div class="feed">' + list.map(cskhCaseCardHtml).join('') + '</div>';
   const sec = (id) => { const s = CSKH_SECTIONS.find(x => x.id === id); const l = byOf(id); return cskhGroupHtml(s.title, s.note, l.length, feed(l), 'Không có.'); };
   const guiBu = cskhGroupHtml('Duyệt gửi bù', 'giao thiếu — từ chat, đánh giá hay trả hàng đều vào đây. Lần 1: trước ' + RESEND_RUN_HOUR + 'h · lần 2: trước ' + RESEND_RUN_HOUR + 'h' + RESEND_CHECK2_MIN,
     rg.need.length, '<div class="feed">' + rg.need.map(resendCardHtml).join('') + '</div>', 'Không có phiếu nào chờ anh.');
 
-  const done = cases.filter(c => c.section === 'done' && c.lastDate >= cskhRange('week')[0] ).sort((a, b) => (b.lastDate || '').localeCompare(a.lastDate || '')).slice(0, 40);
-  const doneHtml = `<details class="hm-fold"><summary>Đã xong 7 ngày qua · ${fmtInt(done.length)} đơn · ${fmtInt(rg.closed.length)} phiếu gửi bù</summary>`
-    + (done.length ? '<div class="card"><table class="dtable"><thead><tr><th></th><th>Khách / mã đơn</th><th>Loại</th><th>Kết quả</th><th></th></tr></thead><tbody>' + done.map(cskhDoneRowHtml).join('') + '</tbody></table></div>' : '<p class="cskh-quiet">Chưa có đơn nào xong trong 7 ngày.</p>')
-    + (rg.closed.length ? '<div class="sub-label">Gửi bù đã xong / dừng</div><div class="card"><table class="dtable"><thead><tr><th>Khách</th><th>Món</th><th>Mã vận đơn</th><th>Trạng thái</th><th></th></tr></thead><tbody>' + rg.closed.map(resendDoneRowHtml).join('') + '</tbody></table></div>' : '')
-    + '</details>';
-  const runningHtml = rg.running.length
-    ? `<details class="hm-fold" open><summary>Gửi bù đang xử lý tự động · ${fmtInt(rg.running.length)} phiếu (xem tiến độ; có ⚠ là kẹt, anh vào xử lý)</summary><div class="feed">${rg.running.map(resendCardHtml).join('')}</div></details>` : '';
+  // XONG: 3 ngày đầu nằm ở "Vừa xong" (còn thấy, còn Mở lại được), sau đó xuống "Đã ẩn" (30 ngày, để tra lại)
+  const doneAll = cases.filter(c => c.section === 'done').sort((a, b) => b.doneAt - a.doneAt);
+  const fresh = doneAll.filter(c => !c.hidden);
+  const hidden = doneAll.filter(c => c.hidden && (Date.now() - c.doneAt) < 30 * CSKH_DAY_MS).slice(0, 60);
+  const rsFresh = rg.closed.filter(r => (Date.now() - new Date(r.updated_at || r.created_at).getTime()) < CSKH_HIDE_DAYS * CSKH_DAY_MS);
+  const rsOld = rg.closed.filter(r => !rsFresh.includes(r));
+  const doneTable = (list) => '<div class="card"><table class="dtable"><thead><tr><th></th><th></th><th>Khách / mã đơn</th><th>Loại</th><th>Kết quả</th><th></th></tr></thead><tbody>' + list.map(cskhDoneRowHtml).join('') + '</tbody></table></div>';
+  const rsTable = (list) => '<div class="sub-label">Gửi bù đã xong / dừng</div><div class="card"><table class="dtable"><thead><tr><th>Khách</th><th>Món</th><th>Mã vận đơn</th><th>Trạng thái</th><th></th></tr></thead><tbody>' + list.map(resendDoneRowHtml).join('') + '</tbody></table></div>';
+  const fold = (title, list, rs, empty) => `<details class="hm-fold"><summary>${esc(title)} · ${fmtInt(list.length)} đơn · ${fmtInt(rs.length)} phiếu gửi bù</summary>`
+    + (list.length ? doneTable(list) : '<p class="cskh-quiet">' + esc(empty) + '</p>') + (rs.length ? rsTable(rs) : '') + '</details>';
+  const doneHtml = fold('Vừa xong — tự ẩn sau ' + CSKH_HIDE_DAYS + ' ngày', fresh, rsFresh, 'Chưa có case nào vừa xong.')
+    + fold('Đã ẩn (30 ngày gần đây, để tra lại)', hidden, rsOld, 'Chưa có.');
+  // Đang theo dõi = case chat/đánh giá task đang cầm + phiếu gửi bù đang chạy tự động
+  const td = byOf('theo_doi'), tdSec = CSKH_SECTIONS.find(x => x.id === 'theo_doi');
+  const theoDoi = cskhGroupHtml(tdSec.title, tdSec.note, td.length + rg.running.length,
+    '<div class="feed">' + td.map(cskhCaseCardHtml).join('') + rg.running.map(resendCardHtml).join('') + '</div>', 'Không có case nào task đang cầm.');
 
-  bodyEl.innerHTML = banner + sec('ghi') + guiBu + sec('xu_ly') + sec('xem') + runningHtml + doneHtml;
+  bodyEl.innerHTML = banner + sec('ghi') + guiBu + sec('xu_ly') + theoDoi + sec('xem') + doneHtml;
 }
 
 // ---------------------------------------------------- hành động trên thẻ -----
@@ -381,13 +474,15 @@ async function cskhPatchRow(i, body){
   Object.assign(i.row, body); // cập nhật cache để render lại ngay
 }
 
-// Đã xử lý / Đã xem: đóng mọi dòng đang chờ của đơn này
-async function cskhActAck(c){
+// Xong: đóng mọi dòng đang mở của đơn này. keepTrack=true (sau Ghi Sổ Kho / Không phải lỗi shop):
+// dòng task CÒN đang xử lý với khách thì để nguyên — quyết xong lỗi kho chưa phải là xong với khách.
+async function cskhActAck(c, keepTrack){
   const now = new Date().toISOString();
   for (const i of c.infos){
-    if (!(i.pendErr || i.pendAck || i.pendOrphan)) continue;
-    if (i.tbl === 'cskh_chat_errors') await cskhPatchRow(i, { errlog_status: 'dismissed' });
-    else await cskhPatchRow(i, { acked_at: now });
+    if (!i.open) continue;
+    if (keepTrack && i.track) continue;
+    if (i.hasAckCol) await cskhPatchRow(i, { acked_at: now });
+    else await cskhPatchRow(i, { errlog_status: 'dismissed' }); // bảng chat chưa có cột acked_at
   }
 }
 
@@ -409,11 +504,11 @@ async function cskhActWrite(c){
   for (const i of c.infos){
     if (!(i.pendErr && i.row.errlog_code === code)) continue;
     const body = { errlog_status: status, errlog_id: errId || null };
-    if (i.tbl !== 'cskh_chat_errors') body.acked_at = now; // quyết xong = xử lý xong
+    if (i.hasAckCol && !i.track) body.acked_at = now; // quyết xong = xử lý xong (trừ khi task còn đang làm với khách)
     await cskhPatchRow(i, body);
   }
   // các dòng còn lại của đơn đang chờ ack (vd đánh giá 3★ cùng đơn) cũng coi là xong
-  await cskhActAck(cskhFindCase(c.key) || { infos: [] });
+  await cskhActAck(cskhFindCase(c.key) || { infos: [] }, true);
 }
 
 async function cskhActDismiss(c){
@@ -421,15 +516,15 @@ async function cskhActDismiss(c){
   for (const i of c.infos){
     if (!i.pendErr) continue;
     const body = { errlog_status: 'dismissed' };
-    if (i.tbl !== 'cskh_chat_errors') body.acked_at = now;
+    if (i.hasAckCol && !i.track) body.acked_at = now;
     await cskhPatchRow(i, body);
   }
-  await cskhActAck(cskhFindCase(c.key) || { infos: [] });
+  await cskhActAck(cskhFindCase(c.key) || { infos: [] }, true);
 }
 
 async function cskhActReopen(c){
   for (const i of c.infos){
-    if (i.acked && i.row.needs_action) await cskhPatchRow(i, { acked_at: null });
+    if (i.acked) await cskhPatchRow(i, { acked_at: null });
   }
 }
 
@@ -461,13 +556,14 @@ function buildCskhScreenHTML(){
   </div>
   <div id="cskh-body"></div>
   <footer>
-    <p><b>Cách dùng:</b> mỗi đơn là 1 thẻ, mỗi thẻ có 1 nút để chốt — chốt xong thẻ rời danh sách, hết việc thì ra "Không còn việc tồn". Bấm nhầm thì mở "Đã xong 7 ngày qua" → <b>Mở lại</b>.</p>
+    <p><b>Cách dùng:</b> mỗi đơn là 1 thẻ. Bấm <b>Xong</b> là thẻ rời danh sách ngay. Không bấm thì thẻ tự ẩn sau 3 ngày kể từ khi xong (task báo xong, hoặc 3 ngày không có gì mới) — trừ thẻ ghi "chờ anh · không tự ẩn". Khách nhắn lại thì thẻ tự quay lại. Bấm nhầm thì mở "Vừa xong" → <b>Mở lại</b>.</p>
     <p><b>Nguồn:</b> skill <code>review-return-check</code> (08:00 &amp; 20:00: đánh giá + trả hàng), task CSKH inbox (chat: lỗi kho / lỗi SP / giao thiếu → gửi bù) chạy trên PC trực. Trang không tự vào sàn; nút "Ghi Sổ Kho" ghi 1 dòng vào <code>warehouse_error_log</code>, chống trùng theo mã vận đơn.</p>
     <p><b>Giao thiếu</b> từ chat / đánh giá / trả hàng đều quy về 1 phiếu gửi bù (2 lần duyệt). Bảng gửi bù không lưu SĐT/địa chỉ đầy đủ — bản đầy đủ ở tin Telegram.</p>
   </footer>`;
 }
 
 // Giờ quét gần nhất + cảnh báo nếu quá lâu (lịch 08:00/20:00 → tối đa 12h giữa 2 lượt)
+const cskhHealth = { bad: '' };   // khác rỗng = lượt quét gần nhất bị chặn / quá 14 giờ chưa quét
 async function cskhRunStatus(){
   let last = null, blocked = '';
   try {
@@ -476,6 +572,8 @@ async function cskhRunStatus(){
   } catch (e){ /* chưa có bảng */ }
   if (!last) return 'Chưa có dữ liệu lượt quét · skill tự chạy 08:00 & 20:00 trên PC trực';
   const hours = (Date.now() - last.getTime()) / 3600000;
+  cskhHealth.bad = hours > 14 ? 'Đã ' + Math.floor(hours) + ' giờ chưa quét đánh giá/trả hàng — kiểm tra PC trực.'
+    : blocked ? 'Lượt quét gần nhất bị chặn: ' + (blocked.length > 160 ? blocked.slice(0, 160) + '…' : blocked) : '';
   return 'Quét đánh giá/trả hàng lúc ' + last.toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })
     + (hours > 14 ? ' · ⚠ đã ' + Math.floor(hours) + ' giờ chưa quét — kiểm tra PC trực' : '')
     + (blocked ? ' · ⚠ ' + (blocked.length > 110 ? blocked.slice(0, 110) + '…' : blocked) : '');

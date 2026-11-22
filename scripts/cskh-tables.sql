@@ -181,3 +181,15 @@ begin
     create policy "anon all" on public.cskh_chat_errors for all using (true) with check (true);
   end if;
 end $$;
+
+-- ------------------------------------------- 22/11/2026: case chat lên tab Hậu mãi --
+-- Chủ shop: "toàn bộ case hậu mãi phải hiện trên Sổ Vận Hành; xong thì 3 ngày sau tự ẩn,
+-- có nút Xong". Bảng chat trước đây chỉ có đề xuất lỗi shop nên đổi size / trả hàng / case
+-- task đang xử lý KHÔNG hiện được. 5 cột dưới đây cho bảng chat ngang hàng 2 bảng kia.
+-- Web (cskh.js) chạy được cả TRƯỚC và SAU khi thêm cột; chưa thêm thì chat hiện như cũ.
+alter table public.cskh_chat_errors add column if not exists case_type     text;        -- giao_nham | san_pham_loi | giao_thieu | doi_size | tra_hang_hoan_tien | hoan_tien_giu_hang | khac
+alter table public.cskh_chat_errors add column if not exists progress_note text;        -- nhật ký bước "▸ DD/MM HH:MM · [trạng thái] ..." (xem .claude/shared/tien-do-xu-ly.md)
+alter table public.cskh_chat_errors add column if not exists needs_action  boolean not null default false; -- cần anh xử lý
+alter table public.cskh_chat_errors add column if not exists action_type   text;        -- như 2 bảng kia (tranh_chap, lien_he_khach...)
+alter table public.cskh_chat_errors add column if not exists acked_at      timestamptz; -- anh bấm Xong trên web; TASK KHÔNG ĐƯỢC GHI cột này
+notify pgrst, 'reload schema';

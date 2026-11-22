@@ -25,6 +25,8 @@ Mỗi lần ghi nhớ PATCH kèm điều kiện trạng thái như thường l�
 
 Web (cskh.js `cskhProgressHtml`) tự: hiện bước cuối + lịch sử, và hiện **⚠ đứng ở bước này N giờ** khi
 `[chờ khách]` ≥ 4 giờ hoặc `[đang làm]` ≥ 1 giờ. Case có dòng cuối `[xong]` không bị cảnh báo.
+**Dòng cuối `[xong]` = case xong** (chốt 22/11/2026): web đưa thẻ vào "Vừa xong", 3 ngày sau tự ẩn — nên CHỈ ghi `[xong]`
+khi đã làm hết phần của shop; còn chờ gì thì ghi `[chờ khách]` / `[chờ anh]`.
 
 ## Thế nào là "case hậu mãi" (chủ shop nhắc lại 22/11/2026: 100% phải lên sổ)
 
@@ -46,10 +48,10 @@ Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ c
 5. `[chờ anh]` Chưa gửi được mã 10k (Shopee / thẻ hết hạn) — anh gửi giúp
 6. `[xong]` Đã hướng dẫn xong, đủ tin + mã / `[xong]` Đã từ chối — <đã giặt / quá 15 ngày>
 
-**Giới hạn web (ghi nhận 22/11/2026):** bảng `cskh_chat_errors` CHƯA có cột ghi chú tiến độ, cột "cần anh xử lý"
-(`needs_action`) hay `acked_at`, nên web hiện dòng chat CHỈ ở nhóm "Ghi lỗi Sổ Kho" (khi `suggest` + mã vận đơn).
-Muốn bảng bước trên hiện được cần: thêm 3 cột (`progress_note`, `needs_action`, `acked_at`) bằng SQL trên Supabase +
-sửa `cskh.js` đọc chúng. Chưa làm xong thì các bước `[chờ anh]` của case chat TẠM báo Telegram 1 dòng (ngoại lệ tạm).
+**Web đã hỗ trợ (chốt 22/11/2026 tối, thay cho "giới hạn web" ghi sáng 22/11):** dòng chat ghi tiến độ vào cột
+`cskh_chat_errors.progress_note` (cùng định dạng `▸`), kèm `case_type` + `needs_action`. Cần chạy 1 lần phần SQL "22/11/2026"
+cuối `scripts/cskh-tables.sql` trên Supabase; chưa chạy thì upsert kèm cột mới báo `PGRST204` → ghi lại không kèm cột mới và
+việc `[chờ anh]` tạm báo Telegram 1 dòng. Thế nào là xong + khi nào thẻ tự ẩn: [hau-mai-so-van-hanh.md](hau-mai-so-van-hanh.md).
 
 **Giao thiếu (mọi nguồn: chat, đánh giá, trả hàng)** — phát hiện là mở phiếu `resend_cases` NGAY + dòng đầu tiên:
 1. `[đang làm]` Phát hiện khách báo thiếu (nguồn: chat/đánh giá/trả hàng) — đang xin ảnh + SĐT + địa chỉ
