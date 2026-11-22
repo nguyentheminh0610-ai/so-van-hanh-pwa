@@ -69,7 +69,7 @@ chung chung, không trích nguyên văn):
 - **Giao nhầm / hàng lỗi** — nguyên văn từ `size-consultation/references/cskh-faq-17-11.md` mục 13:
   > Dạ bạn gửi giúp shop ảnh hoặc video sản phẩm bạn nhận được và ảnh tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ.
   (23/11/2026: bỏ câu xin lỗi ở tin này, xin lỗi nằm ở tin xác nhận lỗi.)
-- **Giao thiếu** — gửi thêm **tin xin lỗi** ("Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.", chốt 23/11/2026) NGAY SAU 3a, rồi mới "Tin xin ảnh vỏ đơn" ở `resend-missing-item/references/resend-flow-batch-2026-11-17.md`
+- **Giao thiếu** — gửi thêm **tin xin lỗi** ("Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.", chốt 23/11/2026) NGAY SAU 3a, rồi mới "Tin xin ảnh vỏ đơn" ở `resend-missing-item/references/resend-flow-batch-2026-11-17.md`
   (nguyên văn). Khách đã gửi ảnh trong chat → bỏ 3b, theo luật "Ảnh bằng chứng" của resend-collect-verify.
 
 Nhóm 1 (lý do ảnh hưởng shop) vẫn gửi **Tin 1 trước** (nhờ đổi lý do sang lý do không ảnh

@@ -80,9 +80,16 @@ là đã có trải nghiệm mua không tốt, vào thẳng "chụp ảnh vỏ �
 đầu tiên của case (không gộp chung 1 tin):
 
 ```
-Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.
 ```
-(Chủ shop duyệt 23/11/2026: thêm câu nêu lý do "nhân viên mới vào nên đóng hàng bị thiếu" — thay bản 22/11 chưa có lý do.)
+(Chủ shop duyệt 23/11/2026: nêu lý do "bạn ở kho mới vào làm nên đóng hàng bị thiếu" + kết bằng "đề xuất hướng xử lý" giống giao nhầm/hàng lỗi.)
+
+**Tin hướng xử lý — gửi NGAY SAU tin xin lỗi** (thêm 23/11/2026 vì chủ shop muốn giao thiếu cũng có đề xuất hướng xử lý;
+câu Claude soạn theo mẫu "đổi hàng miễn phí" của giao nhầm, chủ shop chưa duyệt từng chữ):
+```
+Mình sẽ gửi bù miễn phí sản phẩm còn thiếu cho bạn ạ.
+```
+Thứ tự case mới: tin xin lỗi → tin hướng xử lý → tin xin ảnh (nếu chưa có) → tin xin thông tin. Cờ `xl@HH:MM` phủ cả 2 tin đầu.
 
 - **Chỉ gửi 1 lần/case**, ghi `xl@HH:MM` vào `hoi=` trong dòng `☑` của `owner_note` TRƯỚC khi gửi (cờ chống trùng, không cần cột mới).
 - **Không gửi** nếu trong chat đã có lời xin lỗi của shop/nhân viên cho đúng vụ này (đọc lại cả hội thoại, mục 2

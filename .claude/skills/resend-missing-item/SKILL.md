@@ -168,10 +168,12 @@ references/resend-collect-verify.md mục 2):
 **Tin 0 (xin lỗi) — chốt 22/11/2026, gửi TRƯỚC mọi tin ở trên**, 1 tin riêng, 1 lần/case
 (mẫu + điều kiện bỏ qua ở references/resend-flow-batch-2026-11-17.md):
 ```
-Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
+Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.
 ```
 
-Case mới chưa có gì → gửi Tin 0 (xin lỗi), rồi Tin 2, rồi Tin 1. Sản phẩm thiếu (b)
+Ngay sau Tin 0 gửi **tin hướng xử lý** (23/11/2026): `Mình sẽ gửi bù miễn phí sản phẩm còn thiếu cho bạn ạ.`
+
+Case mới chưa có gì → gửi Tin 0 (xin lỗi), tin hướng xử lý, rồi Tin 2, rồi Tin 1. Sản phẩm thiếu (b)
 thường khách đã nói ngay trong tin báo thiếu. Chưa rõ mẫu/size/số lượng → **hỏi luôn trong Tin 1** (chốt 23/11/2026,
 thay cho "không tự hỏi, báo Telegram").
 
