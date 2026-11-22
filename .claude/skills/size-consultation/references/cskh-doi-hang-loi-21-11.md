@@ -130,7 +130,9 @@ chat (giao nhầm, hàng lỗi, đổi size, trả hàng hoàn tiền, đòi ho�
 thế nào là "xong" ở [hau-mai-so-van-hanh.md](../../../shared/hau-mai-so-van-hanh.md) mục "Hợp đồng dữ liệu cho dòng chat".
 Đổi size / trả hàng không phải lỗi shop thì `errlog_status='none'`, `shop_error_kind=null`.
 
-**Nếu Supabase trả lỗi `PGRST204` (cột chưa tồn tại)** = chủ shop chưa chạy phần SQL 22/11 trong `scripts/cskh-tables.sql`:
+**SQL 22/11 ĐÃ CHẠY 23/11/2026** (chủ shop chạy, Claude kiểm qua REST thấy đủ 5 cột) → luôn ghi kèm cột mới, không báo Telegram.
+Đoạn dưới chỉ còn là phương án dự phòng nếu bảng bị dựng lại.
+**Nếu Supabase trả lỗi `PGRST204` (cột chưa tồn tại)** = phần SQL 22/11 trong `scripts/cskh-tables.sql` chưa chạy:
 ghi lại dòng đó KHÔNG kèm 3 cột mới (như cũ, để không mất đề xuất lỗi), và việc `[chờ anh]` TẠM báo Telegram 1 dòng.
 Không thử lại nhiều lần, không tự ý bỏ ghi.
 

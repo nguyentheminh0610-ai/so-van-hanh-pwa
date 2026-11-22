@@ -51,7 +51,7 @@ Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ c
 6. `[xong]` Đã hướng dẫn xong, đủ tin + mã / `[xong]` Đã từ chối — <đã giặt / quá 15 ngày>
 
 **Web đã hỗ trợ (chốt 22/11/2026 tối, thay cho "giới hạn web" ghi sáng 22/11):** dòng chat ghi tiến độ vào cột
-`cskh_chat_errors.progress_note` (cùng định dạng `▸`), kèm `case_type` + `needs_action`. Cần chạy 1 lần phần SQL "22/11/2026"
+`cskh_chat_errors.progress_note` (cùng định dạng `▸`), kèm `case_type` + `needs_action`. **SQL đã chạy 23/11/2026, đủ cột.** (Dự phòng:) phần SQL "22/11/2026"
 cuối `scripts/cskh-tables.sql` trên Supabase; chưa chạy thì upsert kèm cột mới báo `PGRST204` → ghi lại không kèm cột mới và
 việc `[chờ anh]` tạm báo Telegram 1 dòng. Thế nào là xong + khi nào thẻ tự ẩn: [hau-mai-so-van-hanh.md](hau-mai-so-van-hanh.md).
 
