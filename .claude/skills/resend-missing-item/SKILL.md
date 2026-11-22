@@ -138,6 +138,8 @@ time.
      hướng dẫn khách tự bấm hoàn tiền trên sàn, đẩy lên Sổ Vận Hành — xem
      references/resend-collect-verify.md mục 1 ("Khách muốn hoàn tiền").
    - Khách bực/doạ đánh giá xấu nhưng KHÔNG đòi hoàn tiền → xử lý như case thường (chốt 22/11/2026).
+   - Quá 15 ngày kể từ ngày "Đã giao" → từ chối khéo, không gửi bù; thiếu dây rút / tag mác trên 1 chiếc quần = hàng lỗi,
+     không phải giao thiếu (cả 2 chốt 23/11/2026) — xem references/resend-collect-verify.md mục 1.
 4. Case mới → Step 1b. Case khách đã gửi đủ thông tin → Step 2 trở đi.
 5. Lượt quét không có gì mới → kết thúc im lặng, không gửi Telegram.
 

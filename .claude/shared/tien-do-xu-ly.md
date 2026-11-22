@@ -43,7 +43,8 @@ Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ c
 `size-consultation/references/cskh-doi-hang-loi-21-11.md` và `cskh-ship-faq.md`):
 1. `[đang làm]` Phát hiện khách báo <giao nhầm/hàng lỗi/đổi size> — đang kiểm ảnh + đơn
 2. `[chờ khách]` Đã xin lỗi + xin ảnh lúc HH:MM (chỉ khi khách chưa gửi ảnh)
-3. `[chờ anh]` Không xác nhận được lỗi — <vì sao: ảnh mờ, không thấy mác, đơn nhiều phân loại giống nhau...>
+3. `[chờ anh]` Khách đòi bồi thường thêm ngoài đổi + mã 10k — <khách đòi gì>
+   (23/11/2026: bỏ bước "không xác nhận được lỗi" — khách gửi ảnh hoặc video là chạy tiếp, không tự thẩm định)
 4. `[chờ khách]` Đã xác nhận lỗi + hướng dẫn đổi (hoặc trả hàng nếu khách tự yêu cầu) + gửi mã 10k lúc HH:MM
    (đổi size vì rộng/chật: "Đã gửi câu sẵn sàng đổi + hướng dẫn đổi" — KHÔNG có mã, chốt 22/11/2026)
 5. `[chờ anh]` Chưa gửi được mã 10k (Shopee / thẻ hết hạn) — anh gửi giúp

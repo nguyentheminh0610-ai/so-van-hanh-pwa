@@ -21,7 +21,7 @@ bao nhiêu" (thường kèm chiều cao/cân nặng), hoặc xin bảng size chu
 
 **KHÔNG trả lời** (để trống cho chủ shop hoặc skill khác xử lý), kể cả khi
 có chữ "size"/"dài"/"rộng" trong câu:
-- Khiếu nại khác, logistics, KOC/affiliate (RIÊNG giao sai/hàng lỗi-bẩn-rách: **chốt 21/11/2026** khách đã gửi ảnh + lỗi rõ → CS tự chạy đủ 5 bước đổi hàng + tặng mã giảm 10k, xem [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md); ảnh không rõ / không xác nhận được → nhắn tin đầu rồi đẩy lên Sổ Vận Hành `[chờ anh]` (22/11/2026 thay cho "báo Telegram"); khách đòi trả hàng hoàn tiền → hướng dẫn trả hàng (22/11/2026); giao thiếu: theo resend-missing-item)
+- Khiếu nại khác, logistics, KOC/affiliate (RIÊNG giao sai/hàng lỗi-bẩn-rách: **chốt 21/11/2026** khách đã gửi ảnh + lỗi rõ → CS tự chạy đủ 5 bước đổi hàng + tặng mã giảm 10k, xem [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md); từ 23/11/2026 khách gửi ảnh HOẶC video là đủ, không tự thẩm định lỗi; chỉ đòi bồi thường thêm mới đẩy Sổ Vận Hành `[chờ anh]`; khách đòi trả hàng hoàn tiền → hướng dẫn trả hàng (22/11/2026); giao thiếu: theo resend-missing-item)
 - Lo lắng/hỏi lại **sau khi đã đặt hàng** (vd "sợ về sẽ dài quá", "hàng có
   đúng size không") — đây là CSKH/khiếu nại, không phải tư vấn size mới
 - Đổi size cho đơn **đã lỡ đặt nhầm** (vd "mình lỡ đặt 2XL, mặc XL được
@@ -265,13 +265,17 @@ TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đ
 - **Hàng lỗi / giao nhầm mẫu, khách đã gửi ảnh (chốt 21/11/2026):** không xin ảnh
   lại → xin lỗi + xác nhận lỗi → "hỗ trợ đổi hàng + gửi 1 mã giảm" → tin hướng dẫn
   đổi theo sàn → gửi voucher 10k (TikTok: tab Voucher cột phải). Khách chỉ kêu hơi
-  dài/rộng thì KHÔNG phải hàng lỗi — deal cắt ngắn/cố mặc như cũ. Xem
+  dài/rộng thì KHÔNG phải hàng lỗi — câu "sẵn sàng đổi miễn phí / cố mặc / mang đi sửa" (bỏ deal hoàn tiền cắt ngắn 23/11/2026). Xem
   [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md).
 - **Cập nhật 22/11/2026 (chủ shop train cả ngày, đọc 2 file references trên trước khi xử lý hậu mãi):**
   câu xin lỗi có thêm "note và báo lại anh quản lý"; câu hướng xử lý "đổi hàng **miễn phí**"; tin báo mã 10k;
   hàng lỗi chỉ đổi (trả hàng hoàn tiền chỉ khi khách tự yêu cầu, không hoàn tiền giữ hàng); điều kiện cắt mác /
   đã giặt / 15 ngày; **mã 10k CHỈ cho lỗi shop**, đổi size vì rộng/chật KHÔNG có mã, câu mới "sẵn sàng đổi miễn phí",
   không hỏi size/kiểm tồn; câu "tiền hoàn về ví"; 100% case hậu mãi lên Sổ Vận Hành (không Telegram).
+- **Cập nhật 23/11/2026:** không tự thẩm định lỗi — khách gửi ảnh HOẶC video là chạy luôn; bực/doạ xử lý như thường, chỉ
+  đẩy `[chờ anh]` khi đòi bồi thường ngoài đổi + mã; thiếu dây rút/tag = hàng lỗi; hết hàng cứ đổi như thường; khách giữ món
+  giao nhầm → đồng ý; câu "khách ngại trả tiền đơn mới trước"; đơn đang giao → nhận trước rồi đổi. **Với hậu mãi, file skill
+  thắng Sheet** (Sheet đã cập nhật khớp 23/11, nếu sau này lệch thì theo skill). Chi tiết: cskh-doi-hang-loi-21-11.md.
 - **CHƯA train:** sửa thông tin đơn (sai SĐT, shipper không liên hệ được) +
   khiếu nại nặng chưa có mẫu → chủ shop/PC xử lý.
 - **Không in tên SP/giá trên hộp (chốt 30/10):** từ chối khéo, nêu lý do vận

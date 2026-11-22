@@ -125,6 +125,8 @@ mua được nhé."
 > [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md) (ví dụ chuẩn wdat1504) — không
 > còn dừng ở "nhắn tin đầu rồi chờ anh". Phần "Phạm vi mở" bên dưới chỉ còn áp dụng cho:
 > chưa có ảnh / ảnh không rõ, khách đòi hoàn tiền (một phần hoặc toàn bộ), khiếu nại nặng.
+> **CẬP NHẬT 23/11/2026:** khách gửi ảnh HOẶC video là đủ (không xét "rõ/không rõ"); bực/doạ xử lý như thường; chỉ đòi bồi
+> thường ngoài đổi + mã mới để chủ shop quyết — xem file 21-11.
 > Giao thiếu không đổi: vẫn `resend-missing-item`.
 
 Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`

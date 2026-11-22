@@ -7,16 +7,39 @@ theo skill `resend-missing-item` (gửi bù).
 
 **Thay cho quy tắc 17/11/2026** ở [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 13
 ("CS chỉ nhắn tin đầu rồi báo Telegram, không tự đề xuất hướng xử lý"): từ 21/11 với
-case lỗi/nhầm **rõ ràng** (khách đã gửi ảnh, nhìn ảnh thấy lỗi) thì CS **tự chạy đủ
+case lỗi/nhầm khách **đã gửi bằng chứng** (ảnh hoặc video — sửa 23/11/2026, không cần "nhìn ảnh thấy lỗi rõ") thì CS **tự chạy đủ
 5 bước dưới đây**, vì hướng xử lý đã cố định: **đổi miễn phí + tặng 1 mã giảm**. Lý do:
 đây là lỗi của shop, cách xử lý không cần cân nhắc từng ca, để khách chờ anh duyệt
 chỉ làm chậm.
 
-Vẫn **để chủ shop quyết** (nhắn tin đầu + đẩy lên Sổ Vận Hành `[chờ anh]`, xem mục "ĐẨY LÊN SỔ VẬN HÀNH" bên dưới —
-sửa 22/11/2026, thay cho "Telegram như quy tắc 17/11") khi:
-- khách **đòi hoàn tiền kèm trả hàng** (không muốn đổi) — từ 22/11/2026 CS tự hướng dẫn trả hàng hoàn tiền, xem mục "HÀNG LỖI CHỈ HỖ TRỢ ĐỔI" bên dưới;
-- ảnh không rõ lỗi, hoặc khách chưa gửi ảnh và mô tả mơ hồ;
-- lỗi "nặng" kèm bức xúc, doạ đánh giá xấu, đòi bồi thường thêm.
+**KHÔNG tự thẩm định lỗi — chỉ cần khách có gửi bằng chứng (chủ shop chốt 23/11/2026, thay cho "ảnh không rõ lỗi → để
+chủ shop quyết" và checklist xác nhận lỗi em đề xuất 22/11 — anh bỏ):** khách đã gửi **ảnh HOẶC video** về món lỗi/nhầm là
+đủ, chạy luôn các bước. Không soi xem ảnh có rõ không, không cần đối chiếu mác với phân loại đơn. Lý do: phía sau còn chủ
+shop duyệt (Sổ Vận Hành / ghi Sổ Kho), anh tự lo phần kiểm; để CS dừng vì "không chắc" chỉ làm khách chờ.
+Khách **chưa gửi** ảnh/video nào → xin bằng chứng trước (tin ở faq-17-11 mục 13.2, ghi thêm "ảnh hoặc video đều được ạ").
+
+Vẫn **để chủ shop quyết** (nhắn tin đầu + đẩy lên Sổ Vận Hành `[chờ anh]`, xem mục "ĐẨY LÊN SỔ VẬN HÀNH" bên dưới) CHỈ khi:
+- khách **đòi bồi thường thêm ngoài phần đổi hàng + mã 10k** (đòi tiền, đòi tặng thêm hàng...).
+
+Khách **bực tức, doạ đánh giá xấu** nhưng không đòi gì thêm → **xử lý như thường** (chủ shop chốt 23/11/2026, giống giao
+thiếu; thay cho dòng cũ "lỗi nặng kèm bức xúc, doạ đánh giá xấu → để chủ shop quyết").
+
+## Các tình huống phụ (chủ shop chốt 23/11/2026)
+
+- **Thiếu dây rút / thiếu tag mác** trên 1 chiếc quần → tính là **HÀNG LỖI** (chạy luồng đổi ở đây), KHÔNG phải giao thiếu.
+  Giao thiếu chỉ là thiếu nguyên **1 sản phẩm** trong đơn (đi `resend-missing-item`). Thực tế hiếm, nếu có thường là thiếu dây rút.
+- **Size/mẫu khách cần đổi đang hết hàng** → không phải việc của CS, **cứ hỗ trợ đổi như bình thường**, kho tự xử lý.
+  CS không kiểm tồn trong luồng đổi.
+- **Khách muốn GIỮ LẠI món giao nhầm** (vì thích) → **đồng ý luôn**. Không cần đổi, không hoàn tiền phần chênh. Câu gợi ý
+  (Claude soạn 23/11/2026, chủ shop chưa duyệt từng chữ): "Dạ được ạ, bạn thích thì cứ giữ lại dùng nhé ạ, 1 lần nữa shop xin lỗi
+  bạn vì sự nhầm lẫn này ạ." Vẫn gửi mã 10k + tin báo mã nếu chưa gửi (vẫn là lỗi shop — suy từ quy tắc "mã cho lỗi shop", anh sửa
+  nếu khác). Ghi sổ `[xong] Khách giữ lại món giao nhầm`.
+- **Khách ngại phải trả tiền đơn mới trước** ("phải trả tiền đơn mới rồi mới được hoàn à?") — câu chủ shop chốt ý 23/11/2026
+  (Claude viết thành câu, giữ đúng ý anh), dùng cho cả đổi hàng lỗi/nhầm và đổi size:
+  "Dạ đúng rồi ạ, mong bạn thông cảm giúp shop nhé. Bạn yên tâm tiền chắc chắn sẽ được sàn hoàn lại, không mất đi đâu được ạ. Vì hiện tại tiền đơn cũ đang do sàn giữ chứ shop không giữ, nên bạn cứ yên tâm đặt đơn mới trước, sau đó tiền sẽ được hoàn về ví, thường là hoàn ngay lập tức ạ."
+- **Đơn chưa nhận / đang giao** mà khách đã đòi đổi → báo khách nhận hàng trước, sau đó shop hỗ trợ đổi như bình thường.
+  Câu gợi ý (Claude soạn 23/11/2026): "Dạ bạn nhận hàng giúp shop trước nhé ạ, sau khi nhận nếu cần đổi thì shop hỗ trợ đổi cho bạn như bình thường ạ."
+  Ghi sổ `[chờ khách] Đơn đang giao — đã hẹn khách nhận hàng rồi đổi`.
 
 ## HÀNG LỖI CHỈ HỖ TRỢ ĐỔI — KHÔNG hoàn tiền giữ hàng (chủ shop chốt 22/11/2026)
 
@@ -25,8 +48,8 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 13 — bảng đó không còn dùng cho CS.
 - Hướng dẫn **ĐỔI** **giống hệt giao nhầm** (5 bước + tin báo mã 10k ở dưới). Chỉ khác **lý do xin lỗi ở bước 2**:
   giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
-- Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu gợi ý (Claude soạn 22/11/2026, chủ shop
-  chưa duyệt từng chữ): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
+- Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu (Claude soạn 22/11/2026, **chủ shop
+  duyệt 23/11/2026**): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
 - **CHỈ KHI khách tự yêu cầu trả hàng hoàn tiền** (chủ shop nhấn mạnh 22/11/2026) mới hướng dẫn trả hàng hoàn tiền; còn lại
   LUÔN hướng dẫn **đổi hàng mới** (đừng chủ động mời trả hàng hoàn tiền). Khách không muốn đổi mà muốn **trả hàng hoàn tiền** (chủ shop chốt 22/11/2026): **HỖ TRỢ**. Làm giống luồng đổi
   (bước 1–3: không xin ảnh nếu đã có, xin lỗi + xác nhận lỗi + câu "note và báo lại anh quản lý") nhưng
@@ -43,12 +66,13 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 
 Áp dụng cho cả hàng lỗi, giao nhầm (luồng 5 bước) **và đổi size vì rộng/chật**, khớp Mục 8.3 tài liệu CSKH.
 - **KHÔNG tự soi ảnh để đoán hàng đã dùng hay chưa.** Chỉ xét khi **khách tự nhắn** là đã cắt mác / đã giặt / đã mặc.
-- **Khách nói đã cắt mác** → không sao, vẫn hỗ trợ bình thường. Câu (Claude soạn theo ý chủ shop, chưa duyệt từng chữ):
+- **Khách nói đã cắt mác** → không sao, vẫn hỗ trợ bình thường. Câu (Claude soạn theo ý chủ shop, **chủ shop duyệt 23/11/2026**):
   "Dạ không sao đâu ạ, bạn cắt mác rồi shop vẫn hỗ trợ cho bạn nhé ạ." rồi chạy tiếp các bước.
 - **Khách nói đã giặt hoặc đã sử dụng** → từ chối khéo (câu chủ shop, đã sửa chính tả):
   "Dạ bên mình không hỗ trợ đổi lại với sản phẩm đã qua giặt hoặc sử dụng ạ, mong bạn thông cảm giúp shop nhé ạ."
 - **Quá 15 ngày kể từ khi khách nhận hàng** → không hỗ trợ nữa. Ngày nhận = ngày "Đã giao" trong tab Đơn hàng của khách;
-  không thấy ngày thì coi như còn hạn (đừng chặn oan). Câu (Claude soạn, chưa duyệt từng chữ):
+  không thấy ngày thì coi như còn hạn (đừng chặn oan). Mốc 15 ngày áp dụng cả **giao thiếu** (chốt 23/11/2026, xem
+  `resend-missing-item`). Câu (Claude soạn, **chủ shop duyệt 23/11/2026**):
   "Dạ đơn của bạn đã quá 15 ngày kể từ khi nhận hàng nên shop không hỗ trợ đổi trả được nữa ạ, mong bạn thông cảm giúp shop nhé ạ."
 - Từ chối (đã giặt / quá 15 ngày) vẫn ghi lên Sổ Vận Hành với dòng `[xong] Đã từ chối — <lý do>` để chủ shop thấy.
 
@@ -58,7 +82,7 @@ hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/
 |---|---|---|
 | 1 | **Không xin ảnh nữa** nếu khách đã gửi ảnh/video lỗi | Bỏ hẳn tin "Bạn gửi giúp shop ảnh...". Chỉ xin ảnh khi khách CHƯA gửi (dùng tin ở faq-17-11 mục 13.2). Khách gửi ảnh **trước** rồi mới gõ chữ là chuyện thường — nhớ cuộn lên xem. |
 | 2 | **Xin lỗi + xác nhận lỗi** | Hàng lỗi: "Dạ, sau khi kiểm tra thì shop xác nhận đây là lỗi chưa kiểm tra kĩ trước khi giao hàng. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." Giao nhầm: "...shop xác nhận đây là lỗi kho bên mình giao bị nhầm. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." (Sheet "Mau tin nhan" dòng 8–10, 13–14; câu in đậm chủ shop thêm 22/11/2026, đặt TRƯỚC đề xuất xử lý, áp dụng toàn bộ case lỗi shop.) Có thể mở đầu ngắn kiểu người thật ("Uii dạ") như anh làm. |
-| 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng **miễn phí** và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11, thêm chữ "miễn phí" ngày 22/11/2026; chưa sửa trong Sheet "Mau tin nhan" — nhờ chủ shop cập nhật nếu muốn Sheet khớp). |
+| 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng **miễn phí** và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11, thêm chữ "miễn phí" ngày 22/11/2026; Sheet "Mau tin nhan" đã cập nhật khớp 23/11/2026). |
 | 4 | **Hướng dẫn đổi hàng** theo sàn | Nguyên văn Sheet "Mau tin nhan" mục "Đổi hàng": TikTok lý do **"Đổi ý"**; Shopee lý do **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"** — xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md). Khách đặt đơn mới → bấm trả đơn cũ → shipper qua lấy → tiền về ví sàn. |
 | 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. **Phải xác minh đúng thẻ là Giảm 10.000₫ (đọc chữ trên thẻ, không đoán theo vị trí) trước khi bấm Gửi, và đọc lại thẻ hiện trong chat sau khi gửi.** Sai mức (không phải 10k) → không gửi, đẩy lên Sổ Vận Hành `[chờ anh]`. |
 | 6 | **Tin báo mã giảm** (chủ shop thêm 22/11/2026), gửi ngay sau thẻ voucher | "Dạ mình gửi bạn mã giảm giá 10k khi đặt lại đơn hàng, 1 lần nữa mình xin lỗi bạn vì trải nghiệm chưa được tốt ạ." |
@@ -120,11 +144,9 @@ không ghi thêm bước — TRỪ KHI khách gửi tin mới, lúc đó xử l�
 - Rộng/chật → **câu mới chốt 22/11/2026** (sẵn sàng đổi miễn phí, gợi ý cố mặc hoặc mang đi sửa nếu rộng) rồi gửi
   NGAY hướng dẫn đổi, không hỏi size muốn đổi / không kiểm tồn — nguyên văn + thứ tự ở
   [cskh-ship-faq.md](cskh-ship-faq.md) mục "Đổi size / đổi trả hàng sau khi mua" (câu cũ Sheet dòng 11 không dùng nữa).
-- Dài quá → gợi ý mang ra hàng cắt ngắn, yên tâm không mất form (Sheet "Deal khách —
-  Dài quá" dòng 31; câu ngắn hơn ở [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 10).
-  Câu trong Sheet có đoạn "hoàn lại [x]đ qua ngân hàng" — **số tiền là của chủ shop**,
-  CS không tự điền; nếu khách không chịu cắt thì hướng sang đổi hàng (bước 4) **không
-  kèm** voucher lỗi shop.
+- ~~Dài quá → gợi ý cắt ngắn + "hoàn lại [x]đ qua ngân hàng" (Sheet "Deal khách — Dài quá" dòng 31)~~ — **BỎ 23/11/2026**
+  (chủ shop chốt): không deal hoàn tiền cắt ngắn nữa. Dài/rộng dùng chung câu mới 22/11 ở trên (đã có ý "rộng thì mang ra
+  hàng sửa lại") rồi gửi hướng dẫn đổi. Không có mã 10k.
 - Khách vẫn muốn đổi size → theo luồng đổi size ở cskh-ship-faq.md (câu sẵn sàng đổi → hướng dẫn đổi → hỏi lý do;
   KHÔNG hỏi size mới, KHÔNG kiểm tồn — chốt 22/11/2026). **KHÔNG gửi mã 10k** — mã chỉ cho lỗi shop (chốt lại 22/11/2026 tối,
   thay cho dòng "gửi mã 10k" ghi trưa cùng ngày).

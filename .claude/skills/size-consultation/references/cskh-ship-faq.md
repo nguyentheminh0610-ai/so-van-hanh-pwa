@@ -198,7 +198,10 @@ tài liệu CSKH Mục 8, mẫu câu chuẩn ở **Google Sheet "Mau tin nhan"**
 **Nguồn mẫu câu CSKH CHÍNH THỨC (master):** Google Sheet của shop
 `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`, tab **"Mau tin nhan"** — chứa
 mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 sàn, và tab
-"Chinh sach xu ly loi". Khi cần mẫu CSKH ngoài size → đọc Sheet này, nó thắng.
+"Chinh sach xu ly loi". Khi cần mẫu CSKH ngoài size → đọc Sheet này.
+**Riêng hậu mãi (giao thiếu / giao nhầm / hàng lỗi / đổi size): FILE SKILL THẮNG SHEET** (chủ shop chốt 23/11/2026) — các câu
+anh chốt qua chat 22–23/11 được ghi vào skill trước; Sheet đã được cập nhật khớp ngày 23/11/2026, nếu sau này 2 bên lệch thì theo
+skill và báo lại chủ shop để sửa Sheet.
 
 **Luồng xử lý "khách muốn đổi size" (TikTok/Shopee):**
 1. Chưa hỏi lý do đổi trước. Gửi câu sẵn sàng đổi miễn phí + gợi ý giữ hàng — **câu mới chủ shop chốt
@@ -244,6 +247,11 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
 - **Đổi sang mẫu khác (kể cả lệch giá)** → không sao, hỗ trợ đổi như bình thường: đơn cũ trả theo sàn được hoàn tương
   ứng, đơn mới là đơn mới. Không cần tính chênh lệch.
 - **Đổi lần thứ 2** → vẫn hỗ trợ như bình thường, không gửi mã (vì không phải lỗi shop).
+- **Size muốn đổi đang hết hàng** (chốt 23/11/2026) → việc của kho, CS cứ hỗ trợ đổi như bình thường, không kiểm tồn.
+- **Khách ngại phải trả tiền đơn mới trước** (chốt 23/11/2026, dùng chung với hàng lỗi/giao nhầm):
+  > Dạ đúng rồi ạ, mong bạn thông cảm giúp shop nhé. Bạn yên tâm tiền chắc chắn sẽ được sàn hoàn lại, không mất đi đâu được ạ. Vì hiện tại tiền đơn cũ đang do sàn giữ chứ shop không giữ, nên bạn cứ yên tâm đặt đơn mới trước, sau đó tiền sẽ được hoàn về ví, thường là hoàn ngay lập tức ạ.
+- **Đơn chưa nhận / đang giao mà khách đã muốn đổi** (chốt 23/11/2026) → "Dạ bạn nhận hàng giúp shop trước nhé ạ, sau khi nhận
+  nếu cần đổi thì shop hỗ trợ đổi cho bạn như bình thường ạ." (Đơn CHƯA đóng gói thì theo mục 12 dưới, khác case này.)
 - Điều kiện cắt mác / đã giặt / quá 15 ngày: dùng chung mục "ĐIỀU KIỆN ĐỔI / TRẢ" trong cskh-doi-hang-loi-21-11.md.
 - Lý do chọn khi khách bấm trả đơn cũ để đổi: theo chốt 19/11/2026 là **"Đổi ý"** (Shopee:
   "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), xem `.claude/shared/mau-tin-nhan-tra-hang.md`
@@ -253,8 +261,8 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
 tem mác. Cách 1 tiền hoàn về ví sàn (mã giảm: **22/11/2026 chốt CHỈ lỗi shop mới có, 10k; lỗi khách không có** —
 dòng gốc "10k nếu lỗi khách, 15k nếu lỗi shop" không dùng nữa); khách ngại kẹt ví sàn → (22/11/2026: trả lời câu "tiền hoàn về ví"
 ở trên trước, khách vẫn không chịu thì đẩy lên sổ, CS không tự đưa) Cách 2 (shop qua lấy hàng cũ, gửi lại
-size mới; lỗi khách ~15k/15k, lỗi shop shop chịu cả 2 chiều). Hết size muốn đổi →
-hướng trả hàng hoàn tiền + gợi ý mẫu/màu khác.
+size mới; lỗi khách ~15k/15k, lỗi shop shop chịu cả 2 chiều). ~~Hết size muốn đổi →
+hướng trả hàng hoàn tiền + gợi ý mẫu/màu khác.~~ — **thay 23/11/2026:** hết hàng là việc của kho, CS cứ hỗ trợ đổi như bình thường.
 
 ### 11. Khách yêu cầu không in tên SP/giá tiền trên hộp (chốt 30/10/2026, sửa lại 30/10)
 Shop KHÔNG đáp ứng được yêu cầu này. Từ chối khéo, nêu rõ lý do vận hành

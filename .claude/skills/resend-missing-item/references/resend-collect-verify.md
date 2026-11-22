@@ -90,6 +90,13 @@ Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_orde
   đơn gửi bù, CS không tự duyệt và không hứa số tiền. Khách đổi ý muốn nhận gửi bù thì bỏ cờ (`⚑ hoantien=0`) và đi tiếp luồng thường.
 - **Khách bực / doạ đánh giá xấu nhưng không đòi hoàn tiền (chốt 22/11/2026):** xử lý như case thường, không khác gì (có tin xin lỗi mở đầu).
 - **Món thiếu đang hết hàng (chốt 22/11/2026):** vẫn tạo đơn gửi bù bình thường, không chặn hay hỏi lại; kho tự thu xếp hàng.
+- **Mốc 15 ngày (chủ shop chốt 23/11/2026, giống đổi trả):** khách báo thiếu khi đã **quá 15 ngày** kể từ ngày "Đã giao" của đơn
+  → không gửi bù. Câu (chủ shop duyệt 23/11/2026, dùng chung với đổi trả): "Dạ đơn của bạn đã quá 15 ngày kể từ khi nhận hàng nên
+  shop không hỗ trợ đổi trả được nữa ạ, mong bạn thông cảm giúp shop nhé ạ." Không thấy ngày giao → coi như còn hạn, làm bình
+  thường (đừng chặn oan). Vẫn mở phiếu để hiện trên sổ, dòng cuối `▸ [xong] Đã từ chối — quá 15 ngày (giao DD/MM)`, không tạo đơn.
+- **Thiếu cái gì mới là "giao thiếu" (chủ shop chốt 23/11/2026):** chỉ khi thiếu nguyên **1 sản phẩm** trong đơn. Khách kêu 1 chiếc
+  quần **thiếu dây rút / thiếu tag mác** → đó là **hàng lỗi**, KHÔNG mở phiếu gửi bù; xử lý theo luồng đổi hàng lỗi ở
+  `size-consultation/references/cskh-doi-hang-loi-21-11.md`.
 
 ## 1b. KHÔNG để phiếu đứng im — tin mới của khách có phiếu mở (chốt 19/11/2026)
 
