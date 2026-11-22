@@ -43,9 +43,13 @@ Câu nào đánh dấu *(Claude soạn, chưa duyệt từng chữ)* thì vẫn 
 Thiếu dây rút / tag mác trên 1 chiếc quần = **hàng lỗi** (case 3), không phải giao thiếu.
 Trước khi nhắn: mở tab Đơn hàng xác minh 1 đơn SL ≥ 2 thật sự thiếu (không phải 2 đơn lẻ); mở phiếu `resend_cases`.
 
-1. **Xin lỗi + lý do:** Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.
-2. **Hướng xử lý:** Mình sẽ gửi bù miễn phí sản phẩm còn thiếu cho bạn ạ. *(Claude soạn, chưa duyệt từng chữ)*
-3. **Xin ảnh** (chỉ khi chưa có ảnh nào): Để shop kiểm tra và hỗ trợ gửi bù sản phẩm còn thiếu cho bạn nhanh nhất, bạn chụp giúp shop 1 tấm ảnh phần vỏ đơn hàng (tem/mã vận đơn dán bên ngoài túi/hộp) gửi qua đây giúp shop nhé ạ.
+**Thứ tự (chủ shop chốt lại 23/11/2026, thay thứ tự 22/11 "xin lỗi trước xin ảnh"):** xin ảnh vỏ đơn ĐẦU TIÊN, không xin lỗi;
+khách gửi ảnh xong mới xin lỗi + đề xuất, giống giao nhầm / hàng lỗi. Khách đã gửi ảnh ngay từ đầu → bỏ tin 1, bắt đầu từ tin 2.
+
+1. **Xin ảnh** (chỉ khi chưa có ảnh nào; KHÔNG kèm lời xin lỗi): Để shop kiểm tra và hỗ trợ gửi bù sản phẩm còn thiếu cho bạn nhanh nhất, bạn chụp giúp shop 1 tấm ảnh phần vỏ đơn hàng (tem/mã vận đơn dán bên ngoài túi/hộp) gửi qua đây giúp shop nhé ạ.
+   → chờ khách gửi ảnh (`[chờ khách] Đã xin ảnh vỏ đơn lúc HH:MM`).
+2. **Xin lỗi + lý do** (sau khi có ảnh): Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.
+3. **Hướng xử lý:** Mình sẽ gửi bù miễn phí sản phẩm còn thiếu cho bạn ạ. *(Claude soạn, chưa duyệt từng chữ)*
 4. **Xin thông tin + sản phẩm thiếu:** Dạ bạn cho shop xin họ tên, SĐT, địa chỉ nhận hàng và sản phẩm bị thiếu (tên mẫu, size, số lượng) để shop gửi bù nhé ạ. Vì sàn không cho gửi SĐT và địa chỉ qua tin nhắn, bạn gửi giúp shop thông tin đó bằng ảnh nhé ạ (ảnh chụp màn hình ghi chú điện thoại, hoặc ảnh chụp phần thông tin giao hàng của đơn trên sàn).
    - Khách đã nói đủ tên mẫu + size + số lượng → bỏ đoạn "và sản phẩm bị thiếu (...)"; nói thiếu phần nào → chỉ hỏi phần đó trong ngoặc.
 5. **Cách 3 — CHỈ khi khách nói không biết gửi ảnh:** Dạ bạn có thể ghi họ tên, SĐT, địa chỉ ra 1 tờ giấy rồi chụp ảnh gửi shop cũng được ạ.

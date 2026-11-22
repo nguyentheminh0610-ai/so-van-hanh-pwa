@@ -287,11 +287,12 @@ tự tra được món/mã vận đơn.
   Shopee, `order_to_tracking.sh`). *Lý do:* case `obe9hvmo5o` 18/11 — khách đã gửi ảnh túi
   hàng chỉ có 1 quần lúc 22:26, vẫn bị xin "ảnh vỏ đơn" lúc 23:29; chủ shop: "khách đã gửi
   ảnh sp rồi mà sao còn hỏi lại" → bỏ.
-- **Thứ tự tin đầu tiên của case (chủ shop chốt 22/11/2026): Tin XIN LỖI → Tin xin ảnh → tin xin SĐT/địa chỉ.**
+- **Thứ tự tin của case (chủ shop chốt lại 23/11/2026, thay bản 22/11 "xin lỗi → xin ảnh"): Tin xin ảnh (không xin lỗi, chờ khách
+  gửi) → Tin XIN LỖI → tin hướng xử lý "gửi bù miễn phí" → tin xin SĐT/địa chỉ + sản phẩm thiếu.** Khách có ảnh sẵn → bắt đầu từ tin xin lỗi.
   Tin xin lỗi ("Dạ, shop xin lỗi vì bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị thiếu ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay, mình xin phép đề xuất hướng xử lý như sau ạ.", mẫu + điều kiện bỏ qua ở
   [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md)) gửi 1 lần/case, ghi `xl@HH:MM` vào `hoi=` trước khi gửi.
 - Chưa có ảnh nào → gửi **Tin xin ảnh vỏ đơn** (mẫu ở [resend-flow-batch-2026-11-17.md](resend-flow-batch-2026-11-17.md))
-  sau tin xin lỗi, rồi tin xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
+  ĐẦU TIÊN (trước tin xin lỗi — 23/11/2026); khách gửi ảnh rồi mới tới tin xin lỗi, hướng xử lý, xin họ tên/SĐT/địa chỉ. Cờ `msg_photo_at` lên trước khi gửi (quy tắc chung).
 - **Chưa có ảnh khách gửi trong chat → KHÔNG gửi tin xác minh, KHÔNG chuyển `wait_approve_1`,
   KHÔNG đưa chủ shop duyệt** (trừ khi anh bấm "Duyệt dù thiếu ảnh"). Giữ `collecting`; nhắc khách theo mục 1e (4h, 1 lần).
   Cột `msg_photo_at` chưa có trên DB (chủ shop chưa chạy SQL) thì kiểm lịch sử chat
