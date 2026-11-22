@@ -130,6 +130,8 @@ mua được nhé."
 Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35UGtmTjzbUYcC0jidU-05WE`
 — tab **"Chinh sach xu ly loi"** (mức lỗi, % hoàn, mã giảm) + tab **"Mau tin nhan"**
 (câu chuẩn). Đọc dòng thật trong Sheet, không chép lại từ trí nhớ.
+- ⚠️ **22/11/2026: hàng lỗi chỉ hỗ trợ ĐỔI, không hoàn tiền giữ hàng — bảng % ngay dưới KHÔNG còn dùng cho CS**
+  (chỉ để chủ shop tham khảo khi tự quyết); xem [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md).
 - Sản phẩm, % hoàn khi khách GIỮ hàng — **CHỐT 18/11/2026 (chủ shop), thay cho
   dải cũ "10-15% / 15-20%" ở đây và dải "5-10 / 15-20 / 30-35" trong tài liệu
   CSKH cục bộ** (hai nguồn từng lệch nhau, chủ shop chốt số cố định):

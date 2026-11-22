@@ -13,9 +13,20 @@ case lỗi/nhầm **rõ ràng** (khách đã gửi ảnh, nhìn ảnh thấy l�
 chỉ làm chậm.
 
 Vẫn **để chủ shop quyết** (nhắn tin đầu + Telegram như quy tắc 17/11) khi:
-- khách **đòi hoàn tiền** / hoàn một phần giữ hàng (không muốn đổi) — % hoàn là của anh;
+- khách **đòi hoàn tiền kèm trả hàng** (không muốn đổi) — chưa chốt, báo Telegram, CS không hứa gì;
 - ảnh không rõ lỗi, hoặc khách chưa gửi ảnh và mô tả mơ hồ;
 - lỗi "nặng" kèm bức xúc, doạ đánh giá xấu, đòi bồi thường thêm.
+
+## HÀNG LỖI CHỈ HỖ TRỢ ĐỔI — KHÔNG hoàn tiền giữ hàng (chủ shop chốt 22/11/2026)
+
+Với **sản phẩm bị lỗi** (rách, bẩn, ố, in hỏng, tuột chỉ...): shop **chỉ hỗ trợ đổi lại sản phẩm**, **không hỗ trợ
+hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/30%). Thay cho bảng % trong
+[cskh-faq-17-11.md](cskh-faq-17-11.md) mục 13 — bảng đó không còn dùng cho CS.
+- Hướng dẫn đổi **giống hệt giao nhầm** (5 bước + tin báo mã 10k ở dưới). Chỉ khác **lý do xin lỗi ở bước 2**:
+  giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
+- Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu gợi ý (Claude soạn 22/11/2026, chủ shop
+  chưa duyệt từng chữ): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
+- Khách không muốn đổi mà đòi **trả hàng hoàn tiền**: CHƯA chốt, báo Telegram, CS không hứa gì.
 
 ## 5 bước (đúng thứ tự, mỗi bước 1 tin riêng)
 
