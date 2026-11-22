@@ -126,7 +126,8 @@ không ghi thêm bước — TRỪ KHI khách gửi tin mới, lúc đó xử l�
   CS không tự điền; nếu khách không chịu cắt thì hướng sang đổi hàng (bước 4) **không
   kèm** voucher lỗi shop.
 - Khách vẫn muốn đổi size → theo luồng đổi size ở cskh-ship-faq.md (hỏi size mới, kiểm
-  tồn, hướng dẫn đổi, **gửi mã 10k — chốt 22/11/2026**, rồi mới hỏi lý do).
+  tồn, hướng dẫn đổi, rồi mới hỏi lý do). **KHÔNG gửi mã 10k** — mã chỉ cho lỗi shop (chốt lại 22/11/2026 tối,
+  thay cho dòng "gửi mã 10k" ghi trưa cùng ngày).
 
 ## Ví dụ chuẩn: wdat1504 (TikTok, 21/11/2026)
 
@@ -149,3 +150,8 @@ Kết quả: 12:56 khách đặt đơn mới #587303286707815673 (159k sau mã),
 lỗi khách, **15k** nếu lỗi shop", trong khi Sheet "Chinh sach xu ly loi" và ví dụ
 wdat1504 đều dùng **10k** cho lỗi shop. Luồng này theo **10k** (Sheet + thực tế); dòng
 15k ở Mục 8 chờ chủ shop xác nhận rồi mới sửa.
+→ **ĐÃ CHỐT 22/11/2026:** mã giảm **10k, CHỈ cho lỗi shop** (giao nhầm, hàng lỗi; lỗi shop lần 2 vẫn gửi). Lỗi khách
+(đổi size vì rộng/chật) **không** có mã. Dòng "10k lỗi khách / 15k lỗi shop" đã bỏ.
+
+**Khách hỏi tiền hoàn về đâu** (mọi case trả hàng trên sàn, chốt 22/11/2026): "Dạ tiền đó sẽ được hoàn về ví, nếu có liên kết
+với ngân hàng thì bạn có thể rút về hoặc dùng để thanh toán các đơn hàng tiếp theo trên sàn ạ." — xem cskh-ship-faq.md.

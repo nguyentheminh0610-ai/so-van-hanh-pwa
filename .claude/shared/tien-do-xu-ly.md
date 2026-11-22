@@ -45,6 +45,7 @@ Mọi case hậu mãi, kể cả case task tự xử lý xong hoặc đã từ c
 2. `[chờ khách]` Đã xin lỗi + xin ảnh lúc HH:MM (chỉ khi khách chưa gửi ảnh)
 3. `[chờ anh]` Không xác nhận được lỗi — <vì sao: ảnh mờ, không thấy mác, đơn nhiều phân loại giống nhau...>
 4. `[chờ khách]` Đã xác nhận lỗi + hướng dẫn đổi (hoặc trả hàng nếu khách tự yêu cầu) + gửi mã 10k lúc HH:MM
+   (đổi size vì rộng/chật: "Đã gửi câu sẵn sàng đổi + hướng dẫn đổi" — KHÔNG có mã, chốt 22/11/2026)
 5. `[chờ anh]` Chưa gửi được mã 10k (Shopee / thẻ hết hạn) — anh gửi giúp
 6. `[xong]` Đã hướng dẫn xong, đủ tin + mã / `[xong]` Đã từ chối — <đã giặt / quá 15 ngày>
 

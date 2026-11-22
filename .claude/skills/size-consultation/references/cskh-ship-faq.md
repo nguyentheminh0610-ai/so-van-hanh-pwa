@@ -228,24 +228,31 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
    > size ạ? Với b cho mình xin thêm chiều cao, cân nặng của bạn để shop tham khảo
    > và ghi nhận, từ đó có thể điều chỉnh bảng size cho phù hợp hơn ạ.
 
-**Gửi mã giảm 10k khi khách đổi size vì rộng/chật (chủ shop chốt 22/11/2026):** khách đổi
-vì tự thấy rộng/chật (lỗi khách, không phải hàng lỗi) → sau khi gửi hướng dẫn đổi hàng (bước 2)
-**gửi thêm 1 mã giảm 10.000đ** để khuyến khích đặt lại đơn mới, giống mã của case hàng lỗi.
-- TikTok: tab "Voucher" ở cột phải khung chat → thẻ "Voucher tặng riêng — Giảm 10.000₫" → Gửi
-  (chi tiết + thẻ không được gửi nhầm: [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md)).
-- Shopee: được tự gửi khi xác minh đúng mã 10k (chốt 22/11/2026); không thấy nút/mã → đẩy lên Sổ Vận Hành `[chờ anh]`
-  (cách làm + ngoại lệ Telegram tạm thời: [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md)).
-- Thẻ 10k hết hiệu lực → KHÔNG tự tạo voucher mới, đẩy lên Sổ Vận Hành `[chờ anh]`.
-- Thứ tự tin case đổi size (22/11/2026): câu sẵn sàng đổi (bước 1) → hướng dẫn đổi (bước 2) → mã 10k → hỏi lý do (bước 3).
+**KHÔNG gửi mã giảm 10k khi khách đổi size vì rộng/chật (chủ shop chốt lại 22/11/2026 tối, THAY cho dòng
+"gửi mã 10k" ghi trưa 22/11 — hiểu nhầm):** mã 10k **CHỈ dành cho lỗi của shop** (giao nhầm, hàng lỗi), xem
+[cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md). Shop lỗi lần thứ 2 với cùng khách vẫn gửi mã như thường.
+- Thứ tự tin case đổi size: câu sẵn sàng đổi (bước 1) → hướng dẫn đổi (bước 2) → hỏi lý do (bước 3). Không có mã.
+
+**Các tình huống trong case đổi size (chủ shop chốt 22/11/2026):**
+- **Không tư vấn lại size.** Khách tự chọn size khi đặt đơn mới; chỉ tư vấn khi khách HỎI lại size (lúc đó dùng
+  luồng tư vấn size bình thường của skill này). Khách không hỏi thì thôi.
+- **Khách lo / hỏi tiền hoàn về đâu** (ví chưa đủ tuổi, không có TikTok Pay, ngại kẹt ví...) → ưu tiên trả lời câu này
+  trước tiên (câu chủ shop, đã sửa chính tả):
+  > Dạ tiền đó sẽ được hoàn về ví, nếu có liên kết với ngân hàng thì bạn có thể rút về hoặc dùng để thanh toán các đơn hàng tiếp theo trên sàn ạ.
+  Câu này dùng chung cho MỌI lần khách hỏi "tiền hoàn thế nào" khi trả hàng trên sàn (đổi size, hàng lỗi, giao nhầm,
+  trả hàng hoàn tiền). Khách vẫn không chịu sau câu này → đẩy lên Sổ Vận Hành `[chờ anh]`, KHÔNG tự đưa Cách 2.
+- **Đổi sang mẫu khác (kể cả lệch giá)** → không sao, hỗ trợ đổi như bình thường: đơn cũ trả theo sàn được hoàn tương
+  ứng, đơn mới là đơn mới. Không cần tính chênh lệch.
+- **Đổi lần thứ 2** → vẫn hỗ trợ như bình thường, không gửi mã (vì không phải lỗi shop).
 - Điều kiện cắt mác / đã giặt / quá 15 ngày: dùng chung mục "ĐIỀU KIỆN ĐỔI / TRẢ" trong cskh-doi-hang-loi-21-11.md.
-- Dòng cũ "15k nếu lỗi shop" ở dưới vẫn chờ chủ shop xác nhận; case hàng lỗi/giao nhầm dùng 10k.
 - Lý do chọn khi khách bấm trả đơn cũ để đổi: theo chốt 19/11/2026 là **"Đổi ý"** (Shopee:
   "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), xem `.claude/shared/mau-tin-nhan-tra-hang.md`
   — thay cho "chọn đúng lý do gặp phải" ở bước 2.
 
 **Điều kiện (Mục 8):** trong 15 ngày kể từ nhận hàng; chưa giặt/chưa dùng, còn
-tem mác. Cách 1 tiền hoàn về ví sàn (gửi mã giảm 10k nếu lỗi khách, 15k nếu lỗi
-shop để đặt lại); khách ngại kẹt ví sàn → Cách 2 (shop qua lấy hàng cũ, gửi lại
+tem mác. Cách 1 tiền hoàn về ví sàn (mã giảm: **22/11/2026 chốt CHỈ lỗi shop mới có, 10k; lỗi khách không có** —
+dòng gốc "10k nếu lỗi khách, 15k nếu lỗi shop" không dùng nữa); khách ngại kẹt ví sàn → (22/11/2026: trả lời câu "tiền hoàn về ví"
+ở trên trước, khách vẫn không chịu thì đẩy lên sổ, CS không tự đưa) Cách 2 (shop qua lấy hàng cũ, gửi lại
 size mới; lỗi khách ~15k/15k, lỗi shop shop chịu cả 2 chiều). Hết size muốn đổi →
 hướng trả hàng hoàn tiền + gợi ý mẫu/màu khác.
 
