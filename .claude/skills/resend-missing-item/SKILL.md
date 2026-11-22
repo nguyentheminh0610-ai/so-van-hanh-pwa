@@ -219,13 +219,31 @@ khách tin xác minh dưới đây, điền đúng dữ liệu đã ghép đư�
 không ghi mã SKU.
 
 ```
-Dạ shop xác nhận lại thông tin gửi bù cho bạn nhé ạ:
+Dạ shop xin lỗi bạn rất nhiều vì đơn hàng của bạn bị thiếu sản phẩm, mong bạn thông cảm cho shop ạ. Shop xác nhận lại thông tin gửi bù cho bạn nhé ạ:
 - Người nhận: <tên>
 - SĐT: <sđt>
 - Địa chỉ: <địa chỉ>
 - Sản phẩm gửi bù: <tên phân loại> - size <size> - số lượng <n>
-Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn xác nhận giúp shop để shop tạo đơn gửi bù ngay cho bạn nhé ạ.
+Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn xác nhận giúp shop để shop tạo đơn gửi bù cho bạn sớm nhất nhé ạ.
 ```
+
+**Đây là mẫu DUY NHẤT của tin xác minh** (chốt 22/11/2026, thay cho 2 bản lệch
+nhau từng có ở đây và ở `references/resend-flow-batch-2026-11-17.md`; bản trên
+là bản 17/11 "giọng nhẹ hơn", đang được task dùng thật).
+
+**Gửi thành MỘT tin duy nhất, đúng thứ tự dòng như mẫu** (chốt 22/11/2026).
+*Lý do:* case `_ciara07_` 22/11 — tin xác minh hiện ra thành 5 bong bóng rời,
+dòng Địa chỉ lên đầu, Người nhận/SĐT nằm sau Sản phẩm; khách khó đọc, trông
+khác hẳn mẫu. Nguyên nhân nhiều khả năng: ô chat TikTok **gửi tin ngay khi
+bấm Enter**, nên gõ từng dòng rồi Enter là mỗi dòng thành 1 tin (skill trước
+đây không dặn cách xuống dòng). Cách làm:
+- Xuống dòng trong ô chat bằng **Shift+Enter**, KHÔNG dùng Enter; chỉ bấm Enter
+  một lần duy nhất sau khi đã gõ xong toàn bộ tin.
+- Trước khi bấm gửi, chụp/đọc lại ô nhập: phải đủ 6 phần theo đúng thứ tự
+  (lời xin lỗi → Người nhận → SĐT → Địa chỉ → Sản phẩm → câu đề nghị xác nhận).
+- Sau khi gửi, đọc lại khung chat: nếu tin bị tách thành nhiều bong bóng hoặc
+  sai thứ tự thì ghi `▸` vào sổ để chủ shop biết, và các lượt sau KHÔNG gửi lại
+  bản thứ hai chỉ vì lý do hình thức (khách đã đọc được đủ thông tin).
 
 - Sàn có thể chặn tin có SĐT dạng số liền. Lần đầu chạy, thử ghi SĐT có
   dấu cách (vd `0366 006 450`). Vẫn bị chặn thì gửi tin xác minh dạng ảnh

@@ -105,16 +105,8 @@ SĐT/địa chỉ đã gửi). Chọn mẫu theo dòng `☑ sdt= diachi= anh=` c
 Trong tin **không nhắc tới** mục khách đã gửi (không viết "shop đã nhận địa chỉ, giờ xin thêm SĐT" — ngắn gọn là
 đủ). Trên Shopee bỏ phần hướng dẫn chụp màn hình/gõ cách (Shopee không chặn số).
 
-**Tin xác minh** (Step 2b, giọng nhẹ hơn):
-
-```
-Dạ shop xin lỗi bạn rất nhiều vì đơn hàng của bạn bị thiếu sản phẩm, mong bạn thông cảm cho shop ạ. Shop xác nhận lại thông tin gửi bù cho bạn nhé ạ:
-- Người nhận: <tên>
-- SĐT: <sđt>
-- Địa chỉ: <địa chỉ>
-- Sản phẩm gửi bù: <tên phân loại> - size <size> - số lượng <n>
-Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn xác nhận giúp shop để shop tạo đơn gửi bù cho bạn sớm nhất nhé ạ.
-```
+**Tin xác minh:** mẫu duy nhất nằm ở `SKILL.md` Step 2b (chốt 22/11/2026 — không
+chép lại ở đây nữa để khỏi lệch). Gửi thành 1 tin, xuống dòng bằng Shift+Enter.
 
 **Tin ghi nhận** (ngay khi khách xác nhận thông tin, cờ `msg_ack_at`; không hứa giờ):
 
