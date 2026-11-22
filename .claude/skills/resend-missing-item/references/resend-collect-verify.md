@@ -363,3 +363,10 @@ Mọi bước ở trên (phát hiện, hỏi khách, nhắc, gửi xác minh, kh
 `owner_note` của phiếu theo [tien-do-xu-ly.md](../../../shared/tien-do-xu-ly.md) (có bảng các bước + nhãn `[đang làm]/[chờ khách]/[chờ anh]/[xong]`).
 Web đo thời gian ở bước cuối và hiện ⚠ khi kẹt; chủ shop theo dõi tiến độ trên Sổ Vận Hành, không dùng Telegram.
 Phiếu nào phát hiện giao thiếu từ BẤT KỲ nguồn nào cũng phải mở ngay + ghi dòng đầu tiên, để hiện lên sổ.
+
+## Khách gửi SĐT bằng ẢNH chụp màn hình = ĐÃ gửi SĐT (chốt 21/11/2026, case #9 ntt1072006)
+
+TikTok chặn khách gõ SĐT trong chat; khách làm theo hướng dẫn thì chụp màn hình rồi gửi ảnh ("số điện thoại em ko gửi
+dc, shop xem ảnh giúp em"). Lượt quét 20/11 22:15 hiểu nhầm thành "khách từ chối gửi SĐT" → ghi sai "Thiếu: SĐT".
+Quy tắc: tin ảnh của khách luôn PHẢI mở ra đọc (phóng to ảnh) — thấy SĐT/địa chỉ trong ảnh thì tính là đã có. Đọc không ra
+số thì KHÔNG ghi "khách từ chối"; ghi "SĐT nằm trong ảnh, task đọc không ra — chủ shop mở chat xem" và đẩy lên Sổ Vận Hành.
