@@ -180,6 +180,37 @@ def tt_moi_tao(ten, bat_dau):
     return t >= bat_dau - datetime.timedelta(minutes=2)
 
 
+def tt_bam_tai_hang(page, ten, downloads):
+    """Bấm "Tải xuống" đúng HÀNG có tên file `ten` rồi lưu file. (Sửa 22/11/2026: bản cũ lọc
+    `tr, div` + `.last` có thể trúng khối bao cả danh sách → tải nhầm file CŨ 18/11.) Hàng =
+    tổ tiên nhỏ nhất của chữ tên file mà chỉ chứa ĐÚNG 1 tên file .xlsx/.csv. Trả đường dẫn
+    đã lưu, hoặc None nếu hàng chưa có nút Tải xuống."""
+    h = page.evaluate_handle(r"""(ten) => {
+        const leaf = [...document.querySelectorAll('*')].find(
+            e => e.children.length === 0 && (e.textContent||'').trim() === ten);
+        if (!leaf) return null;
+        let r = leaf;
+        while (r.parentElement) {
+            const n = (r.parentElement.textContent.match(/\.(xlsx|csv)/gi) || []).length;
+            if (n > 1) break;
+            r = r.parentElement;
+        }
+        return r;
+    }""", ten)
+    row = h.as_element()
+    if row is None:
+        return None
+    btn = row.query_selector('button:has-text("Tải xuống")')
+    if btn is None or not btn.is_visible():
+        return None
+    with page.expect_download(timeout=90000) as dl:
+        btn.click()
+    d = dl.value
+    dest = os.path.join(downloads, d.suggested_filename)
+    d.save_as(dest)
+    return dest
+
+
 def tt_cho_va_tai(page, truoc, downloads, cho_giay=240):
     """Chờ TikTok sinh xong file MỚI trong lịch sử xuất rồi bấm "Tải xuống".
     `truoc` = tt_ten_file_lich_su() chụp TRƯỚC khi bấm Xuất. Trả đường dẫn file đã lưu."""
@@ -189,16 +220,9 @@ def tt_cho_va_tai(page, truoc, downloads, cho_giay=240):
         page.wait_for_timeout(4000)
         moi = [t for t in tt_ten_file_lich_su(page) - truoc if tt_moi_tao(t, bat_dau)]
         for ten in moi:
-            hang = page.locator('tr, div').filter(has_text=ten).filter(
-                has=page.get_by_role('button', name=re.compile('Tải xuống'))).last
-            if hang.count() == 0:
-                continue
-            with page.expect_download(timeout=90000) as dl:
-                hang.get_by_role('button', name=re.compile('Tải xuống')).first.click()
-            d = dl.value
-            dest = os.path.join(downloads, d.suggested_filename)
-            d.save_as(dest)
-            return dest
+            dest = tt_bam_tai_hang(page, ten, downloads)
+            if dest:
+                return dest
     raise RuntimeError('TikTok chưa sinh xong file sau %d giây' % cho_giay)
 
 
@@ -298,16 +322,9 @@ def tt_tai_chinh(page, tu, den, downloads):
         for ten in tt_ten_file_lich_su(page):
             if not tt_moi_tao(ten, bat_dau):
                 continue
-            hang = page.locator('tr, div').filter(has_text=ten).filter(
-                has=page.get_by_role('button', name=re.compile('Tải xuống'))).last
-            if hang.count() == 0:
-                continue
-            with page.expect_download(timeout=90000) as dl:
-                hang.get_by_role('button', name=re.compile('Tải xuống')).first.click()
-            d = dl.value
-            dest = os.path.join(downloads, d.suggested_filename)
-            d.save_as(dest)
-            return dest
+            dest = tt_bam_tai_hang(page, ten, downloads)
+            if dest:
+                return dest
     raise RuntimeError('TikTok chưa sinh xong file Tài chính sau 240 giây')
 
 
@@ -330,7 +347,8 @@ def sp_kiem_mat_khau(page):
 def sp_chon_khoang_ngay(page, tu, den, o_nhap):
     """Bộ chọn ngày Shopee (eds-daterange-picker, 2 lịch cạnh nhau). `o_nhap` = locator để
     bấm mở. Nhãn tháng lúc tiếng Việt ("Tháng 10"), lúc tiếng Anh ("October") tuỳ trang."""
-    o_nhap.click(timeout=8000)
+    if o_nhap is not None:
+        o_nhap.click(timeout=8000)
     page.wait_for_timeout(1000)
     L = '.eds-daterange-picker-panel__body-left'
 
@@ -366,7 +384,7 @@ def sp_chon_khoang_ngay(page, tu, den, o_nhap):
     page.wait_for_timeout(800)
 
 
-def sp_cho_va_tai(page, tien_to, downloads, cho_giay=300, loai_tru=None):
+def sp_cho_va_tai(page, tien_to, downloads, cho_giay=300, mo_ds=None):
     """Mở "Lịch sử Xuất Báo cáo" của Shopee, chờ hàng báo cáo MỚI có tên bắt đầu bằng
     `tien_to` hết "Đang được xử lý" rồi bấm Tải về. Tên báo cáo có khoảng ngày nhúng trong tên
     (vd Order.all.20261001_20261031.xlsx) nên khớp theo tiền tố đã gồm ngày."""
@@ -374,24 +392,30 @@ def sp_cho_va_tai(page, tien_to, downloads, cho_giay=300, loai_tru=None):
     nut_ds = re.compile('Lịch sử Xuất Báo cáo|Export History|Report History|Lịch sử xuất', re.I)
     while time.time() < han:
         page.wait_for_timeout(4000)
-        # Danh sách báo cáo là CHUNG cho mọi loại → luôn mở từ trang Đơn hàng (có nút chữ
-        # "Lịch sử Xuất Báo cáo"), tải lại mỗi vòng để thấy trạng thái mới.
-        page.goto('https://banhang.shopee.vn/portal/sale/order',
-                  wait_until='domcontentloaded', timeout=60000)
-        page.wait_for_timeout(5000)
-        try:
-            page.get_by_text(nut_ds).first.click(timeout=8000)
-        except Exception:
-            continue
+        if mo_ds is not None:
+            # Income có danh sách báo cáo RIÊNG trên trang Doanh thu → hàm riêng mở nó
+            try:
+                mo_ds()
+            except Exception:
+                continue
+        else:
+            # Order.* dùng chung 1 danh sách: mở từ trang Đơn hàng, tải lại mỗi vòng.
+            page.goto('https://banhang.shopee.vn/portal/sale/order',
+                      wait_until='domcontentloaded', timeout=60000)
+            page.wait_for_timeout(5000)
+            try:
+                page.get_by_text(nut_ds).first.click(timeout=8000)
+            except Exception:
+                continue
         page.wait_for_timeout(1500)
         h = page.evaluate_handle(r"""(tt) => {
-            const re = /^Order\.[A-Za-z_]+\.\d{8}/;
+            const re = new RegExp('^' + tt);
             const leaf = [...document.querySelectorAll('*')].find(e => e.children.length === 0
-                && (e.textContent||'').trim().startsWith(tt));
+                && re.test((e.textContent||'').trim()));
             if (!leaf) return null;
             let r = leaf;
             while (r.parentElement) {
-                const n = (r.parentElement.textContent.match(/Order\.[a-z_]+\.\d{8}/g) || []).length;
+                const n = (r.parentElement.textContent.match(/\d{8}_\d{8}/g) || []).length;
                 if (n > 1) break;
                 r = r.parentElement;
             }
@@ -426,8 +450,8 @@ def sp_don_hang(page, tu, den, downloads):
     sp_chon_khoang_ngay(page, tu, den, o)
     page.locator('.eds-modal').get_by_role('button', name='Xuất', exact=True).click(timeout=8000)
     page.wait_for_timeout(2500)
-    return sp_cho_va_tai(page, 'Order.all.%s_%s' % (tu.strftime('%Y%m%d'), den.strftime('%Y%m%d')),
-                         downloads)
+    return sp_cho_va_tai(page, re.escape('Order.all.%s_%s' % (tu.strftime('%Y%m%d'),
+                                                              den.strftime('%Y%m%d'))), downloads)
 
 
 def sp_tra_hang(page, tu, den, downloads):
@@ -450,11 +474,60 @@ def sp_tra_hang(page, tu, den, downloads):
     sp_chon_khoang_ngay(page, tu, den, o)
     page.get_by_role('button', name='Export').first.click(timeout=8000)
     page.wait_for_timeout(3000)
-    return sp_cho_va_tai(page, 'Order.return_refund.%s_' % tu.strftime('%Y%m%d'), downloads)
+    return sp_cho_va_tai(page, re.escape('Order.return_refund.%s_' % tu.strftime('%Y%m%d')),
+                         downloads)
+
+
+
+def sp_income(page, tu, den, downloads):
+    """Shopee — Tài chính/Doanh thu: tab Đã thanh toán → ô ngày → "Chọn ngày" → chọn khoảng →
+    Xuất → Lịch sử → Tải về. Shopee trả file .zip (Income.đã phát hành.vn.<tu>_<den>.zip) chứa
+    1 file xlsx — giải nén, giữ xlsx (đúng định dạng đang để ở Drive các tháng trước).
+    Mục này đòi MẬT KHẨU Shopee: không bao giờ nhập hộ, báo chủ shop mở khoá."""
+    page.set_viewport_size({'width': 1400, 'height': 1200})
+    page.goto('https://banhang.shopee.vn/portal/finance/income/', wait_until='domcontentloaded',
+              timeout=60000)
+    page.wait_for_timeout(8000)
+    sp_kiem_mat_khau(page)
+    page.get_by_text('Đã thanh toán', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(2000)
+    page.get_by_text(re.compile(r'(Tuần này|Hôm nay|Trong vòng \S+ \S+( \S+)?|Tùy chỉnh):')).first.click(timeout=8000)
+    page.wait_for_timeout(1200)
+    page.get_by_text('Chọn ngày', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(1200)
+    sp_chon_khoang_ngay(page, tu, den, None)   # picker đã mở sẵn sau "Chọn ngày"
+    page.wait_for_timeout(1500)
+    page.get_by_role('button', name='Xuất', exact=True).first.click(timeout=8000)
+    page.wait_for_timeout(2500)
+    def mo_ds():
+        page.goto('https://banhang.shopee.vn/portal/finance/income/',
+                  wait_until='domcontentloaded', timeout=60000)
+        page.wait_for_timeout(7000)
+        sp_kiem_mat_khau(page)
+        page.get_by_text('Đã thanh toán', exact=True).first.click(timeout=8000)
+        page.wait_for_timeout(1500)
+        hop = page.get_by_role('button', name='Xuất', exact=True).first.bounding_box()
+        # nút "danh sách báo cáo" chỉ có biểu tượng + số đỏ, nằm ngay bên phải nút Xuất
+        page.mouse.click(hop['x'] + hop['width'] + 45, hop['y'] + hop['height'] / 2)
+
+    zip_path = sp_cho_va_tai(page, re.escape('Income.') + r'.*?' + re.escape(
+        '%s_%s' % (tu.strftime('%Y%m%d'), den.strftime('%Y%m%d'))), downloads, mo_ds=mo_ds)
+    if zip_path.lower().endswith('.zip'):
+        import zipfile
+        with zipfile.ZipFile(zip_path) as z:
+            xs = [n for n in z.namelist() if n.lower().endswith(('.xlsx', '.xls'))]
+            if not xs:
+                raise RuntimeError('file zip Income không chứa xlsx')
+            dest = os.path.join(downloads, os.path.basename(xs[0]))
+            with open(dest, 'wb') as f:
+                f.write(z.read(xs[0]))
+        os.remove(zip_path)
+        return dest
+    return zip_path
 
 
 LUONG = {'tt_don_hang': tt_don_hang, 'tt_tra_hang': tt_tra_hang, 'tt_tai_chinh': tt_tai_chinh,
-         'sp_don_hang': sp_don_hang, 'sp_tra_hang': sp_tra_hang}
+         'sp_don_hang': sp_don_hang, 'sp_tra_hang': sp_tra_hang, 'sp_income': sp_income}
 
 
 def chon_ky(page, san, entry, tu, den):
@@ -488,6 +561,10 @@ def tai_mot_file(ctx, san, entry, downloads, tu, den, anh_loi_dir):
     """Chạy luồng riêng của file (khoá "kieu" trong registry, hàm nằm trong LUONG).
     Trả (ok, thong_bao). File chưa có luồng: tuỳ chọn thì bỏ qua êm, bắt buộc thì báo lỗi."""
     kieu = entry.get('kieu')
+    if entry.get('thu_cong'):
+        # Chốt 18/11/2026: Shopee đòi mật khẩu ở mục Tài Chính (mở khoá hết hạn nhanh) nên
+        # chủ shop TỰ tải file này và bỏ vào Drive; orchestrator sẽ lấy từ Drive.
+        return True, '(chủ shop tự tải — orchestrator lấy từ Drive)'
     if kieu not in LUONG:
         if entry.get('bat_buoc'):
             return False, 'chưa có luồng tải tự động cho "%s"' % entry['mo_ta']
@@ -504,6 +581,10 @@ def tai_mot_file(ctx, san, entry, downloads, tu, den, anh_loi_dir):
                 return True, os.path.basename(dest)
             except Exception as e:
                 last = e
+                if 'SHOPEE_HOI_MAT_KHAU' in str(e):
+                    return False, ('Shopee đòi MẬT KHẨU ở mục Tài Chính — chủ shop mở khoá: '
+                                   'bấm đúp scripts/dang-nhap-tai-file.bat, vào Tài Chính > Doanh Thu, '
+                                   'nhập mật khẩu, đóng cửa sổ')
                 if la_trang_dang_nhap(page.url, san):
                     return False, 'MẤT ĐĂNG NHẬP %s (bị đẩy về %s)' % (san, page.url)
                 try:

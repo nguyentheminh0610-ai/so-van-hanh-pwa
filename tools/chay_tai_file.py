@@ -143,13 +143,37 @@ def main():
         print('⚠ Bước tải file có lỗi (xem Telegram). Dừng chuỗi, mai tự thử lại.')
         return rc
 
+    thieu_income = False
+    thu_muc_sp = ''
+    if args.lich == 'thang':
+        # File Income Shopee: chủ shop tự tải (Shopee đòi mật khẩu ở mục Tài Chính) → bỏ vào
+        # thư mục Shopee của tháng trên Drive. Có thì lấy về bộ file (để bộ kiểm + upload
+        # thấy đủ); chưa có thì vẫn xếp các file khác vào Drive, rồi dừng + báo (mai thử lại).
+        import glob
+        import shutil
+        nam, thang = ky.split('-')
+        thu_muc_sp = os.path.join(DRIVE_ROOT, 'Dashboard Vận Hành - Data',
+                                  'Tháng %d-%s' % (int(thang), nam), 'Shopee')
+        co = sorted(glob.glob(os.path.join(thu_muc_sp, 'Income*.xls*')))
+        if co:
+            shutil.copy2(co[-1], downloads)
+            print('Lấy Income từ Drive: %s' % co[-1])
+        else:
+            thieu_income = True
+
     rc = chay([PY, os.path.join(t, 'xep_file_vao_drive.py'),
                '--lich', args.lich, '--ky', ky,
                '--downloads', downloads, '--drive-root', DRIVE_ROOT])
-    if rc != 0:
+    if rc != 0 and not thieu_income:   # thiếu Income thì xep báo rc=1 là bình thường
         bao_telegram('⚠ Sổ Vận Hành %s: tải xong nhưng xếp file vào Drive lỗi (%s). '
                      'Mai tự thử lại.' % (ky, DRIVE_ROOT))
         return rc
+    if thieu_income:
+        bao_telegram('📥 Sổ Vận Hành %s (lần %s): máy đã tải + xếp vào Drive file TikTok và '
+                     'Shopee (đơn, trả hàng). CÒN THIẾU file Income Shopee (Shopee đòi mật khẩu '
+                     'nên anh tự tải). Anh tải rồi bỏ vào: %s — máy sẽ tự upload ở lượt chạy sau.'
+                     % (ky, lan, thu_muc_sp))
+        return 3
 
     if args.lich == 'thang':
         rc = chay([PY, os.path.join(t, 'up_so_van_hanh.py'),

@@ -152,3 +152,24 @@ Sau khi chốt xong trên PC, chạy `--chi <id>` để test từng file:
 - `up_so_van_hanh.py` lái web theo đúng id phần tử thật: `#up-multi-input`
   (nạp file), `#btn-compute` (Tính), `#btn-save-history` (Lưu); nhãn kỳ nhận qua
   dialog `prompt()`.
+
+---
+
+## Cập nhật 22/11/2026 — Shopee + Income tay (chốt với chủ shop)
+
+- **Shopee đã tự tải được** (chạy thật tháng 10/2026): đơn hàng (`sp_don_hang`, `Order.all.<từ>_<đến>.xlsx`)
+  và trả hàng (`sp_tra_hang`, `Order.return_refund.<từ>_<đến+1>.xls` — Shopee cộng thêm 1 ngày cuối tên).
+  Cả hai dùng chung 1 danh sách "Lịch sử Xuất Báo cáo" (mở từ trang Đơn hàng), khoảng tối đa 31 ngày,
+  bộ chọn ngày `eds-daterange-picker` (nhãn tháng lúc tiếng Việt, lúc tiếng Anh).
+- **Income Shopee = chủ shop TỰ TẢI** (registry `thu_cong: true`). Lý do: mục Tài Chính đòi nhập MẬT KHẨU,
+  mở khoá chỉ giữ được một lúc (hết trong < 1 ngày), mà script không bao giờ được nhập mật khẩu. Đã thử mục
+  "Báo Cáo Của Tôi" (chỉ liệt kê Order.*, không có Income) → không có đường nào không cần mật khẩu, trừ API
+  Shopee Open Platform (chưa làm; cần chủ shop đăng ký app + cấp quyền). Code `sp_income` còn trong
+  `tai_file_san.py` nhưng KHÔNG được gọi.
+  Chủ shop bỏ file `Income*.xlsx` vào `Drive/Dashboard Vận Hành - Data/Tháng M-YYYY/Shopee/`;
+  `chay_tai_file.py` lấy file đó vào bộ file. Chưa có → vẫn xếp 5 file kia vào Drive, báo Telegram, hôm sau thử lại.
+  **Ngày 15 phải tải lại Income và ghi đè** file đã bỏ hồi ngày 1, nếu không lần 2 dùng số cũ.
+- **Sửa lỗi nặng 22/11:** TikTok trả danh sách lịch sử nhiều file; bản cũ lọc `tr, div` + `.last` có thể
+  bấm "Tải xuống" của file CŨ (đã tải nhầm file 18/11). Nay `tt_bam_tai_hang` chọn đúng HÀNG theo tên file.
+- Chống tải nhầm Shopee: lấy hàng khớp tên ở TRÊN CÙNG (mới nhất); hàng đang "Đang được xử lý" chưa có
+  nút Tải về thì chờ. Danh sách Shopee giữ cả file đã tải nên đừng tin "chưa tải".

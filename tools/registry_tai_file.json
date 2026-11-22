@@ -48,7 +48,7 @@
       }
     },
     {
-      "id": "shopee_income_thang",
+      "id": "shopee_income_thang", "thu_cong": true,
       "mo_ta": "Shopee — Tài chính (Income) — THÁNG",
       "san": "shopee", "role": "income", "lich": "thang", "bat_buoc": true,
       "export": {
