@@ -125,8 +125,8 @@ không ghi thêm bước — TRỪ KHI khách gửi tin mới, lúc đó xử l�
   Câu trong Sheet có đoạn "hoàn lại [x]đ qua ngân hàng" — **số tiền là của chủ shop**,
   CS không tự điền; nếu khách không chịu cắt thì hướng sang đổi hàng (bước 4) **không
   kèm** voucher lỗi shop.
-- Khách vẫn muốn đổi size → theo luồng đổi size ở cskh-ship-faq.md (hỏi size mới, kiểm
-  tồn, hướng dẫn đổi, rồi mới hỏi lý do). **KHÔNG gửi mã 10k** — mã chỉ cho lỗi shop (chốt lại 22/11/2026 tối,
+- Khách vẫn muốn đổi size → theo luồng đổi size ở cskh-ship-faq.md (câu sẵn sàng đổi → hướng dẫn đổi → hỏi lý do;
+  KHÔNG hỏi size mới, KHÔNG kiểm tồn — chốt 22/11/2026). **KHÔNG gửi mã 10k** — mã chỉ cho lỗi shop (chốt lại 22/11/2026 tối,
   thay cho dòng "gửi mã 10k" ghi trưa cùng ngày).
 
 ## Ví dụ chuẩn: wdat1504 (TikTok, 21/11/2026)
