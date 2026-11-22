@@ -80,8 +80,9 @@ là đã có trải nghiệm mua không tốt, vào thẳng "chụp ảnh vỏ �
 đầu tiên của case (không gộp chung 1 tin):
 
 ```
-Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ.
+Dạ shop xin lỗi bạn vì trải nghiệm mua hàng chưa được tốt ạ. Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay ạ.
 ```
+(Câu thứ hai chủ shop thêm 22/11/2026 cho toàn bộ case lỗi, đặt ở tin xin lỗi đầu, trước mọi đề xuất xử lý.)
 (Câu do Claude soạn theo ý chủ shop 22/11/2026; chủ shop chưa duyệt từng chữ — sửa tại đây nếu muốn đổi.)
 
 - **Chỉ gửi 1 lần/case**, ghi `xl@HH:MM` vào `hoi=` trong dòng `☑` của `owner_note` TRƯỚC khi gửi (cờ chống trùng, không cần cột mới).

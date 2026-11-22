@@ -22,10 +22,11 @@ Vẫn **để chủ shop quyết** (nhắn tin đầu + Telegram như quy tắc 
 | # | Việc | Câu / thao tác |
 |---|---|---|
 | 1 | **Không xin ảnh nữa** nếu khách đã gửi ảnh/video lỗi | Bỏ hẳn tin "Bạn gửi giúp shop ảnh...". Chỉ xin ảnh khi khách CHƯA gửi (dùng tin ở faq-17-11 mục 13.2). Khách gửi ảnh **trước** rồi mới gõ chữ là chuyện thường — nhớ cuộn lên xem. |
-| 2 | **Xin lỗi + xác nhận lỗi** | Hàng lỗi: "Dạ, sau khi kiểm tra thì shop xác nhận đây là lỗi chưa kiểm tra kĩ trước khi giao hàng, mình xin phép đề xuất hướng xử lý như sau ạ." Giao nhầm: "...shop xác nhận đây là lỗi kho bên mình giao bị nhầm, mình xin phép đề xuất hướng xử lý như sau ạ." (Sheet "Mau tin nhan" dòng 8–10, 13–14.) Có thể mở đầu ngắn kiểu người thật ("Uii dạ") như anh làm. |
+| 2 | **Xin lỗi + xác nhận lỗi** | Hàng lỗi: "Dạ, sau khi kiểm tra thì shop xác nhận đây là lỗi chưa kiểm tra kĩ trước khi giao hàng. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." Giao nhầm: "...shop xác nhận đây là lỗi kho bên mình giao bị nhầm. **Về vấn đề này mình chắc chắn sẽ note và báo lại anh quản lý để cải thiện ngay**, mình xin phép đề xuất hướng xử lý như sau ạ." (Sheet "Mau tin nhan" dòng 8–10, 13–14; câu in đậm chủ shop thêm 22/11/2026, đặt TRƯỚC đề xuất xử lý, áp dụng toàn bộ case lỗi shop.) Có thể mở đầu ngắn kiểu người thật ("Uii dạ") như anh làm. |
 | 3 | **Hướng xử lý tổng quan** | "Mình sẽ hỗ trợ đổi hàng và gửi 1 mã giảm giá khi đặt lại ạ." (câu chủ shop dùng 21/11; đã thêm vào Sheet "Mau tin nhan"). |
 | 4 | **Hướng dẫn đổi hàng** theo sàn | Nguyên văn Sheet "Mau tin nhan" mục "Đổi hàng": TikTok lý do **"Đổi ý"**; Shopee lý do **"Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"** — xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md). Khách đặt đơn mới → bấm trả đơn cũ → shipper qua lấy → tiền về ví sàn. |
-| 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. |
+| 5 | **Gửi mã giảm 10.000đ** | Theo tab "Chinh sach xu ly loi" cột "Mã giảm đặt lại đơn" = **10k** cho mọi mức lỗi. Cách gửi xem dưới. **Phải xác minh đúng thẻ là Giảm 10.000₫ (đọc chữ trên thẻ, không đoán theo vị trí) trước khi bấm Gửi, và đọc lại thẻ hiện trong chat sau khi gửi.** Sai mức (không phải 10k) → không gửi, báo Telegram. |
+| 6 | **Tin báo mã giảm** (chủ shop thêm 22/11/2026), gửi ngay sau thẻ voucher | "Dạ mình gửi bạn mã giảm giá 10k khi đặt lại đơn hàng, 1 lần nữa mình xin lỗi bạn vì trải nghiệm chưa được tốt ạ." |
 
 Sau 5 bước: khách hỏi thêm thì trả lời bình thường (vd wdat1504 hỏi "tiền về ví
 TikTok Pay à, em không có tài khoản" → "Dạ b yên tâm, lúc thanh toán k có tiktokpay
@@ -44,9 +45,11 @@ chat như tin nhắn (ở wdat1504 nó nằm ngay sau tin hướng dẫn đổi 
 400.000₫)", "Giảm 15.000₫ cho đơn trên 230.000₫" (voucher thường). Nếu thẻ 10k hết
 hiệu lực/không còn → KHÔNG tự tạo voucher mới, báo Telegram để chủ shop tạo lại.
 
-**Shopee:** chưa xác minh nút gửi voucher trong webchat. Trước mắt: gửi đủ bước 1–4
-bằng chữ, bước 5 báo Telegram "cần gửi mã giảm 10k cho khách X (Shopee)" để chủ shop
-gửi. Khi nào xác minh được thì ghi bổ sung vào đây.
+**Shopee (chủ shop cho phép CS tự gửi voucher từ 22/11/2026, với điều kiện xác minh đúng mã 10k):**
+nút gửi voucher trong webchat Shopee chưa được xác minh thật. CS được tự gửi, nhưng chỉ khi thấy
+đúng 1 mã **giảm 10.000đ** trong danh sách và đọc rõ chữ trên mã; không thấy nút / không thấy mã 10k /
+không chắc → KHÔNG thử bừa, gửi bước 1–4 + 6 bằng chữ rồi báo Telegram "cần gửi mã giảm 10k cho khách X
+(Shopee)". Lần đầu gửi thành công trên Shopee thì ghi lại cách bấm vào đây.
 
 ## Vẫn làm sau khi nhắn xong (giữ nguyên từ 17/11)
 
