@@ -210,6 +210,15 @@ hết quota tuần, **10–16/11 "OAuth session expired" 14/14 lượt thất b�
 Hành không có dữ liệu mới từ 9/11. Bật cả hai cùng lúc = khách bị nhắn 2 lần.
 `scripts/setup-review-return-task.ps1` đã vô hiệu (không tạo lại task đó).
 
+**Task phải ở chế độ quyền Auto (nguyên nhân thật của lỗi kẹt Chrome 17–22/11/2026):**
+log app ghi `Not auto-approving "browser:navigate" in scheduled task "review-return-check-twice-daily":
+browser/computer sentinel permissions require a live card` — task này chạy ở chế độ **Default**
+nên mọi thao tác Chrome chờ người bấm duyệt, quá 5 phút thì huỷ ("run looks unattended").
+Các task `cskh-inbox-*` chạy chế độ **Auto** nên chưa lần nào bị. Cách sửa: trong app Claude
+Desktop → Scheduled → task này → đổi Permission mode sang **Auto** (chỉ chủ shop đổi được trên
+PC; tạo task từ phiên điều khiển từ xa thì app không lưu mode). Gặp lại lỗi này → kiểm mode trước,
+đừng thử lại nhiều lần.
+
 ## Quick reference
 
 **Message templates** — Google Sheet "Chính sách xử lý lỗi SP, DV"
