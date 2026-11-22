@@ -223,6 +223,18 @@ mẫu đổi hàng / trả hàng / hoàn tiền / deal lỗi nhỏ cho cả 2 s�
    > size ạ? Với b cho mình xin thêm chiều cao, cân nặng của bạn để shop tham khảo
    > và ghi nhận, từ đó có thể điều chỉnh bảng size cho phù hợp hơn ạ.
 
+**Gửi mã giảm 10k khi khách đổi size vì rộng/chật (chủ shop chốt 22/11/2026):** khách đổi
+vì tự thấy rộng/chật (lỗi khách, không phải hàng lỗi) → sau khi gửi hướng dẫn đổi hàng (bước 2)
+**gửi thêm 1 mã giảm 10.000đ** để khuyến khích đặt lại đơn mới, giống mã của case hàng lỗi.
+- TikTok: tab "Voucher" ở cột phải khung chat → thẻ "Voucher tặng riêng — Giảm 10.000₫" → Gửi
+  (chi tiết + thẻ không được gửi nhầm: [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md)).
+- Shopee: chưa xác minh nút gửi voucher trong webchat → báo Telegram "cần gửi mã 10k cho khách X (Shopee)".
+- Thẻ 10k hết hiệu lực → KHÔNG tự tạo voucher mới, báo Telegram.
+- Dòng cũ "15k nếu lỗi shop" ở dưới vẫn chờ chủ shop xác nhận; case hàng lỗi/giao nhầm dùng 10k.
+- Lý do chọn khi khách bấm trả đơn cũ để đổi: theo chốt 19/11/2026 là **"Đổi ý"** (Shopee:
+  "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), xem `.claude/shared/mau-tin-nhan-tra-hang.md`
+  — thay cho "chọn đúng lý do gặp phải" ở bước 2.
+
 **Điều kiện (Mục 8):** trong 15 ngày kể từ nhận hàng; chưa giặt/chưa dùng, còn
 tem mác. Cách 1 tiền hoàn về ví sàn (gửi mã giảm 10k nếu lỗi khách, 15k nếu lỗi
 shop để đặt lại); khách ngại kẹt ví sàn → Cách 2 (shop qua lấy hàng cũ, gửi lại

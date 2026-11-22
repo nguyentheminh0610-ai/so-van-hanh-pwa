@@ -71,7 +71,7 @@ gửi. Khi nào xác minh được thì ghi bổ sung vào đây.
   CS không tự điền; nếu khách không chịu cắt thì hướng sang đổi hàng (bước 4) **không
   kèm** voucher lỗi shop.
 - Khách vẫn muốn đổi size → theo luồng đổi size ở cskh-ship-faq.md (hỏi size mới, kiểm
-  tồn, hướng dẫn đổi, rồi mới hỏi lý do).
+  tồn, hướng dẫn đổi, **gửi mã 10k — chốt 22/11/2026**, rồi mới hỏi lý do).
 
 ## Ví dụ chuẩn: wdat1504 (TikTok, 21/11/2026)
 
