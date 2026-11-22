@@ -154,9 +154,9 @@ Không viết mẫu mới. Nguồn chuẩn: Google Sheet `1X08EPdWfJeiP4aQGzcA35
 Khách phàn nàn **giao sai size/màu/mẫu, hàng lỗi/bẩn/ố/rách/in hỏng** → CS **nhắn TIN ĐẦU**
 rồi **báo Telegram**, KHÔNG tự đề xuất số tiền/hướng xử lý (anh quyết):
 1. Đã có nhân viên trả lời sau tin cuối khách (vd CS7682 đang xử lý) → bỏ qua như cũ.
-2. **Chưa có ảnh/bằng chứng** → tin xin lỗi + xin ảnh: "Dạ shop xin lỗi bạn về sự bất
-   tiện này ạ. Bạn gửi giúp shop ảnh (hoặc video mở hàng) phần bị lỗi/bị nhầm và ảnh
-   tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ."
+2. **Chưa có ảnh/bằng chứng** → tin xin ảnh, **KHÔNG xin lỗi ở tin này** (chủ shop chốt 23/11/2026 — lời xin lỗi để
+   dành cho tin xác nhận lỗi kèm lý do, tránh xin lỗi 3 lần): "Dạ bạn gửi giúp shop ảnh hoặc video sản phẩm bạn nhận
+   được và ảnh tem đơn hàng để shop kiểm tra xử lý nhanh cho bạn nhé ạ."
 3. **Đã có ảnh, đối chiếu thấy rõ lỗi shop** (đơn đặt khác hàng nhận) → dùng câu xác nhận
    lỗi trong "Mau tin nhan" (giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi =
    "lỗi chưa kiểm tra kĩ trước khi giao hàng") nhưng thay đoạn cuối "đề xuất hướng xử lý
