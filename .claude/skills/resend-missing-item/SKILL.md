@@ -134,7 +134,10 @@ time.
    - Shop/người khác đã trả lời case này rồi → bỏ qua (đang có người xử lý).
    - Đã gửi tin hỏi thông tin (Step 1b) rồi → không gửi lại, chỉ kiểm tra
      khách đã trả lời đủ chưa.
-   - Khách đang tranh chấp/đòi hoàn tiền → không trả lời, báo qua Telegram.
+   - Khách muốn HOÀN TIỀN thay vì nhận gửi bù (chốt 22/11/2026, thay cho "không trả lời, báo Telegram"):
+     hướng dẫn khách tự bấm hoàn tiền trên sàn, đẩy lên Sổ Vận Hành — xem
+     references/resend-collect-verify.md mục 1 ("Khách muốn hoàn tiền").
+   - Khách bực/doạ đánh giá xấu nhưng KHÔNG đòi hoàn tiền → xử lý như case thường (chốt 22/11/2026).
 4. Case mới → Step 1b. Case khách đã gửi đủ thông tin → Step 2 trở đi.
 5. Lượt quét không có gì mới → kết thúc im lặng, không gửi Telegram.
 
@@ -149,7 +152,7 @@ không tự diễn đạt lại. Thiếu mục nào thì chỉ gửi tin của m
 
 **Tin 1 (hỏi thông tin nhận hàng)** — khi chưa có họ tên/SĐT/địa chỉ:
 ```
-Bạn cho shop xin họ tên, số điện thoại và địa chỉ nhận hàng để shop gửi bù sản phẩm thiếu nhé ạ. Bạn có thể viết vào ghi chú điện thoại rồi chụp màn hình gửi shop, để shop tạo đơn gửi bù cho chuẩn ạ.
+Bạn cho shop xin họ tên, số điện thoại và địa chỉ nhận hàng để shop gửi bù sản phẩm thiếu nhé ạ. Bạn có thể viết vào ghi chú điện thoại rồi chụp màn hình gửi shop, hoặc ghi ra tờ giấy rồi chụp ảnh gửi shop, để shop tạo đơn gửi bù cho chuẩn ạ.
 ```
 
 **Tin 2 (xin ảnh vỏ đơn)** — CHỈ khi khách chưa gửi ảnh nào. Khách đã gửi ảnh

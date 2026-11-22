@@ -56,6 +56,8 @@ dự phòng (cổng rẻ nên không tốn).
 - Khung giờ lấy hàng SPX chọn theo giờ hiện tại (tránh khung đã qua).
 - Giờ xác nhận của khách tính theo **giờ khách nhắn trên sàn**, không phải giờ
   task đọc tin.
+- **Món gửi bù đang hết hàng (chủ shop chốt 22/11/2026):** vẫn tạo đơn bình thường, kho tự thu xếp hàng. Không chặn, không hỏi khách đổi món.
+- **Khách muốn hoàn tiền thay vì nhận gửi bù (22/11/2026):** hướng dẫn khách bấm hoàn tiền trên sàn, đẩy lên Sổ Vận Hành (`⚑ hoantien=1`), chủ shop duyệt trên sàn — chi tiết ở collect-verify mục 1.
 
 ## Mốc giờ (chốt 18/11/2026)
 
@@ -99,7 +101,7 @@ Giao sai hàng: nhờ khách chụp thêm sản phẩm nhận được (không c
 **Hỏi thông tin nhận hàng** (thay Tin 1 cũ; vì sàn chặn SĐT/địa chỉ dạng chữ):
 
 ```
-Dạ bạn cho shop xin họ tên, SĐT và địa chỉ nhận hàng để shop gửi bù nhé ạ. Để gửi thông tin bạn giúp shop 1 trong 2 cách: ghi thông tin vào ghi chú điện thoại rồi chụp màn hình gửi shop, hoặc chụp phần thông tin giao hàng của đơn (có đủ SĐT và địa chỉ) gửi shop ạ.
+Dạ bạn cho shop xin họ tên, SĐT và địa chỉ nhận hàng để shop gửi bù nhé ạ. Để gửi thông tin bạn giúp shop 1 trong 3 cách: ghi thông tin vào ghi chú điện thoại rồi chụp màn hình gửi shop, hoặc ghi ra tờ giấy rồi chụp ảnh gửi shop (thêm 22/11/2026), hoặc chụp phần thông tin giao hàng của đơn (có đủ SĐT và địa chỉ) gửi shop ạ.
 ```
 
 Lưu ý: SĐT trong đơn trên TikTok bị che; cách chụp thông tin giao hàng chỉ có
@@ -112,7 +114,7 @@ SĐT/địa chỉ đã gửi). Chọn mẫu theo dòng `☑ sdt= diachi= anh=` c
 
 | Còn thiếu | Tin gửi khách |
 |---|---|
-| Chỉ SĐT | `Dạ bạn cho shop xin thêm số điện thoại nhận hàng để shop tạo đơn gửi bù cho bạn nhé ạ. TikTok hay chặn gõ số, bạn chụp màn hình ghi chú có số gửi shop, hoặc gõ cách bằng dấu chấm (vd 09.12.345.678) giúp shop ạ.` |
+| Chỉ SĐT | `Dạ bạn cho shop xin thêm số điện thoại nhận hàng để shop tạo đơn gửi bù cho bạn nhé ạ. TikTok hay chặn gõ số, bạn chụp màn hình ghi chú có số gửi shop, hoặc gõ cách bằng dấu chấm (vd 09.12.345.678), hoặc ghi ra tờ giấy rồi chụp ảnh gửi shop giúp shop ạ.` |
 | Chỉ địa chỉ | `Dạ bạn cho shop xin địa chỉ nhận hàng đầy đủ gồm số nhà, phường/xã, tỉnh/thành để shop gửi bù đúng chỗ cho bạn nhé ạ.` |
 | Địa chỉ thiếu phường/xã hoặc tỉnh | `Dạ địa chỉ bạn gửi shop còn thiếu <phường/xã | tỉnh/thành>, bạn bổ sung giúp shop để shop tạo đơn gửi bù nhé ạ.` |
 | SĐT + địa chỉ | mẫu gộp ở trên, bỏ "họ tên": `Dạ bạn cho shop xin SĐT và địa chỉ nhận hàng để shop gửi bù nhé ạ. ...` |

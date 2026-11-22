@@ -75,7 +75,15 @@ Trước khi mở case, tra `resend_cases` theo `platform`, `handle`, `orig_orde
   dung chứa mã đơn gốc chưa) và lịch sử chat. Có rồi → không mở case, báo chủ shop.
 - Insert dòng mới `status=collecting`. Bị lỗi 409 (trùng khoá) = lượt khác vừa mở,
   đọc lại dòng và tiếp tục theo trạng thái.
-- Có tranh chấp / đòi hoàn tiền trong hội thoại → KHÔNG mở case, báo Telegram.
+- **Khách muốn HOÀN TIỀN thay vì nhận gửi bù (chốt 22/11/2026, thay cho "KHÔNG mở case, báo Telegram"):**
+  CS hướng dẫn khách tự bấm hoàn tiền trên sàn ngay, chủ shop duyệt yêu cầu đó trên sàn. Mẫu hướng dẫn: mục hoàn tiền
+  (khách thiếu hàng) ở [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md) — Shopee lý do "Chưa nhận được hàng
+  hoặc thiếu hàng", TikTok "Tôi không nhận được hàng", bỏ đoạn shipper lấy hàng; đọc nguyên văn Sheet "Mau tin nhan" dòng 17–22.
+  Vẫn mở phiếu `resend_cases` để hiện trên Sổ Vận Hành, thêm `⚑ hoantien=1` + dòng
+  `▸ [chờ anh] Khách muốn hoàn tiền trên sàn — đã hướng dẫn khách bấm hoàn tiền, anh duyệt trên sàn`. KHÔNG Telegram, KHÔNG tạo
+  đơn gửi bù, CS không tự duyệt và không hứa số tiền. Khách đổi ý muốn nhận gửi bù thì bỏ cờ (`⚑ hoantien=0`) và đi tiếp luồng thường.
+- **Khách bực / doạ đánh giá xấu nhưng không đòi hoàn tiền (chốt 22/11/2026):** xử lý như case thường, không khác gì (có tin xin lỗi mở đầu).
+- **Món thiếu đang hết hàng (chốt 22/11/2026):** vẫn tạo đơn gửi bù bình thường, không chặn hay hỏi lại; kho tự thu xếp hàng.
 
 ## 1b. KHÔNG để phiếu đứng im — tin mới của khách có phiếu mở (chốt 19/11/2026)
 
@@ -118,7 +126,8 @@ SĐT, địa chỉ (số nhà + phường/xã + tỉnh/thành). Họ tên không
   đầy đủ gồm số nhà, phường/xã, tỉnh/thành để shop gửi đúng chỗ ạ."
 - Món thiếu chưa rõ → hỏi 1 câu kèm danh sách món của đơn để khách chọn (như mục 1b.3).
 - **TikTok chặn gửi SĐT trong chat** (khách báo gửi không được): hỏi 1 lần "Dạ bạn gõ số điện thoại cách
-  bằng dấu chấm hoặc dấu cách giúp shop (vd 09.12.345.678) được không ạ". Khách vẫn không gửi được →
+  bằng dấu chấm hoặc dấu cách giúp shop (vd 09.12.345.678) được không ạ"; cách thứ ba (chốt 22/11/2026, rất hiếm gặp nhưng lưu để chắc): khách **ghi thông tin ra tờ giấy rồi chụp ảnh gửi shop**
+  (ảnh tờ giấy tính là đã gửi, đọc như ảnh chụp màn hình). Khách vẫn không gửi được →
   KHÔNG im lặng: ghi `owner_note` "khách không gửi được SĐT trong chat TikTok", bật Telegram cho chủ shop
   1 lần để quyết định (đọc SĐT từ đơn nếu xem được, hoặc duyệt khi có SĐT che một phần).
 - Mỗi mục thiếu chỉ hỏi **1 lần**; hỏi rồi mà khách im thì theo mục 1e (nhắc 1 lần ở mốc 4h, hiện trên Sổ Vận Hành,
