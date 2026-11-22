@@ -207,9 +207,10 @@ skill và báo lại chủ shop để sửa Sheet.
 1. Chưa hỏi lý do đổi trước. Gửi câu sẵn sàng đổi miễn phí + gợi ý giữ hàng — **câu mới chủ shop chốt
    22/11/2026** (Claude chỉ sửa chính tả/dấu câu, giữ ý và độ dài), thay cho câu cũ "Dạ, nếu rộng hoặc chật
    không quá nhiều thì bạn cố gắng mặc giúp mình là hợp lý nhất đó ạ, tuy nhiên mình cũng sẵn sàng hỗ trợ bạn đổi hàng ạ.":
-   > Dạ, mình sẵn sàng hỗ trợ đổi lại hàng miễn phí cho bạn như sau ạ. Nhưng vì đổi hàng có thể mất 2-5 ngày
-   > và cũng hơi mất công một chút xíu, nên nếu chỉ hơi ngắn hoặc hơi bé thì shop khuyên bạn có thể cố mặc
-   > giúp shop, còn nếu rộng thì bạn có thể mang ra hàng sửa lại một chút xíu là ok ạ.
+   > Dạ, mình sẵn sàng hỗ trợ đổi lại hàng miễn phí ạ. Nhưng vì đổi hàng có thể mất 2-5 ngày và cũng hơi mất công,
+   > nếu chỉ hơi ngắn hoặc hơi bé thì bạn có thể cố mặc giúp shop, còn nếu rộng thì bạn có thể mang ra hàng sửa lại
+   > một chút xíu thì sẽ phù hợp hơn đó ạ.
+   (Nguyên văn chủ shop sửa lại 23/11/2026, thay bản 22/11 — gọn hơn, bỏ "cho bạn như sau", "shop khuyên".)
    → **gửi NGAY tin hướng dẫn đổi hàng (bước 2)**, không chờ khách trả lời câu trên.
    **BỎ bước hỏi khách muốn đổi sang size nào + kiểm tồn** (chủ shop chốt 22/11/2026, thay cho quy tắc cũ
    "hỏi size muốn đổi + kiểm còn hàng"): khách tự chọn size khi đặt đơn mới trên sàn.
