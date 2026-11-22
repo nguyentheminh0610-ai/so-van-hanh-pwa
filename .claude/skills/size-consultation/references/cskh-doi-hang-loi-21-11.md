@@ -13,7 +13,7 @@ case lỗi/nhầm **rõ ràng** (khách đã gửi ảnh, nhìn ảnh thấy l�
 chỉ làm chậm.
 
 Vẫn **để chủ shop quyết** (nhắn tin đầu + Telegram như quy tắc 17/11) khi:
-- khách **đòi hoàn tiền kèm trả hàng** (không muốn đổi) — chưa chốt, báo Telegram, CS không hứa gì;
+- khách **đòi hoàn tiền kèm trả hàng** (không muốn đổi) — từ 22/11/2026 CS tự hướng dẫn trả hàng hoàn tiền, xem mục "HÀNG LỖI CHỈ HỖ TRỢ ĐỔI" bên dưới;
 - ảnh không rõ lỗi, hoặc khách chưa gửi ảnh và mô tả mơ hồ;
 - lỗi "nặng" kèm bức xúc, doạ đánh giá xấu, đòi bồi thường thêm.
 
@@ -22,11 +22,19 @@ Vẫn **để chủ shop quyết** (nhắn tin đầu + Telegram như quy tắc 
 Với **sản phẩm bị lỗi** (rách, bẩn, ố, in hỏng, tuột chỉ...): shop **chỉ hỗ trợ đổi lại sản phẩm**, **không hỗ trợ
 hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/30%). Thay cho bảng % trong
 [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 13 — bảng đó không còn dùng cho CS.
-- Hướng dẫn đổi **giống hệt giao nhầm** (5 bước + tin báo mã 10k ở dưới). Chỉ khác **lý do xin lỗi ở bước 2**:
+- Hướng dẫn **ĐỔI** **giống hệt giao nhầm** (5 bước + tin báo mã 10k ở dưới). Chỉ khác **lý do xin lỗi ở bước 2**:
   giao nhầm = "lỗi kho bên mình giao bị nhầm"; hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
 - Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu gợi ý (Claude soạn 22/11/2026, chủ shop
   chưa duyệt từng chữ): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
-- Khách không muốn đổi mà đòi **trả hàng hoàn tiền**: CHƯA chốt, báo Telegram, CS không hứa gì.
+- Khách không muốn đổi mà muốn **trả hàng hoàn tiền** (chủ shop chốt 22/11/2026): **HỖ TRỢ**. Làm giống luồng đổi
+  (bước 1–3: không xin ảnh nếu đã có, xin lỗi + xác nhận lỗi + câu "note và báo lại anh quản lý") nhưng
+  **khách KHÔNG đặt đơn mới, chỉ bấm trả hàng**: hướng dẫn trả hàng hoàn tiền theo mẫu Sheet "Mau tin nhan"
+  (đọc nguyên văn, xem [mau-tin-nhan-tra-hang.md](../../../shared/mau-tin-nhan-tra-hang.md)), lý do chọn "Đổi ý"
+  (Shopee: "Đổi ý (Sản phẩm còn nguyên tem, nhãn mác, bao bì)"), shipper qua lấy, tiền về ví sàn. Không đặt lại đơn nên
+  **không gửi mã giảm 10k / không có tin báo mã** (suy từ việc mã chỉ để khuyến khích đặt lại — chủ shop chưa nói riêng, sửa nếu khác).
+  Vẫn ghi `cskh-log`, `cskh_chat_errors`, báo Telegram 1 dòng như các case lỗi shop.
+- **Phân biệt:** "không hoàn tiền không hoàn hàng" = khách muốn GIỮ hàng lỗi mà đòi shop hoàn tiền → từ chối, đưa lại 2 lựa chọn
+  (đổi hàng mới, hoặc trả hàng hoàn tiền). Khách chịu trả hàng thì hoàn tiền bình thường.
 
 ## 5 bước (đúng thứ tự, mỗi bước 1 tin riêng)
 
