@@ -47,6 +47,12 @@ chi tiết đơn TikTok):
 - Thật sự có 2 đơn riêng, 1 đơn chưa giao tới → mới là vận chuyển (để chủ shop).
 - Không chắc → xem ảnh khách gửi; vẫn không chắc thì báo Telegram, đừng tự xếp
   vào "vận chuyển" rồi bỏ qua.
+- **Chủ shop nhấn mạnh 22/11/2026: chỉ xếp "2 đơn riêng, vận chuyển" khi ĐÃ XÁC MINH trong tab Đơn hàng
+  thật sự có 2 mã đơn lẻ.** Case "đặt 2 cái trong 1 đơn mà thiếu 1 thật" rất dễ bị nhận nhầm sang nhóm này
+  (khách nói "2 đơn", "2 cái" lẫn lộn) → nhận nhầm là khách bị bỏ rơi. Mặc định khi chưa xác minh được là
+  nghi giao thiếu, mở phiếu, đừng bỏ qua.
+- Đơn 1 mã nhưng đóng thành nhiều gói/kiện (tách kiện): chủ shop xác nhận 22/11/2026 là **không có** trường hợp này, không cần quy tắc.
+  Nếu gặp thật thì để chủ shop tự vào xử lý, CS không tạo đơn bù.
 
 **Ảnh/tin mới của khách đã có trong nhật ký `cskh-log` vẫn phải xem lại**
 (chốt 18/11/2026). Quy tắc chống trùng chỉ để không GHI log 2 lần, KHÔNG có
