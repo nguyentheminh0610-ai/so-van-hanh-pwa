@@ -1,5 +1,8 @@
 # Hàng lỗi / giao nhầm mẫu → hỗ trợ ĐỔI + tặng mã giảm (chốt 21/11/2026)
 
+> **Câu chữ mới nhất (23/11/2026) cho cả 4 case hậu mãi ở [hau-mai-mau-tin-moi-nhat.md](../../../shared/hau-mai-mau-tin-moi-nhat.md)
+> — lệch với file này thì theo file đó.** File này giữ quy trình, ghi sổ, voucher, lịch sử quyết định.
+
 Chủ shop train 21/11/2026, lấy hội thoại thật **wdat1504 (TikTok, 21/11/2026 12:33)**
 làm mẫu chuẩn. Áp dụng cho **sản phẩm bị lỗi** (rách, bẩn, ố, in hỏng, tuột chỉ...)
 và **giao nhầm mẫu/màu/size**. **KHÔNG áp dụng cho giao THIẾU** — giao thiếu vẫn đi
@@ -47,7 +50,7 @@ Với **sản phẩm bị lỗi** (rách, bẩn, ố, in hỏng, tuột chỉ...
 hoàn tiền mà khách vẫn giữ hàng** (kể cả hoàn một phần 10/15/30%). Thay cho bảng % trong
 [cskh-faq-17-11.md](cskh-faq-17-11.md) mục 13 — bảng đó không còn dùng cho CS.
 - Hướng dẫn **ĐỔI** **giống hệt giao nhầm** (5 bước + tin báo mã 10k ở dưới). Chỉ khác **lý do xin lỗi ở bước 2**:
-  giao nhầm = "bên mình có bạn nhân viên mới vào nên đóng hàng bị nhầm" (23/11/2026); hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
+  giao nhầm = "bên mình vừa có bạn ở kho mới vào làm nên đóng hàng bị nhầm" (23/11/2026); hàng lỗi = "**lỗi chưa kiểm tra kĩ trước khi giao hàng**".
 - Khách đòi hoàn tiền giữ hàng → từ chối lịch sự, đưa lại hướng đổi. Câu (Claude soạn 22/11/2026, **chủ shop
   duyệt 23/11/2026**): "Dạ với sản phẩm bị lỗi thì shop hỗ trợ đổi lại sản phẩm mới cho bạn ạ, bên mình chưa hỗ trợ hoàn tiền mà giữ lại hàng được, mong bạn thông cảm giúp shop nhé ạ."
 - **CHỈ KHI khách tự yêu cầu trả hàng hoàn tiền** (chủ shop nhấn mạnh 22/11/2026) mới hướng dẫn trả hàng hoàn tiền; còn lại

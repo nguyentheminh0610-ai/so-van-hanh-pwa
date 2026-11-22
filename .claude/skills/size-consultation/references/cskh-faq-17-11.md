@@ -120,6 +120,10 @@ mua được nhé."
 
 ## 13. Giao sai / hàng lỗi / bẩn / rách — ĐÃ CÓ hướng dẫn, dùng chính sách này (ghi chú 17/11/2026)
 
+> ⛔ **TỪ 23/11/2026 MỤC NÀY CHỈ CÒN GIÁ TRỊ LỊCH SỬ** (trừ mục 9 "ghi `cskh_chat_errors`" vẫn dùng). Câu chữ + luồng đúng
+> cho giao nhầm / hàng lỗi / giao thiếu / đổi size: [hau-mai-mau-tin-moi-nhat.md](../../../shared/hau-mai-mau-tin-moi-nhat.md).
+> Không còn "chỉ nhắn tin đầu rồi báo Telegram", không còn bảng % hoàn giữ hàng, không còn câu "lỗi kho bên mình giao bị nhầm".
+
 > **CẬP NHẬT 21/11/2026:** khi khách **đã gửi ảnh** và lỗi rõ (rách/bẩn/sai mẫu-màu-size),
 > CS **tự chạy đủ luồng đổi hàng + tặng mã giảm 10k** theo
 > [cskh-doi-hang-loi-21-11.md](cskh-doi-hang-loi-21-11.md) (ví dụ chuẩn wdat1504) — không
