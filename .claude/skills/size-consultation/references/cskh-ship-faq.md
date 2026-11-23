@@ -64,11 +64,15 @@ cước J&T (quy từ giờ sang ngày) + trang chất lượng dịch vụ SPX
 > bộ đơn giục giao thì báo..."). MỌI khách giục giao / xin ship nhanh hơn / xin đóng gấp / "cần gấp shop đi đơn" → gửi
 > đúng 1 câu, không hỏi khu vực, không báo mốc 3h chiều, không báo số ngày dự kiến:
 > > Dạ để mình note cho kho ưu tiên gửi đơn hàng này trước ạ.
-> Rồi báo chủ shop mã đơn để kho ưu tiên thật (Telegram, kiểm cờ chống báo trùng — kênh báo là Claude suy ra, chủ shop
-> chưa nói riêng). Case bị bỏ 22–23/11: `lthang.0611_`, `lm1ssh3rrrr`, `vhdangju`.
-> - Khách HỎI "khi nào đến / mấy ngày nhận được" (không phải giục) → vẫn dùng mục 2.
-> - Đơn ĐÃ gửi đi rồi mà khách giục → câu "note cho kho" không còn đúng, dùng câu "đơn mình đã gửi đi rồi" ở mục 2
->   (Claude suy ra, chủ shop sửa nếu khác).
+> (Câu trên dùng khi đơn CHƯA gửi đi.) **KHÔNG cần báo chủ shop / không Telegram** sau câu này (chủ shop chốt lại
+> 23/11/2026: "note cho kho, không cần báo" — bỏ bước báo Telegram Claude tự thêm lúc đầu).
+> Case bị bỏ 22–23/11: `lthang.0611_`, `lm1ssh3rrrr`, `vhdangju`.
+> - **Đơn ĐÃ gửi đi rồi mà khách giục** (chốt 23/11/2026) → gửi:
+>   > Dạ đơn đang trên đường giao, để mình gửi yêu cầu giục giao sớm cho ạ, bạn chờ shop xíu.
+> - **Khách nhắn kiểu "Tôi cần nó sớm hơn" / cần hàng gấp** cũng tính là giục giao: tra trạng thái đơn rồi dùng 1 trong
+>   2 câu trên (chưa đi → "note cho kho"; đã đi → "đang trên đường giao").
+> - Khách HỎI "khi nào đến / mấy ngày nhận được" (không phải giục) → vẫn dùng mục 2. **Mốc 3h chiều + số ngày dự kiến
+>   CHỈ dành cho câu hỏi này**, không dùng cho giục giao (chủ shop xác nhận 23/11/2026).
 > - Xin hẹn GIỜ giao cụ thể → vẫn mục 2b.
 > Các câu cũ ngay dưới chỉ giữ làm lịch sử, KHÔNG gửi nữa.
 
@@ -130,8 +134,7 @@ Tra trạng thái đơn trước:
 - Đơn **chưa bàn giao vận chuyển** → gửi đúng câu chủ shop (đã sửa chính tả):
   > Dạ bên mình có gửi ạ, bạn thông cảm giúp shop vì mấy ngày nay shop đang bị quá tải đơn một chút, để mình note với
   > kho cho đơn hàng này đi luôn ạ.
-  Rồi **báo chủ shop mã đơn để kho ưu tiên đơn này** (đã hứa với khách thì phải có người làm; kênh báo là Claude suy ra
-  từ câu "note với kho", chủ shop chưa nói riêng — dùng Telegram, kiểm cờ chống báo trùng trước).
+  **Không cần báo chủ shop / không Telegram** sau câu này (chủ shop chốt lại 23/11/2026: "note cho kho, không cần báo").
 - Đơn **đã gửi đi rồi** → dùng câu "đơn mình đã gửi đi rồi" ở mục 2.
 
 ### 3. "Có được kiểm tra hàng trước khi nhận không"

@@ -307,8 +307,10 @@ TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đ
 - **Mốc 3h chiều:** đơn đặt trước 3h chiều gửi đi trong ngày; đơn đi tới 19:59
   vẫn tính là gửi hôm nay (nên 4h chiều vẫn tính hôm nay).
 - **Giục giao / xin ship nhanh / xin đóng gấp (chốt 23/11/2026, thay câu mốc 3h
-  chiều + số ngày):** chỉ gửi "Dạ để mình note cho kho ưu tiên gửi đơn hàng này
-  trước ạ." rồi báo chủ shop mã đơn — xem mục 1 file trên.
+  chiều + số ngày):** đơn chưa đi → "Dạ để mình note cho kho ưu tiên gửi đơn hàng này
+  trước ạ."; đơn đã đi → "Dạ đơn đang trên đường giao, để mình gửi yêu cầu giục
+  giao sớm cho ạ, bạn chờ shop xíu." Tính cả tin "Tôi cần nó sớm hơn" / cần hàng
+  gấp. Không báo chủ shop, không Telegram — xem mục 1 file trên.
 - **Khách HỎI khi nào đến / khi nào vận chuyển (không giục):** báo mốc 3h chiều + thời gian
   theo khu vực khách (tra bảng J&T/SPX trong file trên); nói rõ là "dự kiến".
 - **Kiểm tra hàng trước nhận:** sàn có cho kiểm tra trước, không ưng vẫn trả được.
