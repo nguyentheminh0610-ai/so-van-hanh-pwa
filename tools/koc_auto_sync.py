@@ -141,10 +141,13 @@ async ({type, key, signedUrl, bodyTemplate, kyNgay, optType, lui}) => {
           hh: num(m.video_estimated_commission, 'amount') }); }
       else { const m = p.live_metrics || {};
         const don = num(m.live_orders_cnt, 'value');
-        // người xem: trường cũ nếu còn; không thì ước bằng lượt hiển thị × tỉ lệ vào phòng
-        const view = m.live_distinct_unique_live_viewers_cnt ? num(m.live_distinct_unique_live_viewers_cnt, 'value')
-          : m.live_views_cnt ? num(m.live_views_cnt, 'value')
-          : Math.round(num(m.live_impressions_cnt, 'value') * num(m.live_enter_room_rate, 'value'));
+        // Lượt xem LIVE = 0, CỐ Ý (chốt 23/11/2026). Đo thật cùng 1 buổi LIVE của
+        // leetun_130223: live_distinct_unique_live_viewers_cnt trả 1.948.151 (kỳ "7 ngày
+        // qua"), 353.145 (khoảng 7 ngày tuỳ chọn), 82.401 (khoảng 30 ngày) -> trường này
+        // phụ thuộc độ dài kỳ, không phải số người xem của buổi. Cách ước cũ (hiển thị ×
+        // tỉ lệ vào phòng) chỉ có khi mượn body tab khác. Hai cách lẫn nhau làm card
+        // "Lượt xem" nhảy 7,0tr -> 8,7tr cho cùng kỳ. Web giờ chỉ tính lượt xem VIDEO.
+        const view = 0;
         out.push({ koc: c.handle_name, kenh: 'live',
           gmv: m.live_gmv ? num(m.live_gmv, 'amount') : Math.round(num(m.live_average_order_value, 'amount') * don),
           don, view, hh: num(m.live_estimated_commission, 'amount') }); }
@@ -354,12 +357,25 @@ def chay(login_only=False):
 
         # Bấm lần lượt tab Video và tab Buổi LIVE của phần "Chi tiết" để trang tự gửi
         # request của từng tab -> bắt được body mẫu đúng metric cho từng loại.
-        for ten_tab in ("Video", "Buổi LIVE"):
-            try:
-                page.get_by_role("tab", name=ten_tab, exact=True).click(timeout=8000)
-                page.wait_for_timeout(4000)
-            except Exception as e:
-                print("  (không bấm được tab %s): %s" % (ten_tab, str(e)[:80]))
+        # Sửa 23/11/2026: trang có lúc tải chậm hơn 6 giây -> bấm tab trượt -> script
+        # mượn body tab "Nhà sáng tạo" (thiếu GMV và lượt xem LIVE thật) -> số lượt xem
+        # LIVE mỗi lượt một kiểu (7,0tr rồi 8,7tr cho cùng kỳ). Giờ chờ tab hiện tới 40s,
+        # bấm xong chờ tới khi BẮT ĐƯỢC body của đúng loại, thử lại 3 lần.
+        for ten_tab, loai in (("Video", 3), ("Buổi LIVE", 4)):
+            for lan in range(3):
+                try:
+                    tab = page.get_by_role("tab", name=ten_tab, exact=True)
+                    tab.wait_for(state="visible", timeout=40000)
+                    tab.scroll_into_view_if_needed(timeout=5000)
+                    tab.click(timeout=8000)
+                except Exception as e:
+                    print("  (không bấm được tab %s lần %d): %s" % (ten_tab, lan + 1, str(e)[:80]))
+                for _ in range(20):
+                    if loai in captured["by_type"]:
+                        break
+                    page.wait_for_timeout(500)
+                if loai in captured["by_type"]:
+                    break
 
         by_type = captured["by_type"]
         if "url" not in captured or not by_type:

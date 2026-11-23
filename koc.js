@@ -132,13 +132,18 @@ function kocThanhHtml(v, l, laTien){
 
 function kocCardSanHtml(channels, truoc){
   const P = truoc && truoc.length ? kocTongHop(truoc) : null;
+  // Lượt xem: CHỈ video (chốt 23/11/2026). TikTok trả số người xem LIVE phụ thuộc độ
+  // dài kỳ (cùng 1 buổi: 1,95tr / 353K / 82K) nên không dùng được — xem chú thích
+  // "Lượt xem LIVE = 0" trong tools/koc_auto_sync.py. Kỳ trước cũng chỉ lấy video.
+  if (P) P.view = kocTongHop(truoc.filter(c => c.kenh === 'video')).view;
   const V = kocTongHop(channels.filter(c => c.kenh === 'video'));
   const L = kocTongHop(channels.filter(c => c.kenh === 'live'));
   const T = kocTongHop(channels);
+  T.view = V.view;
   const cards = [
     ['GMV từ KOC', kocGon(T.gmv, true), V.gmv, L.gmv, true, 'gmv'],
     ['Số đơn', fmtInt(T.don), V.don, L.don, false, 'don'],
-    ['Lượt xem', kocGon(T.view, false), V.view, L.view, false, 'view'],
+    ['Lượt xem video', kocGon(V.view, false), V.view, 0, false, 'view'],
     ['Hoa hồng đã trả', kocGon(T.hoaHong, true), V.hoaHong, L.hoaHong, true, 'hoaHong'],
   ];
   return `<div class="koc-legend"><span><i class="d1"></i>Video</span><span><i class="d2"></i>LIVE</span></div>
@@ -146,7 +151,7 @@ function kocCardSanHtml(channels, truoc){
       `<div class="kpi-tile koc-stat"><div class="k-label">${esc(ten)}</div>
         <div class="koc-big">${esc(tong)}</div>
         ${P ? `<div class="koc-sosanh">${kocDoiHtml(T[f], P[f])} <i>so với ${kocKy} ngày trước đó (${esc(kocGon(P[f], tien))})</i></div>` : ''}
-        ${kocThanhHtml(v, l, tien)}</div>`).join('')}</div>`;
+        ${f === 'view' ? '<div class="koc-sosanh"><i>Không tính LIVE: TikTok trả số người xem LIVE không ổn định.</i></div>' : kocThanhHtml(v, l, tien)}</div>`).join('')}</div>`;
 }
 
 /* --------------------- hàng nhỏ: số từ SHEET chấm điểm --------------------*/
