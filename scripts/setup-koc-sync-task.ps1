@@ -1,5 +1,6 @@
 # CAI DAT MOT LAN tren PC truc: tao Task Scheduler tu dong dong bo so lieu KOC
-# (TikTok Affiliate -> Supabase) moi TUAN 1 lan. Chay 0 token (khong co Claude).
+# (TikTok Affiliate -> Supabase) 2 NGAY 1 lan luc 09:00, va task do lenh nut
+# "Cap nhat ngay" moi phut. Chay 0 token (khong co Claude).
 #
 # TRUOC KHI CHAY SCRIPT NAY, lam 1 lan:
 #   py -m pip install playwright
@@ -15,6 +16,7 @@
 #
 # Go bo sau nay:
 #   Unregister-ScheduledTask -TaskName "Claude - Dong bo KOC" -Confirm:$false
+#   Unregister-ScheduledTask -TaskName "Claude - KOC cap nhat ngay" -Confirm:$false
 
 $ErrorActionPreference = "Stop"
 
@@ -27,13 +29,15 @@ if (-not (Test-Path $PyFile)) {
     exit 1
 }
 
-# Tim python (py launcher uu tien, roi python)
-$pyCmd = (Get-Command py -ErrorAction SilentlyContinue)
-if ($pyCmd) { $exe = "py" } else {
-    $pyCmd = (Get-Command python -ErrorAction SilentlyContinue)
-    if (-not $pyCmd) { Write-Host "[LOI] Khong tim thay Python (py/python)."; exit 1 }
-    $exe = "python"
-}
+# Dung DUONG DAN DAY DU toi python.exe (sua 23/11/2026). Truoc day de "py": chay
+# tay thi duoc nhung Task Scheduler bao 0x80070002 (khong tim thay file) o MOI
+# luot chay theo lich -> so lieu KOC dung im tu 17/11 ma khong ai biet.
+$pyCmd = (Get-Command python -ErrorAction SilentlyContinue)
+if (-not $pyCmd) { Write-Host "[LOI] Khong tim thay Python."; exit 1 }
+$exe  = $pyCmd.Source
+# pythonw.exe = python khong co cua so console, cho task do lenh chay moi phut
+$exeW = Join-Path (Split-Path -Parent $exe) "pythonw.exe"
+if (-not (Test-Path $exeW)) { $exeW = $exe }
 
 Write-Host "Repo    : $RepoDir"
 Write-Host "Script  : $PyFile"
@@ -46,8 +50,8 @@ $action = New-ScheduledTaskAction `
     -Argument "`"$PyFile`"" `
     -WorkingDirectory $RepoDir
 
-# Chay moi ngay luc 09:00 va 16:00 (chot 17/11/2026). Muc "Can anh xu ly" doi theo
-# hang mau TikTok nen can cap nhat hang ngay; moi lan ~1 phut, 0 token.
+# Lich tu dong: 2 ngay/lan luc 09:00. Can so moi hon thi chu shop bam nut
+# "Cap nhat ngay" tren tab Cham diem KOC (task thu 2 ben duoi).
 $trigger = New-ScheduledTaskTrigger -Daily -DaysInterval 2 -At 9:00AM
 
 $settings = New-ScheduledTaskSettingsSet `
@@ -62,10 +66,27 @@ Register-ScheduledTask `
     -Action $action `
     -Trigger $trigger `
     -Settings $settings `
-    -Description "Tu dong keo so lieu KOC TikTok Affiliate vao Supabase moi tuan (0 token). Xem tools/koc_auto_sync.py va .claude/shared/reference_auto_data_pull_pattern.md." `
+    -Description "Tu dong keo so lieu KOC TikTok Affiliate vao Supabase 2 ngay/lan (0 token). Xem tools/koc_auto_sync.py va .claude/shared/reference_auto_data_pull_pattern.md." `
+    -Force | Out-Null
+
+# --- Task 2 (23/11/2026): nut "Cap nhat ngay" tren So Van Hanh --------------
+# Moi phut do bang koc_sync_requests (scripts/koc-sync-requests.sql). Khong co
+# lenh -> thoat ngay (1 request nhe, khong mo Chrome). Co lenh -> chay dong bo.
+$TaskName2 = "Claude - KOC cap nhat ngay"
+$action2 = New-ScheduledTaskAction `
+    -Execute $exeW `
+    -Argument "`"$PyFile`" --theo-yeu-cau" `
+    -WorkingDirectory $RepoDir
+$trigger2 = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval (New-TimeSpan -Minutes 1)
+Register-ScheduledTask `
+    -TaskName $TaskName2 `
+    -Action $action2 `
+    -Trigger $trigger2 `
+    -Settings $settings `
+    -Description "Moi phut do lenh 'Cap nhat ngay' tu tab Cham diem KOC (bang koc_sync_requests); co lenh thi chay tools/koc_auto_sync.py. 0 token." `
     -Force | Out-Null
 
 Write-Host "[XONG] Da tao task:"
-Get-ScheduledTask -TaskName $TaskName | Select-Object TaskName, State | Format-Table -AutoSize
+Get-ScheduledTask -TaskName $TaskName, $TaskName2 | Select-Object TaskName, State | Format-Table -AutoSize
 Write-Host "Chay thu ngay:  Start-ScheduledTask -TaskName `"$TaskName`""
 Write-Host "Xem lan chay:   Get-ScheduledTaskInfo -TaskName `"$TaskName`""
