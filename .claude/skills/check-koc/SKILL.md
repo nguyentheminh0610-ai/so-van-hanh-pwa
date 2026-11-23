@@ -78,6 +78,41 @@ picks the follow-up back up in Part 2 once told the approval happened.
 
 ## Part 1 — Score new KOC requests
 
+### ⚠️ Chống bỏ dở giữa chừng (chốt 23/11/2026)
+
+**Sự cố thật 23/11/2026:** lượt tự động 4h sáng chấm + ghi 16 KOC vào
+"2.Nhập KOC" (STT 276–291), rồi lúc bấm mở từng dòng trên trang "Yêu cầu
+hàng mẫu" để đọc SKU thì TikTok hiện CAPTCHA → lượt dừng. Kết quả: tab
+Book dòng 163–170 (8 KOC DUYỆT) có tên nhưng E/F/G trống, chủ shop tưởng
+"file KOC bị lỗi"; 16 KOC cũng chưa được nhắn. Đã điền bù tay cùng ngày.
+Vì vậy từ nay:
+
+1. **Bước 0 — dọn việc dở của lượt trước, LÀM ĐẦU TIÊN mỗi lượt.** Đọc
+   `'3.Quản lý Book'!A2:G` (đọc tới dòng cuối có tên ở cột B). Dòng nào có
+   tên + D = `DUYỆT` mà **E, F hoặc G trống** → đó là KOC lượt trước bỏ dở:
+   lấy SKU (mục 2) rồi điền E/F/G như Step 6. Ghi rõ trong báo cáo Telegram
+   "đã điền bù Book dòng …".
+2. **Đọc SKU bằng API của trang, KHÔNG bấm mở từng dòng.** Bấm mở nhiều
+   dòng liên tiếp chính là thứ làm TikTok bật CAPTCHA. Trên trang
+   `affiliate/sample/sample-request`, chạy 1 lần `javascript_tool`: lấy URL
+   đã ký của request `sample/group/list` từ
+   `performance.getEntriesByType('resource')` (đợi trang tải ~5 giây), rồi
+   `fetch` POST lại URL đó với body
+   `{tab:10, cur_page:p, page_size:50, search_params:[{search_key:3,search_type:2,value:''}], order_params:[]}`
+   (tab 10 = "Chờ xem xét"; mã các tab khác xem `SAMPLE_TABS` trong
+   `tools/koc_auto_sync.py`). Mỗi phần tử `agg_info[i].apply_deatil`
+   có `creator_info.name` = username và `apply_info.sku_desc` = SKU KOC xin
+   (vd `Chất Lông-Shin 03,XL`; combo dạng `Patrick-L + Shin 03-XL,1 combo`
+   → ghi cả 2 mã, cách nhau `, `, vd `CL08 - Chất Lông-Patrick Star, CL07 - Chất Lông-Shin 03`).
+   Lấy SKU **ngay ở Step 1** cho mọi KOC mới, giữ lại để dùng ở Step 6.
+3. **Thứ tự mới: Step 4 (ghi Nhập KOC) → Step 6 (điền Book) → Step 5
+   (nhắn KOC).** Điền Book chỉ cần Sheets API, không đụng TikTok, nên làm
+   ngay sau khi ghi Nhập KOC. Phần nhắn tin (dễ gặp CAPTCHA nhất) để cuối.
+   G ghi `Chưa bấm duyệt mẫu` trước; sau khi gửi được tin "Báo KOC review
+   thêm mẫu mới" thì mới đổi sang `Chờ KOC phản hồi thêm mẫu`.
+4. Gặp CAPTCHA ở bất kỳ bước nào: dừng, báo Telegram **kèm danh sách KOC
+   chưa nhắn** (tên + loại tin cần gửi), để lượt sau / chủ shop làm tiếp.
+
 ### Step 1: find genuinely new requests
 
 Go to `https://affiliate.tiktok.com/affiliate/sample/sample-request?shop_region=VN&shop_id=7494594978743617682`,
@@ -173,8 +208,9 @@ This is not optional, do it immediately after scoring, not just when
 asked:
 1. Read the new row's `P` (RANK) value → the matching Book row is
    `RANK + 1`.
-2. Go to **"Yêu cầu hàng mẫu"**, find the creator, expand their row to
-   see the exact SKU they requested (e.g. "Chất Lông-Shin, L").
+2. Lấy SKU KOC xin (e.g. "Chất Lông-Shin, L") từ kết quả API đã đọc ở
+   Step 1 — **không bấm mở từng dòng** trên "Yêu cầu hàng mẫu" (dễ bật
+   CAPTCHA, sự cố 23/11/2026; xem mục "Chống bỏ dở giữa chừng" đầu Part 1).
 3. Map it to the dropdown value in `'0.Danh mục SKU'!F2:F45` (e.g.
    `CL01 - Chất Lông-Shin`) and write that into Book columns **E and F**
    (same value in both — KOC asked for it, shop is sending exactly that).
