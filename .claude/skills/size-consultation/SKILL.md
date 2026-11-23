@@ -194,10 +194,12 @@ phải trả lời, không để trống.** Các điểm mới/nhắc lại:
   theo mục "Đóng hội thoại đã xong" ("Dạ vâng ạ"). Không bỏ qua. Case bị bỏ:
   `bonglac36`, `p.khai05`, `quanghuy.135`.
 - **Vận chuyển / huỷ đơn / KOC xin mã / đổi ngang mẫu:** xem
-  [references/cskh-ship-faq.md](references/cskh-ship-faq.md) mục 1–2 (giục giao),
+  [references/cskh-ship-faq.md](references/cskh-ship-faq.md) mục **1** (giục giao — từ 23/11/2026
+  chỉ 1 câu "Dạ để mình note cho kho ưu tiên gửi đơn hàng này trước ạ."),
+  2 (hỏi khi nào đến),
   13 (chưa nhận hàng, shipper không liên lạc), **2f** (trách "shop không gửi
   hàng"), **15** (xin huỷ đơn), **16** (KOC xin mã cho khách), **17** (đổi
-  ngang sang mẫu khác khi đơn chưa đi — mới chốt phần từ chối).
+  ngang sang mẫu khác khi đơn chưa đi → 1 câu khuyên đặt lại đơn khác).
 - **Hỏi còn hàng / bao giờ về:** đã có ở mục "Chào chung & hỏi tồn kho" +
   cskh-faq-17-11.md mục 1 — tra tồn rồi trả lời, không để trống.
 
@@ -304,7 +306,10 @@ TRƯỚC ĐÂY skill để trống. Nay đã có mẫu chuẩn — xem đầy đ
   không chắc → báo theo J&T (dải chậm, an toàn).
 - **Mốc 3h chiều:** đơn đặt trước 3h chiều gửi đi trong ngày; đơn đi tới 19:59
   vẫn tính là gửi hôm nay (nên 4h chiều vẫn tính hôm nay).
-- **Giục giao / khi nào đến / khi nào vận chuyển:** báo mốc 3h chiều + thời gian
+- **Giục giao / xin ship nhanh / xin đóng gấp (chốt 23/11/2026, thay câu mốc 3h
+  chiều + số ngày):** chỉ gửi "Dạ để mình note cho kho ưu tiên gửi đơn hàng này
+  trước ạ." rồi báo chủ shop mã đơn — xem mục 1 file trên.
+- **Khách HỎI khi nào đến / khi nào vận chuyển (không giục):** báo mốc 3h chiều + thời gian
   theo khu vực khách (tra bảng J&T/SPX trong file trên); nói rõ là "dự kiến".
 - **Kiểm tra hàng trước nhận:** sàn có cho kiểm tra trước, không ưng vẫn trả được.
 - **Lo sau mua (sợ dài/rộng):** nay TRẢ LỜI "sẵn sàng hỗ trợ đổi trả nếu không

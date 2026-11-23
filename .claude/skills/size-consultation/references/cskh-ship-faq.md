@@ -59,13 +59,26 @@ cước J&T (quy từ giờ sang ngày) + trang chất lượng dịch vụ SPX
 ## Mẫu câu theo tình huống (bỏ tym, tự nhiên)
 
 ### 1. Khách giục giao gấp / "giao giúp mình ngày mai được không"
-**Chưa biết khách ở đâu:**
+
+> ⛔ **CHỐT 23/11/2026 — THAY toàn bộ câu giục giao cũ ở mục 1 và mục 2c bên dưới** (chủ shop: "không làm như thế, toàn
+> bộ đơn giục giao thì báo..."). MỌI khách giục giao / xin ship nhanh hơn / xin đóng gấp / "cần gấp shop đi đơn" → gửi
+> đúng 1 câu, không hỏi khu vực, không báo mốc 3h chiều, không báo số ngày dự kiến:
+> > Dạ để mình note cho kho ưu tiên gửi đơn hàng này trước ạ.
+> Rồi báo chủ shop mã đơn để kho ưu tiên thật (Telegram, kiểm cờ chống báo trùng — kênh báo là Claude suy ra, chủ shop
+> chưa nói riêng). Case bị bỏ 22–23/11: `lthang.0611_`, `lm1ssh3rrrr`, `vhdangju`.
+> - Khách HỎI "khi nào đến / mấy ngày nhận được" (không phải giục) → vẫn dùng mục 2.
+> - Đơn ĐÃ gửi đi rồi mà khách giục → câu "note cho kho" không còn đúng, dùng câu "đơn mình đã gửi đi rồi" ở mục 2
+>   (Claude suy ra, chủ shop sửa nếu khác).
+> - Xin hẹn GIỜ giao cụ thể → vẫn mục 2b.
+> Các câu cũ ngay dưới chỉ giữ làm lịch sử, KHÔNG gửi nữa.
+
+**(CŨ, không dùng từ 23/11/2026) Chưa biết khách ở đâu:**
 > Dạ đơn đặt trước 3h chiều là bên mình gửi đi luôn trong hôm nay nha bạn. Bạn
 > cho mình xin khu vực mình đang ở để mình báo thời gian nhận dự kiến với. Đây
 > là thời gian dự kiến thôi, đôi khi có trường hợp bất khả kháng nhưng hiếm lắm,
 > bên mình sẽ cố gửi sớm nhất cho bạn.
 
-**Đã biết khu vực (tự tra được đơn), đơn CHƯA gửi:**
+**(CŨ, không dùng từ 23/11/2026) Đã biết khu vực (tự tra được đơn), đơn CHƯA gửi:**
 > Dạ đơn của bạn ở {khu_vuc} thì dự kiến khoảng {X} ngày là nhận được nha. Đơn
 > đặt trước 3h chiều mình gửi luôn hôm nay, đây là thời gian dự kiến thôi, thỉnh
 > thoảng có trường hợp bất khả kháng nhưng hiếm, bạn yên tâm bên mình gửi sớm nhất.
@@ -90,6 +103,7 @@ hứa hẹn giờ, chỉ hướng khách tự báo với shipper lúc được g
 ### 2c. Khách xin đóng gấp / gửi sớm cho kịp (chốt 21/11/2026)
 Khách xin đóng hàng ngay để shipper lấy sớm (vd "mai người ta lấy sớm được
 không"). KHÔNG hứa mốc giờ cụ thể, chỉ trấn an sẽ ưu tiên.
+**Từ 23/11/2026 dùng câu chung ở mục 1 ("Dạ để mình note cho kho ưu tiên gửi đơn hàng này trước ạ."), câu dưới chỉ còn là lịch sử.**
 > Dạ đơn của bạn shop sẽ ưu tiên đóng gói gửi sớm hơn các đơn khác nếu không có
 > vấn đề gì phát sinh, bạn yên tâm giúp shop nhé ạ.
 
@@ -344,12 +358,16 @@ giảm giá, thật ra là **KOC**. Gặp tin xin giá/mã mà chưa rõ ngườ
   rồi báo chủ shop (Telegram, kiểm cờ chống báo trùng). KHÔNG tự hứa mã, không tự gửi voucher.
 - Khách thường xin giảm giá: **chưa chốt** → ghi cskh-log (category gia_khuyen_mai) như cũ.
 
-### 17. Đơn CHƯA đi, khách xin đổi ngang sang MẪU KHÁC (chốt 23/11/2026 — mới chốt phần từ chối)
+### 17. Đơn CHƯA đi, khách xin đổi ngang sang MẪU KHÁC (chốt 23/11/2026)
 Case thật: `anhtao2908` (Shopee, 22/11) đặt Thỏ Nơ, muốn đổi ngang sang Shin vì đơn chưa đi; không muốn huỷ vì đơn
 đang có mã giảm giá, đặt lại thì hết mã.
 - **Chủ shop chốt: KHÔNG đổi ngang mẫu trên đơn đã đặt** — rất dễ nhầm khi đóng hàng, và giá 2 mẫu không bằng nhau.
-- Cách trả lời đầy đủ (câu từ chối + đưa lựa chọn nào cho khách, có bù mã không) **đang chờ chủ shop duyệt đề xuất
-  của Claude** → cho tới khi chốt: KHÔNG tự trả lời, KHÔNG nhận ghi chú đổi mẫu, ghi cskh-log để chủ shop xử lý.
+- **Câu trả lời chung (chủ shop chốt 23/11/2026, thay cho đề xuất 2 tin "từ chối + 2 lựa chọn" của Claude):** gửi đúng 1 câu
+  > Dạ bạn đặt lại đơn khác giúp mình là hợp lý nhất ạ, vì nếu có note lại để kho đóng sang sản phẩm khác thì rất dễ
+  > nhầm, giá 2 sản phẩm có thể khác nhau nên rất khó cho shop, mong bạn thông cảm giúp shop nha.
+  (Nguyên văn chủ shop, Claude sửa chính tả; chủ shop gõ "đặt lại đơn khách", hiểu là "đơn khác".)
+- KHÔNG nhận ghi chú đổi mẫu, KHÔNG gửi mã bù, không đưa thêm lựa chọn. Khách nói mất mã giảm / vẫn không chịu →
+  chưa chốt, ghi cskh-log để chủ shop xử lý.
 - Khác mục 12 (đổi SIZE cùng mẫu trước khi đóng gói — đã có câu khuyên đặt lại đơn mới).
 
 ## CHƯA train (để trống chờ chủ shop)
