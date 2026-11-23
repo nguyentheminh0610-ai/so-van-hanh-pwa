@@ -245,7 +245,8 @@ asked:
      để dựng thêm (copy dòng 3000 xuống tiếp) — đừng tự ghi vào vùng chưa có format.
    - **Tuyệt đối không xoá/chèn dòng, không "Clear formatting" trên 2 tab này.**
    - Màu Book (chốt 2026-11-16): `Hành động = "Đã duyệt"` → cả dòng xanh lá;
-     mọi trạng thái khác → trắng, không tô. Đừng thêm luật tô vàng/xám lại.
+     `"Đã từ chối"` → cả dòng đỏ nhạt (chốt 23/11/2026); mọi trạng thái
+     khác → trắng, không tô. Đừng thêm luật tô vàng/xám lại.
 
    *(Phần dưới đây là cách sửa cũ — chỉ dùng khi bước kiểm ở trên phát hiện thiếu.)*
 

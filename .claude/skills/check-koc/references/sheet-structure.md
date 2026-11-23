@@ -130,6 +130,10 @@ giá trị, xem SKILL.md Step 6 mục 5.
 
 - Book — Green "Đã duyệt": `=$G2="Đã duyệt"`; mọi trạng thái khác = trắng
   (đã XOÁ luật vàng "cần xử lý" và xám "Đã từ chối" cũ cho đỡ lộn xộn).
+- Book — **Đỏ nhạt "Đã từ chối"** (chốt 23/11/2026, chủ shop yêu cầu để nhìn
+  ra ngay KOC đã từ chối, thay cho quy tắc 16/11 "Đã từ chối = trắng"):
+  `=$G2="Đã từ chối"`, nền `#F4CCCC`, phủ A2:W3100, đặt ngay sau luật xanh
+  "Đã duyệt" (sau luật tìm KOC nên ô tìm vẫn tô đỏ đậm đè lên được).
 - Book — Search highlight (ưu tiên cao nhất): `=AND(TRIM($W$1)<>"";TRIM($B2)=TRIM($W$1))`
   tô đỏ; ô W1 xanh nếu tìm thấy, hồng nếu không. Dùng `TRIM()` vì ô tìm từng
   có ký tự khoảng trắng thừa làm `<>""` khớp mọi dòng trống.
