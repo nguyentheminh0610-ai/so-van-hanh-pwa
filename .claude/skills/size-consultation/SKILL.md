@@ -31,7 +31,10 @@ bao nhiêu" (thường kèm chiều cao/cân nặng), hoặc xin bảng size chu
 có chữ "size"/"dài"/"rộng" trong câu:
 - Khiếu nại khác, logistics, KOC/affiliate (RIÊNG giao sai/hàng lỗi-bẩn-rách: **chốt 21/11/2026** khách đã gửi ảnh + lỗi rõ → CS tự chạy đủ 5 bước đổi hàng + tặng mã giảm 10k, xem [references/cskh-doi-hang-loi-21-11.md](references/cskh-doi-hang-loi-21-11.md); từ 23/11/2026 khách gửi ảnh HOẶC video là đủ, không tự thẩm định lỗi; chỉ đòi bồi thường thêm mới đẩy Sổ Vận Hành `[chờ anh]`; khách đòi trả hàng hoàn tiền → hướng dẫn trả hàng (22/11/2026); giao thiếu: theo resend-missing-item)
 - Lo lắng/hỏi lại **sau khi đã đặt hàng** (vd "sợ về sẽ dài quá", "hàng có
-  đúng size không") — đây là CSKH/khiếu nại, không phải tư vấn size mới
+  đúng size không") — đây là CSKH/khiếu nại, không phải tư vấn size mới.
+  **NGOẠI LỆ (chốt 23/11/2026):** khách đã đặt rồi nhưng hỏi thẳng "cao X nặng
+  Y thì size gì" → **vẫn tư vấn size bình thường** như khách chưa mua, xem mục
+  "Chốt 23/11/2026" bên dưới.
 - Đổi size cho đơn **đã lỡ đặt nhầm** (vd "mình lỡ đặt 2XL, mặc XL được
   không") — đây là đổi đơn, không phải tư vấn size mới
 
@@ -138,7 +141,8 @@ Sapo/sàn trước**, xem bước 2 dưới.
   khách xin bảng size/số đo chi tiết, hoặc khách đang phân vân / sợ rộng
   chật — gửi ảnh bảng size của đúng dòng quần (ảnh "Bảng kích cỡ" trên tin
   đăng) kèm câu "Dạ bạn xem thêm số đo chi tiết trong bảng size giúp mình
-  nha." Từ 17/11/2026 ảnh nằm sẵn trong `assets/` (bang-size-hoat-hinh.jpg,
+  nha." **Chốt 23/11/2026:** khách xin bảng size mà không nói rõ sản phẩm /
+  không có card → gửi luôn bảng Quần Lông, không hỏi lại. Từ 17/11/2026 ảnh nằm sẵn trong `assets/` (bang-size-hoat-hinh.jpg,
   bang-size-caro.jpg). Không kèm câu "ngắn hơn 1-2cm" trừ khi khách hỏi vì
   sao bảng ngắn hơn số đo tư vấn — xem references/cskh-faq-17-11.md mục 3.
 - **Caro cotton thường (Đỏ 03, Đỏ 04, Đen 02)**: KHÔNG khuyên lên size (chốt
@@ -152,6 +156,50 @@ Sapo/sàn trước**, xem bước 2 dưới.
   rút.** Mọi dòng khác (Hoạt Hình, Thun, Bộ Dài/Ngắn, Short) **KHÔNG có dây
   rút** — tất cả đều là cạp chun co giãn nhiều (khớp câu trả lời "sợ
   rộng/chật eo" ở trên). Trả lời theo đúng dòng khách hỏi, đừng mặc định.
+
+## Chốt 23/11/2026 — rà log tin bỏ qua 22–23/11 (chủ shop trả lời từng câu)
+
+Nguồn: 57 khách task bỏ qua trong 2 ngày (file `C:\sokho\cskh-log\`). Phần lớn là
+câu ĐÃ CÓ đáp án trong skill nhưng task vẫn bỏ — chủ shop nhắc: **đã có mẫu thì
+phải trả lời, không để trống.** Các điểm mới/nhắc lại:
+
+- **Chỉ có chiều cao (kể cả rất cao 1m83 hay thấp 1m49):** KHÔNG chờ cân nặng,
+  KHÔNG để chủ shop — tư vấn ngay theo bảng chiều cao bằng mẫu `missing_weight`
+  (1m83 → XXL 102cm; 1m49 → S 92cm, kẹp theo dải size của mẫu). Case bị bỏ:
+  `deckcanaihet`, `2za8uosiwe`.
+- **Khách đã đặt hàng rồi mới hỏi lại size** ("m74 55kg size j ạ" sau khi đặt):
+  **vẫn tư vấn bình thường** theo thuật toán, không coi là hậu mãi, không bỏ qua.
+  Thay cho cách hiểu cũ "hỏi sau khi đặt = để chủ shop". Case bị bỏ:
+  `hongson_0112`, `_dungchu482011`.
+- **Khách chọn "quét đất"** sau khi đã được tư vấn size chạm gót → **lên 1 size
+  so với size vừa tư vấn** (đúng B3 trong size-spec; vd đã tư vấn M chạm gót →
+  báo L), gửi mẫu `has_length_pref`. Không phải chờ chủ shop chốt số đo. Case
+  bị bỏ: `anhtuyet.260`.
+- **Khách nói "muốn mặc vừa"** → vừa = đúng size mình đã tư vấn. Gửi mẫu
+  `fit_true_to_size`: *"Dạ bạn muốn mặc vừa thì lấy size {size} như mình tư vấn
+  là chuẩn ạ."* Case bị bỏ: `nganhtu.o07`.
+- **Khách muốn ống rộng hơn** → lên 1 size, và **phải báo kèm là lên size thì
+  quần cũng dài hơn**. Gửi mẫu `wider_leg_size_up`: *"Dạ bạn muốn ống rộng hơn
+  thì lên 1 size, lấy size {size_up} ạ. Lên 1 size thì quần cũng dài hơn, dài
+  {length_up}cm ạ."* Case bị bỏ: `quanh2_10`. (Ý chủ shop, câu chữ 2 mẫu này
+  Claude soạn — chủ shop sửa nếu cần.)
+- **Khách xin bảng size → gửi ảnh luôn** (ảnh ở Drive thư mục "Bảng size", bản
+  sao trong `assets/`): khách có gửi card sản phẩm hoặc nhắc tên sản phẩm → gửi
+  bảng của đúng sản phẩm đó; **không nói rõ / không có card → gửi bảng Quần
+  Lông** (`assets/bang-size-hoat-hinh.jpg`). Không hỏi lại "bạn hỏi mẫu nào".
+  Case bị bỏ: `_mc_ddangwj`.
+- **Tin không rõ nội dung** (chỉ GIF/sticker, tin cụt, hội thoại "Quá hạn"): mở
+  đọc cả đoạn chat rồi xét ngữ cảnh — là **tin mới** (trước đó chưa có gì đang
+  dở) → *"Dạ, bạn cần shop hỗ trợ gì ạ?"*; là **tin kết thúc đoạn chat** → đóng
+  theo mục "Đóng hội thoại đã xong" ("Dạ vâng ạ"). Không bỏ qua. Case bị bỏ:
+  `bonglac36`, `p.khai05`, `quanghuy.135`.
+- **Vận chuyển / huỷ đơn / KOC xin mã / đổi ngang mẫu:** xem
+  [references/cskh-ship-faq.md](references/cskh-ship-faq.md) mục 1–2 (giục giao),
+  13 (chưa nhận hàng, shipper không liên lạc), **2f** (trách "shop không gửi
+  hàng"), **15** (xin huỷ đơn), **16** (KOC xin mã cho khách), **17** (đổi
+  ngang sang mẫu khác khi đơn chưa đi — mới chốt phần từ chối).
+- **Hỏi còn hàng / bao giờ về:** đã có ở mục "Chào chung & hỏi tồn kho" +
+  cskh-faq-17-11.md mục 1 — tra tồn rồi trả lời, không để trống.
 
 ## Đọc tin nhắn viết tắt — đừng đoán nhầm "mét" thành "cân" (chốt 23/10/2026)
 

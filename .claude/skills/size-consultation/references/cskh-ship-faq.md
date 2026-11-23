@@ -110,6 +110,16 @@ tự liên hệ lại shipper.
 > nhé (nếu đơn chưa bị hoàn). Trường hợp hay đặt hàng qua sàn thì bạn gọi số
 > shipper khu vực đó báo giao lại giúp shop luôn ạ.
 
+### 2f. Khách trách "shop không gửi hàng ạ" / đơn chưa đi (chốt 23/11/2026)
+Case thật: `hs1wcb9slq` (Shopee, 23/11) nhắn "shop ko gửi hàng ạ", task bỏ qua vì xếp vào "logistics để chủ shop".
+Tra trạng thái đơn trước:
+- Đơn **chưa bàn giao vận chuyển** → gửi đúng câu chủ shop (đã sửa chính tả):
+  > Dạ bên mình có gửi ạ, bạn thông cảm giúp shop vì mấy ngày nay shop đang bị quá tải đơn một chút, để mình note với
+  > kho cho đơn hàng này đi luôn ạ.
+  Rồi **báo chủ shop mã đơn để kho ưu tiên đơn này** (đã hứa với khách thì phải có người làm; kênh báo là Claude suy ra
+  từ câu "note với kho", chủ shop chưa nói riêng — dùng Telegram, kiểm cờ chống báo trùng trước).
+- Đơn **đã gửi đi rồi** → dùng câu "đơn mình đã gửi đi rồi" ở mục 2.
+
 ### 3. "Có được kiểm tra hàng trước khi nhận không"
 > Dạ hiện sàn có cho mình kiểm tra hàng trước khi nhận luôn nha bạn, lỡ nhận về
 > mà không ưng ý thì bạn vẫn yêu cầu trả hàng được, nên bạn cứ yên tâm đặt nha.
@@ -313,6 +323,34 @@ khiếu nại về sản phẩm/shop**, nên không dùng sticker như case CSKH
 (mục "Đóng hội thoại đã xong" ở SKILL.md). Trả lời ngắn gọn, kết bằng "Dạ
 vâng ạ", không dài dòng:
 > "Dạ vâng ạ."
+
+### 15. Khách xin HUỶ ĐƠN (chốt 23/11/2026)
+Case thật: `dai_zuong`, `saochu24032009` (TikTok, 23/11) xin huỷ đơn, task bỏ qua vì chưa có quy tắc.
+**Phải mở đơn xem mục trạng thái đơn hàng trước khi trả lời, không đoán:**
+- Đơn **đang giao** (đã bàn giao vận chuyển) → năn nỉ khách nhận hàng giúp, vì shop đã mất công đóng và gửi đi rồi:
+  > Dạ đơn của bạn đang trên đường giao rồi ạ, bạn nhận hàng giúp shop với nhé, vì shop đã mất công đóng gói và gửi
+  > đi rồi ạ. Mong bạn thông cảm giúp shop ạ.
+- Đơn **đang chờ lấy hàng / chờ vận chuyển** → báo khách tự thao tác huỷ trên sàn, sàn duyệt huỷ:
+  > Dạ bạn thao tác huỷ đơn trên sàn giúp shop nhé, sàn sẽ duyệt huỷ cho bạn ạ.
+(Ý của chủ shop, câu chữ Claude soạn — chủ shop sửa nếu cần. Khách vẫn nhất quyết không nhận đơn đang giao: chưa
+chốt, không ép thêm, ghi cskh-log để chủ shop xem.)
+
+### 16. KOC xin mã giảm / hỗ trợ giá cho khách của họ (chốt 23/11/2026)
+Case thật: `ngayte10l` (TikTok, 23/11) nhắn "shop ơi hỗ trợ em về giá được khum ạ" — task tưởng là khách thường xin
+giảm giá, thật ra là **KOC**. Gặp tin xin giá/mã mà chưa rõ người nhắn là ai → **đọc lại toàn bộ tin nhắn trước đó**
+để xác nhận có phải KOC không (đã xin mẫu, nói về kênh/video/live...).
+- Là KOC, cần mã để khách của họ mua → trả lời:
+  > Dạ để mình báo anh quản lý ạ.
+  rồi báo chủ shop (Telegram, kiểm cờ chống báo trùng). KHÔNG tự hứa mã, không tự gửi voucher.
+- Khách thường xin giảm giá: **chưa chốt** → ghi cskh-log (category gia_khuyen_mai) như cũ.
+
+### 17. Đơn CHƯA đi, khách xin đổi ngang sang MẪU KHÁC (chốt 23/11/2026 — mới chốt phần từ chối)
+Case thật: `anhtao2908` (Shopee, 22/11) đặt Thỏ Nơ, muốn đổi ngang sang Shin vì đơn chưa đi; không muốn huỷ vì đơn
+đang có mã giảm giá, đặt lại thì hết mã.
+- **Chủ shop chốt: KHÔNG đổi ngang mẫu trên đơn đã đặt** — rất dễ nhầm khi đóng hàng, và giá 2 mẫu không bằng nhau.
+- Cách trả lời đầy đủ (câu từ chối + đưa lựa chọn nào cho khách, có bù mã không) **đang chờ chủ shop duyệt đề xuất
+  của Claude** → cho tới khi chốt: KHÔNG tự trả lời, KHÔNG nhận ghi chú đổi mẫu, ghi cskh-log để chủ shop xử lý.
+- Khác mục 12 (đổi SIZE cùng mẫu trước khi đóng gói — đã có câu khuyên đặt lại đơn mới).
 
 ## CHƯA train (để trống chờ chủ shop)
 

@@ -190,6 +190,8 @@ Cấu trúc bắt buộc: **1 size + dài quần + mốc**, rồi hỏi/chốt m
 | Caro – Cotton thường | thêm: "Mẫu {tên} là cotton thường ít co giãn, shop khuyên bạn lên 1 size cho thoải mái ạ." (xem mục 8) |
 | Kẹp size nhỏ nhất **và có mẫu khác có size đó** (chốt 23/10/2026) | "Dạ mẫu {model} nhỏ nhất chỉ có size {size} thôi ạ, dài quần {length}cm, với chiều cao của bạn quần sẽ dài tầm {actual_landmark} á. Bạn có thể đo thử từ eo xuống {length}cm xem tới đâu nha. Nếu bạn muốn quần ngắn tới {wanted_landmark} thì chọn sang mẫu {alt_model}, mẫu này có size {alt_size} ({alt_length}cm) ạ." — vd Hello Kitty (M–XL) vs Shin (có S). Không có mẫu thay thế thì dùng mẫu "Kẹp size nhỏ nhất" ở trên. |
 | Không có card sản phẩm, khách không nói rõ mẫu (chốt 23/10/2026) | Tư vấn theo **quần lông** (Bảng A), gửi câu size theo đúng tình huống rồi nối thêm: "Mình đang tư vấn theo quần lông ạ, nếu bạn cần tư vấn mẫu quần khác thì báo mình nha." — KHÔNG hỏi lại "có phải quần lông không" (quy tắc 22/10 đã bỏ). |
+| Khách "muốn mặc vừa" (chốt 23/11/2026) | Vừa = đúng size đã tư vấn: "Dạ bạn muốn mặc vừa thì lấy size {size} như mình tư vấn là chuẩn ạ." |
+| Khách muốn ống rộng hơn (chốt 23/11/2026) | Lên 1 size so với size đã tư vấn, báo kèm dài cũng tăng: "Dạ bạn muốn ống rộng hơn thì lên 1 size, lấy size {size_up} ạ. Lên 1 size thì quần cũng dài hơn, dài {length_up}cm ạ." |
 | Thiếu chiều cao | "Dạ bạn cho mình xin **chiều cao và cân nặng** để mình tư vấn size chuẩn nhé ạ. Thường các bạn 1m55–1m60 mặc M, 1m62–1m74 mặc L ạ." |
 | Thiếu cân nặng | Tư vấn theo chiều cao ngay + xin thêm cân nặng trong cùng tin: "Dạ 1m70 bạn mặc **size L** (97cm, chạm gót) nhé ạ. Bạn cho mình xin thêm cân nặng để mình chắc chắn hơn ạ." |
 
