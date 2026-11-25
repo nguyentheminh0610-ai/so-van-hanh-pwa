@@ -157,6 +157,23 @@ Sapo/sàn trước**, xem bước 2 dưới.
   rút** — tất cả đều là cạp chun co giãn nhiều (khớp câu trả lời "sợ
   rộng/chật eo" ở trên). Trả lời theo đúng dòng khách hỏi, đừng mặc định.
 
+## Chốt 25/11/2026 — khách hỏi NHIỀU Ý trong 1 tin thì trả lời ĐỦ TỪNG Ý; màu mẫu Hello Kitty
+
+**Sự cố thật 24/11/2026:** khách hỏi "shop ơi mình có hello kity đen hoặc trắng sz s ko ạ" (2 ý: **màu** + **size**). Shop chỉ
+trả lời size ("chỉ có size M đến XL, không có size S, mẫu Shin có S"), bỏ hẳn câu hỏi màu. Chủ shop: "khách hỏi có màu đen
+hoặc trắng mà em trả lời size?".
+
+- Trước khi gửi, đếm số ý khách hỏi trong tin (màu, size, còn hàng, giá, chất liệu...) và kiểm câu trả lời có đủ từng ý.
+  Trả lời ý chính khách hỏi TRƯỚC (ở đây là màu), rồi mới tới ý phụ.
+- Ý nào **không có dữ liệu trong skill** → KHÔNG trả lời lệch sang ý mình biết rồi coi như xong. Trả lời các ý đã có dữ liệu,
+  còn ý thiếu thì ghi `cskh-log` để chủ shop trả lời (và bổ sung dữ liệu vào skill).
+- **Màu mẫu Hello Kitty (chủ shop chốt 25/11/2026):** `Chất Lông-Hello Kitty` ("kitty thường", CL02) là **màu trắng**;
+  `Chất Lông-Hello Kitty Hồng` (CL09) là màu hồng. **Không có Hello Kitty màu đen.** Màu của các mẫu khác chưa có trong skill —
+  chưa chắc thì xem ảnh phân loại trên tin đăng, không đoán.
+- Câu đúng cho case trên (Claude soạn 25/11/2026 theo dữ liệu chủ shop chốt, anh sửa chữ nếu cần):
+  "Dạ mẫu Hello Kitty bên mình có màu trắng ạ, không có màu đen. Mẫu này chỉ có size M đến XL thôi, không có size S ạ. Nếu bạn
+  cần size S thì bên mình có mẫu Shin có đủ size S ạ."
+
 ## Chốt 25/11/2026 — nhớ bối cảnh giữa các lượt (đọc TRƯỚC khi trả lời khách đã có đơn)
 
 Mỗi lượt 15 phút là phiên mới, không nhớ lượt trước. Trước khi gõ tin cho khách đã có đơn: tra phiếu cũ trên Sổ Vận Hành theo
