@@ -22,6 +22,12 @@ của TikTok/Shopee**, nên kho không biết mà đóng. Vì vậy tạo xong �
 2. upload PDF lên bucket `notices-pdf`,
 3. insert `warehouse_notices` (`done=false`, `pdf_path` = file vừa upload, `order_code` = mã vận đơn SPX) theo mẫu ở mục tương ứng,
 4. gửi PDF cho chủ shop.
+5. **Đơn của KHÁCH (không phải KOC) → nhắn khách giống bước cuối gửi bù** (chủ shop chốt 25/11/2026, đơn #35876 thichancomnhat):
+   ảnh phiếu giao (phần Người gửi / Người nhận / mã vận đơn / sản phẩm) + tin mẫu dòng 33 Sheet "Mau tin nhan" kèm
+   `https://spx.vn/track?<mã vận đơn>`, rồi 1 tin về tiền: có thu COD thì nêu số tiền + đơn giá + "phí ship shop đã trả rồi ạ";
+   không thu tiền thì dùng tin "Đơn gửi bù này shop đã thanh toán phí ship rồi ạ..." như gửi bù. Ảnh phiếu Sapo: hiện
+   `iframe[srcdoc]` của phiếu thành lớp phủ toàn trang rồi chụp màn hình (`computer screenshot` → `upload_image`).
+   Ghi 1 dòng `cskh-log` để lượt CSKH tự động không trả lời lại.
 Chưa có dòng Sổ Kho = đơn chưa xong, kể cả khi đơn đã tạo thành công trên Sapo/SPX.
 
 **Lấy PDF phiếu Sapo (25/11/2026):** nút "In phiếu giao hàng" (menu "..." của kiện hàng) KHÔNG tải file mà mở hộp thoại in của
