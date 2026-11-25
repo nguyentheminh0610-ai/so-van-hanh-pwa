@@ -157,6 +157,13 @@ Sapo/sàn trước**, xem bước 2 dưới.
   rút** — tất cả đều là cạp chun co giãn nhiều (khớp câu trả lời "sợ
   rộng/chật eo" ở trên). Trả lời theo đúng dòng khách hỏi, đừng mặc định.
 
+## Chốt 25/11/2026 — nhớ bối cảnh giữa các lượt (đọc TRƯỚC khi trả lời khách đã có đơn)
+
+Mỗi lượt 15 phút là phiên mới, không nhớ lượt trước. Trước khi gõ tin cho khách đã có đơn: tra phiếu cũ trên Sổ Vận Hành theo
+tên khách, đọc lại cả đoạn chat **có chụp màn hình** (đọc chữ không thấy ảnh khách gửi), chốt loại case theo cả đoạn chat, chỉ
+gửi tin còn thiếu. Đủ 4 việc + lý do (case `_dt.54` 24/11: giao nhầm bị xử lý thành đổi size, xin ảnh 3 lần) ở
+[../../shared/cskh-nho-boi-canh.md](../../shared/cskh-nho-boi-canh.md).
+
 ## Chốt 23/11/2026 — rà log tin bỏ qua 22–23/11 (chủ shop trả lời từng câu)
 
 Nguồn: 57 khách task bỏ qua trong 2 ngày (file `C:\sokho\cskh-log\`). Phần lớn là

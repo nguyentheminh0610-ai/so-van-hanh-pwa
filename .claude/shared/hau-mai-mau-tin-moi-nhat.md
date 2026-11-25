@@ -7,6 +7,14 @@ tài liệu CSKH cục bộ, mục cũ trong cskh-faq-17-11.md) ghi câu khác �
 
 Câu nào đánh dấu *(Claude soạn, chưa duyệt từng chữ)* thì vẫn dùng, nhưng chủ shop có thể sửa sau.
 
+## ⛔ TRƯỚC KHI GÕ TIN: tra sổ + đọc lại cả chat (chốt 25/11/2026)
+
+Bắt buộc làm đủ 4 việc trong [cskh-nho-boi-canh.md](cskh-nho-boi-canh.md): (1) tra phiếu cũ của khách trên Sổ Vận Hành,
+(2) đọc lại cả đoạn chat **có chụp màn hình** để thấy ảnh khách gửi, (3) chốt loại case theo cả đoạn chat — khách nói "đặt X
+mà giao Y" là GIAO NHẦM chứ không phải đổi size, phiếu cũ là lỗi shop thì không hạ xuống đổi size, (4) chỉ gửi tin còn thiếu,
+xin ảnh tối đa 1 lần. Lý do: case `_dt.54` 24/11 — shop giao nhầm, khách đã gửi ảnh mà bị xin ảnh 3 lần rồi bị xử lý như khách
+tự đặt nhầm size, không xin lỗi, không mã 10k.
+
 ## Quy tắc chung cả 4 case
 
 - **Bằng chứng:** khách gửi **ảnh HOẶC video** là đủ, KHÔNG tự thẩm định lỗi (chủ shop duyệt phía sau). Chỉ xin khi khách chưa gửi gì.
@@ -80,6 +88,9 @@ Giống hệt case 2, chỉ khác tin 2:
 Chi tiết case 2–3: [cskh-doi-hang-loi-21-11.md](../skills/size-consultation/references/cskh-doi-hang-loi-21-11.md).
 
 ## Case 4 — ĐỔI SIZE vì rộng / chật / dài (lỗi khách, KHÔNG mã 10k, KHÔNG xin ảnh, KHÔNG xin lỗi)
+
+**Chỉ dùng case này khi khách nhận ĐÚNG món đã đặt mà mặc không vừa.** Khách nói nhận khác size/mẫu so với đơn đặt ("đặt XL
+mà giao L") → đó là Case 2 GIAO NHẦM, kể cả khi khách chỉ nói "em cần đổi sang size XL" (25/11/2026, xem cskh-nho-boi-canh.md).
 
 1. **Sẵn sàng đổi:** Dạ, mình sẵn sàng hỗ trợ đổi lại hàng miễn phí ạ. Nhưng vì đổi hàng có thể mất 2-5 ngày và cũng hơi mất công, nếu chỉ hơi ngắn hoặc hơi bé thì bạn có thể cố mặc giúp shop, còn nếu rộng thì bạn có thể mang ra hàng sửa lại một chút xíu thì sẽ phù hợp hơn đó ạ.
 2. **Hướng dẫn đổi hàng** theo sàn (ở trên) — gửi NGAY, không chờ khách trả lời tin 1, không hỏi size muốn đổi, không kiểm tồn.
