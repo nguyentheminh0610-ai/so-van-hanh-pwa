@@ -14,6 +14,23 @@ Chủ shop nói "gửi cho KOC này mẫu X" mà không nói sàn nào → mặc
 trên SPX") từ 25/11/2026 **không dùng nữa** cho KOC (giữ lại để đọc các đơn cũ); chỉ làm theo mục 2 khi chủ shop nói rõ "tạo
 trên SPX".
 
+### MỌI đơn gửi NGOÀI SÀN phải đẩy vào Sổ Kho để kho đóng (chủ shop chốt 25/11/2026)
+
+Đơn tạo trên Sapo (mẫu KOC, đơn khách chốt ngoài sàn có thu COD...) hoặc SPX trực tiếp (gửi bù) **không hiện trên màn hình đơn
+của TikTok/Shopee**, nên kho không biết mà đóng. Vì vậy tạo xong đơn nào ngoài sàn là **cùng lượt** phải:
+1. lấy phiếu giao hàng PDF, đọc lại xác nhận mã vận đơn + người nhận đúng đơn (mục 5),
+2. upload PDF lên bucket `notices-pdf`,
+3. insert `warehouse_notices` (`done=false`, `pdf_path` = file vừa upload, `order_code` = mã vận đơn SPX) theo mẫu ở mục tương ứng,
+4. gửi PDF cho chủ shop.
+Chưa có dòng Sổ Kho = đơn chưa xong, kể cả khi đơn đã tạo thành công trên Sapo/SPX.
+
+**Lấy PDF phiếu Sapo (25/11/2026):** nút "In phiếu giao hàng" (menu "..." của kiện hàng) KHÔNG tải file mà mở hộp thoại in của
+Chrome — hộp thoại này **treo cả tab**, mọi thao tác Claude in Chrome báo "Script injection timed out" (gặp thật đơn #35874).
+Thoát: `navigate` lại URL đơn. Cách lấy PDF chạy được: trước khi bấm, dùng `javascript_tool` chặn `print` của iframe in
+(phiếu là HTML nằm trong `iframe[srcdoc]`), bấm "In phiếu giao hàng", rồi tải `outerHTML` của iframe đó thành file `.html`,
+chuyển sang PDF bằng Chrome chạy ẩn trên PC:
+`chrome.exe --headless=new --no-pdf-header-footer --user-data-dir=<thư mục tạm> --print-to-pdf=<file>.pdf file:///<file>.html`.
+
 ## Nguyên tắc chung
 
 - **Có dấu tiếng Việt**. Gửi JSON từ file UTF-8 (`--data-binary @file.json`),
@@ -103,7 +120,7 @@ Gửi KOC - <tên KOC> - <SL> Quần <tên phân loại> <size> + <SL> Quần ..
 ```
 Vd: `Gửi KOC - Hoàng Trung Thảo - 1 Quần Chất Lông-Shin L + 1 Quần Chất Lông-Shin 02 L - đơn Sapo #28463`
 
-PDF: **lấy ngay trong Sapo** — trang chi tiết đơn → "Phiếu giao hàng" → "In
+PDF: **lấy ngay trong Sapo** (cách lấy file khi nút in chỉ mở hộp thoại in: xem mục "MỌI đơn gửi NGOÀI SÀN" đầu file) — trang chi tiết đơn → "Phiếu giao hàng" → "In
 phiếu giao hàng" (phiếu có logo SPX Express + mã vận đơn, người nhận là KOC,
 mã đơn hàng #<mã Sapo>). Tên file `<mã_SPX>_koc_<tên_KOC_không_dấu>.pdf`.
 
