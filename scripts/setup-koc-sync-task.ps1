@@ -45,8 +45,10 @@ Write-Host "Python  : $exe"
 Write-Host "Ten task: $TaskName"
 Write-Host ""
 
+# 26/11/2026: task 2 ngay/lan cung dung pythonw (python.exe bat cua so den, day game
+# fullscreen cua chu shop ra desktop).
 $action = New-ScheduledTaskAction `
-    -Execute $exe `
+    -Execute $exeW `
     -Argument "`"$PyFile`"" `
     -WorkingDirectory $RepoDir
 

@@ -34,8 +34,8 @@ Write-Host "Runner  : $RunFile"
 Write-Host "Ten task: $TaskName`n"
 
 $action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RunFile`"" `
+    -Execute "wscript.exe" `
+    -Argument "//B //Nologo `"$(Join-Path $PSScriptRoot 'run-hidden.vbs')`" `"$RunFile`"" `
     -WorkingDirectory $RepoDir
 
 # Moi 2 ngay, 07:30 sang (sau khi may da thuc/online).

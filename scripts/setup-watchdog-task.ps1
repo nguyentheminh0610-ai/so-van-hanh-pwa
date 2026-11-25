@@ -4,6 +4,10 @@
 $ErrorActionPreference = "Stop"
 $RepoDir = Split-Path -Parent $PSScriptRoot
 $py = (Get-Command python).Source
+# 26/11/2026: dung pythonw.exe (khong co cua so console). python.exe bat 1 cua so den
+# moi 30 phut -> game fullscreen cua chu shop bi day ra desktop.
+$pyw = Join-Path (Split-Path -Parent $py) "pythonw.exe"
+if (Test-Path $pyw) { $py = $pyw }
 $name = "Claude - Watchdog"
 $a1 = New-ScheduledTaskAction -Execute $py -Argument "scripts\watchdog.py" -WorkingDirectory $RepoDir
 $t1 = New-ScheduledTaskTrigger -Once -At (Get-Date).Date -RepetitionInterval (New-TimeSpan -Minutes 30)

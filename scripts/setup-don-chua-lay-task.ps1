@@ -26,8 +26,8 @@ $cred = Join-Path $HOME ".config\sapo\credentials.json"
 if (-not (Test-Path $cred)) { Write-Host "[CANH BAO] Chua thay $cred - task se loi khi chay." }
 
 $action = New-ScheduledTaskAction `
-    -Execute "powershell.exe" `
-    -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -File `"$RunFile`"" `
+    -Execute "wscript.exe" `
+    -Argument "//B //Nologo `"$(Join-Path $PSScriptRoot 'run-hidden.vbs')`" `"$RunFile`"" `
     -WorkingDirectory $RepoDir
 
 $trigger = New-ScheduledTaskTrigger -Daily -At 8:00PM
