@@ -862,7 +862,7 @@
           <b>Lương cứng:</b> quỹ cả kho mỗi tháng là 4.000.000đ mùa cao điểm (tháng 9 đến hết tháng 2) và 1.500.000đ mùa thấp điểm (tháng 3 đến 8). Tháng 28 hay 31 ngày vẫn đủ quỹ. Mỗi ngày lấy quỹ ÷ số ngày của tháng rồi chia đều cho các bạn đang trong kỳ hôm đó (cao điểm: 1 bạn 4tr, 2 bạn 2tr mỗi bạn, 3 bạn 1,33tr mỗi bạn; thấp điểm: 1 bạn 1,5tr, 2 bạn 750k mỗi bạn). Trả cố định, không trừ theo ngày công; bạn làm hộ nhau thì tự bù trừ ngoài sổ.<br>
           <b>Tiền đơn:</b> 300đ mỗi đơn riêng, 150đ mỗi đơn chung. <b>Hoàn:</b> 2.000đ mỗi kiện hoàn đã quét, kể cả hủy chưa đi.<br>
           <b>Thưởng chất lượng:</b> tính riêng từng bạn theo tỷ lệ lỗi Kho vận: dưới 0,5% được 500.000đ, từ 0,5% đến 1% được 250.000đ, trên 1% không có (đơn chung: mỗi người 0,5 đơn và 0,5 lỗi). Ngày vào làm: vào ngày 1 nhận đủ; vào từ ngày 2 đến ngày 15 thì chia 2; vào từ ngày 16 trở đi thì không có. Bạn nghỉ giữa tháng cũng chia 2.<br>
-          <b>Thưởng đơn trước 16h:</b> quỹ 500.000đ chung cả kho, chia đều như lương cứng. Tỷ lệ trễ tính chung cả kho, cộng cả tháng (tổng đơn trễ ÷ tổng đơn đến hạn): dưới 10% thì mọi bạn nhận phần của mình, từ 10% thì không ai nhận. Ngày đặc biệt bỏ khỏi tử và mẫu.<br>
+          <b>Thưởng đơn trước 16h:</b> quỹ 500.000đ chung cả kho, chia đều theo tháng cho các bạn có lương tháng đó (không chia theo ngày). Tính tiền từ tháng 12/2026, tháng 11 chỉ xem số thử. Tỷ lệ trễ tính chung cả kho, cộng cả tháng (tổng đơn trễ ÷ tổng đơn đến hạn): dưới 10% thì mọi bạn nhận phần của mình, từ 10% thì không ai nhận. Ngày đặc biệt bỏ khỏi tử và mẫu.<br>
           <b>Thưởng gắn bó:</b> anh Minh cộng tay như cũ, chưa gồm trong tổng.</p></details>
       <details class="card" id="paynew-special" hidden style="margin-top:12px;"><summary style="cursor:pointer;font-weight:600;">Ngày đặc biệt (chỉ quản lý)</summary>
         <p class="sub" style="margin:10px 0;">Ngày lễ, shipper nghỉ, sàn lỗi: bỏ khỏi tử và mẫu của thưởng 16h; vẫn tính ngày công và vẫn chia quỹ. Chỉ sửa được trong tháng hiện tại (tháng trước chỉ sửa được tới ngày 5).</p>
@@ -3147,6 +3147,7 @@
   var PN_FUND_HARD_LOW = 1500000;  // mùa thấp điểm (tháng 3 đến 8): giữ như cũ, 1.500.000đ cả kho (chốt 17/11/2026)
   function payNewFund(high){ return high ? PN_FUND_HARD : PN_FUND_HARD_LOW; }
   var PN_FUND_16H = 500000;        // quỹ thưởng đơn trước 16h / tháng, chia đều như quỹ cứng
+  var PN_16H_START = "2026-12";    // thưởng 16h bắt đầu TÍNH TIỀN từ tháng này; tháng trước đó chỉ xem số thử (anh Minh chốt 25/11/2026)
   var PN_QUALITY_BONUS = 500000;   // thưởng lỗi đơn mức cao nhất mỗi người (dưới 0,5%); 0,5–1% = một nửa; trên 1% = 0
   var PN_LOYALTY_BONUS = 0;        // thưởng gắn bó: 0 = anh Minh vẫn cộng tay (quy chế cũ: 1.000.000đ mỗi 6 tháng liên tục)
   var PN_SCALE = 2520;             // bội chung của 1..10: chia tử/mẫu cho k bạn vẫn ra số nguyên
@@ -3180,7 +3181,6 @@
       for(d = p.startDay; d <= p.endDay; d++){
         var n = nd[d];                                         // số bạn đang trong kỳ hôm đó (>= 1 vì chính bạn này đang trong kỳ)
         p.cung += FUND / D / n;                        // lương cứng trả cố định, không nhân theo ngày công
-        p.fund16 += PN_FUND_16H / D / n;
         p.chuan += 1 / n;                                      // số ngày công "đáng lẽ" của bạn: 1 bạn = cả tháng, 2 bạn = nửa tháng...
       }
       p.chuan = Math.round(p.chuan * 10) / 10;
@@ -3195,6 +3195,7 @@
       p.quality = { amount: p.qualityBase * p.factor, note: p.quality.note };
       p.loyalty = PN_LOYALTY_BONUS;
       p.tuS = 0; p.mauS = 0;
+      p.fund16 = PN_FUND_16H / P.length;                       // quỹ 16h chia đều THEO THÁNG cho các bạn có lương tháng đó, không chia theo ngày trong kỳ (anh Minh chốt 25/11/2026)
     });
     // ---- thưởng đơn trước 16h: tính CHUNG CẢ KHO, CẢ THÁNG (chủ shop chốt 25/11/2026, thay cho cách cũ 17/11
     //      "tử/mẫu mỗi ngày chia cho các bạn có quét hôm đó"). Tỷ lệ = tổng đơn trễ / tổng đơn đến hạn của mọi ngày
@@ -3210,16 +3211,17 @@
       tuAll += cd.tu; mauAll += cd.mau;
       days16.push({ ds: ds, tu: cd.tu, mau: cd.mau });
     }
+    var apply16 = o.ym >= PN_16H_START;                        // trước tháng bắt đầu: chỉ xem số thử, không cộng tiền
     var pass16 = (mauAll === 0) || (10 * tuAll < mauAll);      // dưới 10% mới trả; đúng 10% thì không; mẫu = 0 coi như đạt
     var h16state = (Y === 0 || X === 0) ? "du" : (X === Y ? "cho" : "thieu");
     P.forEach(function(p){
       var pass = pass16;
-      p.h16 = { state: h16state, X: X, Y: Y, tu: tuAll, mau: mauAll, rate: mauAll ? tuAll / mauAll : null, pass: pass };
-      p.bonus16 = (h16state === "du" && !o.isCurrentMonth && pass) ? p.fund16 : 0;
+      p.h16 = { state: h16state, X: X, Y: Y, tu: tuAll, mau: mauAll, rate: mauAll ? tuAll / mauAll : null, pass: pass, apply: apply16 };
+      p.bonus16 = (apply16 && h16state === "du" && !o.isCurrentMonth && pass) ? p.fund16 : 0;
       p.total = Math.round(p.cung + p.tienDon + p.congHoan + p.quality.amount + p.bonus16 + p.loyalty);   // làm tròn đồng 1 lần ở cuối
     });
     return { people: P, nd: nd, X: X, Y: Y, nSpecial: nSpecial, h16state: h16state, fund: FUND, high: !!o.high,
-             days16: days16, tu16: tuAll, mau16: mauAll, pass16: pass16 };
+             days16: days16, tu16: tuAll, mau16: mauAll, pass16: pass16, apply16: apply16 };
   }
   /* PAYNEW-CORE-END */
 
@@ -3386,9 +3388,9 @@
       '<div class="kpi"><span class="lbl">Tổng lương tháng' + (S.isCurrentMonth ? " (tạm tính)" : "") + '</span><span class="val tabular">'+payMoney(sumNew)+'</span>' +
         '<span class="foot">'+list.length+' bạn · dùng cho P&amp;L</span></div>' +
       '<div class="kpi"><span class="lbl">Thưởng đơn trước 16h</span><span class="val tabular '+(h16 === "du" ? (nPass === list.length ? "good" : "warn") : "warn")+'">' +
-        (h16 === "cho" ? "chờ dữ liệu" : (h16 === "thieu" ? "thiếu "+out.X+"/"+out.Y+" ngày" : (S.isCurrentMonth ? "chốt cuối tháng" : (out.pass16 ? "cả kho đạt" : "cả kho không đạt")))) + '</span>' +
+        (!out.apply16 ? "xem thử" : h16 === "cho" ? "chờ dữ liệu" : (h16 === "thieu" ? "thiếu "+out.X+"/"+out.Y+" ngày" : (S.isCurrentMonth ? "chốt cuối tháng" : (out.pass16 ? "cả kho đạt" : "cả kho không đạt")))) + '</span>' +
         '<span class="foot">' + (S.tablesMissing ? "chưa tạo bảng 16h/ngày đặc biệt (chạy file SQL mục 3-4)" :
-          "tính chung cả kho cả tháng, trễ dưới 10% mới thưởng" + (out.nSpecial ? " · "+out.nSpecial+" ngày đặc biệt bỏ ra" : "")) + '</span></div>' +
+          (out.apply16 ? "" : "chưa áp dụng, tính tiền từ tháng 12/2026 · ") + "tính chung cả kho cả tháng, trễ dưới 10% mới thưởng" + (out.nSpecial ? " · "+out.nSpecial+" ngày đặc biệt bỏ ra" : "")) + '</span></div>' +
       (S.untraced ? '<div class="kpi"><span class="lbl">Lỗi chưa tra được người</span><span class="val tabular warn">'+S.untraced+'</span><span class="foot">không trừ thưởng của ai</span></div>' : '');
 
     $("paynew-people").innerHTML = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px;">' + list.map(function(p){
@@ -3396,7 +3398,8 @@
         return '<div class="pay-row"><span class="pay-label">'+label+(hint ? '<span class="sub" style="display:block;margin:0;">'+hint+'</span>' : '')+'</span><span class="pay-value tabular">'+value+'</span></div>';
       };
       var h = p.h16, h16Val, h16Hint;
-      if(h.state === "cho"){ h16Val = "chưa tính"; h16Hint = "chờ dữ liệu"; }
+      if(!h.apply){ h16Val = "chưa áp dụng"; h16Hint = "xem thử: trễ " + payNewPct(h.rate) + " (" + h.tu + "/" + h.mau + " đơn) · tính tiền từ tháng 12"; }
+      else if(h.state === "cho"){ h16Val = "chưa tính"; h16Hint = "chờ dữ liệu"; }
       else if(h.state === "thieu"){ h16Val = "chưa tính"; h16Hint = "thiếu "+h.X+"/"+h.Y+" ngày dữ liệu"; }
       else if(S.isCurrentMonth){ h16Val = "chốt cuối tháng"; h16Hint = "trễ tạm tính " + payNewPct(h.rate); }
       else { h16Val = payMoney(p.bonus16); h16Hint = "trễ " + payNewPct(h.rate) + (h.pass ? " — dưới 10%" : " — từ 10% trở lên"); }
@@ -3414,7 +3417,7 @@
           '<b>Lương cứng:</b> quỹ '+payMoney(out.fund)+(out.high ? ' (cao điểm)' : ' (thấp điểm)')+' ÷ '+S.D+' ngày, mỗi ngày chia đều cho các bạn đang trong kỳ. Trả cố định, không trừ theo ngày công; bạn làm hộ nhau thì tự bù trừ ngoài sổ.<br>' +
           '<b>Tiền đơn:</b> '+p.rieng+' × 300đ + '+p.chung+' × 150đ = '+payMoney(p.tienDon)+'. <b>Hoàn:</b> '+p.hoan+' kiện × 2.000đ = '+payMoney(p.congHoan)+'.<br>' +
           '<b>Chất lượng:</b> lỗi quy đổi '+(p.loi2/2)+' trên '+(p.don2/2)+' đơn quy đổi ('+p.quality.note+', mức '+payMoney(p.qualityBase)+(p.factor === 1 ? '' : ' × '+p.factor+' vì vào hoặc nghỉ giữa tháng')+').<br>' +
-          '<b>16h:</b> quỹ '+payMoney(PN_FUND_16H)+' chia đều theo ngày, phần của bạn '+payMoney(p.fund16)+'. Tỷ lệ trễ chung cả kho cả tháng: '+p.h16.tu+'/'+p.h16.mau+' đơn.</div>' +
+          '<b>16h:</b> quỹ '+payMoney(PN_FUND_16H)+' chia đều theo tháng cho '+list.length+' bạn, phần của bạn '+payMoney(p.fund16)+'. Tỷ lệ trễ chung cả kho cả tháng: '+p.h16.tu+'/'+p.h16.mau+' đơn.</div>' +
         '<button type="button" class="btn ghost small" data-pn-toggle style="margin-top:8px;">Xem cách tính chi tiết</button>' +
       '</div>';
     }).join("") + '</div>';
@@ -3506,7 +3509,8 @@
       var cls = out.pass16 ? "good" : "crit";
       $("cut-sum").innerHTML = '<span><b>' + mon + ', cả kho:</b> <span class="rate ' + cls + '">' + cutPct(out.tu16, out.mau16) + ' trễ</span> ' +
         '<span class="cnt">(' + out.tu16 + '/' + out.mau16 + ' đơn)</span></span>' +
-        '<span class="tag ' + cls + '">' + (out.pass16 ? "Đang đạt" : "Đang không đạt") + ' thưởng ' + payMoney(PN_FUND_16H) + '</span>';
+        '<span class="tag ' + (out.apply16 ? cls : "") + '">' + (out.apply16 ? (out.pass16 ? "Đang đạt" : "Đang không đạt") + ' thưởng ' + payMoney(PN_FUND_16H)
+          : "Số xem thử · tính thưởng từ tháng 12") + '</span>';
     }
     $("cut-note").textContent = Y === 0 ? "Tháng này chưa có ngày nào để tính."
       : "Dưới 10% cả tháng là cả kho đạt thưởng 16h. Trễ = hãng vận chuyển chưa lấy lúc 20:00. Đã có số liệu " + have + "/" + Y + " ngày" +

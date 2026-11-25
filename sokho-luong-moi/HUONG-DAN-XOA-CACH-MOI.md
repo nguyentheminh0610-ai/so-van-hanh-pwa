@@ -31,3 +31,4 @@ Không làm nữa, trừ khi anh Minh nhắc lại. (Màn nhập/job tự chạy
 - Lý do: anh Minh muốn một con số chung cho cả kho, các bạn dễ hiểu; tách theo người không quy được đơn chưa đóng về ai.
 - Thẻ "Đơn trước 16h" ở tab Tổng quan: bỏ thẻ từng bạn và 2 nút danh sách dài; thay bằng 1 dòng tổng tháng + lưới ô theo ngày (chỉ ghi ngày và % trễ, từ 10% tô đỏ), bấm vào ngày mới hiện đơn trễ ngày đó.
 - Đơn "Chưa xử lý" vẫn tính là trễ ở thưởng 16h (khác khối cảnh báo đơn trễ, chỉ tính đơn đã có mã vận đơn).
+- Chốt thêm 25/11/2026 (sửa 2 ý ở trên): quỹ 500.000đ chia đều THEO THÁNG cho các bạn có lương tháng đó (không chia theo ngày trong kỳ nữa); thưởng 16h bắt đầu TÍNH TIỀN từ tháng 12/2026 (PN_16H_START), tháng 11/2026 chỉ hiện số xem thử, không cộng tiền.
