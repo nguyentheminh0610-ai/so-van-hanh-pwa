@@ -209,6 +209,7 @@ Giọng: thân thiện, có "dạ/ạ/nhé", **không** liệt kê nhiều size,
 | Chiều cao dạng "1m6", "160", "1,6m", "mét sáu" | Chuẩn hoá về cm (160). Chấp nhận 140–200; ngoài khoảng hỏi lại. |
 | Cân nặng dạng "5 chục", "60 cân" | Chuẩn hoá về kg. |
 | Khách hỏi cho người khác ("mua cho mẹ") | Hỏi chiều cao/cân của người mặc, không của người mua. |
+| Khách đã được tư vấn size, hỏi "lấy lên 1 size được không, em chân dài" (chủ shop duyệt 25/11/2026) | Trả lời thẳng về size khách hỏi, không lặp lại size cũ: "Dạ bạn chân dài thì lấy size {size_up} được ạ, dài quần {length_up}cm, form sẽ rộng hơn size {size} một chút. Quần bên mình cạp chun nên không sợ rộng eo đâu ạ." (câu cạp chun chỉ khi khách nhắc eo). Mẫu `long_legs_size_up_ok`. |
 | Khách đưa size thường mặc của hãng khác | Không quy đổi; vẫn xin chiều cao (quần ống rộng, size theo dài quần). |
 
 ---

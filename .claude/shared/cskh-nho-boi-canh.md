@@ -32,10 +32,34 @@ trả lời được: case loại gì, đã gửi những tin nào, đang chờ 
 
 ### Việc 2 — ĐỌC LẠI CẢ ĐOẠN CHAT, có CHỤP MÀN HÌNH để thấy ảnh
 
-- Cuộn lên tới **tin đầu tiên khách nói về đơn/vấn đề này** (không chỉ màn hình cuối), đọc chữ bằng `get_page_text`.
+- Cuộn lên tới **tin đầu tiên khách nói về đơn/vấn đề này** (không chỉ màn hình cuối; mốc dừng ở mục "Đọc lại TỚI ĐÂU" bên dưới), đọc chữ bằng `get_page_text`.
 - `get_page_text` **KHÔNG hiện ảnh / video / thẻ đơn hàng**. Vì vậy bắt buộc **chụp màn hình** đoạn chat đó (cuộn + chụp tới
   khi phủ hết từ tin báo lỗi đầu tiên đến tin cuối). Thấy bong bóng ảnh/video của khách → `has_photo=true`, coi như đã có bằng chứng.
 - Đếm luôn: shop đã gửi những tin mẫu nào rồi (xin ảnh mấy lần, đã xin lỗi chưa, đã hướng dẫn đổi chưa, đã có thẻ voucher chưa).
+
+#### Đọc lại TỚI ĐÂU — theo VỤ VIỆC, không phải cả lịch sử (chủ shop hỏi lại 25/11/2026)
+
+"Đọc lại cả đoạn chat" = đọc hết **vụ việc đang mở**, KHÔNG phải mọi tin từ trước tới giờ. Khách nhắn shop từ năm ngoái thì
+không đọc lại năm ngoái. Dừng cuộn ở mốc nào tới TRƯỚC:
+1. **Ngày đặt của đơn đang được nói tới** (xem tab Đơn hàng bên phải khung chat) — tin trước ngày đó không liên quan đơn này.
+2. **Chỗ vụ trước đã đóng**: sticker / "Dạ vâng ạ" đóng hội thoại, hoặc phiếu cũ trên sổ có dòng cuối `[xong]`.
+3. **Trần cứng 30 ngày.** Hậu mãi chỉ hỗ trợ 15 ngày từ ngày "Đã giao", nên tin cũ hơn 30 ngày không bao giờ cần đọc.
+
+Tư vấn size trước khi mua: chỉ đọc từ lúc khách bắt đầu hỏi lần này (thường trong ngày), không cần lùi xa hơn.
+
+#### Khách có NHIỀU ĐƠN — mỗi đơn là một vụ riêng (chủ shop hỏi lại 25/11/2026)
+
+Vd: đơn tháng trước lỗi sản phẩm (đã xử lý xong), tháng này đơn mới bị kho giao nhầm → **2 vụ độc lập, 2 phiếu, 2 loại case**.
+- Tra sổ ra nhiều phiếu thì **ghép phiếu theo mã đơn** (`order_code` / `orig_order_code`), không ghép theo tên khách đơn thuần.
+- Xác định khách đang nói về ĐƠN NÀO trước: thẻ đơn hàng khách gửi trong chat → mẫu/size khách nhắc → đơn vừa "Đã giao" gần
+  nhất trong tab Đơn hàng. Vẫn không rõ giữa 2 đơn → hỏi 1 câu, không đoán: "Dạ bạn đang nói về đơn nào ạ, bạn gửi giúp shop
+  ảnh đơn hàng đó nhé ạ." *(Claude soạn 25/11/2026, chủ shop sửa nếu cần)*
+- Phiếu của **đơn khác** chỉ để biết lịch sử, **không quyết định loại case của đơn này**: đơn cũ là hàng lỗi không làm đơn mới
+  thành hàng lỗi, và ngược lại. Quy tắc "không hạ lỗi shop xuống đổi size" ở Việc 3 chỉ áp dụng **trong cùng 1 đơn**.
+- Đơn mới chưa có phiếu → mở phiếu MỚI cho mã đơn đó, chạy luồng của nó từ tin đầu (lời xin lỗi theo đúng loại lỗi của đơn này:
+  hàng lỗi = "chưa kiểm tra kĩ", giao nhầm/thiếu = "bạn ở kho mới vào làm"). Lỗi shop lần 2 vẫn gửi mã 10k (chốt 22/11/2026).
+- **Phiếu nào cũng phải có `order_code`.** Phiếu cũ để trống mã đơn (như phiếu giao nhầm của `_dt.54`) → bổ sung mã ngay khi gặp
+  lại; phiếu trống mã trong 15 ngày gần đây thì coi là cùng vụ, trừ khi rõ ràng khách đang nói về đơn khác.
 
 ### Việc 3 — CHỐT LOẠI CASE theo cả đoạn chat + phiếu, không theo tin cuối
 
