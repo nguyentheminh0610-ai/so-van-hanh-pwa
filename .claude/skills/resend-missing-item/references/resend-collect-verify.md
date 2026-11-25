@@ -319,6 +319,16 @@ hoặc đơn có nhiều món cùng loại; low = đoán), `item_evidence` (1-2 
    với `name`, `phone` (dạng liền, vd `0900000000`), `address`, `item_name`
    (tên sản phẩm SPX theo `.claude/shared/notice_naming.md`), `item_summary`,
    `qty`, **`price`** (giá bán 1 món thiếu trên đơn gốc, số nguyên đồng, vd 150284 — SPX bắt khai "giá sản phẩm"), `orig_order_code`, `orig_tracking`.
+   **BẮT BUỘC có thêm mảng `items` — mỗi món khác phân loại hoặc khác size là 1 phần tử (sửa lỗi 25/11/2026, lý do ở `notice_naming.md` mục 1):**
+   ```json
+   "items": [
+     {"name": "Gửi bù - 587275116939019871 - Quần Chất Lông-Shin L",    "qty": 1, "price": 156800},
+     {"name": "Gửi bù - 587275116939019871 - Quần Chất Lông-Shin 02 L", "qty": 1, "price": 156800}
+   ]
+   ```
+   Đơn thiếu 1 món vẫn ghi `items` với 1 phần tử. `name` của 1 phần tử **không bao giờ chứa ` + `**; `qty` là số lượng của riêng món đó,
+   `price` là giá 1 chiếc của món đó. `item_name` / `qty` cũ chỉ còn để đọc file cũ: `item_name` = tên phần tử đầu, `qty` = tổng số chiếc.
+   Trong tin xác minh, mỗi món ghi 1 dòng `- Sản phẩm gửi bù: ...` riêng.
 2. Gửi tin xác minh (mẫu duy nhất ở `SKILL.md` Step 2b; gửi thành 1 tin, xuống dòng bằng Shift+Enter, không Enter từng dòng) — các trường lấy từ **chính file này**.
 3. PATCH: `status=wait_approve_1`, `run_date` = hôm nay, `customer_confirmed_at` = null, `msg_verify_at`, `item_*`, `recipient_masked`,
    `orig_tracking`, `data_hash` = SHA-256 của file

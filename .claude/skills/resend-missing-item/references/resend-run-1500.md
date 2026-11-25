@@ -37,6 +37,12 @@ tính SHA-256, so với `data_hash`. Không khớp / thiếu file → `status=st
 `stall_reason='dữ liệu chốt không khớp'`, Telegram, sang case khác. **Tạo đơn chỉ
 chép từ file này**, không đọc lại ảnh hay suy luận lại.
 
+**Nhiều món → nhiều dòng sản phẩm, KHÔNG gộp (sửa lỗi 25/11/2026; lý do + ví dụ ở `.claude/shared/notice_naming.md` mục 1):**
+đọc mảng `items` trong file chốt; ở mục 4 form SPX bấm "Thêm sản phẩm mới" **một lần cho mỗi phần tử**, gõ đúng `name`, số lượng = `qty`,
+giá = `price` của phần tử đó. File cũ chưa có `items`: nếu `item_name` chứa ` + ` hoặc `item_summary` có nhiều món (ngăn bằng `;` / `+`) thì
+TỰ TÁCH thành từng món theo `item_summary` trước khi điền (mỗi món 1 dòng, tên `Gửi bù - <mã đơn gốc> - Quần <phân loại> <size>`), không điền
+nguyên chuỗi gộp. Không tách được chắc chắn, hoặc form không cho thêm dòng thứ 2 → đặt lại `status=approved`, ghi `▸ [chờ anh]`, không tạo đơn.
+
 **Giá sản phẩm (ô "giá sản phẩm" ở mục 4 của form SPX) — KHÔNG dừng vì thiếu giá (chốt 21/11/2026, phiếu #9):** lấy `price` trong file chốt; file
 cũ chưa có `price` thì lấy GIÁ BÁN của món thiếu trên đơn gốc (khung đơn hàng chat / trang chi tiết đơn, vd Chất Lông-Đốm Hồng L = 150284) × số lượng.
 Chỉ dừng + báo `[chờ anh]` khi không đọc ra được giá từ đơn gốc. Ghi dòng `▸` "khai giá <số> theo giá món trên đơn gốc" để anh thấy ở duyệt 2.
@@ -68,7 +74,9 @@ kiểm file mở được và kích thước hợp lý; **upload ngay lên bucke
 `✓ ...` hoặc `✗ ...` (mục lỗi bắt đầu bằng ✗ để tab hiện đỏ):
 - mã vận đơn có trên trang;
 - tên người nhận; SĐT (so 9 số cuối); các thành phần địa chỉ (số nhà, phường/xã, tỉnh);
-- tên sản phẩm = `item_name` trong file; số lượng;
+- sản phẩm (sửa 25/11/2026): **số dòng sản phẩm trên trang = số phần tử `items`**; từng dòng đúng `name` và đúng `qty` của phần tử đó
+  (ghi 1 dòng ✓/✗ cho mỗi món). Tên nào chứa ` + `, hoặc 1 dòng có SL bằng tổng nhiều món khác nhau → **✗** (không được ghi ✓ chỉ vì
+  "khớp item_name" — đây là lý do đơn 23/11 lọt qua đối chiếu);
 - COD = 0; người gửi thanh toán phí;
 - khung giờ lấy hàng không nằm trong quá khứ.
 PATCH `check_result` (các dòng nối bằng `\n`), `check_ok` (true nếu không có ✗).

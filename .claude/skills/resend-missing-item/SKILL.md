@@ -244,6 +244,8 @@ Dạ shop xin lỗi bạn rất nhiều vì đơn hàng của bạn bị thiếu
 - Sản phẩm gửi bù: <tên phân loại> - size <size> - số lượng <n>
 Bạn kiểm tra giúp shop thông tin trên đã chính xác chưa ạ. Bạn xác nhận giúp shop để shop tạo đơn gửi bù cho bạn sớm nhất nhé ạ.
 ```
+Thiếu nhiều món khác nhau → lặp dòng `- Sản phẩm gửi bù: ...` cho từng món, mỗi
+món 1 dòng với số lượng riêng (25/11/2026), không gộp vào 1 dòng.
 
 **Đây là mẫu DUY NHẤT của tin xác minh** (chốt 22/11/2026, thay cho 2 bản lệch
 nhau từng có ở đây và ở `references/resend-flow-batch-2026-11-17.md`; bản trên
@@ -298,6 +300,10 @@ bấm Enter**, nên gõ từng dòng rồi Enter là mỗi dòng thành 1 tin (s
    `Quần Lông Sometime - Chất Lông-Shin - XL`) — nhãn sẽ in tên sai. Đơn KOC
    thì ghi `Gửi KOC - <tên KOC> - Quần <tên phân loại> <size>`. Số lượng
    defaults to 1 (correct — you're sending the one missing piece).
+   **Gửi bù từ 2 món khác nhau trở lên (khác phân loại hoặc khác size): lặp lại
+   "Thêm sản phẩm mới" cho TỪNG món, mỗi món 1 dòng riêng với số lượng riêng —
+   CẤM gộp `Quần A + Quần B` vào 1 tên rồi để SL 2** (sửa lỗi 25/11/2026, đơn
+   SPXVN06351246242B in nhãn gộp; xem `.claude/shared/notice_naming.md` mục 1).
    **Khối lượng (weight) field only accepts whole numbers** — typing
    `0.3` gets mangled (the `.` and leading digit get silently dropped).
    Just leave/set it to `1` kg, SPX doesn't need gram-precision for a

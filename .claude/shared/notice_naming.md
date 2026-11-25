@@ -27,7 +27,25 @@ Gửi bù - <mã đơn gốc> - Quần <tên phân loại> <size>
 ```
 Vd: `Gửi bù - 586635843530425651 - Quần Chất Lông-Shin XL`
 
+**⚠️ Gửi bù NHIỀU MÓN KHÁC NHAU (khác phân loại hoặc khác size) — MỖI MÓN 1 DÒNG
+SẢN PHẨM RIÊNG trên SPX (sửa lỗi 25/11/2026):** bấm "Thêm sản phẩm mới" một lần
+cho từng món, mỗi dòng tự mang tên đầy đủ `Gửi bù - <mã đơn gốc> - Quần <tên
+phân loại> <size>` và **số lượng của riêng món đó**. **CẤM** nối nhiều món bằng
+` + ` vào 1 tên sản phẩm rồi cộng dồn số lượng. Vd thiếu 1 Shin L + 1 Shin 02 L:
+```
+1. Gửi bù - 587275116939019871 - Quần Chất Lông-Shin L       SL 1
+2. Gửi bù - 587275116939019871 - Quần Chất Lông-Shin 02 L    SL 1
+```
+Chỉ khi cùng phân loại + cùng size mới là 1 dòng với SL > 1.
+*Lý do:* đơn SPXVN06351246242B (23/11, khách xlg.no2) và SPXVN06312903536B bị in
+nhãn `Quần Chất Lông-Shin L + Quần Chất Lông-Shin 02 L, SL: 2` — đọc thành "2 bộ
+gồm 2 quần" (4 chiếc) cũng được, kho không biết mỗi mẫu mấy chiếc. Nguyên nhân:
+file dữ liệu chốt chỉ có 1 ô `item_name` + 1 ô `qty`, và quy ước ở đây chỉ có
+mẫu cho 1 món. Form SPX không cho thêm dòng thứ 2 → DỪNG, ghi `[chờ anh]`,
+không gộp.
+
 **Sổ Kho:** `category = "gui_don_bu"`, `order_code` = mã vận đơn SPX **mới**
+(Sổ Kho vẫn 1 dòng, nhiều món nối ` + `, mỗi món có SL riêng — phần này không đổi)
 ```
 <mã đơn gốc> - <SL> Quần <tên phân loại> <size>
 ```
