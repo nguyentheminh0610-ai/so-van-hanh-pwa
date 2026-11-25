@@ -211,6 +211,34 @@ Chủ shop: "hệ thống phải chạy tới cùng, không dừng giữa chừn
 6. **Mẫu thiếu mà đơn có 3 món (phiếu #9, 21/11/2026):** chủ shop xác nhận món thiếu `Chất Lông-Đốm Hồng L` CÓ trong đơn (món thứ 3, bị ẩn sau
    nút "Ẩn bớt/Xem thêm" ở khung đơn hàng chat TikTok). Phải bấm mở rộng danh sách mặt hàng trước khi kết luận "đơn không có món X".
 
+## 1i. Phiếu có `⚑ hoantien=1` → MỖI LƯỢT mở trang Trả hàng/Hoàn tiền của sàn kiểm trạng thái (chủ shop chốt 25/11/2026, cả Shopee + TikTok)
+
+*Lý do (sự cố thật):* phiếu #8 `obe9hvmo5o` (Shopee, đơn 261114AGT3DCNC). Khách bấm hoàn tiền 165.000đ vì thiếu 1 quần; Shopee
+**đã hoàn xong** (yêu cầu `2611200RAT0MJE6` = "Đã hoàn tiền cho Người mua") nhưng từ 21/11 tới 25/11 hơn 30 lượt quét chỉ đọc
+chat rồi ghi "khách vẫn đang yêu cầu hoàn tiền, chờ anh quyết" — không lượt nào mở trang trả hàng. Chủ shop tưởng còn phải
+quyết, suýt gửi bù thêm cho khách đã nhận lại tiền. Chat KHÔNG cho biết yêu cầu hoàn tiền đã kết thúc thế nào.
+
+Mọi lượt quét gặp phiếu mở (`collecting` / `wait_approve_*` / `approved`, chưa `creating`) có `⚑ hoantien=1`, TRƯỚC khi ghi
+dòng `▸ [chờ anh]`:
+
+1. **Mở trang trả hàng của ĐÚNG sàn, tìm theo mã đơn gốc** (`orig_order_code`):
+   - **Shopee** (Chrome Shopee): `https://banhang.shopee.vn/portal/sale/returnrefundcancel` → ô "Tìm yêu cầu" gõ mã đơn →
+     "Tìm kiếm". Một đơn có thể có NHIỀU yêu cầu (khách bấm lại) — đọc hết, cột "Trạng thái" + "Phương án cho Người mua".
+     `get_page_text` trang này không ra bảng; dùng `find`/chụp màn hình.
+   - **TikTok** (Chrome TikTok): `https://seller-vn.tiktok.com/order/return` → ô tìm "ID đơn hàng trả lại, ID đơn hàng…" gõ
+     mã đơn; xem cả tab "Đã giải quyết" (`&tab=1100`). `get_page_text` đọc được cả danh sách.
+2. **Đã hoàn tiền xong** — Shopee: "Đã hoàn tiền cho Người mua"; TikTok: "Yêu cầu hoàn tiền đã hoàn tất" → **KHÔNG gửi bù**.
+   PATCH `status=cancelled` (điều kiện theo trạng thái cũ), `stall_reason` = `Đã hoàn tiền <số tiền> trên <sàn> — không gửi bù`,
+   thêm `▸ [xong] …` ghi mã yêu cầu + số tiền + chữ trạng thái đọc được, và `⚑ hoantien=0`. Không nhắn khách, không Telegram.
+3. **Yêu cầu bị huỷ / đóng mà KHÔNG hoàn tiền** — Shopee: "Yêu cầu bị huỷ"; TikTok: "Đã đóng yêu cầu" (kiểm thêm chi tiết
+   yêu cầu xem tiền có thật sự được hoàn không — chữ này chưa đối chiếu trên case gửi bù thật nào, 25/11/2026) và không còn
+   yêu cầu nào khác đang mở → ghi `⚑ hoantien=0` + `▸` nói rõ, rồi **chạy tiếp luồng gửi bù bình thường** (mục 1c/1h).
+4. **Còn đang chờ xử lý** (chờ shop / chờ sàn quyết) → giữ `[chờ anh]`, nhưng dòng `▸` phải ghi **chữ trạng thái đọc được trên
+   trang trả hàng + hạn phản hồi nếu có**, không ghi chung chung "khách vẫn đang yêu cầu hoàn tiền".
+5. Không mở được trang (lỗi tải, đăng xuất) → ghi rõ "chưa kiểm được trang trả hàng lượt này", KHÔNG suy trạng thái từ chat.
+6. Gửi bù qua SPX khi khách đã được sàn hoàn tiền = mất cả tiền lẫn hàng → trước khi tạo đơn SPX (pha A 15h) cho phiếu từng
+   có `hoantien=1` cũng kiểm lại bước 1 một lần nữa.
+
 ## 1h. LUỒNG NHANH — gửi xác minh cho khách ĐỒNG THỜI đưa chủ shop duyệt (chốt 21/11/2026, THAY mục 3 + 4 + 5 cũ)
 
 > **Lịch sử 21/11/2026:** từng bỏ hẳn bước xác minh (cdaa392) rồi chủ shop yêu cầu THÊM LẠI cùng ngày. Bản hiện hành = mục này: tin xác minh gửi NGAY khi đủ thông tin, chạy song song với duyệt lần 1.

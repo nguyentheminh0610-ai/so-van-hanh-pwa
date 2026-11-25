@@ -3,6 +3,17 @@
 Nguồn chuẩn duy nhất (chủ shop chốt 2026-10-20). Skill nào ghi
 `warehouse_notices` hoặc tạo phiếu giao SPX/Sapo đều theo file này.
 
+## ⚠️ TẠO ĐƠN Ở ĐÂU: KOC → SAPO, GỬI BÙ → SPX (chủ shop chốt 25/11/2026 — "quan trọng")
+
+| Loại đơn | Tạo ở đâu | Vì sao |
+|---|---|---|
+| **Gửi mẫu cho KOC** (chủ shop dán tên/SĐT/địa chỉ, không qua yêu cầu mẫu TikTok) | **Sapo** (`sometime-official.mysapo.net`, hãng giao SPX) — mục 3 | Hàng mẫu chưa từng bị trừ kho ở đâu cả → phải tạo trên Sapo để **trừ tồn kho thật**. |
+| **Gửi bù hàng giao thiếu** | **SPX trực tiếp** (`spx.vn`) — mục 1 | Đơn gốc của khách trên sàn **đã trừ kho thật rồi**; tạo thêm đơn Sapo là trừ kho 2 lần. |
+
+Chủ shop nói "gửi cho KOC này mẫu X" mà không nói sàn nào → mặc định **Sapo**, không hỏi lại. Mục 2 ("Gửi KOC — tạo trực tiếp
+trên SPX") từ 25/11/2026 **không dùng nữa** cho KOC (giữ lại để đọc các đơn cũ); chỉ làm theo mục 2 khi chủ shop nói rõ "tạo
+trên SPX".
+
 ## Nguyên tắc chung
 
 - **Có dấu tiếng Việt**. Gửi JSON từ file UTF-8 (`--data-binary @file.json`),
@@ -54,7 +65,7 @@ Vd: `586635843530425651 - 1 Quần Chất Lông-Shin XL`
 
 PDF: nút "In vận đơn" → "Tải" trên SPX, tên file `<mã_SPX>_guibu_<tên_khách_không_dấu>.pdf`.
 
-## 2. Gửi KOC — tạo trực tiếp trên SPX
+## 2. Gửi KOC — tạo trực tiếp trên SPX (KHÔNG dùng nữa từ 25/11/2026 — KOC tạo qua Sapo, xem bảng đầu file + mục 3)
 
 **Phiếu giao (SPX):**
 ```

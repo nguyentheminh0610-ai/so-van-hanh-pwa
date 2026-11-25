@@ -337,6 +337,12 @@ affiliate-request flow above entirely (no sheet row, no Book row, no
 TikTok chat message) and goes straight to creating a real sales order so
 the warehouse's real stock count drops. Chốt 2026-10-20.
 
+**Chủ shop chốt lại 25/11/2026 ("quan trọng"): đơn gửi mẫu KOC LUÔN tạo qua
+Sapo** — kể cả khi chủ shop chỉ nói "gửi cho KOC này mẫu X" mà không nhắc
+chữ "sapo" — vì hàng mẫu phải trừ tồn kho thật. Không tạo thẳng trên SPX
+(SPX trực tiếp chỉ dành cho **gửi bù**, vì đơn gốc trên sàn đã trừ kho rồi).
+Bảng đối chiếu: [notice_naming.md](../../shared/notice_naming.md) mục đầu.
+
 **Login**: `https://sometime-official.mysapo.net/admin/dashboard` — on
 this machine, already signed in on the Windows Chrome profile named
 **"Minh"** (not the two Chrome profiles used for TikTok/Shopee — see

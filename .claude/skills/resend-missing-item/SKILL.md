@@ -33,6 +33,13 @@ Trigger:
   pastes an order screenshot with a missing-item context, or says "gửi bù"
   for an order.
 
+> **Gửi bù LUÔN tạo trực tiếp trên SPX, không qua Sapo (chủ shop chốt 25/11/2026):** đơn gốc của khách trên sàn đã trừ kho
+> thật rồi, tạo đơn Sapo nữa là trừ kho 2 lần. Ngược lại đơn gửi mẫu KOC thì tạo qua Sapo để trừ kho thật — bảng ở
+> [notice_naming.md](../../shared/notice_naming.md) mục đầu.
+>
+> **Phiếu có khách bấm hoàn tiền (`⚑ hoantien=1`):** mỗi lượt phải mở trang Trả hàng/Hoàn tiền của sàn (Shopee + TikTok) kiểm
+> trạng thái, đã hoàn xong thì đóng phiếu, không gửi bù (chốt 25/11/2026) — [resend-collect-verify.md](references/resend-collect-verify.md) mục 1i.
+
 ## ✅ LUỒNG HIỆN HÀNH (từ 17/11/2026) — đọc trước, thay cho phần "Hard rule" và Step 0 dưới đây
 
 Chủ shop chốt: **duyệt 2 lần trên tab "Gửi bù" của Sổ Vận Hành** (bảng Supabase
