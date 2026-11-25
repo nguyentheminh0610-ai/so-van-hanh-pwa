@@ -170,6 +170,15 @@ thêm chiều cao để mình tư vấn độ dài quần cho chuẩn với ạ.
 > Dạ shop nhận được yêu cầu rồi nha, bên bộ phận duyệt sẽ xử lý giúp mình, có gì
 > khác bạn cứ nhắn shop qua đây nha.
 
+### 7b. KOC báo KHÔNG thấy nút yêu cầu mẫu / hỏi gửi địa chỉ để shop đi đơn (chủ shop duyệt 25/11/2026)
+Vd: "Mình mở giỏ rồi mà không có yêu cầu mẫu miễn phí shop ơi", "Mình gửi địa chỉ shop đi đơn được không".
+Câu mục 7 ("shop nhận được yêu cầu rồi") không hợp ở đây vì khách này báo CHƯA gửi được yêu cầu (lỗi thật 24/11/2026,
+KOC `nngoccbichh`). Gửi đúng 1 câu:
+> Dạ để mình báo anh quản lý ạ.
+
+Rồi báo chủ shop như mục 16 (1 dòng: tên KOC + khách nói gì; kiểm cờ chống trùng trước khi báo). Phần tiếp theo (chỉ chỗ
+bấm yêu cầu mẫu hay nhận địa chỉ qua chat) chủ shop chưa chốt, nên CS dừng ở câu trên và chờ anh trả lời khách.
+
 ### 8. Khách chỉ gửi card sản phẩm / "shop ơi" mà chưa hỏi gì (chốt 28/10/2026)
 > Dạ bạn cần shop tư vấn gì về mẫu này không ạ?
 
