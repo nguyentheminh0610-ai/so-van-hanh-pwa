@@ -149,7 +149,17 @@ Fields to pull:
 - **Tần suất đăng bài ước tính** (%) — under "Số liệu cộng tác" — this is
   the "Cộng tác" figure
 - **Số món bán ra** — raw unit count, NOT GMV
-- **Danh mục** (category) — shown at the top of the profile
+- **Hạng mục sản phẩm KOC đang bán** — đọc từ biểu đồ tròn **"GMV theo hạng
+  mục sản phẩm"** (có lúc trang hiện tên tiếng Anh "Revenue of categories")
+  trong khối "Doanh số": lấy **ĐỦ mọi dòng** kèm %. **KHÔNG dùng dòng "Danh
+  mục" ở đầu hồ sơ** — nó chỉ hiện 1 mục đầu rồi ", +2" (có khi hiện cả mã số
+  như `601739`), xem Step 3 cột E. `get_page_text` trả đủ tên + %; hoặc chạy
+  `javascript_tool` trên trang chi tiết:
+  ```js
+  (()=>{const t=document.body.innerText;const m=t.match(/(?:Revenue of categories|GMV theo hạng mục sản phẩm)\s*\n([\s\S]*?)\n(?:Số liệu cộng tác|Collaboration metrics)/i);if(!m)return null;const L=m[1].split('\n').map(s=>s.trim()).filter(Boolean);const n=L.filter(s=>!/%$/.test(s)),p=L.filter(s=>/%$/.test(s));return n.map((x,i)=>x+' '+(p[i]||'?'))})()
+  ```
+  Trả `null` = biểu đồ chưa tải (đợi vài giây, thử lại 1 lần) hoặc KOC chưa có
+  doanh số.
 - **Tuổi 18-24% + 25-34%** — under "Người theo dõi" → "Tuổi"
 
 ### Step 3: score (exact rubric)
@@ -157,14 +167,47 @@ Fields to pull:
 | Sheet col | Field | Rule |
 |---|---|---|
 | D | Cộng tác ≥80% | `Có` if Tần suất đăng bài ≥ 80%, else `Không`. If TikTok shows `--` (no data), treat as `Không` — can't confirm it. **`Không` does NOT raise the approval bar** (chốt 2026-11-05, thay cho quy tắc cũ "cộng tác <80% thì phải >80 điểm"): the DUYỆT threshold is `K>60` for everyone, and a low-cộng-tác KOC who passes simply gets the "cf sẽ lên bài" reminder (inbox row 3) on top. D only drives that reminder now. |
-| E | Có SP liên quan | `Có` if the category is menswear/womenswear & underwear or clearly adjacent (general fashion/outfit review). `Không` only when the category is clearly unrelated to the shop's loungewear line (beauty, electronics, automotive, generic home goods, sports/outdoor, etc) — when in doubt, lean `Có` (lenient default, established precedent). |
+| E | Có SP liên quan | **Chốt 25/11/2026 — xem mục "Cột E" ngay dưới bảng.** `Có` nếu biểu đồ "GMV theo hạng mục sản phẩm" có **bất kỳ** hạng mục thời trang nào, dù % nhỏ. `Không` chỉ khi đã đọc đủ biểu đồ và **không có** hạng mục thời trang nào. Không đọc được biểu đồ → `Có` + báo chủ shop. |
 | F | Số đơn bán | raw number from "Số món bán ra" |
 | G | GPM (nghìn VNĐ/đơn) | the ₫ figure **divided by 1000** (column is in thousands) |
 | H | KH 18-34 (%) | (18-24% + 25-34%) as a **fraction**, e.g. `82.4%` → `0.824` |
 | I | Style kênh | judgment call: `Phù hợp nhiều` / `Phù hợp vừa` / `Phù hợp ít`. No strict rule — default to `Phù hợp vừa` unless the content is obviously off-topic for loungewear (e.g. a sports/pickleball-only channel → `Phù hợp ít`). |
 
-Columns J (Ghi đè thủ công), M (Ghi chú), N (unused) stay **blank** —
-don't fill them in.
+#### Cột E "Có SP liên quan" — đọc từ biểu đồ GMV theo hạng mục (chốt 25/11/2026)
+
+**Sự cố thật (chủ shop phát hiện 25/11/2026):** `landoxinhhh` (STT 280) và
+`bgaune` (STT 313) bị chấm E = `Không` → 0 điểm → KHÔNG DUYỆT, trong khi cả 2
+đều có bán thời trang. Nguyên nhân: lượt chấm chỉ đọc dòng **"Danh mục"** ở
+đầu hồ sơ / danh sách yêu cầu mẫu, mà TikTok chỉ hiện **1 mục đầu + ", +2"**
+(`Máy tính & thiết bị văn phòng, +2`; `Điện thoại & đồ điện tử`), các mục thời
+trang nằm trong phần ẩn. Thực tế biểu đồ GMV của landoxinhhh có Trang phục nữ
+& đồ lót 20% + Hành lý & túi xách 6%; của bgaune có Phụ kiện thời trang 25% +
+Trang phục nữ & đồ lót 12%. Chủ shop chốt: **đọc luôn từ biểu đồ "GMV theo
+hạng mục sản phẩm"**, thay cho quy tắc cũ "xem category ở đầu hồ sơ".
+
+Quy tắc:
+
+1. Lấy đủ mọi dòng của biểu đồ (Step 2). **Hạng mục thời trang** gồm: Trang
+   phục nam & đồ lót, Trang phục nữ & đồ lót, Phụ kiện thời trang, Giày dép,
+   Hành lý & túi xách, Thời trang trẻ em, Thời trang Hồi giáo (và tên tiếng
+   Anh tương ứng nếu trang hiện tiếng Anh).
+2. Có **ít nhất 1** hạng mục thời trang trong biểu đồ, **bất kể % bao nhiêu**
+   và bất kể nó đứng thứ mấy → E = `Có`.
+3. E = `Không` **chỉ khi** đã đọc được biểu đồ và không dòng nào là thời trang
+   (dòng "Khác" không tính là thời trang). Khi ghi `Không`, **ghi vào cột M**
+   đúng các hạng mục đã đọc, dạng `Hạng mục GMV: Làm đẹp 70%, Đồ gia dụng 20%,
+   Khác 10%` — để chủ shop nhìn sheet là kiểm được. Chỉ chép tên hạng mục + %,
+   không thêm nhận xét (cột O dò chữ "hết hàng" / "sai giới tính" / "không phù
+   hợp" trong cột M để bật tin nhắn — đừng viết các chữ đó).
+4. **Không đọc được biểu đồ** (không tìm được hồ sơ KOC, biểu đồ trống vì chưa
+   có doanh số, trang lỗi) → **không được ghi `Không`**. Ghi `Có` (nguyên tắc
+   nới tay sẵn có: nghi ngờ thì nghiêng về `Có`), ghi cột M `Chưa đọc được
+   hạng mục GMV`, và nêu tên KOC đó trong báo cáo Telegram để chủ shop xem lại.
+5. Tuyệt đối không suy E từ dòng "Danh mục" 1 mục + ", +N", cũng không suy từ
+   cột danh mục trên trang "Yêu cầu hàng mẫu".
+
+Columns J (Ghi đè thủ công), N (unused) stay **blank** — don't fill them
+in. M (Ghi chú) cũng để trống, **trừ** 2 trường hợp ở mục Cột E ngay trên.
 
 ### Step 4: write to the sheet
 
@@ -478,6 +521,8 @@ Chiến lược phân nhóm VIP/Thường để giữ chân KOC + bảng đối 
 
 End with a short summary: how many new KOC were scored, their
 DUYỆT/KHÔNG DUYỆT split, which messages went out, and which DUYỆT rows
-got Book entries. If any step above was skipped (e.g. couldn't find a
+got Book entries. Với mỗi KOC bị chấm E = `Không`, ghi kèm tên + các hạng
+mục GMV đã đọc; KOC nào không đọc được biểu đồ hạng mục thì nêu tên riêng
+(chốt 25/11/2026). If any step above was skipped (e.g. couldn't find a
 creator's profile, GPM/age left blank), say so explicitly rather than
 reporting a clean sweep.
