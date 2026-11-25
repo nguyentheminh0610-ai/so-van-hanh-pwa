@@ -91,4 +91,31 @@ trên Seller Center (`seller-vn.tiktok.com/order/detail?order_no=<mã>`):
 
 - Chưa đối chiếu danh sách đủ 3 ngày với Seller Center (mới kiểm 3 đơn "chờ
   lấy" ngày 16/11 + đo độ trễ 111 đơn).
-- Chưa nối vào Sổ Kho.
+- ~~Chưa nối vào Sổ Kho.~~ Đã nối 25/11/2026, xem mục dưới.
+
+## Cảnh báo đơn trễ trong Sổ Kho (chốt 25/11/2026)
+
+Lý do: đơn Shopee `261121SXM569D4` đặt 20/11 mà 24/11 chưa đi; job 20:00 đã bắt được từ
+21/11 nhưng danh sách chỉ nằm trong log, kho không ai thấy.
+
+Chủ shop chốt:
+- **Quét 1 lần lúc 20:00 là đủ** (không chạy nhiều lần trong ngày).
+- **Phạm vi:** chỉ đơn ĐÃ CÓ MÃ VẬN ĐƠN mà hãng chưa lấy = TikTok "Chờ lấy hàng" /
+  Shopee "Đã xử lý". Đơn "Chưa xử lý" (chưa có mã vận đơn) KHÔNG tính.
+- **2 nhóm, đối chiếu mã vận đơn với "Tích đơn đi":**
+  - Chưa tích → "Đã in phiếu, chưa đóng": phiếu bắt buộc còn trong kho. Bạn kho tích đơn
+    đi là Sổ Kho **bỏ ngay** khỏi cảnh báo (thay cho ý ban đầu "chờ lần quét sau").
+  - Đã tích mà hãng chưa lấy → "Đã đóng, hãng chưa lấy": kiện bỏ sót trong kho. Giữ
+    thành nhóm riêng tới lần quét 20:00 sau.
+- **Hiển thị:** tên nhóm + số đơn + số ngày trễ; nhóm ≤ 3 đơn hiện thẳng mã vận đơn,
+  nhiều hơn thì thu gọn sau nút "Xem". Khối nằm trên cùng, hiện ở mọi tab.
+- **Bắt buộc xem:** đầu ca mỗi người mỗi ngày phải bấm xác nhận đã xem danh sách.
+- **Telegram:** chỉ báo chủ shop đơn trễ từ 2 ngày (1 tin mỗi tối), không báo hằng ngày.
+
+Cách tính trễ: đặt trước 16:00 → hạn trong ngày; từ 16:00 → hạn hôm sau; số ngày trễ =
+hôm nay − hạn.
+
+Code: `tools/sync_late_orders.py` (gọi từ `scripts/run-don-chua-lay.ps1`, ghi bảng
+`warehouse_late_orders`), SQL `sokho-luong-moi/04-canh-bao-don-tre.sql`, giao diện là các
+khối "CẢNH BÁO ĐƠN TRỄ" trong `sokho-luong-moi/index.html` (bảng xác nhận đầu ca:
+`warehouse_late_ack`).

@@ -48,11 +48,23 @@ if not (TG_TOKEN and TG_CHAT):
 
 
 def api(cred, path):
-    r = subprocess.run(
-        ['curl', '-sf', '-u', '%s:%s' % (cred['api_key'], cred['api_secret']),
-         '-H', 'User-Agent: ' + UA, '-H', 'Accept: application/json',
-         'https://%s%s' % (cred['store'], path)],
-        capture_output=True, timeout=120)
+    # Thử 2 lần; bắt TimeoutExpired để thông báo lỗi KHÔNG in kèm dòng lệnh (trong đó có khoá API Sapo)
+    # — 24/11/2026 Sapo treo quá 120s, tin lỗi in cả khoá ra log.
+    r = None
+    for _ in range(2):
+        try:
+            r = subprocess.run(
+                ['curl', '-sf', '-m', '90', '-u', '%s:%s' % (cred['api_key'], cred['api_secret']),
+                 '-H', 'User-Agent: ' + UA, '-H', 'Accept: application/json',
+                 'https://%s%s' % (cred['store'], path)],
+                capture_output=True, timeout=120)
+        except subprocess.TimeoutExpired:
+            r = None
+            continue
+        if r.returncode == 0:
+            break
+    if r is None:
+        raise RuntimeError('Sapo không trả lời (quá thời gian) cho %s' % path.split('?')[0])
     if r.returncode != 0:
         raise RuntimeError('curl lỗi %s cho %s' % (r.returncode, path.split('?')[0]))
     return json.loads(r.stdout.decode('utf-8'))

@@ -21,3 +21,5 @@ $Log = Join-Path $LogDir "don-chua-lay.log"
 $pyExe = $py.Source
 cmd /c "echo ===== $(Get-Date -Format 'yyyy-MM-dd HH:mm') ===== >> `"$Log`" & `"$pyExe`" tools\check_don_chua_lay.py --telegram-loi >> `"$Log`" 2>&1"
 cmd /c "echo ===== cutoff $(Get-Date -Format 'yyyy-MM-dd HH:mm') ===== >> `"$Log`" & `"$pyExe`" tools\sync_cutoff_daily.py --ghi-so >> `"$Log`" 2>&1"
+# Tu 25/11/2026: canh bao don tre cho So Kho (warehouse_late_orders) + bao Telegram chu shop don tre tu 2 ngay.
+cmd /c "echo ===== don tre $(Get-Date -Format 'yyyy-MM-dd HH:mm') ===== >> `"$Log`" & `"$pyExe`" tools\sync_late_orders.py --ghi-so --telegram >> `"$Log`" 2>&1"

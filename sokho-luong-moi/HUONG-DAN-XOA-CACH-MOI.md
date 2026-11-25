@@ -21,3 +21,7 @@ Không làm nữa, trừ khi anh Minh nhắc lại. (Màn nhập/job tự chạy
 - Thẻ "Đơn trước 16h" ở tab Tổng quan đọc bảng warehouse_cutoff_daily + warehouse_cutoff_orders (chi tiết tự xoá sau 40 ngày).
 - Job 20:00 trên PC (tools/sync_cutoff_daily.py, gọi từ scripts/run-don-chua-lay.ps1) ghi số liệu từ Sapo vào 2 bảng đó.
 - Mọi con số của lương cách mới nằm ở đầu khối PAYNEW-CORE trong index.html (PN_FUND_HARD, PN_FUND_16H, PN_QUALITY_BONUS, PN_LOYALTY_BONUS).
+
+## Thêm 25/11/2026: cảnh báo đơn trễ (KHÔNG thuộc "cách mới", giữ lại)
+- Chạy thêm `04-canh-bao-don-tre.sql` trong Supabase, rồi kéo thả `index.html` lên GitHub. Chưa chạy SQL thì khối cảnh báo tự ẩn, không lỗi gì.
+- Job 20:00 trên PC (tools/sync_late_orders.py) ghi bảng warehouse_late_orders. Chi tiết: .claude/shared/reference_sapo_api_don_chua_lay.md.
