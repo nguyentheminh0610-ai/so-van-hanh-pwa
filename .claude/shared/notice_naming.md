@@ -28,6 +28,15 @@ của TikTok/Shopee**, nên kho không biết mà đóng. Vì vậy tạo xong �
    không thu tiền thì dùng tin "Đơn gửi bù này shop đã thanh toán phí ship rồi ạ..." như gửi bù. Ảnh phiếu Sapo: hiện
    `iframe[srcdoc]` của phiếu thành lớp phủ toàn trang rồi chụp màn hình (`computer screenshot` → `upload_image`).
    Ghi 1 dòng `cskh-log` để lượt CSKH tự động không trả lời lại.
+   **Nhắn trên ĐÚNG sàn khách đã chat** (áp dụng cả 2 sàn, chủ shop hỏi lại 25/11/2026):
+   - **TikTok** — Chrome TikTok (`40800ac7…`), inbox Seller Center, tìm theo username; ảnh gửi qua `input[type=file]` trong thanh
+     công cụ ô chat (đã chạy thật đơn #35876). Ô chat gửi ngay khi Enter.
+   - **Shopee** — Chrome vàng (`14db4f42…`, xem [reference_chrome_browsers.md](reference_chrome_browsers.md)),
+     `banhang.shopee.vn/webchat/conversations`, tìm theo tên đăng nhập Shopee của khách. Trước khi gõ: click ô nhập + chụp đáy
+     khung chat để chắc đang thấy tin mới nhất (webchat Shopee từng hiện dữ liệu cũ → gửi trùng). Ảnh gửi qua nút ảnh/
+     `input[type=file]` của ô chat. Phần Shopee **chưa chạy thật lần nào** cho đơn ngoài sàn — lần đầu làm thì ghi lại vào đây
+     chỗ nào khác TikTok.
+   - Tên người nhận trên phiếu: khách không gửi họ tên thì dùng tên đăng nhập trên sàn (TikTok username / Shopee username).
 Chưa có dòng Sổ Kho = đơn chưa xong, kể cả khi đơn đã tạo thành công trên Sapo/SPX.
 
 **Lấy PDF phiếu Sapo (25/11/2026):** nút "In phiếu giao hàng" (menu "..." của kiện hàng) KHÔNG tải file mà mở hộp thoại in của
