@@ -25,3 +25,9 @@ Không làm nữa, trừ khi anh Minh nhắc lại. (Màn nhập/job tự chạy
 ## Thêm 25/11/2026: cảnh báo đơn trễ (KHÔNG thuộc "cách mới", giữ lại)
 - Chạy thêm `04-canh-bao-don-tre.sql` trong Supabase, rồi kéo thả `index.html` lên GitHub. Chưa chạy SQL thì khối cảnh báo tự ẩn, không lỗi gì.
 - Job 20:00 trên PC (tools/sync_late_orders.py) ghi bảng warehouse_late_orders. Chi tiết: .claude/shared/reference_sapo_api_don_chua_lay.md.
+
+## Chốt 25/11/2026: thưởng đơn trước 16h tính CHUNG CẢ KHO, cả tháng (thay cho cách 17/11 "chia tử/mẫu cho các bạn có quét hôm đó")
+- Tỷ lệ = tổng đơn trễ ÷ tổng đơn đến hạn của mọi ngày thường có số liệu. Dưới 10% thì mọi bạn nhận phần quỹ 500.000đ của mình (quỹ vẫn chia theo ngày trong kỳ như lương cứng), từ 10% thì không ai nhận. Áp dụng luôn từ tháng 11/2026.
+- Lý do: anh Minh muốn một con số chung cho cả kho, các bạn dễ hiểu; tách theo người không quy được đơn chưa đóng về ai.
+- Thẻ "Đơn trước 16h" ở tab Tổng quan: bỏ thẻ từng bạn và 2 nút danh sách dài; thay bằng 1 dòng tổng tháng + lưới ô theo ngày (chỉ ghi ngày và % trễ, từ 10% tô đỏ), bấm vào ngày mới hiện đơn trễ ngày đó.
+- Đơn "Chưa xử lý" vẫn tính là trễ ở thưởng 16h (khác khối cảnh báo đơn trễ, chỉ tính đơn đã có mã vận đơn).
