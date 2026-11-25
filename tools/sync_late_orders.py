@@ -22,6 +22,8 @@ Cách chạy:
   python tools/sync_late_orders.py                       chỉ in ra màn hình
   python tools/sync_late_orders.py --ghi-so              ghi vào Supabase
   python tools/sync_late_orders.py --ghi-so --telegram   + báo chủ shop đơn trễ từ 2 ngày (1 tin/lần chạy)
+  python tools/sync_late_orders.py --ghi-so --chot-hom-qua   chạy tay TRƯỚC 16:00: chỉ xét đơn tới hạn từ
+                                                         hôm qua trở về trước (đơn hôm nay chưa tới hạn)
 """
 import datetime
 import json
@@ -60,7 +62,8 @@ def main():
     ghi = '--ghi-so' in sys.argv
     now = datetime.datetime.now(VN)
     cred = json.load(open(CRED))
-    kq, tong, _ = tim_don(cred, now)
+    hom_qua = '--chot-hom-qua' in sys.argv
+    kq, tong, _ = tim_don(cred, now - datetime.timedelta(days=1) if hom_qua else now)
     rows = {}
     for d in kq:
         mvd = (d['mvd'] or '').strip().upper()
@@ -89,7 +92,7 @@ def main():
     if not ghi:
         print('(chạy thử — thêm --ghi-so để ghi vào Sổ Kho)')
         return
-    if now.hour < GIO_CHOT:
+    if now.hour < GIO_CHOT and not hom_qua:
         print('Không ghi sổ trước %d:00 (đơn hôm nay chưa tới hạn).' % GIO_CHOT)
         return
     # ghi mới trước, xoá dòng của lần quét cũ sau -> Sổ Kho không bao giờ thấy bảng trống giữa chừng
