@@ -300,7 +300,7 @@ bấm Enter**, nên gõ từng dòng rồi Enter là mỗi dòng thành 1 tin (s
    `Quần Lông Sometime - Chất Lông-Shin - XL`) — nhãn sẽ in tên sai. Đơn KOC
    thì ghi `Gửi KOC - <tên KOC> - Quần <tên phân loại> <size>`. Số lượng
    defaults to 1 (correct — you're sending the one missing piece).
-   **Gửi bù từ 2 món khác nhau trở lên (khác phân loại hoặc khác size): lặp lại
+   **Gửi bù / gửi KOC từ 2 món khác nhau trở lên (khác phân loại hoặc khác size): lặp lại
    "Thêm sản phẩm mới" cho TỪNG món, mỗi món 1 dòng riêng với số lượng riêng —
    CẤM gộp `Quần A + Quần B` vào 1 tên rồi để SL 2** (sửa lỗi 25/11/2026, đơn
    SPXVN06351246242B in nhãn gộp; xem `.claude/shared/notice_naming.md` mục 1).

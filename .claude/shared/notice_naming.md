@@ -58,8 +58,17 @@ PDF: nút "In vận đơn" → "Tải" trên SPX, tên file `<mã_SPX>_guibu_<t�
 
 **Phiếu giao (SPX):**
 ```
-Gửi KOC - <tên KOC> - Quần <tên phân loại> <size> + Quần <tên phân loại> <size>
+Gửi KOC - <tên KOC> - Quần <tên phân loại> <size>
 ```
+**Nhiều món khác nhau (khác phân loại hoặc khác size) → MỖI MÓN 1 DÒNG SẢN PHẨM
+RIÊNG, mỗi dòng số lượng riêng** (chủ shop chốt 25/11/2026, thay cho quy tắc cũ
+20/10 "nối các món bằng ` + ` trong 1 tên"; cùng lý do với gửi bù ở mục 1 — nhãn
+gộp `Quần A + Quần B, SL: 2` không cho biết mỗi mẫu mấy chiếc). Vd:
+```
+1. Gửi KOC - Hoàng Trung Thảo - Quần Chất Lông-Shin L       SL 1
+2. Gửi KOC - Hoàng Trung Thảo - Quần Chất Lông-Shin 02 L    SL 1
+```
+Form SPX không cho thêm dòng thứ 2 → dừng, báo chủ shop, không gộp.
 
 **Sổ Kho:** `category = "thong_bao_chung"`, `order_code` = mã vận đơn SPX
 ```
