@@ -174,35 +174,30 @@ hoặc trắng mà em trả lời size?".
   "Dạ mẫu Hello Kitty bên mình có màu trắng ạ, không có màu đen. Mẫu này chỉ có size M đến XL thôi, không có size S ạ. Nếu bạn
   cần size S thì bên mình có mẫu Shin có đủ size S ạ."
 
-## Khách hỏi MÀU — cách làm chung cho MỌI mẫu (chủ shop yêu cầu 25/11/2026)
+## Khách hỏi MÀU — cách làm chung cho MỌI mẫu (chủ shop chốt 25/11/2026)
 
-Chủ shop: "tìm ra cách để hễ khách hỏi những màu shop không có thì có thể dùng chung". Vì vậy không viết quy tắc riêng từng
-mẫu nữa; mọi câu hỏi màu ("có màu đen không", "mẫu này có trắng không", "kitty đen hoặc trắng"...) đi theo 3 bước:
+**Cách của chủ shop (25/11/2026, thay cho bản Claude đề xuất cùng ngày "tra bảng màu từng mẫu, màu chưa biết thì mở tin đăng
+xem ảnh rồi ghi lại, 3 mẫu câu"):** "sao không gửi ảnh toàn bộ màu, và báo khách là toàn bộ màu bên mình có là có trong sản
+phẩm, bạn vào xem thêm giúp shop?" — đơn giản hơn, dùng chung cho mọi mẫu, không cần biết màu từng mẫu, không bao giờ trả lời
+sai màu. Áp dụng cho mọi câu hỏi màu: "có màu đen không", "mẫu này có trắng không", "kitty đen hoặc trắng", "còn màu nào"...
 
-**B1. Xác định MẪU khách hỏi + MÀU khách hỏi.** Mẫu lấy từ tên khách gõ hoặc card sản phẩm. Khách không nói mẫu nào (chỉ gửi
-card tin đăng chung rồi hỏi "có màu đen không") → hiểu là hỏi cả tin đăng đó (mọi phân loại trong card).
+**Làm đúng 2 việc, theo thứ tự:**
 
-**B2. Tra bảng màu** [../../shared/mau-sac-san-pham.json](../../shared/mau-sac-san-pham.json) (khoá = mã SKU, `mau` = màu của mẫu).
-- `mau` có giá trị → dùng luôn.
-- `mau: null` (chưa biết) → **mở tin đăng, chụp màn hình ảnh phân loại của mẫu đó** để xem màu thật, trả lời theo ảnh, rồi
-  **ghi màu vừa xem vào bảng** (`"nguon": "anh_tin_dang"`, kèm `ngay`) để lượt sau khỏi xem lại — bảng tự đầy dần.
-  Không xem được ảnh / không chắc màu → KHÔNG đoán: ghi `cskh-log` (category `khac`, context "hỏi màu <mẫu> chưa có trong bảng màu")
-  để chủ shop trả lời.
+1. **Gửi ảnh toàn bộ màu** của đúng dòng quần khách hỏi (ảnh trong `assets/`, tên `tat-ca-mau-<dòng>.jpg`: `quan-long`, `caro`,
+   `thun`...). Khách không nói rõ dòng / không có card → ảnh quần lông (giống quy tắc bảng size).
+   ⚠️ **25/11/2026: thư mục `assets/` CHƯA có ảnh màu nào** (mới có 2 ảnh bảng size) — chờ chủ shop gửi ảnh. Chưa có ảnh của
+   dòng đó thì BỎ việc 1, chỉ gửi câu ở việc 2; không tự chụp/ghép ảnh thay.
+2. **Gửi câu** (ý chủ shop, Claude viết thành câu 25/11/2026 — anh sửa chữ nếu cần):
+   > Dạ toàn bộ màu bên mình đang có đều nằm trong sản phẩm ạ, bạn vào xem thêm giúp shop nhé ạ.
 
-**B3. Trả lời bằng đúng 1 trong 3 mẫu câu** (Claude soạn 25/11/2026 theo câu Hello Kitty chủ shop đã xem; anh sửa chữ nếu cần):
+**Thêm 1 câu ngắn phía trước CHỈ KHI bảng màu đã ghi chắc** ([../../shared/mau-sac-san-pham.json](../../shared/mau-sac-san-pham.json),
+mẫu có `"nguon": "chu_shop"`): nói thẳng có/không rồi mới tới câu trên, vd "Dạ mẫu Hello Kitty bên mình có màu trắng ạ, không có
+màu đen." Mẫu `mau: null` hoặc nguồn khác → KHÔNG nói có/không, chỉ làm 2 việc trên. Không mở tin đăng soi ảnh, không đoán,
+không cần để lại cho chủ shop.
 
-| Tình huống | Câu |
-|---|---|
-| Mẫu CÓ màu khách hỏi | Dạ mẫu {mẫu} bên mình có màu {màu} ạ. |
-| Mẫu KHÔNG có màu khách hỏi, và **có mẫu khác cùng dòng quần** có màu đó | Dạ mẫu {mẫu} bên mình chỉ có màu {màu có} thôi ạ, không có màu {màu hỏi}. Nếu bạn thích màu {màu hỏi} thì bên mình có mẫu {mẫu khác} ạ. |
-| Mẫu KHÔNG có màu khách hỏi, **không mẫu nào cùng dòng** có màu đó | Dạ mẫu {mẫu} bên mình chỉ có màu {màu có} thôi ạ, không có màu {màu hỏi} ạ. |
-
-- Khách hỏi 2 màu ("đen hoặc trắng"), có 1 màu → nói rõ cả hai: "Dạ mẫu Hello Kitty bên mình có màu trắng ạ, không có màu đen."
-- "Mẫu khác cùng dòng" = cùng nhóm sản phẩm (quần lông gợi ý quần lông, caro gợi ý caro), tối đa 2 mẫu, chỉ lấy mẫu mà bảng
-  màu ghi rõ có màu đó (không gợi ý mẫu `mau: null`). Mẫu thiên nữ không gợi ý cho khách nam (cskh-ship-faq.md mục 9).
 - Câu hỏi màu **không kèm kiểm tồn kho**; khách hỏi thêm "còn hàng không / còn size nào" thì mới tra tồn theo mục hỏi tồn kho.
-- Khách hỏi màu kèm size (như case 24/11) → câu màu TRƯỚC, câu size SAU, trong cùng 1 tin.
-- Chủ shop thêm mẫu mới / đổi màu → sửa thẳng bảng màu (kèm `"nguon": "chu_shop"`), không sửa ở đây.
+- Khách hỏi màu kèm size (case 24/11) → trả lời phần màu TRƯỚC, phần size SAU.
+- Bảng màu chỉ là dữ liệu phụ: chủ shop chốt màu mẫu nào thì ghi vào đó kèm `"nguon": "chu_shop"`.
 
 ## Chốt 25/11/2026 — nhớ bối cảnh giữa các lượt (đọc TRƯỚC khi trả lời khách đã có đơn)
 
