@@ -47,7 +47,8 @@ Mốc:
 1. ≥1.000: 30 · 300–999: 22 · 100–299: 14 · 30–99: 6 · <30: 0
 2. ≥80K: 25 · 40–80K: 18 · 20–40K: 10 · <20K: 3 — **mốc đã sửa, xem dưới**
 3. ≥50%: 20 · 20–49%: 14 · 1–19%: 8 · 0%: điều kiện loại (như cột E nay)
-4. trong tầm giá shop: 15 · lệch 1 bậc: 8 · lệch xa: 3
+4. **≥150K: 15 · 100–150K: 10 · 60–100K: 5 · <60K: 0** (chủ shop cho biết
+   26/11/2026: **GMV mỗi khách của shop là 150–170K**)
 5. GPM LIVE ≥50K: 10 · có live nhưng GPM thấp: 5 · không live: 0
 
 ## ⚠️ Bài học từ lượt chạy thử: mốc nhóm 2 ban đầu SAI 50–100 lần
@@ -69,20 +70,45 @@ chốt, không đoán.**
 | minhrosivip | 146 | 132K | 108 | 14,3K | 96,92% | 215,5K | không live |
 | luckyboy2xxx | 5.320 | 139,6K | 330 | 46,1K | 7,11% | 311,6K | GPM 2,3Tr · 70 buổi |
 
-Điểm theo bảng mới (mốc đã sửa) so với điểm cũ:
+Điểm THÀNH PHẦN theo bảng mới (mốc đã sửa) — ghi `giá trị → điểm`:
+
+| KOC | Số món (30) | DT/video (25) | % thời trang (20) | GMV/khách (15) | Live (10) | Tổng |
+|---|---|---|---|---|---|---|
+| thanhquyenreview1 | 7.780 → 30 | 81,6K → 25 | 99,25% → 20 | 129,3K → 10 | 45,3K/10 buổi → 5 | **90** |
+| luckyboy2xxx | 5.320 → 30 | 46,1K → 18 | 7,11% → 8 | 311,6K → 15 | 2,3Tr/70 buổi → 10 | **81** |
+| gucuaquatdca06 | 312 → 22 | 51,7K → 18 | 92,28% → 20 | 216,6K → 15 | không live → 0 | **75** |
+| ducph282 | 976 → 22 | 19,4K → 3 | 99,80% → 20 | ~194K → 15 | 1,4Tr/75 buổi → 10 | **70** |
+| minhrosivip | 146 → 14 | 14,3K → 3 | 96,92% → 20 | 215,5K → 15 | không live → 0 | **52** |
+
+Nhận xét rút ra từ bảng thành phần:
+
+- Hai cột **Số món** + **DT/video** tạo ra gần hết khoảng cách 90→52. Đây là
+  phần phân loại thật.
+- **GMV/khách: 4/5 KOC cùng 15 điểm** → mục này phân loại yếu, vì KOC bán đồ
+  mặc thì GMV/khách tự nhiên rơi vào 130–310K, gần như luôn ≥150K. Nó chỉ phát
+  huy khi gặp KOC bán đồ rẻ (phụ kiện vài chục nghìn). Đề xuất: **giữ 15 điểm
+  nhưng coi là lưới chặn, không phải mục ăn điểm**; nếu muốn gọn hơn thì hạ
+  xuống 5 và dồn 10 sang DT/video. Chấm **một chiều** (chỉ trừ khi THẤP hơn
+  tầm shop) vì khách quen chi cao hơn giá shop là lợi thế, không phải điểm trừ.
+- **Live quyết định 2 trường hợp**: bỏ mục live thì `ducph282` còn 60 → trượt,
+  dù đó là KOC bán khoẻ nhất qua live (98,59% GMV từ LIVE).
+- `minhrosivip` trượt vì **yếu đều cả 2 cột đầu**, không phải do một chỉ số lẻ.
+
+So sánh với điểm cũ:
 
 | KOC | Cũ | Mới | Chênh |
 |---|---|---|---|
-| thanhquyenreview1 | 95 DUYỆT | 95 DUYỆT | — |
+| thanhquyenreview1 | 95 DUYỆT | 90 DUYỆT | −5 |
 | luckyboy2xxx | 95 DUYỆT | 81 DUYỆT | −14 (thời trang chỉ 7%) |
 | gucuaquatdca06 | 95 DUYỆT | 75 DUYỆT | −20 |
 | ducph282 | 95 DUYỆT | 70 DUYỆT | −25 |
 | minhrosivip | 75 DUYỆT | **52 KHÔNG DUYỆT** | −23, **lật kết quả** |
 
-## 3 câu hỏi còn chờ chủ shop quyết
+## Câu hỏi còn chờ chủ shop quyết
 
-1. **Tầm giá shop** để đặt mốc nhóm 4. Đang tạm 100–400K; cả 5 KOC đều lọt
-   nên mục này chưa phân loại được gì — cần dải hẹp hơn hoặc bỏ bớt điểm.
+1. ✅ **ĐÃ CÓ: tầm giá shop = GMV mỗi khách 150–170K** (chủ shop cho biết
+   26/11/2026) → mốc nhóm 4 đã đặt lại một chiều ở trên. Còn lại: giữ 15 điểm
+   hay hạ xuống 5 và dồn 10 sang DT/video (xem nhận xét ở mục trên).
 2. **Thể thao có tính là hạng mục liên quan không?** `luckyboy2xxx` có 92,21%
    GMV là Thể thao, thời trang chỉ 7,11%, nên tụt 12 điểm ở nhóm 3 — dù live
    rất mạnh (GPM LIVE 2,3Tr, 32,49K view/buổi). Đồ mặc nhà khá gần đồ thể thao.
