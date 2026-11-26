@@ -171,7 +171,7 @@ Fields to pull:
 | F | Số đơn bán | raw number from "Số món bán ra" |
 | G | GPM (nghìn VNĐ/đơn) | the ₫ figure **divided by 1000** (column is in thousands) |
 | H | KH 18-34 (%) | (18-24% + 25-34%) as a **fraction**, e.g. `82.4%` → `0.824` |
-| I | Style kênh | judgment call: `Phù hợp nhiều` / `Phù hợp vừa` / `Phù hợp ít`. No strict rule — default to `Phù hợp vừa` unless the content is obviously off-topic for loungewear (e.g. a sports/pickleball-only channel → `Phù hợp ít`). |
+| I | Style kênh | judgment call: `Phù hợp nhiều` / `Phù hợp vừa` / `Phù hợp ít`. No strict rule — default to `Phù hợp vừa` unless the content is obviously off-topic for loungewear (e.g. a sports/pickleball-only channel → `Phù hợp ít`). **Đang có đề xuất lượng hoá chờ chủ shop chốt (26/11/2026), chưa áp dụng:** [references/style-kenh-de-xuat.md](references/style-kenh-de-xuat.md). |
 
 #### Cột E "Có SP liên quan" — đọc từ biểu đồ GMV theo hạng mục (chốt 25/11/2026)
 
